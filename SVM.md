@@ -317,6 +317,9 @@ Each of these has already cost time once.
 
 ## 5. Order of work
 
+Open items are tracked in `ToDo.md`, ranked. This is the sequence.
+
+
 1. ~~Decide whether the demo video is in git or LFS~~ — **done**: neither,
    `setup_demo.py` copies it and `Customers/` is gitignored
 2. ~~Decide the tree shape~~ — **done**: flat, `paths.py`/`vtt.py` in `shared/`

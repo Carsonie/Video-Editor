@@ -5,8 +5,11 @@ the real Rentify UI. It holds the two editors, the build pipeline, and every
 customer's `help-videos/` working files while a video is being made.
 
 `Basic_E2E_Testing` keeps the E2E testing, the BCP work, and the customer
-folders — and receives finished videos. See `SVM.md` for the split and what is
-left to make this repo fully independent.
+folders — and receives finished videos.
+
+- **`SVM.md`** — the plan, the end state, and the traps
+- **`ToDo.md`** — open work, ranked `P1`–`P4`
+- **`PIPELINE.md`** — how a help video actually gets made. Read before building
 
 ---
 
