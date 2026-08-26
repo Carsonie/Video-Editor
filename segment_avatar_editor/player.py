@@ -1637,6 +1637,13 @@ SEQ_TEMPLATE = """<!doctype html>
     const i = curI();
     if (i < 0 || !SEQ[i]) return;
     const s = SEQ[i], n = s.n;
+    if (s.in_script === false) {{
+      alert(`${{String(n).padStart(2, '0')}}-${{s.label}} is a bookend.\\n\\n`
+          + `It is a folder with no row in script.json — the fixed opening or `
+          + `closing. A split rewrites the scene list, so it cannot take one.\\n\\n`
+          + `Move the pointer to a script scene and split that.`);
+      return;
+    }}
     const {{ local }} = at(+$('slider').value);
     const trk = tracksOf('splitTrk');
     const dropped = ['segment', 'avatar'].filter(t => !trk.includes(t))
@@ -1729,8 +1736,27 @@ SEQ_TEMPLATE = """<!doctype html>
     }} catch (e) {{ /* leave it false: refusing to save on a guess is worse */ }}
   }}
 
+  // A bookend — 00-opening, 99-closing — is a real folder with no row in
+  // script.json. Join and Split both rewrite the scene list, so neither can
+  // touch one. Caught HERE rather than at the server, because the server sees
+  // it only after the naming dialog has been filled in and confirmed: the
+  // refusal read as "not scenes in the script: [0]" at the end of the job.
+  function bookendsOn(list) {{
+    return list.filter(s => s.in_script === false)
+               .map(s => `${{String(s.n).padStart(2, '0')}}-${{s.label}}`);
+  }}
+
   async function joinTimeline() {{
     if (SEQ.length < 2) {{ status('A join needs at least two scenes on the timeline.'); return; }}
+    const bk = bookendsOn(SEQ);
+    if (bk.length) {{
+      alert(`This timeline includes ${{bk.length === 1 ? 'a bookend' : 'bookends'}}: `
+          + `${{bk.join(', ')}}.\n\n`
+          + `A bookend is a folder with no row in script.json — the fixed opening `
+          + `and closing. A join rewrites the scene list, so it cannot take one.\n\n`
+          + `Rebuild the timeline from script scenes only, then join.`);
+      return;
+    }}
     const list = SEQ.map(s => s.n);
     const taken = ALL.map(a => (a.label || '').toLowerCase());
     const segF = SEQ.reduce((a, s) => a + s.base_n, 0);
