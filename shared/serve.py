@@ -833,6 +833,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 label = folder[3:] if re.match(r"^\d\d-", folder) else folder
             manifest.append({
                 "n": n, "label": label or f"{n:02d}",
+                # A bookend (00-opening, 99-closing) is a real folder with no row
+                # in script.json. It can sit on a timeline — that is the point,
+                # you watch the joins — but it cannot be joined or split, because
+                # both rewrite the scene list and it is not in one. The page has
+                # to know that BEFORE it offers to do it.
+                "in_script": n in labels,
                 "base_slug": os.path.basename(bdir), "base_n": bm["nb_frames"],
                 "base_ext": bm.get("ext", ".jpg"), "base_audio": bool(bm.get("has_audio")),
                 "over_slug": os.path.basename(odir) if odir else None,
