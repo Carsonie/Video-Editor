@@ -1,0 +1,30 @@
+# ── the demo data ───────────────────────────────────────────────────────────
+# 150MB of ski-demo video, copied in by setup_demo.py rather than committed.
+#
+# Not a size decision. dev/ and sandbox/ are exactly the folders the editors
+# WRITE to, so running the tools changes 106MB of files. Git keeps every
+# version of every file forever and cannot pack video down, so each commit of
+# a working state would add its full size again — permanently, since taking it
+# back out means rewriting history.
+#
+# Both repos live on the same machine, so the data is one command away:
+#     python3 setup_demo.py
+Customers/
+
+# ── regenerable ─────────────────────────────────────────────────────────────
+# Extracted frames. One extraction of a clip serves every player, and it is
+# rebuilt from the source video on first open.
+video_players/cache/
+
+# Run logs: the record of one machine's work, not source.
+video_players/logs/*.log
+video_players/tests/log_reports/*.log
+
+# Generation archives — dev/, sandbox/ and video/ each keep their previous
+# batch. Under Customers/ and so already ignored, but named here because the
+# rule is about what they ARE, not where they sit.
+**/z_History/
+
+__pycache__/
+*.pyc
+.DS_Store

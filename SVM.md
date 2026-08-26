@@ -59,7 +59,8 @@ for this repo's shape — see §4.
 | File | Why |
 |---|---|
 | `video_players/layers.sh` | helper script that lives with the players |
-| `.gitignore` rules for `cache/`, `logs/`, `tests/log_reports/`, and the three `z_History/` folders | without them the repo fills with regenerable video |
+| `.gitignore` — **already written** | ignores `Customers/`, `cache/`, the logs and every `z_History/` |
+| `setup_demo.py` — **already written** | copies the demo data in |
 
 ---
 
@@ -100,9 +101,35 @@ Customers/Rentify Demos Corp/ski-demo/help-videos/
 
 Full ski-demo is **2.2 GB**. The demo is **155 MB** — about 7%.
 
-⚠ **Git LFS or not in git at all.** 155 MB of video in a normal git repo will
-be slow and GitHub warns above 50 MB per file. Decide this before the first
-commit, not after.
+### The video is NOT in git — decided 2026-08-26
+
+`setup_demo.py` copies it in; `Customers/` is gitignored.
+
+Not a size decision. `dev/` and `sandbox/` are the folders the editors WRITE
+to, so running the tools changes 106 MB of files. Git keeps every version of
+every file forever and cannot pack video down, so each commit of a working
+state would add its full size again — permanently, since removing it later
+means rewriting history.
+
+```bash
+python3 setup_demo.py          # copy what is missing
+python3 setup_demo.py --force  # throw it away and copy it again
+python3 setup_demo.py --check  # say what is there, copy nothing
+```
+
+Measured: **88 files, 150 MB, 0.2 seconds** (same filesystem, so the copies are
+cheap). The tracked repo stays **15 KB**.
+
+LFS was the alternative and was not taken: it needs installing before anyone
+can clone, GitHub's free allowance is 1 GB stored and 1 GB a month
+transferred, and it solves a problem this repo does not have.
+
+The cost, stated plainly: **this repo is not self-contained.** On a machine
+that has never had `Basic_E2E_Testing`, point the script at a copy of that
+store with `--from`, or bring the data by hand.
+
+`.gitkeep` files are deliberately not copied — they exist so git tracks those
+folders in the other repo, and `Customers/` is ignored here.
 
 ---
 
@@ -158,9 +185,11 @@ Each of these has already cost time once.
 
 ## 5. Order of work
 
-1. Decide the tree shape and whether the demo video is in git or LFS
-2. Copy the 13 code files, keeping the `paths.py` / `vtt.py` relationship intact
-3. Copy the 155 MB of demo data
-4. Fix `fixture.py`'s two hard-coded paths
-5. Run the checklist in §3
-6. Import back into `Basic_E2E_Testing`
+1. ~~Decide whether the demo video is in git or LFS~~ — **done**: neither,
+   `setup_demo.py` copies it and `Customers/` is gitignored
+2. Decide the tree shape (see trap 1)
+3. Copy the 13 code files, keeping the `paths.py` / `vtt.py` relationship intact
+4. ~~Copy the demo data~~ — **done**, `python3 setup_demo.py`
+5. Fix `fixture.py`'s two hard-coded paths
+6. Run the checklist in §3
+7. Import back into `Basic_E2E_Testing`
