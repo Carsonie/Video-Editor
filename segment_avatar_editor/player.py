@@ -1763,6 +1763,13 @@ SEQ_TEMPLATE = """<!doctype html>
     const ovlF = SEQ.reduce((a, s) => a + (s.over_n || 0), 0);
     const pending = SEQ.filter(s => histOf(s.n).length).map(s => s.n);
     const trk = tracksOf('joinTrk');
+    // A scene with no narration, joined to scenes that have one. The opening is
+    // the case: it is built from two HeyGen clips plus the morph, so no single
+    // raw render sits behind it. Concatenating as-is would start the NEXT
+    // scene's narration at frame 1 — Sarah saying the login line over the
+    // intro. Filling holds that time open instead.
+    const noNar = SEQ.filter(s => s.has_narration === false);
+    const fillNar = noNar.length > 0 && noNar.length < SEQ.length && trk.includes('avatar');
     const dropped = ['segment', 'avatar'].filter(t => !trk.includes(t))
                       .map(t => t === 'segment' ? 'segment track' : 'overlay track');
 
@@ -1776,6 +1783,12 @@ SEQ_TEMPLATE = """<!doctype html>
         + `<ul>`
         + (trk.includes('segment') ? `<li>segments joined end to end &mdash; <b>${{segF}}</b> frames</li>` : '')
         + (trk.includes('avatar')  ? `<li>avatars joined the same way &mdash; <b>${{ovlF}}</b> frames</li>` : '')
+        + (fillNar
+           ? `<li><b>${{noNar.map(s => s.label).join(', ')}}</b> has no narration &mdash; `
+             + `its time is held open with a transparent silent clip, `
+             + `<b>${{noNar.reduce((a, s) => a + s.base_n, 0)}}</b> frames, so the narration `
+             + `after it stays where it belongs</li>`
+           : '')
         + (dropped.length ? `<li class="warn">the <b>${{dropped.join(' and ')}}</b> of these scenes is NOT carried`
                           + ` into the joined scene &mdash; recoverable from z_History/ only</li>` : '')
         + `<li>their narration lines are joined in order into one line</li>`
@@ -1795,7 +1808,7 @@ SEQ_TEMPLATE = """<!doctype html>
     try {{
       const r = await fetch('/api/join', {{ method: 'POST',
         headers: {{ 'Content-Type': 'application/json' }},
-        body: JSON.stringify({{ root: ROOT_REL, ns: list, label: name, tracks: trk }}) }});
+        body: JSON.stringify({{ root: ROOT_REL, ns: list, label: name, tracks: trk, fill_gaps: fillNar }}) }});
       d = await r.json();
     }} catch (e) {{ status(`Join failed: ${{e}}`); return; }}
     if (d.error) {{ status(`Join failed: ${{d.error}}`); return; }}
