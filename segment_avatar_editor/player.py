@@ -1090,6 +1090,17 @@ SEQ_TEMPLATE = """<!doctype html>
   .histbtn.undo:not(:disabled) {{ border-color:#e0a93f; color:#e8c98a; }}
   .histbtn.save:not(:disabled) {{ border-color:#2e8ecc; color:#8fc9ee; }}
   .histbtn:disabled {{ opacity:.25; cursor:default; }}
+  /* PRISTINE vs DIRTY, said in colour rather than only in opacity. A greyed
+     icon reads as "not available"; it does not read as "this scene has three
+     unsaved changes". The amber is the same amber the segment checkboxes use
+     for work in progress, so the two mean one thing across the page. */
+  .histbtn.save {{ position:relative; }}
+  .histbtn.save.dirty {{ background:#4a3a18; border-color:#e0a93f; color:#ffdc9a;
+                        font-weight:700; }}
+  .histbtn.save.dirty:hover {{ background:#5c4820; }}
+  .histbtn.save.dirty::after {{ content:''; position:absolute; top:-3px; right:-3px;
+                        width:5px; height:5px; border-radius:50%;
+                        background:#e0a93f; }}
   /* Actions that apply to the LIST rather than to one row, kept below the
      rebuild button and boxed so they read as list-level, not row-level. */
   #bulk {{ margin-top:8px; padding-top:8px; border-top:1px solid #3a4248;
@@ -1646,6 +1657,18 @@ SEQ_TEMPLATE = """<!doctype html>
     }}
     const {{ local }} = at(+$('slider').value);
     const trk = tracksOf('splitTrk');
+
+    // Same rule as the join, and for the same reason: a split renumbers every
+    // scene after the one it cuts, and it reads the files.
+    const dirty = SEQ.filter(x => histOf(x.n).length);
+    if (dirty.length) {{
+      alert(`Save these scenes before splitting.\\n\\n`
+          + dirty.map(x => `  ${{x.n}} ${{x.label}} — ${{histOf(x.n).length}} change(s)`).join('\\n')
+          + `\\n\\nA split renumbers every scene after the one it cuts, and reads `
+          + `the files on disk. These edits are not on disk yet.\\n\\n`
+          + `Use each scene's save icon, or "Save all scenes".`);
+      return;
+    }}
     const dropped = ['segment', 'avatar'].filter(t => !trk.includes(t))
                       .map(t => t === 'segment' ? 'segment' : 'overlay');
     const lens = {{ segment: s.base_n, avatar: s.over_n || 0 }};
@@ -1700,6 +1723,7 @@ SEQ_TEMPLATE = """<!doctype html>
     if (d.error) {{ status(`Split failed: ${{d.error}}`); return; }}
 
     RENUMBERED = true;
+    paintSaveBtn();
     const moved = (d.renumbered || []).map(r => `${{r.from}}\u2192${{r.to}}`).join(', ');
     alert(`Split scene ${{d.split}} at frame ${{d.at}} into "${{d.labels[0]}}" and "${{d.labels[1]}}".\n\n`
         + `The narration line stayed with "${{d.line_stayed_with}}" — the second half needs one writing.\n\n`
@@ -1726,6 +1750,7 @@ SEQ_TEMPLATE = """<!doctype html>
       const r = await fetch(`/api/renumber-state?root=${{encodeURIComponent(ROOT_REL)}}`);
       const d = await r.json();
       RENUMBERED = !!d.renumbered;
+      paintSaveBtn();
       if (RENUMBERED) {{
         const moved = (d.moved || []).map(m => `${{m.from}}\u2192${{m.to}}`).join(', ');
         status(`These scenes were renumbered${{moved ? ` (${{moved}})` : ''}} and have not been `
@@ -1762,6 +1787,26 @@ SEQ_TEMPLATE = """<!doctype html>
     const segF = SEQ.reduce((a, s) => a + s.base_n, 0);
     const ovlF = SEQ.reduce((a, s) => a + (s.over_n || 0), 0);
     const pending = SEQ.filter(s => histOf(s.n).length).map(s => s.n);
+
+    // A join RENUMBERS every scene, and it reads the FILES. An edit still sitting
+    // in a scene's history has not reached a file, and after the renumber its
+    // scene no longer has the number that history was recorded against — so it
+    // could not be saved even if you wanted to. Refused rather than warned: the
+    // warning let you agree to lose them, which is not a choice anyone means to
+    // make while naming a new scene.
+    if (pending.length) {{
+      const rows = pending.map(n => {{
+        const s = SEQ.find(x => x.n === n);
+        const c = histOf(n).length;
+        return `  ${{n}} ${{s ? s.label : ''}} — ${{c}} change${{c === 1 ? '' : 's'}}`;
+      }}).join('\\n');
+      alert(`Save these scenes before joining.\\n\\n${{rows}}\\n\\n`
+          + `A join renumbers every scene and reads the files on disk. These `
+          + `edits are not on disk yet, and once the numbers move they cannot `
+          + `be saved under the number they were made against.\\n\\n`
+          + `Use each scene's save icon, or "Save all scenes".`);
+      return;
+    }}
     const trk = tracksOf('joinTrk');
     // A scene with no narration, joined to scenes that have one. The opening is
     // the case: it is built from two HeyGen clips plus the morph, so no single
@@ -1794,10 +1839,6 @@ SEQ_TEMPLATE = """<!doctype html>
         + `<li>their narration lines are joined in order into one line</li>`
         + `<li>every scene in the script is renumbered <b>1..N</b>, since a join leaves a gap</li>`
         + `<li>the folders replaced, and script.json, are copied to <b>z_History/</b> first</li></ul>`
-        + (pending.length
-            ? `<p class="warn">Scenes ${{pending.join(', ')}} have unsaved edits. `
-              + `A join reads the FILES, so those edits are not included &mdash; save them first if you want them.</p>`
-            : '')
         + `<p class="warn">This changes the store, not just the preview, and cannot be undone from here.</p>`
     }});
     if (!name) return;
@@ -1814,6 +1855,7 @@ SEQ_TEMPLATE = """<!doctype html>
     if (d.error) {{ status(`Join failed: ${{d.error}}`); return; }}
 
     RENUMBERED = true;
+    paintSaveBtn();
     const moved = (d.renumbered || []).map(r => `${{r.from}}\u2192${{r.to}}`).join(', ');
     alert(`Joined ${{d.joined.join(', ')}} into "${{d.label}}" as scene ${{d.new_n}}.\n\n`
         + (moved ? `Renumbered: ${{moved}}\n\n` : '')
@@ -1852,6 +1894,7 @@ SEQ_TEMPLATE = """<!doctype html>
             body: JSON.stringify({{ root: ROOT_REL }}) }});
         }} catch (e) {{ status('Could not clear the renumber flag.'); return; }}
         RENUMBERED = false;
+        paintSaveBtn();
         renderScenes();
         status('The set is written. Single scenes can be saved again.');
         return;
@@ -1919,6 +1962,7 @@ SEQ_TEMPLATE = """<!doctype html>
           body: JSON.stringify({{ root: ROOT_REL }}) }});
       }} catch (e) {{ /* the markers stay; the next load will still refuse, which is safe */ }}
       RENUMBERED = false;
+      paintSaveBtn();
     }}
     renderScenes();
     status(`Saved ${{done.length}} of ${{withWork.length}} scene(s)`
@@ -2120,6 +2164,26 @@ SEQ_TEMPLATE = """<!doctype html>
   // gated, so after a join the toolbar still wrote one scene on its own: the
   // exact thing the flag exists to prevent. Written once so the two cannot drift
   // apart again.
+  // While a join or split has the set locked, the toolbar's Save BECOMES
+  // "Save all scenes" rather than refusing to be Save. A button that exists
+  // only to say no is a button in the way; one that does the thing you can
+  // actually do is a button.
+  function paintSaveBtn() {{
+    const b = $('saveBtn');
+    if (!b) return;
+    // The glyphs are real characters here, not backslash-u escapes: this
+    // is a PYTHON string, so Python would resolve them, and a surrogate pair
+    // for an emoji becomes two lone surrogates that cannot be encoded to
+    // UTF-8 at all. The page failed to write, with no page as the symptom.
+    b.textContent = RENUMBERED ? '⤓ Save all scenes' : '💾 Save scene';
+    b.title = RENUMBERED
+      ? 'A join or split renumbered every scene, so they are written together. '
+        + 'This writes the whole set and lifts the lock.'
+      : "Write this scene's edits back over its file in sandbox/. The current "
+        + 'file is archived to z_History/ first.';
+  }}
+
+
   function refuseLoneSave(n) {{
     if (!RENUMBERED) return false;
     alert(`Scene ${{n}} cannot be saved on its own.\n\n`
@@ -2375,7 +2439,10 @@ SEQ_TEMPLATE = """<!doctype html>
   $('saveBtn').onclick = async () => {{
     stop();
     const i = curI();
-    if (refuseLoneSave(SEQ[i].n)) return;
+    // Locked by a join or split: this button IS Save all scenes, so it does
+    // that instead of refusing to be Save. A button whose only job is to
+    // say no is a button in the way.
+    if (RENUMBERED) return saveAllScenes();
     const bothS = !isLocked(SEQ[i].n, 'base') && !isLocked(SEQ[i].n, 'overlay')
                   && slugOf(i, 'base') && slugOf(i, 'overlay');
     const layerS = which === 'base' ? 'SEGMENT (the footage)' : 'OVERLAY (the avatar)';
@@ -2984,6 +3051,10 @@ SEQ_TEMPLATE = """<!doctype html>
         // is explained on click, but a live-looking button that always refuses
         // is worse than one that shows it cannot act.
         hb.disabled = hist.length === 0 || (act === 'save' && RENUMBERED);
+        // Dirty the moment this scene has an unsaved change; pristine again
+        // when it is saved OR when every change has been undone — both end with
+        // an empty history, which is the one thing that decides it.
+        hb.classList.toggle('dirty', act === 'save' && hist.length > 0);
         hb.title = (act === 'save' && RENUMBERED && hist.length)
           ? `The scenes were renumbered by a join or split, so they must be written together.`
             + ` Use "Save all scenes".`
