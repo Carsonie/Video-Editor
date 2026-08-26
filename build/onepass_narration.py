@@ -47,8 +47,18 @@ import paths as PTH
 API = "https://api.heygen.com/v3"
 AVATAR_ID = "468eabb3326a4d8587ba29d065b1eba7"
 VOICE_ID  = "04d0ae1d0af2489ca7d3bb402a39a890"
-REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
-ENV  = os.path.join(REPO, "Help_Videos", "HeyGen", ".env.local")
+REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+# Where the HeyGen key is looked for, in order. It was ONE hardcoded path three
+# levels up from this file — which resolved to the home directory once these
+# tools moved, so the key was simply not found and the reason was invisible.
+#
+# The environment variable comes first because it is the one place a secret can
+# live that no repo can accidentally swallow.
+ENV_CANDIDATES = [
+    os.path.join(REPO, ".env.local"),
+    os.path.join(REPO, "Help_Videos", "HeyGen", ".env.local"),
+]
+ENV = ENV_CANDIDATES[0]          # what an error message names
 # $/second, measured from the 2026-08-22 probe: $0.35 for a 7.12s clip.
 RATE = 0.049
 # Alpha survives all three of decode, encode and container only if each is told.
@@ -58,11 +68,23 @@ ENC = ["-c:v", "libvpx-vp9", "-pix_fmt", "yuva420p", "-auto-alt-ref", "0",
 
 
 def key():
-    for line in open(ENV):
-        m = re.match(r'\s*(?:export\s+)?HEYGEN_API_KEY\s*=\s*["\']?([^"\'\s]+)', line)
-        if m:
-            return m.group(1)
-    sys.exit(f"HEYGEN_API_KEY not found in {ENV}")
+    """The HeyGen key, from the environment or the first .env.local that has it.
+
+    Every render is a real charge, so a key that is quietly missing has to fail
+    loudly and say exactly where it looked."""
+    from_env = os.environ.get("HEYGEN_API_KEY", "").strip()
+    if from_env:
+        return from_env
+    for path in ENV_CANDIDATES:
+        try:
+            for line in open(path):
+                m = re.match(r'\s*(?:export\s+)?HEYGEN_API_KEY\s*=\s*["\']?([^"\'\s]+)', line)
+                if m:
+                    return m.group(1)
+        except OSError:
+            continue
+    sys.exit("HEYGEN_API_KEY not set. Put it in the environment, or in one of:\n  "
+             + "\n  ".join(ENV_CANDIDATES))
 
 
 def req(url, k, payload=None):

@@ -25,6 +25,13 @@ tests/log_reports/*.log
 # rule is about what they ARE, not where they sit.
 **/z_History/
 
+# ── secrets ─────────────────────────────────────────────────────────────────
+# The HeyGen key. Every render against it is a real charge, so this must never
+# be committed — the rule is written BEFORE the file is created, not after.
+.env.local
+**/.env.local
+.env
+
 __pycache__/
 *.pyc
 .DS_Store

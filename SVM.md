@@ -109,7 +109,27 @@ them — `assemble_video`, `export_bookends`, `make_scene_overlays`,
 `onepass_narration` — carry one extra `sys.path` line pointing at `../shared`.
 One home for `paths.py` beats two that drift.
 
-`assemble_video.py` needs **Pillow**. `render_narration.py` needs a HeyGen key.
+`assemble_video.py` needs **Pillow** (installed: 12.2.0).
+
+### The HeyGen key
+
+Looked for in this order:
+
+1. `HEYGEN_API_KEY` in the environment
+2. `<repo>/.env.local`
+3. `<repo>/Help_Videos/HeyGen/.env.local`
+
+Environment first, because it is the one place a secret can live that no repo
+can accidentally swallow. `.env.local` is gitignored — the rule was written
+before the file was created, not after.
+
+It used to be a single hardcoded path three levels above the tool, which
+resolved to the **home directory** once these moved here. The key was simply
+not found, and nothing said why.
+
+⚠ **`render_narration.py` is the only step that spends money.** Every clip is a
+real charge, and HeyGen speaks the line exactly as written — a typo costs
+another render. Proofread with `vtt.py` first; it is free.
 
 ---
 
