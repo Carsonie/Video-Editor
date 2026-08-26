@@ -1,13 +1,58 @@
 # SVM — Standalone Video Migration
 
-Lifting the video pipeline out of `Basic_E2E_Testing` into this repo, with
-ski-demo as the worked example, so development happens here and the finished
-functionality is imported back.
+This repo becomes the **help-video creation repo**. All video development
+happens here. `Basic_E2E_Testing` keeps the E2E testing, the BCP work and the
+customer folders — and receives finished videos.
 
-**Scope widened 2026-08-26**, from the two editors to the whole pipeline. The
-editors cut and assemble a video's parts; they do not build the finished mp4.
-Keeping half the pipeline in each repo is the shape that causes drift, so the
-eight build tools came too, and the store came whole rather than trimmed.
+**The plan changed twice on 2026-08-26, and the second change is the bigger one.**
+
+First the scope widened from the two editors to the whole pipeline: the editors
+cut and assemble a video's parts, they do not build the finished mp4, and half
+a pipeline in each repo is the shape that causes drift. So the eight build
+tools came too, and the store came whole rather than trimmed.
+
+Then the *direction* changed. This was going to be "develop here, import the
+functionality back". It is not. **The pipeline stays here.** The only thing
+that travels back is the finished video.
+
+---
+
+## The end state
+
+```
+   Basic_E2E_Testing                          Video-Editor  (this repo)
+   ─────────────────                          ────────────────────────
+   A#5 records an E2E run
+   → help-videos/raw_mp4/  ────── import ──→  the raw recording
+
+                                              cut · hand off · edit
+                                              join · split · narrate
+                                              assemble
+
+   Customers/<Business>/<store>/  ←─ return ─  the finished video, and
+   help-videos/                                nothing else
+```
+
+**Coming this way:** raw `.mp4` recordings, and every customer's
+`help-videos/` working files. They live here while a video is being made.
+
+**Going back:** the finished video product, into that customer's folder in
+`Basic_E2E_Testing`. Not the working files, not the archives, not the cuts —
+the product.
+
+### Why the split is clean
+
+Nothing in `Basic_E2E_Testing` imports this pipeline. Checked 2026-08-26:
+three TypeScript files under `Master_Flows/UI/` *mention* `cut_segments.py`,
+but only in comments explaining a convention they share. No code depends on
+`paths.py`, `vtt.py` or any build tool.
+
+So **trap 1 dissolves.** There is no import-back to plan for and no second copy
+of `paths.py` to drift — this repo owns it now.
+
+The one live seam is **A#5, the recorder**. It writes into
+`Basic/Customers/<Business>/<store>/help-videos/raw_mp4/`, and it stays there,
+because it wraps an E2E test run. That is the file this repo imports.
 
 Source of everything below:
 `~/Rentify/Basic_E2E_Testing/.claude/agent-tools/6_end-customer-help-video-creations/`
@@ -242,10 +287,9 @@ Each of these has already cost time once.
    now live in `shared/`, beside `serve.py`, and the `video_players/` level is
    gone — the players sit at the repo root. Both `sys.path` climbs are deleted.
 
-   ⚠ **The cost, for import-back:** those two files still serve nine other
-   tools in `Basic_E2E_Testing`. Either the move goes back with them, or the
-   two copies drift. Drift is the real risk; decide it at import time, not
-   after.
+   ~~The cost, for import-back~~ — **no longer applies.** There is no
+   import-back: the pipeline stays here. Nothing in `Basic_E2E_Testing` imports
+   it, so there is no second copy to drift.
 
 2. **`fixture.py` still hard-codes ski-demo's `dev/`** for its source clips.
    The five-`..` walk to `Customers/` is fixed — it is one level here — but the
@@ -282,4 +326,10 @@ Each of these has already cost time once.
    is still hard-coded
 6. Walk the checklist in §3 by hand in a browser — the endpoints pass, the
    controls have not been clicked here yet
-7. Import back into `Basic_E2E_Testing`, deciding trap 1's cost first
+7. Cut the last cords, in this order:
+   - a `CLAUDE.md` here, so a session in this repo starts informed
+   - the `A#6` pipeline knowledge, which lives in `Basic`'s agent doc today
+   - make `Customers/` a configurable root rather than a fixed name
+   - a script that imports a raw recording FROM `Basic`
+   - a script that returns a finished video TO the right customer folder
+8. Bring the other customers' `help-videos/` over as they are worked on
