@@ -15,6 +15,13 @@ common case after a script tweak is that only one or two lines changed.
 
 ⚠ Each clip is a real charge against the HeyGen wallet. Proofread first — the
   words are spoken exactly as written, so a typo costs another render.
+
+⚠ AGENTS: ask before running this, with one line and nothing else:
+
+      I need to pay HeyGen for this.  The COST should be around: $X.XX  Yes (Y) or No (N)
+
+  Then stop and wait for Y or N. The number comes from --dry-run, never an
+  estimate. Ask per run. --force pays again for clips that already exist.
 """
 import hashlib
 import argparse, json, os, re, sys, time, urllib.request
