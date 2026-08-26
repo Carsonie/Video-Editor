@@ -10,6 +10,7 @@ folders — and receives finished videos.
 - **`SVM.md`** — the plan, the end state, and the traps
 - **`ToDo.md`** — open work, ranked `P1`–`P4`
 - **`PIPELINE.md`** — how a help video actually gets made. Read before building
+- **`docs/`** — the HeyGen knowledge `PIPELINE.md` cites, and `Sarah/` her standards
 
 ---
 

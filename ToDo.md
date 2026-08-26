@@ -9,23 +9,6 @@ Open work in this repo. Ranked `P1`–`P4`, most severe first, same convention a
 
 ## P1 — the playbook has holes in it
 
-### P1.1 Five HeyGen docs `PIPELINE.md` points at are not here
-
-`PIPELINE.md` is the record of four shipped videos, and it cites documents that
-stayed behind in `Basic_E2E_Testing/Help_Videos/HeyGen/`:
-
-| Missing | What it holds |
-|---|---|
-| `INSTRUCTIONAL.md` | how an instructional video is written |
-| `Instructional_Lessons_Learned.md` | what went wrong on earlier ones |
-| `Video_Goal.md` | what a help video is FOR |
-| `.claude/skill/hey_gen/avatar_compositing.md` | the compositing reference |
-| `videos/<name>/HANDOFF.md` | the per-video handoff, one per video |
-
-So the playbook can explain *what* to do and then point at nothing when asked
-*why*. Bring them, rewrite the references, or delete the references — but not
-leave them dangling.
-
 ### P1.2 The demo checklist has never been walked by hand here
 
 `SVM.md` §3 lists what "working" means. The endpoints all pass (106 checks) and
@@ -112,3 +95,6 @@ is a deliberate human step.
   was created
 - ~~`CLAUDE.md` here~~ — a session in this repo starts informed
 - ~~The `A#6` pipeline knowledge~~ — `PIPELINE.md`, copied whole
+- ~~P1.1 the five HeyGen docs~~ — 12 documents in `docs/`, plus `Sarah/` (her
+  rest-pose standards AND the idle footage holds are filled with). 35
+  references rewired; nothing in `PIPELINE.md` dangles

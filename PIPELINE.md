@@ -16,6 +16,10 @@ something.
 | `paths.py`, `vtt.py` | `shared/` |
 | everything else `.py` | `build/` |
 
+The five documents this cites came too, into `docs/`, along with `Sarah/` —
+her rest-pose standards AND the idle footage every hold is filled with, which
+is a working asset, not a reference.
+
 Two things in here describe `Basic_E2E_Testing` and are kept as history rather
 than instruction: the session logs from August, and the run-logging convention.
 Anything about **how a video is built** applies unchanged.
@@ -30,7 +34,7 @@ Pillow is the only one this pipeline needs and it is installed system-wide
 
 You produce polished help videos for **End-Customers** of the Rentify platform (e.g. "how to place your first order"): HeyGen generates the avatar narration, ffmpeg composites it over a recording of the real platform UI.
 
-**The pipeline works and has shipped.** ski-demo's "First Time Ordering" (75.0s, 11 scenes, **1152×1152**) was built end-to-end on 2026-08-18 and has been through nine cuts and the process is repeatable for any store. Do **not** treat this as exploratory or rebuild it from first principles — follow "Building a video — the actual workflow" below, which is the current path, and reach for the older `Help_Videos/HeyGen/` documents only for background.
+**The pipeline works and has shipped.** ski-demo's "First Time Ordering" (75.0s, 11 scenes, **1152×1152**) was built end-to-end on 2026-08-18 and has been through nine cuts and the process is repeatable for any store. Do **not** treat this as exploratory or rebuild it from first principles — follow "Building a video — the actual workflow" below, which is the current path, and reach for the older `docs/` documents only for background.
 
 ⚠ **Delivery is blocked, generation is not.** `Rentify_v10` has no way to serve a help video to a customer (`ToDo_Rentify_v10.md` V3). Say so when a video is described as shipping.
 
@@ -47,7 +51,7 @@ Using them loosely is how a build goes wrong quietly.
 | **Front track** | Sarah alone, transparent, carries **all** the audio. |
 | **Rear track** | Background: dark, then the segments. **Silent.** |
 | **VTT** | **Video Timing Table** — segment vs spoken length vs gap. Not WebVTT subtitles. |
-| **Rest pose** | Her settled held expression. References in `Help_Videos/HeyGen/Sarah/`. |
+| **Rest pose** | Her settled held expression. References in `Sarah/`. |
 
 > ### ⚠ "Scene" means something different to HeyGen — this already cost a wasted plan
 >
@@ -64,7 +68,7 @@ Using them loosely is how a build goes wrong quietly.
 ## Where it lives now
 
 `Help_Videos/` at this repo's root (renamed from `Help Videos/` on 2026-08-01 for shell-friendliness), all three siblings from the original `Help Videos/` project copied in (`rsync`, verified identical, `node_modules`/`.DS_Store` excluded each time) and committed:
-- **`Help_Videos/HeyGen/`** — the video-generation pipeline itself (see "Current state" below). Run `npm install` there before running any script.
+- **`docs/`** — the video-generation pipeline itself (see "Current state" below). Run `npm install` there before running any script.
 - **`Help_Videos/Mux_Discovery_Plan/`** — early planning notes only (Mux-vs-YouTube research), no code.
 - **`Help_Videos/VSCode_Mux_Ex/`** — a separate, more elaborate Go + React/Mantine prototype for **private, JWT-signed** Mux playback (own backend, sqlite `videos.db`, `z_slog` logger). Never deployed or wired into `rentify_live`; relevant to the "delivery target" decision below.
 
@@ -99,16 +103,16 @@ Step 4 is **not new** — it's a real, working pipeline: `.claude/skills/mux/vid
 
 ## Current state — this is a proven, documented pipeline that already shipped a real video. Read the docs before building anything.
 
-Correcting an earlier read: this is **not** an unbuilt or half-built pipeline. `Help_Videos/HeyGen/` holds a fully worked-out, hard-won, **Claude-assisted manual workflow** — proven end-to-end on a real deliverable (`videos/first_time_ordering/final/First_Time_Ordering_6.mp4`, shipped 2026-06-26). "Claude-assisted manual" is the actual *design*, not a stopgap — `Video_Goal.md`'s stated philosophy is "ffmpeg for assembly [driven by Claude + the user together in a terminal], HeyGen AI Studio for polish [captions, audio enhance, export — a manual browser session]." Full push-button automation (HeyGen's Template/Studio API) is explicitly named as a *future* migration target once that API matures — not today's goal.
+Correcting an earlier read: this is **not** an unbuilt or half-built pipeline. `docs/` holds a fully worked-out, hard-won, **Claude-assisted manual workflow** — proven end-to-end on a real deliverable (`videos/first_time_ordering/final/First_Time_Ordering_6.mp4`, shipped 2026-06-26). "Claude-assisted manual" is the actual *design*, not a stopgap — `docs/Video_Goal.md`'s stated philosophy is "ffmpeg for assembly [driven by Claude + the user together in a terminal], HeyGen AI Studio for polish [captions, audio enhance, export — a manual browser session]." Full push-button automation (HeyGen's Template/Studio API) is explicitly named as a *future* migration target once that API matures — not today's goal.
 
 **Read these, in this order, before touching anything:**
 1. `CLAUDE.md` — the hard rules. Short, non-negotiable, read every session.
-2. `Video_Goal.md` — the philosophy + the master prompt to open every new video session with.
-3. `INSTRUCTIONAL.md` — the master step-by-step guide (prep → script → avatar → assemble → PII blur → package → HeyGen polish).
-4. `Instructional_Lessons_Learned.md` — supersedes parts of `INSTRUCTIONAL.md` with the CLI-first workflow and every hard-won lesson from the pilot.
-5. `.claude/skill/hey_gen/avatar_compositing.md` — the actual ffmpeg recipes (VP9 alpha, scale/position math, corner overlay, concat).
-6. `.claude/skill/hey_gen/avatar_launch.md` — Sarah's full spec.
-7. `.claude/skill/hey_gen/heygen_api.md` + `heygen_api_addendum.md` — full API reference.
+2. `docs/Video_Goal.md` — the philosophy + the master prompt to open every new video session with.
+3. `docs/INSTRUCTIONAL.md` — the master step-by-step guide (prep → script → avatar → assemble → PII blur → package → HeyGen polish).
+4. `docs/Instructional_Lessons_Learned.md` — supersedes parts of `docs/INSTRUCTIONAL.md` with the CLI-first workflow and every hard-won lesson from the pilot.
+5. `docs/avatar_compositing.md` — the actual ffmpeg recipes (VP9 alpha, scale/position math, corner overlay, concat).
+6. `docs/avatar_launch.md` — Sarah's full spec.
+7. `docs/heygen_api.md` + `heygen_api_addendum.md` — full API reference.
 8. `.claude/skills/mux/video.md` (this repo) — Mux upload/update/delete mechanics for the actual handoff step.
 9. `rentify_live/.claude/skills/help-videos/main-header-mapping/skill.md` — which page gets which video (registry key resolution, per-customer mapping doc convention) — added 2026-08-05, was missing before.
 
@@ -126,9 +130,9 @@ Correcting an earlier read: this is **not** an unbuilt or half-built pipeline. `
 
 **Two generation tools, used deliberately for different purposes — not a bug, don't "fix" this:**
 - A real `heygen` CLI (Go binary, `~/.local/bin/heygen`, globally installed — not part of the npm project, no source in this repo) drives most of it. `heygen-sarah` (a `~/.zshrc` alias wrapping `heygen video-agent create --avatar-id ... --voice-id ... --mode generate --wait --human`) is **fast but AI-scripted** — HeyGen's Video Agent may rewrite the words. Use it only for the intro/exploratory clips where exact wording is flexible.
-- `.claude/skill/hey_gen/generate_avatar_video.py` (Python, direct `POST /v3/videos`) speaks **verbatim** — use this for every customer-facing narration segment where exact wording matters. This is Rule from `CLAUDE.md` itself: "Generate clips via Video Generation (verbatim script), NOT the Video Agent."
+- ~~`.claude/skill/hey_gen/generate_avatar_video.py`~~ **superseded by `build/render_narration.py`; stayed in `Basic_E2E_Testing`.** (Python, direct `POST /v3/videos`) speaks **verbatim** — use this for every customer-facing narration segment where exact wording matters. This is Rule from `CLAUDE.md` itself: "Generate clips via Video Generation (verbatim script), NOT the Video Agent."
 
-**Hard-won technical rules (from `CLAUDE.md` + `Instructional_Lessons_Learned.md` — treat as load-bearing, not optional):**
+**Hard-won technical rules (from `CLAUDE.md` + `docs/Instructional_Lessons_Learned.md` — treat as load-bearing, not optional):**
 - **Never edit a deliverable in place.** Every ffmpeg edit writes to a NEW incremented file (`-5` → `-6`). This exists because of a real incident: a bad splice + `mv -f` over the source permanently destroyed a file with no recovery (Claude's sandbox can't reach the Mac filesystem — there is no undo).
 - VP9 alpha: HeyGen's transparent webm clips need `-c:v libvpx-vp9` on decode or the alpha silently drops (black box instead of transparency).
 - `amix` needs `normalize=0` or volume ramps quiet→loud across a chained composite.
@@ -147,11 +151,11 @@ Correcting an earlier read: this is **not** an unbuilt or half-built pipeline. `
 Full re-review of `Help_Videos/` (every file), the two other relevant skills (`.claude/skills/mux/video.md` in this repo, `rentify_live/.claude/skills/help-videos/main-header-mapping/skill.md`), and a live check of HeyGen's current API docs against what's stored in `heygen_api.md` (dated June 23 — six weeks stale by this session). Findings:
 
 - ⚠ **Superseded 2026-08-15 — recordings no longer land in `OBS_Staging/`.** They are filed per store, in `Customers/<Business>/<store>/help-videos/raw_mp4/`, with `final/` beside it for the edited cut; `OBS_Staging/` is now only the transient spot OBS writes to before `record_flow.ts` moves the file out. Filenames are `<slug>_<recipe>_<dev|dev-FAILED>_<DD-HH-MM>_v<N>.mp4`. See `Help_Videos/README.md`. The bullet below is kept for its still-valid point about verifying the spec of any source clip.
-- **New source path: `Help_Videos/OBS_Staging/`.** `testing-recorder-manager` (agent #5) shipped this session — it's no longer WIP (design decision 5 below is updated accordingly). It fully automates the OBS screen-recording step that `INSTRUCTIONAL.md`/`CLAUDE.md` assumed was manual, outputting `<store>_<scenario>_<dev|live>_<timestamp>.mp4` straight into `Help_Videos/OBS_Staging/` (gitignored). This is now the preferred raw-input path over hand-recording — bring the chosen clip into `videos/<slug>/source/` (per the existing folder convention) as the first step of `INSTRUCTIONAL.md` Section 1, same as any other raw.
-- **Canonical spec vs. reality — a real doc/reality gap, not just theory.** The locked spec table above says `1152×1080, 60fps` — but the actual shipped `First_Time_Ordering_6.mp4` (`ffprobe`-verified) is `1152×1080` at **25fps** (HeyGen's editor re-encoded it on export; the 60fps figure only ever applied to our own ffmpeg-side intermediate renders, never the final polished deliverable). Separately, a fresh `Help_Videos/OBS_Staging/` clip (`paddle-sports_add-item_dev_2026-08-05_13-26.mp4`) probes at `1152×962` @ 30fps — 962 not 1080 because of `testing-recorder-manager`'s new browser-chrome top-crop (117px off a 1080-tall canvas). **Any new video built from an OBS_Staging source needs Section 1.6's normalize-to-canonical-spec step for real** — don't assume a fresh OBS capture already matches; verify with `ffprobe` every time, per `INSTRUCTIONAL.md` Section 1.1's own "inspect first" rule.
+- **New source path: `Help_Videos/OBS_Staging/`.** `testing-recorder-manager` (agent #5) shipped this session — it's no longer WIP (design decision 5 below is updated accordingly). It fully automates the OBS screen-recording step that `docs/INSTRUCTIONAL.md`/`CLAUDE.md` assumed was manual, outputting `<store>_<scenario>_<dev|live>_<timestamp>.mp4` straight into `Help_Videos/OBS_Staging/` (gitignored). This is now the preferred raw-input path over hand-recording — bring the chosen clip into `videos/<slug>/source/` (per the existing folder convention) as the first step of `docs/INSTRUCTIONAL.md` Section 1, same as any other raw.
+- **Canonical spec vs. reality — a real doc/reality gap, not just theory.** The locked spec table above says `1152×1080, 60fps` — but the actual shipped `First_Time_Ordering_6.mp4` (`ffprobe`-verified) is `1152×1080` at **25fps** (HeyGen's editor re-encoded it on export; the 60fps figure only ever applied to our own ffmpeg-side intermediate renders, never the final polished deliverable). Separately, a fresh `Help_Videos/OBS_Staging/` clip (`paddle-sports_add-item_dev_2026-08-05_13-26.mp4`) probes at `1152×962` @ 30fps — 962 not 1080 because of `testing-recorder-manager`'s new browser-chrome top-crop (117px off a 1080-tall canvas). **Any new video built from an OBS_Staging source needs Section 1.6's normalize-to-canonical-spec step for real** — don't assume a fresh OBS capture already matches; verify with `ffprobe` every time, per `docs/INSTRUCTIONAL.md` Section 1.1's own "inspect first" rule.
 - **`main-header-mapping` skill was missing from this file's reading list — added.** `rentify_live/.claude/skills/help-videos/main-header-mapping/skill.md` documents the piece between "upload to Mux" and "customer sees it": which page context (route → parent component → registry key, e.g. `OrderLayout.tsx`'s `getPlaybackId`) resolves to which Mux `playback_id`, where the registry actually lives (`customers/default/help_videos/playback_ids.json` is the live one — **never** create a `customers/{storeId}/` folder, it silently shadows the default and one was already deleted 2026-07-29 for exactly this reason), and the per-customer mapping doc convention (`customers/<customer-folder>/assets/<CustomerName>.md`). Step 4 of "What this is for, end to end" undersold this — it's not just "upload + edit playback_ids.json," it's upload + pick/confirm the right registry key for the target page + update the mapping doc.
-- **A second, separate, SIMPLER partial pipeline exists in the same folder — don't confuse it with the real one.** `Help_Videos/HeyGen/scripts/1-generate-voiceover.ts` + `lib/{heygen,paths,metadata}.ts` + `package.json`'s `voiceover` script is a different, audio-only exploration: Starfish TTS (`POST /v3/voices/speech`, synchronous, no polling) generating a narration `.mp3` with **no avatar video at all**. `metadata.json` shows its "voiceover" stage done once (2026-06-22, `audio/first-time-ordering.mp3`, 4.34s) and its "combine" stage (mux narration audio + OBS video) never built. This is NOT the approach that shipped `First_Time_Ordering_6.mp4` (that used the full ffmpeg + avatar-corner-overlay pipeline in `INSTRUCTIONAL.md`) and it has no visible-avatar capability at all — irrelevant to "the avatar seated then collapses to a corner," ignore it for this video. Worth a cleanup/archive decision later, not now.
-- **HeyGen API currency check — confirmed our approach is still the only one, but found something new.** Live-fetched `POST /v3/videos`'s current schema: confirmed there is still **no native avatar position/corner-placement or seated-to-corner motion preset** — `fit` (cover/contain) and `background` are the only placement-adjacent fields, so the manual ffmpeg shrink-move + corner-overlay recipe in `avatar_compositing.md` remains necessary, not a workaround for a solved problem. New discovery not in `heygen_api.md`: `POST /v3/videos` now accepts `type: "studio"` with a `scenes` array (`avatar_video` / `image` / `video` scene types) — a `VideoScene` supports `playback: {mode: "freeze"|"loop"|"fit_to_scene"}`, i.e. the `fit_to_scene` auto-length-matching behavior `INSTRUCTIONAL.md` Section 6 attributed only to the old **v2-only** Template API is apparently now reachable natively on **v3**, without pre-building a template in the web UI first. Not adopted for this video (unproven, and scenes still can't composite an avatar-in-corner over a simultaneous video background — same limitation as today), but worth a real evaluation as the Section 6 "future automation" migration target, sooner than previously assumed. Flagged, not acted on.
+- **A second, separate, SIMPLER partial pipeline exists in the same folder — don't confuse it with the real one.** `docs/scripts/1-generate-voiceover.ts` + `lib/{heygen,paths,metadata}.ts` + `package.json`'s `voiceover` script is a different, audio-only exploration: Starfish TTS (`POST /v3/voices/speech`, synchronous, no polling) generating a narration `.mp3` with **no avatar video at all**. `metadata.json` shows its "voiceover" stage done once (2026-06-22, `audio/first-time-ordering.mp3`, 4.34s) and its "combine" stage (mux narration audio + OBS video) never built. This is NOT the approach that shipped `First_Time_Ordering_6.mp4` (that used the full ffmpeg + avatar-corner-overlay pipeline in `docs/INSTRUCTIONAL.md`) and it has no visible-avatar capability at all — irrelevant to "the avatar seated then collapses to a corner," ignore it for this video. Worth a cleanup/archive decision later, not now.
+- **HeyGen API currency check — confirmed our approach is still the only one, but found something new.** Live-fetched `POST /v3/videos`'s current schema: confirmed there is still **no native avatar position/corner-placement or seated-to-corner motion preset** — `fit` (cover/contain) and `background` are the only placement-adjacent fields, so the manual ffmpeg shrink-move + corner-overlay recipe in `docs/avatar_compositing.md` remains necessary, not a workaround for a solved problem. New discovery not in `heygen_api.md`: `POST /v3/videos` now accepts `type: "studio"` with a `scenes` array (`avatar_video` / `image` / `video` scene types) — a `VideoScene` supports `playback: {mode: "freeze"|"loop"|"fit_to_scene"}`, i.e. the `fit_to_scene` auto-length-matching behavior `docs/INSTRUCTIONAL.md` Section 6 attributed only to the old **v2-only** Template API is apparently now reachable natively on **v3**, without pre-building a template in the web UI first. Not adopted for this video (unproven, and scenes still can't composite an avatar-in-corner over a simultaneous video background — same limitation as today), but worth a real evaluation as the Section 6 "future automation" migration target, sooner than previously assumed. Flagged, not acted on.
 
 ### Session 2026-08-06 — pivot to HeyGen-native "Scene by scene" composition
 
@@ -712,7 +716,7 @@ same motion never appears twice. ski-demo v14's six holds need 127 frames and 50
 `IDLE_CAP` the hold falls back to freezing, and the whole thing is inside a
 `try` — a failure degrades to the old behaviour rather than losing the build.
 
-⚠ **The source is `Help_Videos/HeyGen/Sarah/idle/sarah-idle-10s-alpha.webm`,
+⚠ **The source is `Sarah/idle/sarah-idle-10s-alpha.webm`,
 made from SILENT AUDIO — not scraped from speech.** Send `audio_asset_id`
 pointing at a WAV of room tone, with no `script` and no `voice_id`; clip length
 follows the audio. Full method, measurements and cost in that folder's README.
@@ -748,7 +752,7 @@ render**:
 
 ```bash
 … fade_frames.py tail sarah-scene-11-alpha.webm \
-    --to Help_Videos/HeyGen/Sarah/sarah-rest-pose-full-alpha.png \
+    --to Sarah/sarah-rest-pose-full-alpha.png \
     --out closing-fade-alpha.webm
 ```
 
@@ -1130,7 +1134,7 @@ anything hand-written will not.
 ## Design decisions to make with the user before writing code
 
 1. ~~Where does this live?~~ **Resolved 2026-08-01** — copied into this repo at `Help_Videos/` (HeyGen pipeline + both Mux-related siblings; renamed from `Help Videos/` the same day for shell-friendliness), keeping the working code, credentials, and avatar/voice discovery intact rather than rebuilding from scratch. The originals outside this repo are untouched pending a later delete decision.
-2. ~~Automate the pipeline, or accept manual compositing?~~ **Resolved by the docs themselves** — `Video_Goal.md` explicitly designs this as a Claude-assisted ffmpeg workflow with HeyGen's web editor for final polish, not push-button automation. Full API automation (Template/Studio API) is an explicit *future* item (Section 6 of both `INSTRUCTIONAL.md` and `Video_Goal.md`), gated on that API maturing. The remaining real question is narrower: **is this agent ready to actually run that documented workflow for a real video today** (open with `Video_Goal.md`'s master prompt, walk the 10 steps with the user) — confirm with the user before starting a real session, since it costs real HeyGen credits per generated clip and 10–20+ minutes of generation time isn't unusual for a 9-segment video.
+2. ~~Automate the pipeline, or accept manual compositing?~~ **Resolved by the docs themselves** — `docs/Video_Goal.md` explicitly designs this as a Claude-assisted ffmpeg workflow with HeyGen's web editor for final polish, not push-button automation. Full API automation (Template/Studio API) is an explicit *future* item (Section 6 of both `docs/INSTRUCTIONAL.md` and `docs/Video_Goal.md`), gated on that API maturing. The remaining real question is narrower: **is this agent ready to actually run that documented workflow for a real video today** (open with `docs/Video_Goal.md`'s master prompt, walk the 10 steps with the user) — confirm with the user before starting a real session, since it costs real HeyGen credits per generated clip and 10–20+ minutes of generation time isn't unusual for a 9-segment video.
 3. **Which of the two generation tools for a given clip** — `heygen-sarah` CLI (fast, AI-scripted, wording may drift) vs. `generate_avatar_video.py` (verbatim, slower). This isn't really open — `CLAUDE.md` already answers it (verbatim for all customer-facing narration, CLI only for intro/exploratory) — but flagging because it's an easy rule to accidentally violate by reaching for the faster CLI out of habit.
 4. ~~MCP plugin vs. the proven CLI/Python split?~~ **CLOSED 2026-08-19 — do not reopen.**
 
@@ -1145,7 +1149,7 @@ anything hand-written will not.
 6. **Which Mux delivery mechanism?** Two real options now sit in this repo: the simple, already-in-production `mux-video-upload` skill (curl + `playback_ids.json`, public-but-unlisted Mux asset — this is what `rentify_live` actually serves today) vs. `Help_Videos/VSCode_Mux_Ex/`'s prototype (own Go backend, JWT-signed **private** playback, sqlite-backed) — built but never deployed or connected to `rentify_live`. Adopting the latter means standing up and hosting a whole second service; the former is a shell script and a json edit. Ask whether genuinely private (token-gated, not just unlisted) playback is a real requirement before taking on that scope — if unlisted-public has been fine so far, that's the strong default to keep using.
 7. **Delivery target** — which store(s) is the first video for? `customers/default/help_videos/` (all stores) vs. a specific `customers/{storeId}/help_videos/` override, per the existing Mux skill's convention. Affects nothing about generation, only where the final upload lands — and is moot until decision 6 is made.
 8. ~~Corner position: locked bottom-right vs. a per-video override?~~ **Resolved 2026-08-05** — after being asked directly, the user confirmed bottom-right stays the standing default; the earlier lower-left request for this specific video was reconsidered and dropped, not adopted. No compositing recipes needed to change.
-9. ~~Compositing approach: ffmpeg-assembled + HeyGen-editor-polished, or build directly in HeyGen's own editor?~~ **Resolved 2026-08-06** — pivoted to building directly in HeyGen's "Scene by scene" editor, per explicit user feedback that the ffmpeg-bridged version had "too much shifting" in the avatar's gap-filling motion. See "Session 2026-08-06" above for the full reasoning and what HeyGen's platform actually supports. The original ffmpeg + HeyGen-editor-polish pipeline (`INSTRUCTIONAL.md`, `Instructional_Lessons_Learned.md`, `avatar_compositing.md`) remains fully documented and is what shipped `First_Time_Ordering_6.mp4` — still a legitimate fallback path if the HeyGen-native build stalls, not something to delete or treat as wrong.
+9. ~~Compositing approach: ffmpeg-assembled + HeyGen-editor-polished, or build directly in HeyGen's own editor?~~ **Resolved 2026-08-06** — pivoted to building directly in HeyGen's "Scene by scene" editor, per explicit user feedback that the ffmpeg-bridged version had "too much shifting" in the avatar's gap-filling motion. See "Session 2026-08-06" above for the full reasoning and what HeyGen's platform actually supports. The original ffmpeg + HeyGen-editor-polish pipeline (`docs/INSTRUCTIONAL.md`, `docs/Instructional_Lessons_Learned.md`, `docs/avatar_compositing.md`) remains fully documented and is what shipped `First_Time_Ordering_6.mp4` — still a legitimate fallback path if the HeyGen-native build stalls, not something to delete or treat as wrong.
 
 ## Logging your progress (session summary)
 
@@ -1179,10 +1183,10 @@ Logs land in `build/logs/<video-slug>_<timestamp>.log` — gitignored, local onl
 
 ## Guardrails
 
-- Never read, print, or copy the contents of any `.env.local` (in `Help_Videos/HeyGen/` or elsewhere) — credentials stay where they are; ask the user directly if a key is needed here.
+- Never read, print, or copy the contents of any `.env.local` (in `docs/` or elsewhere) — credentials stay where they are; ask the user directly if a key is needed here.
 - Don't target HeyGen's v2 avatar endpoints — confirmed dead end (hangs/404s). v3 only.
 - Don't assume the HeyGen MCP plugin is usable — it's unauthenticated; if a tool call to it fails for that reason, tell the user it needs authorization rather than working around it.
-- Don't re-derive the avatar/voice/endpoint decisions already made in `Help_Videos/HeyGen/`'s handoff docs — read them first; only revisit a locked decision if the user asks to.
+- Don't re-derive the avatar/voice/endpoint decisions already made in `docs/`'s handoff docs — read them first; only revisit a locked decision if the user asks to.
 - Don't upload anything to Mux or write to `rentify_live/customers/**/playback_ids.json` until there's an actual finished, verified mp4 — that's the existing `mux-video-upload` skill's job once step 3 (compositing) produces real output, not something to wire early against placeholder files.
 - Don't create git commits in either repo.
 - This agent's surface is help-video production (avatar/voiceover generation, compositing, and handing off to the existing Mux upload step) — not BCP/customer catalog data, not the rental-flow E2E tests themselves (that's `testing-runner-manager`/`testing-recorder-manager`).
@@ -1191,7 +1195,7 @@ Logs land in `build/logs/<video-slug>_<timestamp>.log` — gitignored, local onl
 
 Before reporting a failure, classify why, and say the category explicitly as part of the report:
 
-- **Process/Agent gap** — this file's own instructions, or the documented pipeline (`CLAUDE.md`/`INSTRUCTIONAL.md`/`Instructional_Lessons_Learned.md`) were wrong, missing a case, or ambiguous. The fix belongs in THIS FILE (or the referenced doc it points to) — once resolved, add a dated entry to "Lessons Learned" below.
+- **Process/Agent gap** — this file's own instructions, or the documented pipeline (`CLAUDE.md`/`docs/INSTRUCTIONAL.md`/`docs/Instructional_Lessons_Learned.md`) were wrong, missing a case, or ambiguous. The fix belongs in THIS FILE (or the referenced doc it points to) — once resolved, add a dated entry to "Lessons Learned" below.
 - **Content/input quality issue** — the raw material was bad, not the process: a source screen recording has a UI bug or bad framing making it unusable, a narration script has a typo that wasn't caught before generating (costs a real HeyGen credit to fix), a config value (avatar_id, voice_id) was mistyped. Not this agent's fault if it followed the documented steps — name exactly what's wrong and where.
 - **External/environmental** — HeyGen's API/CLI behaves differently than `heygen_api.md`/`heygen_api_addendum.md` describe (a real possibility — those were captured at a point in time), an ffmpeg build quirk, a credit/quota issue. Note it plainly; only add a Lessons Learned entry if a durable workaround is now known.
 
@@ -1216,11 +1220,11 @@ Also confirmed the hard way that the repo's own long-standing warning is real: *
 
     b. **A held frame mid-clip catches a blink or a half-formed word.** This render blinks and glances down constantly — four of eight frames sampled across one 13s clip had her eyes shut, and scene 7 is continuous speech with almost no closed-mouth frame anywhere in it. The two 1s pauses spliced into that scene were cloning whatever frame sat at the split, which is a coin flip. They now hold the clip's **final** frame.
 
-    c. **Which works because every HeyGen clip ENDS on the settled rest pose** — eyes open, mouth closed, level head — verified across all eleven scene clips. Clip **starts** are the opposite: mid-word with eyes shut. So `clone` is correct for a mid-video hold by construction, not by luck. **But scene 11's final frame is an exception** (a softer, asymmetric look, now kept as the "Uncertainty" standard), so the video's *closing* frame must come from the canonical reference file, never from "whatever the last clip ended on". `assemble_video.py` closes with a 1s hold on `Help_Videos/HeyGen/Sarah/sarah-rest-pose-full-alpha.png` and warns if it is missing.
+    c. **Which works because every HeyGen clip ENDS on the settled rest pose** — eyes open, mouth closed, level head — verified across all eleven scene clips. Clip **starts** are the opposite: mid-word with eyes shut. So `clone` is correct for a mid-video hold by construction, not by luck. **But scene 11's final frame is an exception** (a softer, asymmetric look, now kept as the "Uncertainty" standard), so the video's *closing* frame must come from the canonical reference file, never from "whatever the last clip ended on". `assemble_video.py` closes with a 1s hold on `Sarah/sarah-rest-pose-full-alpha.png` and warns if it is missing.
 
     Framing is consistent enough across renders to drop the reference in — measured `head_cx` 321 vs 319 with identical `top` — but measure before relying on it rather than assuming.
 
-    **The standards live in `Help_Videos/HeyGen/Sarah/`** with a README. Check a hold against them rather than inventing a metric: scoring frames on eye contrast minus mouth contrast still ranked mid-speech frames top, and looking at a contact sheet found the right frame in seconds.
+    **The standards live in `Sarah/`** with a README. Check a hold against them rather than inventing a metric: scoring frames on eye contrast minus mouth contrast still ranked mid-speech frames top, and looking at a contact sheet found the right frame in seconds.
 
 
 **2026-08-16 — Rendered all 11 narration clips and assembled the first complete video. Three failures worth knowing, one of them expensive.**
