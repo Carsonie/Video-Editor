@@ -9,6 +9,29 @@ Source of everything below:
 
 ---
 
+## 0. The tree, as built
+
+```
+Video-Editor/
+├── SVM.md  setup_demo.py  .gitignore  layers.sh
+├── mp4_splitter/          player.py  VERSION  __init__.py
+├── segment_avatar_editor/ player.py  VERSION  __init__.py
+├── shared/                serve.py  frames.py  paths.py  vtt.py  __init__.py
+├── tests/                 test_editor.py  fixture.py  README.md
+└── Customers/             gitignored — setup_demo.py fills it
+```
+
+Flatter than the source by one level: there is no `video_players/` here,
+because there is nothing beside it to be distinguished from. `paths.py` and
+`vtt.py` moved DOWN into `shared/`, which is what let the level go — they were
+the only reason `serve.py` had to climb out of the tree.
+
+**Proven 2026-08-26:** server starts, the splitter opens the raw recording, the
+editor opens a scene layered and three on a timeline, the VTT reads 11 scenes,
+and `tests/test_editor.py` passes 106/106.
+
+---
+
 ## 1. The code — 13 files, all of it
 
 Everything the two editors run on. No file here is optional.
@@ -156,17 +179,23 @@ The migration is done when all of these pass **in this repo**:
 
 Each of these has already cost time once.
 
-1. **The two reach-ups.** `serve.py` does `sys.path.insert` twice to find
-   `paths.py` and `vtt.py` one directory above `video_players/`. Flatten the
-   layout here and those imports break — decide the shape first.
+1. ~~**The two reach-ups.**~~ **Settled 2026-08-26.** `paths.py` and `vtt.py`
+   now live in `shared/`, beside `serve.py`, and the `video_players/` level is
+   gone — the players sit at the repo root. Both `sys.path` climbs are deleted.
 
-2. **`fixture.py` hard-codes ski-demo's `dev/`** for its source clips, and
-   counts five `..` to reach `Customers/`. Both are wrong the moment the tree
-   changes.
+   ⚠ **The cost, for import-back:** those two files still serve nine other
+   tools in `Basic_E2E_Testing`. Either the move goes back with them, or the
+   two copies drift. Drift is the real risk; decide it at import time, not
+   after.
+
+2. **`fixture.py` still hard-codes ski-demo's `dev/`** for its source clips.
+   The five-`..` walk to `Customers/` is fixed — it is one level here — but the
+   clip path remains a hard-coded reach into the demo store.
 
 3. **`safe_join()` pins everything under `Customers/`.** Anything outside it is
-   unreachable by every endpoint. The demo data must sit under a `Customers/`
-   root even here, or the root has to be made configurable — which is the
+   unreachable by every endpoint. `find_repo_root()` walks up looking for a
+   `Customers/` folder, so it lands on this repo root by itself — but the demo
+   data still has to sit under that name. Making the root configurable is the
    better fix and belongs in this repo.
 
 4. **The pages are Python `.format()` templates.** Every CSS and JS brace is
@@ -187,9 +216,11 @@ Each of these has already cost time once.
 
 1. ~~Decide whether the demo video is in git or LFS~~ — **done**: neither,
    `setup_demo.py` copies it and `Customers/` is gitignored
-2. Decide the tree shape (see trap 1)
-3. Copy the 13 code files, keeping the `paths.py` / `vtt.py` relationship intact
+2. ~~Decide the tree shape~~ — **done**: flat, `paths.py`/`vtt.py` in `shared/`
+3. ~~Copy the 13 code files~~ — **done**, keeping the `paths.py` / `vtt.py` relationship intact
 4. ~~Copy the demo data~~ — **done**, `python3 setup_demo.py`
-5. Fix `fixture.py`'s two hard-coded paths
-6. Run the checklist in §3
-7. Import back into `Basic_E2E_Testing`
+5. ~~Fix `fixture.py`'s repo-root walk~~ — **done**; its ski-demo clip path
+   is still hard-coded
+6. Walk the checklist in §3 by hand in a browser — the endpoints pass, the
+   controls have not been clicked here yet
+7. Import back into `Basic_E2E_Testing`, deciding trap 1's cost first

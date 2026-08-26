@@ -14,11 +14,11 @@ Customers/
 # ── regenerable ─────────────────────────────────────────────────────────────
 # Extracted frames. One extraction of a clip serves every player, and it is
 # rebuilt from the source video on first open.
-video_players/cache/
+cache/
 
 # Run logs: the record of one machine's work, not source.
-video_players/logs/*.log
-video_players/tests/log_reports/*.log
+logs/*.log
+tests/log_reports/*.log
 
 # Generation archives — dev/, sandbox/ and video/ each keep their previous
 # batch. Under Customers/ and so already ignored, but named here because the
