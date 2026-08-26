@@ -418,6 +418,40 @@ TRACK_FILE = {"segment": "segment.mp4", "avatar": "avatar.webm",
               "narration": "narration.webm"}
 
 
+def make_gap_filler(like, frames, dst, log=lambda m: None):
+    """
+    A transparent, silent clip `frames` long, matching `like`'s size and rate.
+
+    Used where a scene HAS NO track the others have — the opening has no
+    narration render. Concatenating without it makes the next scene's narration
+    start at frame 1 instead of after the opening, so Sarah says the login line
+    over the intro. The filler holds that time open.
+
+    Transparent and silent is the honest content: for the opening's duration
+    there IS no narration, and that is what "no narration" looks like once it
+    has to occupy time.
+    """
+    w = build_mod.probe(like, "width", stream=True, dec=["-c:v", "libvpx-vp9"])
+    h = build_mod.probe(like, "height", stream=True, dec=["-c:v", "libvpx-vp9"])
+    num, _, den = build_mod.probe(like, "r_frame_rate", stream=True,
+                        dec=["-c:v", "libvpx-vp9"]).partition("/")
+    fps = f"{num}/{den or 1}"
+    r = subprocess.run(
+        ["ffmpeg", "-v", "error",
+         # `,format=yuva420p` in the FILTER, not just -pix_fmt on the output.
+         # Without it the colour source hands over yuv420p and the encoder adds
+         # an OPAQUE alpha channel — measured 255 everywhere. The filler would
+         # have blacked the opening out instead of being invisible.
+         "-f", "lavfi", "-i", f"color=c=black@0.0:s={w}x{h}:r={fps},format=yuva420p",
+         "-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo",
+         "-frames:v", str(frames)] + ENCODE_ALPHA + ["-shortest", "-y", dst],
+        capture_output=True, text=True)
+    if r.returncode != 0:
+        raise RuntimeError(f"could not build the {frames}-frame filler: {r.stderr[-300:]}")
+    log(f"  filled a {frames}-frame gap with a transparent silent clip")
+    return dst
+
+
 def renumber_sandbox_folders(final, scenes):
     """
     Rename sandbox folders so their NN- prefix matches the scene numbers.
@@ -839,6 +873,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 # both rewrite the scene list and it is not in one. The page has
                 # to know that BEFORE it offers to do it.
                 "in_script": n in labels,
+                # Whether this scene has a raw narration render. The opening has
+                # none — it is built from TWO HeyGen clips plus the morph, so its
+                # avatar IS the finished article and no single raw clip sits
+                # behind it. A join across that gap has to fill it or the next
+                # scene's narration slides forward on top of the opening.
+                "has_narration": bool(sb["narration"]) if sb else False,
                 "base_slug": os.path.basename(bdir), "base_n": bm["nb_frames"],
                 "base_ext": bm.get("ext", ".jpg"), "base_audio": bool(bm.get("has_audio")),
                 "over_slug": os.path.basename(odir) if odir else None,
@@ -1513,11 +1553,30 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if not sb["segment"]:
                 return self.send_json({"error": f"scene {n} has no segment in sandbox"}, 400)
             parts.append((n, sb["segment"], sb["avatar"], sb["narration"]))
+        # A track some scenes have and others do not. Two ways this can go, and
+        # the difference is the whole point: dropping it SILENTLY moves every
+        # later clip forward — the opening has no narration, so scene 2's would
+        # start at frame 1 and Sarah would say the login line over the intro.
+        # Filling the gap holds that time open instead.
+        fill = bool(payload.get("fill_gaps"))
+        gaps = {}
         for idx, what in ((2, "avatar"), (3, "narration")):
-            if "avatar" in tracks and any(p[idx] is None for p in parts) and any(p[idx] for p in parts):
+            if "avatar" not in tracks:
+                continue
+            missing = [p for p in parts if p[idx] is None]
+            present = [p for p in parts if p[idx]]
+            if not (missing and present):
+                continue
+            if not fill:
+                names = ", ".join(str(p[0]) for p in missing)
                 return self.send_json(
-                    {"error": f"some of those scenes have a {what} and some do not — "
-                              f"join would silently drop it"}, 400)
+                    {"error": f"scene(s) {names} have no {what} and the others do. "
+                              f"Joining as-is would move every later {what} forward. "
+                              f"Send fill_gaps to hold that time open with a "
+                              f"transparent silent clip instead.",
+                     "gap": what,
+                     "scenes_missing": [p[0] for p in missing]}, 400)
+            gaps[what] = (idx, [p[0] for p in missing], present[0][idx])
 
         stamp = time.strftime("%Y%m%d-%H%M%S")
         hist = os.path.join(final, "z_History", f"join-{stamp}")
@@ -1527,7 +1586,22 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         first = order[0]
         new_dir = os.path.join(PTH.sandbox_root(final), f"{first:02d}-{label}")
         tmp_dir = tempfile.mkdtemp(prefix="video_players_join_")
+        filled = []
         try:
+            # Each gap gets a filler as long as that SCENE is — measured on its
+            # segment, which is the scene's true duration. Built before the
+            # concat so the parts list is complete when it runs.
+            for what, (idx, missing_ns, like) in gaps.items():
+                for k, prt in enumerate(parts):
+                    if prt[0] not in missing_ns:
+                        continue
+                    n_frames = build_mod.decoded_frames(prt[1], dec_for(prt[1]))
+                    dst = os.path.join(tmp_dir, f"fill_{what}_{prt[0]}.webm")
+                    make_gap_filler(like, n_frames, dst)
+                    row = list(prt)
+                    row[idx] = dst
+                    parts[k] = tuple(row)
+                    filled.append({"scene": prt[0], "track": what, "frames": n_frames})
             # narration.webm rides with the AVATAR, and is not separately
             # choosable, because it is what the avatar was rendered from --
             # assemble_video composites the narration, not the avatar. Left
@@ -1592,7 +1666,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             json.dump(doc, fh, indent=2)
 
         self.send_json({"joined": order, "label": label, "new_n": joined["n"],
-                         "renamed": renamed,
+                         "renamed": renamed, "filled": filled,
                          "renumbered": renum, "scenes": len(kept),
                          "archived_to": os.path.relpath(hist, CUSTOMERS_ROOT)})
 
