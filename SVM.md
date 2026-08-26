@@ -1,8 +1,13 @@
 # SVM — Standalone Video Migration
 
-Lifting the two video editors out of `Basic_E2E_Testing` into this repo, with
+Lifting the video pipeline out of `Basic_E2E_Testing` into this repo, with
 ski-demo as the worked example, so development happens here and the finished
 functionality is imported back.
+
+**Scope widened 2026-08-26**, from the two editors to the whole pipeline. The
+editors cut and assemble a video's parts; they do not build the finished mp4.
+Keeping half the pipeline in each repo is the shape that causes drift, so the
+eight build tools came too, and the store came whole rather than trimmed.
 
 Source of everything below:
 `~/Rentify/Basic_E2E_Testing/.claude/agent-tools/6_end-customer-help-video-creations/`
@@ -18,7 +23,8 @@ Video-Editor/
 ├── segment_avatar_editor/ player.py  VERSION  __init__.py
 ├── shared/                serve.py  frames.py  paths.py  vtt.py  __init__.py
 ├── tests/                 test_editor.py  fixture.py  README.md
-└── Customers/             gitignored — setup_demo.py fills it
+├── build/                 the 8 tools that make the finished video
+└── Customers/             gitignored — the whole ski-demo store
 ```
 
 Flatter than the source by one level: there is no `video_players/` here,
@@ -85,6 +91,26 @@ for this repo's shape — see §4.
 | `.gitignore` — **already written** | ignores `Customers/`, `cache/`, the logs and every `z_History/` |
 | `setup_demo.py` — **already written** | copies the demo data in |
 
+### `build/` — the finished video
+
+| File | What it does |
+|---|---|
+| `assemble_video.py` | builds the finished mp4 and archives the older ones |
+| `render_narration.py` | the HeyGen renders — **the only step that costs money** |
+| `onepass_narration.py` | one-pass narration |
+| `make_scene_overlays.py` | Sarah over each scene |
+| `morph_avatar_corner.py` | the 1.2s move to the corner |
+| `build_sarah_opening.py` | intro → morph → corner |
+| `export_bookends.py` | the opening and closing |
+| `fade_frames.py`, `cut_segments.py` | frame maths and slicing |
+
+They import each other AND `paths`. `paths.py` is in `shared/` here, so four of
+them — `assemble_video`, `export_bookends`, `make_scene_overlays`,
+`onepass_narration` — carry one extra `sys.path` line pointing at `../shared`.
+One home for `paths.py` beats two that drift.
+
+`assemble_video.py` needs **Pillow**. `render_narration.py` needs a HeyGen key.
+
 ---
 
 ## 2. The demo data — ski-demo
@@ -140,8 +166,21 @@ python3 setup_demo.py --force  # throw it away and copy it again
 python3 setup_demo.py --check  # say what is there, copy nothing
 ```
 
-Measured: **88 files, 150 MB, 0.2 seconds** (same filesystem, so the copies are
-cheap). The tracked repo stays **15 KB**.
+**Updated 2026-08-26: the WHOLE store is here, not the 150 MB subset.**
+2.2 GB, 801 files, cloned in **0.16 seconds** and using **no extra disk** — the
+volume is APFS, so a copy on it shares blocks until something changes. The
+trimmed subset existed to keep a git repo small; nothing is committed, so there
+was nothing to keep small.
+
+`setup_demo.py` still copies the 150 MB subset, which is all the editors and
+the tests need. To bring the whole store instead:
+
+```bash
+cp -Rc "~/Rentify/Basic_E2E_Testing/Customers/Rentify Demos Corp/ski-demo" \
+       "Customers/Rentify Demos Corp/ski-demo"
+```
+
+The tracked repo stays **under 400 KB**.
 
 LFS was the alternative and was not taken: it needs installing before anyone
 can clone, GitHub's free allowance is 1 GB stored and 1 GB a month
