@@ -2305,7 +2305,7 @@ SEQ_TEMPLATE = """<!doctype html>
     const g = $('rep');
     if (i < 0 || !SEQ[i]) {{
       g.innerHTML = repCell('scene', '\u2014') + repCell('segment', '\u2014')
-                  + repCell('overlay', '\u2014') + repCell('selection', '\u2014');
+                  + repCell('selection', '\u2014') + repCell('overlay', '\u2014');
       return;
     }}
     const s = SEQ[i], fps = s.fps || 25;
@@ -2323,12 +2323,17 @@ SEQ_TEMPLATE = """<!doctype html>
            + `<b>${{a}}\u2013${{b}}</b> (${{b - a + 1}}f)`;
     }};
 
+    // The grid fills left-to-right, so this ORDER is the layout. SEGMENT and
+    // OVERLAY now sit in the same column, one above the other, because the
+    // thing you read them for is comparing the two frame counts — 483 over 439
+    // is a glance; 483 beside a duration and 439 under a scene name is not.
     g.innerHTML =
         repCell('scene', `<b>${{s.n}}</b> <span class="nm">${{s.label || ''}}</span>`)
       + repCell('segment', track('base'), 'seg')
-      + repCell('overlay', track('overlay'), 'ovl')
       + repCell('selection', `<b>${{(zoneLen / fps).toFixed(2)}}s</b>`
-                           + `<span class="sep">timeline</span><b>${{(total / fps).toFixed(2)}}s</b>`);
+                           + `<span class="sep">timeline</span>`
+                           + `<b>${{(total / fps).toFixed(2)}}s</b>`)
+      + repCell('overlay', track('overlay'), 'ovl');
   }}
 
   $('addFrame').onclick = () => doEdit('dup', false);
