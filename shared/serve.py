@@ -640,7 +640,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         except json.JSONDecodeError:
             return self.send_json({"error": "malformed JSON body"}, 400)
         self._last_json, self._last_status = None, 200
-        self.route_post(parsed, payload)
+        # One writer at a time per cache folder. Taken HERE rather than inside
+        # each of the nine handlers that mutate one, for the same reason the
+        # session log is: nine places is nine chances to forget, and the one
+        # forgotten is the one that corrupts a cache at two clicks a second.
+        outdir = (resolve_outdir(payload.get("slug"), payload.get("which"))
+                  if payload.get("slug") else None)
+        if outdir:
+            with build_mod.dir_lock(outdir):
+                self.route_post(parsed, payload)
+        else:
+            self.route_post(parsed, payload)
         session_log(parsed.path, payload, self._last_json, self._last_status)
 
     def route_post(self, parsed, payload):

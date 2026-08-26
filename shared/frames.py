@@ -30,6 +30,7 @@ import re
 import shutil
 import subprocess
 import sys
+import threading
 
 # The cache is SHARED by every player: one extraction of a clip serves the
 # splitter, the layered editor and the timeline alike. It therefore lives at
@@ -37,6 +38,27 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 CACHE = os.path.join(ROOT, "cache")
+
+# ── one worker at a time, per cache folder ──────────────────────────────────
+# The server is threaded, so two clicks a second apart run at once. Nothing
+# stopped two of them re-extracting into the SAME frames/ directory, and they
+# stomped on each other: six Undo clicks in six seconds left a 440-frame clip
+# with a 204-frame cache, by way of 216 and 381, and one "[Errno 66] Directory
+# not empty" as two swaps collided.
+#
+# Keyed on the folder, so edits to different clips still run in parallel —
+# which is the whole reason the server is threaded.
+_DIR_LOCKS = {}
+_LOCKS_GUARD = threading.Lock()
+
+
+def dir_lock(outdir):
+    key = os.path.abspath(outdir)
+    with _LOCKS_GUARD:
+        lock = _DIR_LOCKS.get(key)
+        if lock is None:
+            lock = _DIR_LOCKS[key] = threading.Lock()
+    return lock
 
 
 def probe(path, entry, stream=False, dec=None):
@@ -640,17 +662,26 @@ def restore_map(outdir, target, log=print):
     if not os.path.isfile(src):
         raise RuntimeError(f"source no longer exists: {src}")
     ext = meta.get("ext", ".jpg")
-    build_frames(src, out=outdir, box=meta.get("box", 750), force=True,
-                 log=log, alpha_png=(ext == ".png"))
 
-    meta = load_meta(outdir)
-    n_src = meta["nb_frames"]
+    # VALIDATED BEFORE ANYTHING IS RE-EXTRACTED. This used to re-extract first
+    # and check afterwards, so a map that failed the check had already wiped the
+    # edits it was meant to restore — the error read as "nothing happened" while
+    # the cache was already back to raw.
+    #
+    # The count comes from the SOURCE, not from the cache, because the cache is
+    # exactly what is about to be replaced.
     target = [int(x) for x in target]
+    if not target:
+        raise RuntimeError("refusing to restore an empty map")
+    n_src = decoded_frames(src, ["-c:v", "libvpx-vp9"] if ext == ".png" else None)
+    if n_src is None:
+        raise RuntimeError(f"could not count the frames in {os.path.basename(src)}")
     bad = [x for x in target if not (1 <= x <= n_src)]
     if bad:
         raise RuntimeError(f"map refers to frames outside 1..{n_src}: {sorted(set(bad))[:5]}")
-    if not target:
-        raise RuntimeError("refusing to restore an empty map")
+
+    build_frames(src, out=outdir, box=meta.get("box", 750), force=True,
+                 log=log, alpha_png=(ext == ".png"))
 
     frames_dir = os.path.join(outdir, "frames")
     staging = os.path.join(outdir, "frames.restoring")
