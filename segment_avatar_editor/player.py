@@ -1087,6 +1087,21 @@ SEQ_TEMPLATE = """<!doctype html>
      the same x in every row and the rows read as a stack, not a pile. */
   .ctlrow[data-r="3"] button {{ border-color:#4a5259; }}
   .vsep {{ width:1px; height:22px; background:#3a4248; margin:0 4px; flex:none; }}
+
+  /* A BUTTON THAT IS STILL WORKING.
+     A save re-encodes every track it writes, and the overlays are VP9 with
+     alpha, which is slow: one 470-frame overlay took 43 seconds and a whole
+     set took three and a half minutes. With nothing on screen saying so, a
+     finished-looking button over a run still in flight invites a reload — and
+     a reload part way through leaves the rest unwritten. */
+  button.working {{ position:relative; color:#cfe6f5; border-color:#2e8ecc;
+                    cursor:progress; }}
+  button.working::after {{ content:''; position:absolute; right:8px;
+                           top:50%; margin-top:-6px; width:11px; height:11px;
+                           border:2px solid rgba(207,230,245,.30);
+                           border-top-color:#cfe6f5; border-radius:50%;
+                           animation:spin .7s linear infinite; }}
+  @keyframes spin {{ to {{ transform:rotate(360deg); }} }}
   /* Row 4 states what is selected, so it is read, not clicked. */
   .ctlrow.report {{ align-items:flex-start; }}
   /* The player's name, centred and given some weight — it is the page's title. */
@@ -2034,33 +2049,61 @@ SEQ_TEMPLATE = """<!doctype html>
   // which. Those two moved to Backup Scenes; each button now does one thing
   // that can be named in the label.
   async function saveAllScenes() {{
-    const withWork = SEQ.map((s, i) => ({{ i, n: s.n, hist: histOf(s.n) }}))
-                        .filter(x => x.hist.length);
+    const withWork = SEQ.map((s, i) => ({{ i, n: s.n, layers: pendingOf(i) }}))
+                        .filter(x => x.layers.length);
+    const held = SEQ.flatMap((s, i) => heldBackOf(i).map(w =>
+      `  scene ${{s.n}}: ${{w === 'base' ? 'segment' : 'overlay'}} is unticked`));
     if (!withWork.length) {{
       // Nothing to write. If a join or split left a note outstanding, say
       // WHICH button clears it rather than quietly doing it from here — that
       // silent second job is what made this button unreadable.
-      status(RENUMBERED
-        ? `No scene has unsaved edits. A join or split left a renumber note; `
-          + `Backup Scenes is what clears it.`
-        : `No scene has unsaved edits.`);
+      // Say WHY there is nothing, when a lock is the reason. "No scene has
+      // unsaved edits" over a scene you know you edited is the answer that
+      // sends someone looking for a bug that is not there.
+      status(held.length
+        ? `Nothing to save — every edit is on a track you have unticked:\n`
+          + held.join(`\n`)
+        : RENUMBERED
+          ? `No scene has unsaved edits. A join or split left a renumber note; `
+            + `Backup Scenes is what clears it.`
+          : `No scene has unsaved edits.`);
       return;
     }}
     const lines = withWork.map(x => {{
-      const layers = [...new Set(x.hist.flatMap(e => Object.keys(e)))]
-        .map(w => w === 'base' ? 'segment' : 'overlay').join(' and ');
-      return `  scene ${{x.n}}: ${{layers}} (${{x.hist.length}} change${{x.hist.length === 1 ? '' : 's'}})`;
-    }}).join('\\n');
+      const names = x.layers.map(w => w === 'base' ? 'segment' : 'overlay');
+      const sizes = x.layers.map(w => `${{lenOf(x.i, w)}}f`);
+      return `  scene ${{x.n}}: ${{names.join(' and ')}} (${{sizes.join(', ')}})`;
+    }}).join(`\n`);
     if (!confirm(`Save ${{withWork.length}} scene(s)?\n\n${{lines}}\n\n`
                + `WRITING TO\n${{ROOT_REL}}/sandbox/\n\n`
                + `Each file keeps its previous version in its own scene's `
                + `z_History/.\n\n`
+               + (held.length ? `Left alone, because you unticked them:\n`
+                                     + held.join(`\n`) + `\n\n` : ``)
                + `No whole-set backup is taken and no renumber note is cleared. `
                + `Backup Scenes does both of those.`)) return;
     stop();
+    // Both buttons that reach this call, because either could be the one you
+    // pressed. `busy` is written into the label rather than beside it, so the
+    // count is where the eye already is.
+    const btns = ['saveBtn', 'cutBtn'].map(id => $(id)).filter(Boolean);
+    const total_ = withWork.reduce((n, x) => n + x.layers.length, 0);
+    let wrote = 0;
+    const busy = () => btns.forEach(b => {{
+      b.classList.add('working');
+      b.disabled = true;
+      b.innerHTML = `Saving ${{wrote}} / ${{total_}}…`;
+    }});
+    const rest = () => btns.forEach((b, k) => {{
+      b.classList.remove('working');
+      b.disabled = false;
+      b.innerHTML = k === 0 ? '&#10515; Save All' : '&#128190; Save Scenes';
+    }});
+    busy();
+
     const done = [], failed = [], warn = [];
     for (const x of withWork) {{
-      const layers = [...new Set(x.hist.flatMap(e => Object.keys(e)))].filter(w => slugOf(x.i, w));
+      const layers = x.layers;
       let ok = true;
       for (const w of layers) {{
         let d;
@@ -2072,11 +2115,20 @@ SEQ_TEMPLATE = """<!doctype html>
         }} catch (e) {{ failed.push(`scene ${{x.n}} ${{w}}: ${{e}}`); ok = false; continue; }}
         if (d.error) {{ failed.push(`scene ${{x.n}} ${{w}}: ${{d.error}}`); ok = false; continue; }}
         if (d.warning) warn.push(`scene ${{x.n}} ${{w}}: ${{d.warning}}`);
+        // This track's file now matches its cache. Marked per TRACK, so a
+        // scene whose overlay wrote and whose segment failed still shows the
+        // segment as outstanding.
+        setEditedOf(x.i, w, false);
+        wrote++;
+        busy();
       }}
-      // Cleared per scene, and only when that scene wrote cleanly — a scene
-      // that failed must keep its history so it can be retried or undone.
-      if (ok) {{ x.hist.length = 0; done.push(x.n); }}
+      // The undo snapshots go only when the whole scene wrote — one that
+      // failed keeps them, so it can be retried or walked back.
+      if (ok) {{ histOf(x.n).length = 0; done.push(x.n); }}
     }}
+    // Put the labels back BEFORE anything else, so a failure below cannot
+    // leave two buttons spinning over a run that has stopped.
+    rest();
     renderScenes();
     status(`Saved ${{done.length}} of ${{withWork.length}} scene(s)`
          + (done.length ? `: ${{done.join(', ')}}` : '') + '.'
@@ -2200,6 +2252,45 @@ SEQ_TEMPLATE = """<!doctype html>
   //
   // Cleared on a successful save: at that moment the file on disk IS the
   // current state, so there is nothing left to undo back to.
+  // WHICH TRACKS OF A SCENE HAVE EDITS THAT ITS FILE HAS NOT GOT.
+  //
+  // Read from the CACHE — carried on the manifest as base_edited/over_edited,
+  // kept in step here as edits land — and NOT from the undo history below.
+  //
+  // The history is this page's memory, and a reload empties it. That is what
+  // it cost: ten scenes padded by Update Frame Imbalance, the page reloaded
+  // while something unrelated was being fixed, and every save icon came back
+  // pristine over a cache still holding all ten. Save All then answered "no
+  // scene has unsaved edits" and meant it, because it was asking the wrong
+  // thing.
+  //
+  // A LOCKED track is left out. The tick is a deliberate "do not touch this
+  // one", and a save is exactly the touch it is protecting against — but the
+  // caller is told, so a lock can never quietly hold work back.
+  function pendingOf(i) {{
+    const s = SEQ[i];
+    if (!s) return [];
+    return ['base', 'overlay'].filter(w =>
+      slugOf(i, w) && !isLocked(s.n, w) && editedOf(i, w));
+  }}
+  function editedOf(i, w) {{
+    const s = SEQ[i];
+    return !!(s && (w === 'base' ? s.base_edited : s.over_edited));
+  }}
+  function setEditedOf(i, w, on) {{
+    const s = SEQ[i];
+    if (!s) return;
+    if (w === 'base') s.base_edited = on; else s.over_edited = on;
+  }}
+  // Locked tracks that DO have unsaved edits, so a save can name what it is
+  // leaving behind instead of silently skipping it.
+  function heldBackOf(i) {{
+    const s = SEQ[i];
+    if (!s) return [];
+    return ['base', 'overlay'].filter(w =>
+      slugOf(i, w) && isLocked(s.n, w) && editedOf(i, w));
+  }}
+
   const HIST = {{}};                       // scene number -> [{{base, overlay}}, ...]
   const histOf = n => (HIST[n] = HIST[n] || []);
 
@@ -2219,7 +2310,15 @@ SEQ_TEMPLATE = """<!doctype html>
     }}
     return e;
   }}
+  // Every write to a cache marks that track as ahead of its file. Called
+  // beside pushHist rather than inside each edit, for the same reason the lock
+  // and the session log are taken in one place: one of them WILL be forgotten,
+  // and the one forgotten is the edit that never gets saved.
+  function markEdited(i, layers) {{
+    for (const w of layers) setEditedOf(i, w, true);
+  }}
   function pushHist(i, entry) {{
+    markEdited(i, Object.keys(entry || {{}}));
     if (!entry || (!entry.base && !entry.overlay)) return;
     histOf(SEQ[i].n).push(entry);
     renderScenes();
@@ -2255,6 +2354,10 @@ SEQ_TEMPLATE = """<!doctype html>
         if (w === 'base') {{ row.frames = d.nb_frames; row.frames_exact = true; }}
         else {{ row.overlay_frames = d.nb_frames; row.overlay_frames_exact = true; }}
       }}
+      // Whether the clip is still edited AFTER the undo, from the server —
+      // it is not derivable from the frame count, and a page that assumes
+      // "still edited" leaves Save armed with nothing to save.
+      if (d.edited !== undefined) setEditedOf(i, w, !!d.edited);
       done.push(`${{w === 'base' ? 'segment' : 'overlay'}} ${{d.nb_frames}}`);
     }}
     // Popped only after every layer in the entry is back, or a half-applied
@@ -2286,16 +2389,13 @@ SEQ_TEMPLATE = """<!doctype html>
 
   async function saveScene(n) {{
     const i = SEQ.findIndex(s => s.n === n);
-    const hist = histOf(n);
-    if (i < 0 || !hist.length) return;
-    // After a join every scene has been renumbered, so a scene's number no
-    // longer means what it did when its edits were made. Writing one on its own
-    // would put it on disk under a number the rest of the set has not been
-    // written under yet.
-
-    // Which layers this scene actually has pending work on.
-    const layers = [...new Set(hist.flatMap(e => Object.keys(e)))].filter(w => slugOf(i, w));
-    if (!layers.length) {{ hist.length = 0; renderScenes(); return; }}
+    if (i < 0) return;
+    // WHICH TRACKS ARE BEHIND THEIR CACHE — asked of the cache, not of this
+    // page's undo history. The history empties on a reload, and the edits do
+    // not: a scene padded before a reload came back with a pristine icon and
+    // this function returned without doing anything.
+    const layers = pendingOf(i);
+    if (!layers.length) return;
     const names = layers.map(w => w === 'base' ? 'segment' : 'overlay').join(' and ');
     if (!confirm(`Save scene ${{n}} (${{SEQ[i].label}})?\n\n`
                + `WRITING TO\n${{ROOT_REL}}/sandbox/`
@@ -2304,7 +2404,7 @@ SEQ_TEMPLATE = """<!doctype html>
                + `archived to this scene's own z_History/ first.\n\n`
                + `A snapshot of the WHOLE sandbox is taken by "Save all scenes", `
                + `not by this.\n\n`
-               + `This scene's ${{hist.length}} undo step(s) are cleared.`)) return;
+               + `This scene's ${{histOf(n).length}} undo step(s) are cleared.`)) return;
     stop();
     const done = [], warn = [];
     for (const w of layers) {{
@@ -2321,10 +2421,12 @@ SEQ_TEMPLATE = """<!doctype html>
       // loudly: a save that quietly writes a different length than the one you
       // edited is the worst kind of wrong.
       if (d.warning) warn.push(`${{w === 'base' ? 'segment' : 'overlay'}}: ${{d.warning}}`);
+      // This track's file now matches its cache.
+      setEditedOf(i, w, false);
     }}
     // Cleared only after EVERY layer wrote. A partial save that emptied the
     // history would strand the unwritten layer with no way back.
-    hist.length = 0;
+    histOf(n).length = 0;
     renderScenes();
     status(`Saved scene ${{n}} — ${{done.join(', ')}}. History cleared.`
          + (warn.length ? `\n\u26a0 ${{warn.join(' | ')}}` : ''));
@@ -3433,7 +3535,13 @@ SEQ_TEMPLATE = """<!doctype html>
       // Undo and Save for THIS scene. Both are lit only while the scene has
       // unsaved changes -- the same condition, because a save is what empties
       // the history and an undo is what walks back through it.
+      // Two different questions, and they were the same one until it cost ten
+      // scenes. UNDO walks this page's own snapshots, so it needs the history.
+      // SAVE asks whether the FILE is behind its cache — which survives a
+      // reload, and is the only honest answer.
       const hist = histOf(it.n);
+      const iSeq = SEQ.findIndex(x => x.n === it.n);
+      const needsSave = iSeq >= 0 && pendingOf(iSeq).length > 0;
       for (const [act, glyph, cls, tip] of [
             ['undo', '\u21b6', 'undo', 'Undo the last change to this scene'],
             ['save', '\u2913', 'save', 'Save this scene to sandbox and clear its history']]) {{
@@ -3449,11 +3557,11 @@ SEQ_TEMPLATE = """<!doctype html>
         // reloads the page, so every edit made after one was made under the new
         // numbering — saving a single scene was never unsafe, and the lock that
         // used to sit here only got in the way.
-        hb.disabled = hist.length === 0;
+        hb.disabled = act === 'undo' ? hist.length === 0 : !needsSave;
         // Dirty the moment this scene has an unsaved change; pristine again
         // when it is saved OR when every change has been undone — both end with
         // an empty history, which is the one thing that decides it.
-        hb.classList.toggle('dirty', act === 'save' && hist.length > 0);
+        hb.classList.toggle('dirty', act === 'save' && needsSave);
         hb.title = hist.length === 0
           ? `Scene ${{it.n}} has no unsaved changes, so there is nothing to ${{act}}.`
             + ` These two light up as soon as you edit this scene.`
