@@ -82,6 +82,7 @@ GROUPS = [
         ("Select all / none",         "onSelectAll"),
         ("Update Frame Imbalance",    "onBalance"),
         ("Save all scenes",           "onSaveAll"),
+        ("Backup Scenes",             "onBackup"),
         ("VTT, lines edited inline",  "VttPanel"),
         ("Per-scene undo",            "undoScene"),
         ("The naming MODAL",          "NameModal"),
