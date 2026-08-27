@@ -960,8 +960,20 @@ SEQ_TEMPLATE = """<!doctype html>
      The padding is three rows deep at each end, which is what lets scene 1 and
      the last scene sit in the middle like every other one instead of being
      stuck against an edge. */
+  /* NO `scroll-behavior:smooth`, and `overflow-anchor:none`. Both were fought
+     for and both are load-bearing.
+
+     Smooth SWALLOWED the assignment: scrollTop stayed put at 11 through every
+     scene, so the active row was never centred and simply drifted down the
+     panel until it fell off the bottom. Measured — with `auto` the same
+     assignment lands instantly.
+
+     Scroll anchoring is the other half. The active row wraps and the one being
+     left collapses, so row heights change at every boundary (42px against 94px
+     on ski-demo), and the browser helpfully nudges scrollTop to hold the
+     content still — against a scroll that is trying to move it. */
   #vttRows {{ flex:1 1 auto; overflow-y:auto; position:relative;
-              padding-block:87px; scroll-behavior:smooth; }}
+              padding-block:87px; overflow-anchor:none; }}
   #vttSum {{ float:right; text-transform:none; letter-spacing:0; color:#7d868d;
              font-weight:400; }}
   .vt {{ display:grid; grid-template-columns:22px 1fr auto; gap:2px 8px;
