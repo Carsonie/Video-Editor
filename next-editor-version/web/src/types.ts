@@ -123,3 +123,121 @@ export interface ClipMeta {
 export interface ApiError {
   error: string;
 }
+
+// ── the Segment and Avatar Editor ───────────────────────────────────────────
+
+/** One scene on the timeline. Each keeps its OWN extraction — they are ordinary
+ *  pairs, cached and reused — and the manifest maps a global frame to a scene
+ *  plus a local one. Concatenating the frames into one new cache would have
+ *  been simpler and would have thrown away both the reuse and the ability to
+ *  say WHICH scene you are looking at. */
+export interface SeqScene {
+  n: number;
+  label: string;
+  /** A BOOKEND (00-opening, 99-closing) is a real folder with no row in
+   *  script.json. It can sit on a timeline — that is the point, you watch the
+   *  joins — but it cannot be joined or split, because both rewrite the scene
+   *  list and it is not in one. The page has to know that BEFORE it offers to. */
+  in_script: boolean;
+  /** The opening has no raw narration render — it is built from two clips plus
+   *  a morph. A join across that gap has to FILL it, or the next scene's
+   *  narration slides forward on top of the opening. */
+  has_narration: boolean;
+  base_slug: string;
+  base_n: number;
+  base_ext: Ext;
+  base_audio: boolean;
+  over_slug: string | null;
+  over_n: number;
+  over_ext: Ext;
+  over_audio: boolean;
+  base_rel: string;
+  over_rel: string | null;
+  fps: number;
+}
+
+export interface OpenSeqResponse {
+  url: string;
+  slug: string;
+  scenes: number[];
+  missing: number[];
+  manifest: SeqScene[];
+}
+
+/** One row of /api/siblings: every scene of the store, resolved. */
+export interface SiblingRow {
+  n: number;
+  label: string;
+  name: string;
+  dur: number | null;
+  path: string | null;
+  overlay: string | null;
+  src: string | null;
+  overlay_src: string | null;
+  /** No sandbox copy. Shown as a gap rather than quietly resolved from dev,
+   *  because an edit that appears to work on a file the editor cannot write is
+   *  worse than an obvious hole. */
+  missing: boolean;
+  extra?: boolean;
+  frames: number | null;
+  frames_exact: boolean;
+  overlay_frames: number | null;
+  overlay_frames_exact: boolean;
+  current: boolean;
+}
+
+export interface SiblingsResponse {
+  layout: string;
+  editor_scope: string;
+  by_version: Record<string, SiblingRow[]>;
+  folder: string;
+}
+
+export interface VttRow {
+  n: number;
+  label: string;
+  line: string;
+  words: number;
+  pause: number;
+  /** left on the half of a split with no line — its job is done the moment
+   *  someone writes one */
+  todo: boolean;
+}
+
+export interface VttResponse {
+  wps: number;
+  store: string;
+  title: string;
+  scenes: VttRow[];
+}
+
+export interface JoinResponse {
+  joined: number[];
+  label: string;
+  new_n: number;
+  renamed: string[];
+  filled: { scene: number; track: string; frames: number }[];
+  renumbered: { from: number; to: number }[];
+  scenes: number;
+  archived_to: string;
+  /** set on a REFUSAL: the track some scenes have and others do not */
+  gap?: string;
+  scenes_missing?: number[];
+}
+
+export interface SplitResponse {
+  split: number;
+  at: number;
+  labels: string[];
+  tracks: string[];
+  renamed: string[];
+  renumbered: { from: number; to: number }[];
+  scenes: number;
+  line_stayed_with: string;
+  archived_to: string;
+}
+
+export interface RenumberState {
+  renumbered: boolean;
+  moved: { from: number; to: number }[];
+}

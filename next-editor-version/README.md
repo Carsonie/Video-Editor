@@ -141,3 +141,68 @@ The Python run stays at 29/29 and the step says why it skipped, rather than
 showing a green tick that means "not applicable".
 
 ## Phase 3 — the Segment and Avatar Editor in React
+
+**Done.** Several scenes on one timeline, the avatar laid over the footage,
+with every operation driven and checked in a browser: mark, ＋/－ Frame, ＋/－
+Zone, copy and paste, per-scene undo, Update Frame Imbalance, Cut, Save, Save
+all, Join, Split, and the VTT with its lines edited in place.
+
+```
+/timeline?root=<video folder>&ns=1,2,3
+```
+
+`ns=all` is resolved from the store's own script. Bookends are not in the
+script and so are not included — they are ticked on from the scene list,
+deliberately, because a bookend can sit on a timeline but cannot be joined or
+split.
+
+### One component, not two
+
+The Python build had a `PAIR_TEMPLATE` for one scene and a `SEQ_TEMPLATE` for
+several, and they drifted. Here a **one-scene timeline IS the layered view** —
+same controls, same code, nothing to keep in step.
+
+### The rules that had to survive the port
+
+Each of these was paid for with a real defect, and each is a comment in the
+source where it lives:
+
+- **Check every ticked track BEFORE writing any.** The tracks are routinely
+  different lengths — 480 segment against 442 avatar is normal — so the frame
+  on screen can exist in one and be past the end of the other. Skipping past a
+  refusal changed the tracks that worked and left the rest: a half-done edit
+  that reads as an error. It shipped four times, on paste.
+- **One zone, decided before anything is written.** Editing the first layer
+  shifts its marks, so recomputing the zone for the second read the
+  already-moved marks: a 35-frame zone grew the segment by 35 and the overlay
+  by 70.
+- **Resync before aiming an edit at a frame number.** The page's idea of a
+  length can drift below the cache's real one, and the edit is then aimed at
+  the wrong frame.
+- **The VTT's clip length comes from the TIMELINE, not the file.** Reading the
+  file is right for a report and wrong for an editor: a gap that does not move
+  while you add frames is just a lie with a decimal point.
+- **A join that would drop a track refuses**, and offers to fill the gap. The
+  opening has no narration render, so dropping it silently would make scene 2's
+  narration start at frame 1 — Sarah saying the login line over the intro.
+- **The renumber lock is read from `script.json`, not remembered in the page.**
+  A join RELOADS the timeline, so a flag held in JavaScript dies at exactly the
+  moment it starts mattering.
+
+### What the two additive fields are for
+
+`/api/open-seq` and `/api/open-pair` now also return the manifest — the same
+data the generated page carried inside its own JavaScript. Every field the old
+answers had is unchanged, and the test asserts on those.
+
+### Fixed while driving it
+
+- The undo history is keyed by POSITION, so it cannot outlive the set of scenes
+  it came from. After a join, index 0 is a different clip.
+- The footage sets the stage height. A hardcoded aspect put the stage at the
+  wrong shape for any clip that was not 750×422, and the avatar hung off the
+  bottom.
+- A backend too old to send the manifest now says so. It answered everything
+  else perfectly and handed back nothing to draw — a blank page and a stack
+  trace three layers down. The cause was a server still running the previous
+  build.

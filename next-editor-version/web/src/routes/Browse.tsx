@@ -4,6 +4,7 @@ import {
   Alert,
   Badge,
   Box,
+  Button,
   Group,
   Loader,
   Paper,
@@ -91,6 +92,28 @@ export function Browse() {
           </Text>
         </Group>
       )}
+
+      {/* A VIDEO FOLDER is one holding both `sandbox/` and `video/`. Derived
+          from what the listing already returned rather than asked for — the
+          Segment and Avatar Editor works on a whole video, not on one file, so
+          this is the only place it can be entered from. */}
+      {data &&
+        data.dirs.some((d) => d.name === 'sandbox') &&
+        data.dirs.some((d) => d.name === 'video') && (
+          <Paper withBorder radius="md" p="sm" mb="sm">
+            <Group justify="space-between">
+              <Text fz={13}>
+                This is a video folder — its scenes can go on one timeline.
+              </Text>
+              <Button
+                size="compact-sm"
+                onClick={() => navigate(`/timeline?root=${encodeURIComponent(data.path)}&ns=all`)}
+              >
+                Open the Segment and Avatar Editor →
+              </Button>
+            </Group>
+          </Paper>
+        )}
 
       <Paper withBorder radius="md" style={{ overflow: 'hidden' }}>
         {!data && !error && (

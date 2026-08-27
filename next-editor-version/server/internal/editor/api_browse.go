@@ -170,7 +170,24 @@ func (s *Server) openPair(w http.ResponseWriter, req *http.Request, rep *reply, 
 	}
 	sendJSON(w, rep, map[string]any{
 		"url": slug + "/viewer.html", "slug": slug,
-		"base_frames": bm.NbFrames, "overlay_frames": om.NbFrames}, 200)
+		"base_frames": bm.NbFrames, "overlay_frames": om.NbFrames,
+		// The pair's own facts, for a front end that was not generated with
+		// them baked in. ADDITIVE — every field the old answer had is still
+		// here, and the test asserts on those.
+		//
+		// Each half lives in its OWN cache folder under this slug, which is
+		// what lets either be edited without disturbing the other, so the page
+		// needs both paths and not just the pair's name.
+		"base": map[string]any{
+			"slug": slug + "/base", "n": bm.NbFrames, "ext": bm.Ext,
+			"fps": bm.FPS, "audio": bm.HasAudio, "name": bm.SourceName,
+			"rel": bRel, "edited": bm.Edited,
+		},
+		"overlay": map[string]any{
+			"slug": slug + "/overlay", "n": om.NbFrames, "ext": om.Ext,
+			"fps": om.FPS, "audio": om.HasAudio, "name": om.SourceName,
+			"rel": oRel, "edited": om.Edited,
+		}}, 200)
 }
 
 func (s *Server) apiOpenSeq(w http.ResponseWriter, req *http.Request, rep *reply) {
@@ -355,7 +372,13 @@ func (s *Server) openSeq(w http.ResponseWriter, req *http.Request, rep *reply, r
 	}
 	sendJSON(w, rep, map[string]any{
 		"url": slug + "/viewer.html", "slug": slug,
-		"scenes": sceneNs, "missing": missing}, 200)
+		"scenes": sceneNs, "missing": missing,
+		// The manifest itself. The generated page carried this inside its own
+		// JavaScript; a front end that is a static bundle has to be given it.
+		//
+		// ADDITIVE — `url`, `slug`, `scenes` and `missing` are unchanged, and
+		// the test asserts on those.
+		"manifest": manifest}, 200)
 }
 
 // apiSiblings — every scene of this store, RESOLVED, not a directory listing.

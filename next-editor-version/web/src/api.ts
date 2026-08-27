@@ -9,6 +9,12 @@
 import type {
   ArchiveResponse,
   ClipMeta,
+  JoinResponse,
+  OpenSeqResponse,
+  RenumberState,
+  SiblingsResponse,
+  SplitResponse,
+  VttResponse,
   CutResponse,
   EditResponse,
   FrameMapResponse,
@@ -55,6 +61,37 @@ export const api = {
   // ── browsing ──────────────────────────────────────────────────────────
   list: (path: string) => get<ListResponse>('/api/list', { path }),
   open: (path: string) => get<OpenResponse>('/api/open', { path }),
+
+  /** Several scenes as ONE timeline. A scene on its own cannot show the thing
+   *  that most often goes wrong — how one scene JOINS the next. */
+  openSeq: (root: string, ns: number[]) =>
+    get<OpenSeqResponse>('/api/open-seq', { root, ns: ns.join(',') }),
+  /** Every scene of this store, resolved — not a directory listing. */
+  siblings: (path: string) => get<SiblingsResponse>('/api/siblings', { path }),
+
+  // ── the script ────────────────────────────────────────────────────────
+  /** The Video Timing Table — the lines, and the maths behind them. The clip
+   *  LENGTH is left to the page, which knows what is on the timeline including
+   *  edits not yet saved; a gap that does not move while you add frames is
+   *  just a lie with a decimal point. */
+  vtt: (root: string) => get<VttResponse>('/api/vtt', { root }),
+  line: (root: string, n: number, line: string) =>
+    post<{ n: number; line: string; words: number; unchanged?: boolean }>('/api/line', {
+      root,
+      n,
+      line,
+    }),
+  join: (body: {
+    root: string;
+    ns: number[];
+    label: string;
+    tracks: string[];
+    fill_gaps?: boolean;
+  }) => post<JoinResponse>('/api/join', body),
+  split: (body: { root: string; n: number; at: number; labels: string[]; tracks: string[] }) =>
+    post<SplitResponse>('/api/split', body),
+  renumberState: (root: string) => get<RenumberState>('/api/renumber-state', { root }),
+  renumberClear: (root: string) => post<{ cleared: number }>('/api/renumber-clear', { root }),
 
   // ── one clip ──────────────────────────────────────────────────────────
   /** The clip's own facts. The old players baked these into the generated

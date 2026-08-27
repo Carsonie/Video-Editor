@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router';
 
 import { Browse } from './routes/Browse';
+import { Editor } from './routes/Editor';
 import { Splitter } from './routes/Splitter';
 
 // Three views, and the URL says which clip each is looking at — so a page can
@@ -12,6 +13,7 @@ export function App() {
       <Route path="/" element={<Browse />} />
       <Route path="/browse" element={<Browse />} />
       <Route path="/clip/:slug" element={<Splitter />} />
+      <Route path="/timeline" element={<Editor />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
