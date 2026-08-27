@@ -319,6 +319,86 @@ def frame_count(path):
     return None, False
 
 
+def speech_span(outdir):
+    """
+    WHERE THE VOICE ACTUALLY IS inside this clip's audio — not one span, but
+    every run of speech, with the pauses between them left out.
+
+    Two things made a single span wrong, and both were reported from the chair:
+
+      * A scene's avatar does not begin talking on its first frame. Sarah
+        settles into shot first, and how long that takes differs per scene —
+        measured on ski-demo, 1.64s on the opening and 0.11s on the two after
+        it. An offset guessed once is wrong everywhere but one scene.
+
+      * Inside the span she does not talk at a constant rate. She pauses
+        between sentences, then speaks faster than an even spread expects, so
+        a highlight laid evenly over the whole span drifts ahead, waits, and
+        drifts ahead again. Spreading the words over the SPEECH ONLY, run by
+        run, holds it against her.
+
+    Measured with ffmpeg's own silence detector rather than estimated, and
+    written into the clip's meta.json the first time so it is paid for once —
+    about 0.05s per clip. Adding keys there is safe: the cache-validity check
+    compares a fixed list (source, size, mtime, box, alpha_png) and ignores
+    everything else.
+
+    Returns (start, end, runs). `runs` is [[a, b], ...] in seconds. All three
+    are None/empty for a clip with no audio. Only the editor's highlight reads
+    them; nothing that writes a file does.
+    """
+    meta_p = os.path.join(outdir, "meta.json")
+    try:
+        meta = json.load(open(meta_p))
+    except OSError:
+        return None, None, []
+    if "speech_runs" in meta:
+        return meta.get("speech_start"), meta.get("speech_end"), meta.get("speech_runs") or []
+
+    audio = os.path.join(outdir, "audio.m4a")
+    start = end = None
+    runs = []
+    if os.path.isfile(audio):
+        r = subprocess.run(
+            ["ffmpeg", "-hide_banner", "-i", audio,
+             # -45dB is below room tone and above nothing at all. 0.10s so the
+             # ordinary gap between two words is not read as a pause; anything
+             # longer than that is one she actually took.
+             "-af", "silencedetect=noise=-45dB:d=0.10", "-f", "null", "-"],
+            capture_output=True, text=True)
+        log = r.stderr
+        starts = [float(x) for x in re.findall(r"silence_start: ([\d.-]+)", log)]
+        ends = [float(x) for x in re.findall(r"silence_end: ([\d.]+)", log)]
+        try:
+            dur = float(build_mod.probe(audio, "duration"))
+        except (ValueError, RuntimeError):
+            dur = 0.0
+
+        # Walk the silences and keep what is BETWEEN them. A silence with no
+        # matching end is one that runs to the end of the file, so the voice
+        # stopped where it opened and there is nothing after it.
+        pos = 0.0
+        for k, st in enumerate(starts):
+            if st > pos + 0.01:
+                runs.append([round(pos, 3), round(st, 3)])
+            if k >= len(ends):
+                pos = None
+                break
+            pos = ends[k]
+        if pos is not None and dur - pos > 0.01:
+            runs.append([round(pos, 3), round(dur, 3)])
+
+        if runs:
+            start, end = runs[0][0], runs[-1][1]
+
+    meta["speech_start"], meta["speech_end"], meta["speech_runs"] = start, end, runs
+    try:
+        json.dump(meta, open(meta_p, "w"), indent=2)
+    except OSError:
+        pass
+    return start, end, runs
+
+
 def marks_path(outdir):
     return os.path.join(outdir, "breakpoints.json")
 
@@ -902,6 +982,15 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 "has_narration": bool(sb["narration"]) if sb else False,
                 "base_slug": os.path.basename(bdir), "base_n": bm["nb_frames"],
                 "base_ext": bm.get("ext", ".jpg"), "base_audio": bool(bm.get("has_audio")),
+                # WHEN THE VOICE STARTS, per scene. Sarah settles into shot
+                # before she talks, and how long that takes differs scene to
+                # scene, so the editor cannot place a spoken word from the
+                # frame number alone. Read from the AVATAR, which is the clip
+                # carrying her voice; measured once and cached in its meta.
+                # WHERE HER VOICE IS, run by run, so the highlight can hold
+                # through a pause instead of drifting past it. Read from the
+                # AVATAR, which is the clip carrying her voice.
+                "speech_runs": (speech_span(odir)[2] if odir else []),
                 "over_slug": os.path.basename(odir) if odir else None,
                 "over_n": om["nb_frames"] if om else 0,
                 "over_ext": om.get("ext", ".png") if om else ".png",
