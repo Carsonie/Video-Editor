@@ -340,7 +340,50 @@ def archive_name(folder, day=None):
     return f"{day}-v_{seen + 1}"
 
 
-def archive_contents(folder, keep=(), move=True, only=None):
+# ── Add-V ───────────────────────────────────────────────────────────────────
+# A SECOND archive naming scheme, asked for by name.
+#
+#     Add-V      26-8-27_v1     two-digit year, unpadded month and day,
+#                               sequence resetting each day
+#
+# It sits beside the older `2026-08-26-v_1` rather than replacing it, because
+# folders in that shape already exist on disk and renaming someone's backups to
+# suit a new convention is not a rename, it is a rewrite of their history.
+#
+# ⚠ IT DOES NOT SORT. `26-8-3` lands after `26-8-27` in any listing, because
+# the month and day are unpadded. That is the shape that was asked for; the
+# padded form `26-08-27_v1` would sort and is one edit away.
+#
+# The sequence is read from BOTH schemes, so the two can never hand out the same
+# number on the same day. Two counters in one folder, each blind to the other,
+# is exactly how two files come to claim the same version.
+_ADDV_RE = re.compile(r"^(\d{2})-(\d{1,2})-(\d{1,2})_v(\d+)$")
+
+
+def archive_name_v(folder, day=None):
+    """The next Add-V archive name for `folder`, e.g. 26-8-27_v3."""
+    now = time.localtime()
+    yy, mm, dd = (now.tm_year % 100, now.tm_mon, now.tm_mday) if day is None else day
+    stem = f"{yy}-{mm}-{dd}"
+    root = os.path.join(folder, ARCHIVE_DIR)
+    seen = 0
+    if os.path.isdir(root):
+        for d in os.listdir(root):
+            m = _ADDV_RE.match(d)
+            if m and f"{int(m.group(1))}-{int(m.group(2))}-{int(m.group(3))}" == stem:
+                seen = max(seen, int(m.group(4)))
+                continue
+            # The older scheme, for the same calendar day. Read so the two
+            # counters cannot collide, never written by this function.
+            m = _ARCHIVE_RE.match(d)
+            if m:
+                y, mo, dy = (int(x) for x in m.group(1).split("-"))
+                if (y % 100, mo, dy) == (yy, mm, dd):
+                    seen = max(seen, int(m.group(2)))
+    return f"{stem}_v{seen + 1}"
+
+
+def archive_contents(folder, keep=(), move=True, only=None, naming=None):
     """
     Put `folder`'s current generation into folder/z_History/<date>-v_N/.
 
@@ -357,6 +400,9 @@ def archive_contents(folder, keep=(), move=True, only=None):
     folder the caller is about to read from. `only` narrows it to specific
     entries, for a folder that holds more than one kind of thing.
 
+    `naming` picks the folder name: the default `2026-08-26-v_1`, or `"add-v"`
+    for `26-8-27_v1`. See archive_name_v().
+
     Returns the archive path, or None when there was nothing to archive. Doing
     nothing is the normal case for a first run and must not look like a failure.
     """
@@ -369,7 +415,8 @@ def archive_contents(folder, keep=(), move=True, only=None):
         names = [x for x in names if x in set(only)]
     if not names:
         return None
-    dest = os.path.join(folder, ARCHIVE_DIR, archive_name(folder))
+    name = archive_name_v(folder) if naming == "add-v" else archive_name(folder)
+    dest = os.path.join(folder, ARCHIVE_DIR, name)
     os.makedirs(dest, exist_ok=True)
     for x in names:
         src = os.path.join(folder, x)

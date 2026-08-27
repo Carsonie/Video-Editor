@@ -1354,6 +1354,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
         `dry` asks what WOULD happen, so the editor's confirmation can name the
         destination before the user agrees to it rather than after.
+
+        `naming` picks the folder name — the default `<date>-v_N`, or `"add-v"`
+        for `26-8-27_v1`. Both live in the same z_History and the sequence is
+        read from both, so they cannot hand out the same number on one day.
         """
         # Two ways in, one rule. The editor knows the video folder and passes
         # `root`; the splitter knows only the clip it opened, so it passes
@@ -1386,14 +1390,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         skip = set(keep) | {PTH.ARCHIVE_DIR}
         holds = [x for x in sorted(os.listdir(folder))
                  if x not in skip and not x.startswith(".")]
-        would = os.path.join(folder, PTH.ARCHIVE_DIR, PTH.archive_name(folder))
+        naming = payload.get("naming")
+        would = os.path.join(folder, PTH.ARCHIVE_DIR,
+                             PTH.archive_name_v(folder) if naming == "add-v"
+                             else PTH.archive_name(folder))
         if payload.get("dry"):
             return self.send_json({"folder": folder, "would_archive": holds,
                                    "into": would, "empty": not holds})
         if not holds:
             return self.send_json({"folder": folder, "archived_to": None,
                                    "archived": [], "empty": True})
-        dest = PTH.archive_contents(folder, keep=keep, move=(which == "dev"))
+        dest = PTH.archive_contents(folder, keep=keep, move=(which == "dev"),
+                                    naming=payload.get("naming"))
         self.send_json({"folder": folder, "archived_to": dest,
                         "archived": holds, "empty": False,
                         "moved": which == "dev"})
