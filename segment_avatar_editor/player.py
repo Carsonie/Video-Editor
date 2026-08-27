@@ -1112,8 +1112,15 @@ SEQ_TEMPLATE = """<!doctype html>
           display:flex; flex-direction:column; gap:6px; }}
   .bulkrow {{ display:flex; gap:6px; }}
   .bulkrow button {{ flex:1; }}
-  #balanceBtn, #saveAllBtn {{ width:100%; }}
-  #saveAllBtn:not(:disabled) {{ border-color:#2e8ecc; color:#cfe6f5; }}
+  #balanceBtn, #backupBtn {{ width:100%; }}
+  #backupBtn {{ margin-top:6px; }}
+  /* GREEN when a join or split has left a renumber note outstanding — the one
+     moment this button has a second job to do, and the moment it is easiest to
+     walk away from. It stays enabled the rest of the time: a backup is worth
+     taking whenever, and gating it behind a rare event would put the only
+     revert this data has behind a door. */
+  #backupBtn.pending {{ border-color:#2ecc40; color:#dff5e2;
+                        box-shadow:0 0 0 1px rgba(46,204,64,.35); }}
   #balanceBtn:not(:disabled) {{ border-color:#4a8fbf; color:#cfe6f5; }}
   #balNote {{ font-size:11px; line-height:1.5; color:#8b949c; }}
   #balNote b {{ color:#dfe4e7; }}
@@ -1206,7 +1213,7 @@ SEQ_TEMPLATE = """<!doctype html>
   <div class="bar">
     <div id="segbar"></div>
     <div id="ticks"></div>
-    <input id="slider" type="range" min="1" max="{total}" value="1" step="1">
+    <input id="slider" type="range" min="1" max="{total}" value="1" step="1" title="The whole timeline, every scene end to end. Drag to scrub, or click anywhere to jump there. The arrow keys step one frame from wherever you land, which is how you find the exact frame something happens on.">
   </div>
   <div class="meta" id="pos"></div>
 
@@ -1231,7 +1238,7 @@ SEQ_TEMPLATE = """<!doctype html>
        <button id="selNone" title="Untick every scene. Then tick just the few you want to compare, and rebuild.">Unselect all</button>
      </div>
      <button id="balanceBtn" title="Make each ticked scene's two tracks the same length, by repeating the LAST frame of whichever is shorter. The last frame is the settled end of the shot, so the repeat is invisible. Undoable per scene.">&#8646; Update Frame Imbalance</button>
-     <button id="saveAllBtn" title="Write every scene that has unsaved edits back to sandbox/, in one go. Each file is archived to z_History/ first. This is the only way to save once a join has renumbered the scenes.">&#10515; Save all scenes</button>
+     <button id="backupBtn" title="Copy every scene folder in sandbox/ into sandbox/z_History/26-8-27_v1 &mdash; a whole-set backup, because none of this is in git. A COPY: your scenes stay where they are. If a join or split has renumbered the scenes, it also clears that note, which is the only thing left outstanding after one.">&#9707; Backup Scenes</button>
      <div id="balNote"></div>
    </div>
 
@@ -1265,7 +1272,7 @@ SEQ_TEMPLATE = """<!doctype html>
          timeline once at 1x, not start looping a zone the user has not asked
          for yet. Loop Zone is a thing you turn ON to study a seam. -->
     <label id="loopLbl" title="Loop the zone the pointer is inside — the span between the marks either side of it. With no marks it loops the whole scene. Turn this on to watch one seam over and over while you trim it.">
-      <input id="loopChk" type="checkbox"><span>&#8635; Loop Zone</span></label>
+      <input id="loopChk" type="checkbox" title="Loop the zone the pointer is inside — the span between the marks either side of it. With no marks it loops the whole scene."><span>&#8635; Loop Zone</span></label>
     <span class="act" id="joinAct">
       <button id="joinBtn" title="Join every scene on the timeline into ONE new scene. You are asked to name it first and shown exactly what will be merged. Scene numbers are rewritten 1..N afterwards, so from then on scenes must be saved as a set.">Join</button>
       <span class="caret"><svg class="chev" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><select id="joinTrk" title="Which tracks the join acts on. Both is the normal case and the button turns green for it; pick one track alone and the button takes that track's colour. A track you do not pick is NOT carried into the joined scene.">
@@ -1292,8 +1299,8 @@ SEQ_TEMPLATE = """<!doctype html>
     <button id="copyFrame" title="Copy the frame on screen. It is remembered by POSITION, not as a picture — pasting it later inserts the very same frame, with no re-encoding. Hold Shift as you click to put the picture on the Mac clipboard as well, for pasting into another app.">⧉ Copy</button>
     <button id="pasteFrame" disabled title="Paste the copied frame in after the frame on screen, on the ticked tracks. Nothing is copied yet — press Copy first.">⧉ Paste</button>
     <span class="vsep"></span>
-    <button id="cutBtn" title="Cut this scene into separate files at every mark, writing them to the store's segments folder. It never changes the scene you are editing — it only writes new numbered files.">&#9986; Cut scene</button>
-    <button id="saveBtn" title="Write this scene's edits back over its file in sandbox/. The current file is archived to z_History/ first. This is the one control here that changes a file you already had.">&#128190; Save scene</button>
+    <button id="cutBtn" title="Write every scene ON THIS TIMELINE that has unsaved edits back over its file in sandbox/. Each file keeps its previous version in its own scene's z_History/. No whole-set backup is taken and no renumber note is cleared &mdash; Backup Scenes does both of those.">&#128190; Save Scenes</button>
+    <button id="saveBtn" title="Write every scene with unsaved edits back over its file in sandbox/. Same set as Save Scenes: a rebuild reloads the page, so a scene taken off the timeline takes its pending edits with it and there is no third set to reach.">&#10515; Save All</button>
   </div>
 
   <div class="ctlrow report" data-r="4"><span id="rep"></span>
@@ -1308,12 +1315,12 @@ SEQ_TEMPLATE = """<!doctype html>
 <div id="modal"><div class="mbox">
   <h5 id="mTitle">Name it</h5>
   <div id="mBody"></div>
-  <label class="mlab" for="mName">New scene name</label>
-  <input id="mName" type="text" autocomplete="off" spellcheck="false">
+  <label class="mlab" for="mName" title="Lower-case letters, digits and hyphens. This becomes the scene's FOLDER name in sandbox/ and its label in script.json, so it is what every later tool will call this scene.">New scene name</label>
+  <input id="mName" type="text" autocomplete="off" spellcheck="false" title="Lower-case letters, digits and hyphens — no spaces or capitals. It becomes the folder name in sandbox/ and the label in script.json. Enter confirms; Escape cancels.">
   <div id="mErr"></div>
   <div class="mrow">
-    <button id="mCancel">Cancel</button>
-    <button id="mOk">Confirm</button>
+    <button id="mCancel" title="Close this without changing anything. Nothing has been written yet — a join or split only touches your files once you confirm here.">Cancel</button>
+    <button id="mOk" title="Do it. This writes to disk immediately: folders are created and removed in sandbox/ and script.json is rewritten, all in one go. The previous state is archived to z_History/ first, so it is recoverable but not undoable from the editor.">Confirm</button>
   </div>
 </div></div>
   <div class="playerName">{player_label}</div>
@@ -1576,7 +1583,9 @@ SEQ_TEMPLATE = """<!doctype html>
       if (!text) return;
       held = {{ el, text }};
       el.removeAttribute('title');                       // suppress the native one
-      timer = setTimeout(() => show(el, text), 2000);
+      // 3 seconds. Long enough that a tip does not chase the pointer across a
+      // row of eight buttons on the way to the one you meant.
+      timer = setTimeout(() => show(el, text), 3000);
     }});
     document.addEventListener('mouseout', e => {{
       if (held && !held.el.contains(e.relatedTarget)) hide();
@@ -1759,6 +1768,7 @@ SEQ_TEMPLATE = """<!doctype html>
       const d = await r.json();
       RENUMBERED = !!d.renumbered;
       paintSaveBtn();
+      paintBackupBtn();
       // Said, not enforced. Knowing a join moved the numbers is useful; being
       // stopped from saving one scene because of it was not — every edit made
       // after a join is made under the new numbering, since a join reloads the
@@ -1880,70 +1890,119 @@ SEQ_TEMPLATE = """<!doctype html>
   // ── save every scene that has pending work ──────────────────────────────
   // The only way to save once a join has renumbered things, and useful before
   // that too: a set written together is a set whose numbers agree.
+  // ── Backup Scenes ─────────────────────────────────────────────────────
+  // Copy every scene folder in sandbox/ into sandbox/z_History/26-8-27_v1.
+  //
+  // WHY IT EXISTS: none of this is in git. The video is hundreds of megabytes
+  // and git keeps every version of every file forever, so the whole Customers/
+  // tree is ignored — which leaves no revert at all. A per-file z_History
+  // covers "undo that save"; this covers "put the whole set back".
+  //
+  // A COPY, NOT A MOVE. A backup that empties the folder it backed up is not a
+  // backup. The sandbox is edited in place, one scene at a time, and moving it
+  // would take away every scene this backup is not about.
+  //
+  // The second job, and the only conditional one: a join or a split leaves a
+  // `_was_n` marker on every scene whose number moved. The files themselves
+  // were already written — atomically, by the join — so the marker is the ONLY
+  // thing left outstanding, and clearing it is what "I accept this reorder"
+  // means. The button turns green while one is pending.
+  async function backupScenes() {{
+    let plan = null;
+    try {{
+      const r = await fetch('/api/archive', {{ method: 'POST',
+        headers: {{ 'Content-Type': 'application/json' }},
+        body: JSON.stringify({{ root: ROOT_REL, folder: 'sandbox',
+                              naming: 'add-v', dry: true }}) }});
+      plan = await r.json();
+    }} catch (e) {{ /* fall through — the message says so rather than guessing */ }}
+    if (!plan || plan.error) {{ status(`Could not read the sandbox: ${{plan && plan.error}}`); return; }}
+    if (plan.empty) {{ status('The sandbox is empty — nothing to back up.'); return; }}
+
+    const dirty = SEQ.filter(s => histOf(s.n).length).map(s => s.n);
+    if (!confirm(`Back up ${{plan.would_archive.length}} scene folder(s)?\n\n`
+               + `COPYING TO\n${{plan.into}}\n\n`
+               + `Your scenes stay exactly where they are — this is a copy, `
+               + `taken because none of this is in git.\n\n`
+               + (dirty.length
+                  ? `⚠ Scene(s) ${{dirty.join(', ')}} have UNSAVED edits. A backup `
+                    + `copies the FILES ON DISK, so those edits are not in it. `
+                    + `Save All first if you want them.\n\n`
+                  : ``)
+               + (RENUMBERED
+                  ? `A join or split renumbered the scenes. That note is cleared `
+                    + `too — it is the only thing left outstanding after one.`
+                  : `No renumber note is outstanding.`))) return;
+    stop();
+    let dest = null;
+    try {{
+      const r = await fetch('/api/archive', {{ method: 'POST',
+        headers: {{ 'Content-Type': 'application/json' }},
+        body: JSON.stringify({{ root: ROOT_REL, folder: 'sandbox',
+                              naming: 'add-v' }}) }});
+      const d = await r.json();
+      if (d.error) {{ status(`Backup failed: ${{d.error}}`); return; }}
+      dest = d.archived_to;
+    }} catch (e) {{ status(`Backup failed: ${{e}}`); return; }}
+
+    // Only AFTER the copy landed. Clearing the marker first would leave the
+    // note gone and the backup missing if the copy then failed.
+    let cleared = '';
+    if (RENUMBERED) {{
+      try {{
+        await fetch('/api/renumber-clear', {{ method: 'POST',
+          headers: {{ 'Content-Type': 'application/json' }},
+          body: JSON.stringify({{ root: ROOT_REL }}) }});
+        RENUMBERED = false;
+        cleared = ' The renumber note is cleared.';
+      }} catch (e) {{ cleared = ' ⚠ The renumber note could not be cleared.'; }}
+    }}
+    paintBackupBtn();
+    renderScenes();
+    status(`Backed up to:\n${{dest}}${{cleared}}`);
+  }}
+
+  // GREEN while a join or split has left a note outstanding — the one moment
+  // this button has a second job, and the moment it is easiest to walk away
+  // from. Enabled the rest of the time: a backup is worth taking whenever, and
+  // putting the only revert this data has behind a rare event would be worse
+  // than the confusion that gating it would avoid.
+  function paintBackupBtn() {{
+    const b = $('backupBtn');
+    if (b) b.classList.toggle('pending', RENUMBERED);
+  }}
+
+  // ── Save All ──────────────────────────────────────────────────────────
+  // Writes every dirty scene back over its file. THAT IS ALL IT DOES.
+  //
+  // It used to also snapshot the whole sandbox and clear the renumber note, so
+  // one click could do any of three different jobs and nothing on screen said
+  // which. Those two moved to Backup Scenes; each button now does one thing
+  // that can be named in the label.
   async function saveAllScenes() {{
     const withWork = SEQ.map((s, i) => ({{ i, n: s.n, hist: histOf(s.n) }}))
                         .filter(x => x.hist.length);
     if (!withWork.length) {{
-      // A dead end lived here. After a join or a split the page RELOADS, which
-      // throws away every scene's undo history -- so nothing is pending, this
-      // returned early, and the one control able to clear the renumber flag
-      // could never do it. The store stayed locked in "save as a set" for good,
-      // and a single scene could never be saved again.
-      //
-      // Lifting it is safe because the join/split already wrote the whole set
-      // itself: folders renamed and script.json rewritten in one go. There is
-      // nothing left to write, only the requirement left to lift.
-      if (RENUMBERED) {{
-        if (!confirm(`No scene has unsaved edits.\n\n`
-                   + `The join or split already wrote the whole set to sandbox/ `
-                   + `-- every folder renamed and the script renumbered together `
-                   + `-- so there is nothing left to save.\n\n`
-                   + `Clear the renumber note?`)) return;
-        try {{
-          await fetch('/api/renumber-clear', {{ method: 'POST',
-            headers: {{ 'Content-Type': 'application/json' }},
-            body: JSON.stringify({{ root: ROOT_REL }}) }});
-        }} catch (e) {{ status('Could not clear the renumber flag.'); return; }}
-        RENUMBERED = false;
-        paintSaveBtn();
-        renderScenes();
-        status('The set is written. Single scenes can be saved again.');
-        return;
-      }}
-      status('No scene has unsaved edits.'); return;
+      // Nothing to write. If a join or split left a note outstanding, say
+      // WHICH button clears it rather than quietly doing it from here — that
+      // silent second job is what made this button unreadable.
+      status(RENUMBERED
+        ? `No scene has unsaved edits. A join or split left a renumber note; `
+          + `Backup Scenes is what clears it.`
+        : `No scene has unsaved edits.`);
+      return;
     }}
     const lines = withWork.map(x => {{
       const layers = [...new Set(x.hist.flatMap(e => Object.keys(e)))]
         .map(w => w === 'base' ? 'segment' : 'overlay').join(' and ');
       return `  scene ${{x.n}}: ${{layers}} (${{x.hist.length}} change${{x.hist.length === 1 ? '' : 's'}})`;
     }}).join('\\n');
-    // Ask the server what an archive WOULD do before asking the user, so the
-    // confirmation names the real destination instead of describing one.
-    let plan = null;
-    try {{
-      const r = await fetch('/api/archive', {{ method: 'POST',
-        headers: {{ 'Content-Type': 'application/json' }},
-        body: JSON.stringify({{ root: ROOT_REL, folder: 'sandbox', dry: true }}) }});
-      plan = await r.json();
-    }} catch (e) {{ /* the save still goes ahead; the snapshot is the extra */ }}
-    const known = plan && !plan.error;
-    if (!confirm(`Save ${{withWork.length}} scene(s)?\\n\\n${{lines}}\\n\\n`
-               + `WRITING TO\\n${{known ? plan.folder : 'sandbox/'}}\\n\\n`
-               + (known && !plan.empty
-                  ? `The sandbox already holds ${{plan.would_archive.length}} folder(s). `
-                    + `A copy of all of it is taken first:\\n${{plan.into}}\\n\\n`
-                    : known
-                      ? `The sandbox is empty — nothing to archive first.\\n\\n`
-                      : `The archive destination could not be read.\\n\\n`)
-               + `Each file also keeps its previous version in its own scene's `
-               + `z_History/.`)) return;
-    if (known && !plan.empty) {{
-      try {{
-        await fetch('/api/archive', {{ method: 'POST',
-          headers: {{ 'Content-Type': 'application/json' }},
-          body: JSON.stringify({{ root: ROOT_REL, folder: 'sandbox' }}) }});
-      }} catch (e) {{ /* the per-scene archives still cover each file */ }}
-    }}
+    if (!confirm(`Save ${{withWork.length}} scene(s)?\n\n${{lines}}\n\n`
+               + `WRITING TO\n${{ROOT_REL}}/sandbox/\n\n`
+               + `Each file keeps its previous version in its own scene's `
+               + `z_History/.\n\n`
+               + `No whole-set backup is taken and no renumber note is cleared. `
+               + `Backup Scenes does both of those.`)) return;
     stop();
     const done = [], failed = [], warn = [];
     for (const x of withWork) {{
@@ -1964,24 +2023,13 @@ SEQ_TEMPLATE = """<!doctype html>
       // that failed must keep its history so it can be retried or undone.
       if (ok) {{ x.hist.length = 0; done.push(x.n); }}
     }}
-    // Cleared only when EVERY scene wrote: a partial save leaves the set
-    // disagreeing with the script, which is the state the rule exists for.
-    if (done.length === withWork.length && !failed.length) {{
-      try {{
-        await fetch('/api/renumber-clear', {{ method: 'POST',
-          headers: {{ 'Content-Type': 'application/json' }},
-          body: JSON.stringify({{ root: ROOT_REL }}) }});
-      }} catch (e) {{ /* the markers stay; the next load will still refuse, which is safe */ }}
-      RENUMBERED = false;
-      paintSaveBtn();
-    }}
     renderScenes();
     status(`Saved ${{done.length}} of ${{withWork.length}} scene(s)`
          + (done.length ? `: ${{done.join(', ')}}` : '') + '.'
          + (failed.length ? `\\n\u26a0 ${{failed.join('; ')}}` : '')
          + (warn.length ? `\\n\u26a0 ${{warn.join('; ')}}` : ''));
   }}
-  $('saveAllBtn').onclick = saveAllScenes;
+  $('backupBtn').onclick = backupScenes;
 
   // ── list-level actions ──────────────────────────────────────────────────
   const setAllPicks = on => {{
@@ -2175,16 +2223,10 @@ SEQ_TEMPLATE = """<!doctype html>
   // scenes" while a renumber lock was set; the lock is gone. A join reloads the
   // page, so every edit made after one was made under the NEW numbering —
   // saving a single scene on its own was never unsafe.
-  function paintSaveBtn() {{
-    const b = $('saveBtn');
-    if (!b) return;
-    // dataset.tip, not just title: refreshEditGate() caches each control's tip
-    // there and rewrites title from the cache, so title alone gets clobbered.
-    const tip = "Write this scene's edits back over its file in sandbox/. The "
-              + 'current file is archived to z_History/ first.';
-    b.dataset.tip = tip;
-    b.title = tip;
-  }}
+  // Save All's tip is written in the markup and does not change, so nothing
+  // rewrites it here any more. This used to set a PER-SCENE wording on every
+  // renumber-state load, which would now describe the wrong job.
+  function paintSaveBtn() {{}}
 
 
 
@@ -2616,45 +2658,27 @@ SEQ_TEMPLATE = """<!doctype html>
   }}
 
 
-  $('cutBtn').onclick = async () => {{
-    stop();
-    const i = curI(), n = marksOf(i).size;
-    if (!n) {{ status(`No break points on the ${{which}} of scene ${{SEQ[i].n}}.`); return; }}
-    // Named explicitly, because on a timeline the scene you are cutting is not
-    // the only one on screen. Everywhere else that is obvious; here it is not.
-    // Name the layer explicitly. With the Background/Overlay toggle gone
-    // there is nothing on screen to check before writing files, so the
-    // confirm has to carry it -- and say WHY that layer, when both are ticked.
-    const both = !isLocked(SEQ[i].n, 'base') && !isLocked(SEQ[i].n, 'overlay')
-                 && slugOf(i, 'base') && slugOf(i, 'overlay');
-    const layerName = which === 'base' ? 'SEGMENT (the footage)' : 'OVERLAY (the avatar)';
-    if (!confirm(`Cut SCENE ${{SEQ[i].n}} (${{SEQ[i].label}})\\n\\n` +
-                 `Layer: ${{layerName}}` +
-                 (both ? `\\nBoth layers are ticked; Cut writes ONE, and takes the segment.` : '') +
-                 `\\nBreak points: ${{n}}\\n\\nOnly this scene is touched.`)) return;
-    const d = await api('/api/cut', {{}});
-    if (!d) return;
-    status(`Wrote ${{d.count}} segment(s) of scene ${{SEQ[i].n}} to:\\n${{d.outdir}}`);
-  }};
+  // ── Save Scenes ───────────────────────────────────────────────────────
+  // Every scene on THIS TIMELINE that has unsaved edits, written back over its
+  // file in sandbox/.
+  //
+  // This slot used to be Cut scene, and it went for three reasons. It wrote
+  // loose numbered files into the MP4 Splitter's dev/_cuts/, which are not
+  // scenes and need a hand-off before they are. It took only ONE layer — the
+  // segment whenever the segment was ticked — with nothing on screen saying so.
+  // And Split already does the job properly: it names both halves and rewrites
+  // the scene list. The slot went to what is actually reached for from here.
+  $('cutBtn').onclick = saveAllScenes;
 
-  $('saveBtn').onclick = async () => {{
-    stop();
-    const i = curI();
-
-    const bothS = !isLocked(SEQ[i].n, 'base') && !isLocked(SEQ[i].n, 'overlay')
-                  && slugOf(i, 'base') && slugOf(i, 'overlay');
-    const layerS = which === 'base' ? 'SEGMENT (the footage)' : 'OVERLAY (the avatar)';
-    if (!confirm(`Overwrite SCENE ${{SEQ[i].n}} (${{SEQ[i].label}})\\n\\n` +
-                 `Layer: ${{layerS}}` +
-                 (bothS ? `\\nBoth layers are ticked; Save writes ONE, and takes the segment.` : '') +
-                 `\\nNew length: ${{lenOf(i)}} frames\\n\\n` +
-                 `Only this scene is touched. The current file is archived to ` +
-                 `z_History/ first.`)) return;
-    const d = await api('/api/save', {{}});
-    if (!d) return;
-    ver++;
-    status(`Saved ${{d.duration_s}}s to:\\n${{d.path}}`);
-  }};
+  // ── Save All ──────────────────────────────────────────────────────────
+  // The SAME set as Save Scenes, and there is no third set to reach: Rebuild
+  // navigates the page, so a scene taken off the timeline takes its pending
+  // edits with it. Two ways to one call, because that is where the hand is.
+  //
+  // It used to save a SINGLE layer of the current scene and leave that scene's
+  // undo history untouched, while the save icon on the scene row saved every
+  // dirty layer and cleared it. Per-scene saving lives on those icons now.
+  $('saveBtn').onclick = saveAllScenes;
 
   // ── audio ────────────────────────────────────────────────────────────
   // ONE element, re-pointed at each boundary. Two alternating elements would
@@ -3069,8 +3093,12 @@ SEQ_TEMPLATE = """<!doctype html>
             ? `Duplicate the frame on screen, on scene ${{rn}}'s ticked track(s). Same as + Frame below.`
             : `Delete the frame on screen, from scene ${{rn}}'s ticked track(s). Same as - Frame below.`);
     }}
+    // Save Scenes and Save All are NOT in this list. The gate is about the
+    // track under the pointer being locked, and those two act on every scene on
+    // the timeline — greying out the only way to save, because of one scene the
+    // pointer happens to be sitting in, would be a trap.
     for (const id of ['addFrame', 'delFrame', 'addZone', 'delZone',
-                      'addL', 'addR', 'delL', 'delR', 'cutBtn', 'saveBtn']) {{
+                      'addL', 'addR', 'delL', 'delR']) {{
       const el = $(id);
       if (el) {{
         el.disabled = blocked;
