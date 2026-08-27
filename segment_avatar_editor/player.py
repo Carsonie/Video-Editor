@@ -1289,6 +1289,9 @@ SEQ_TEMPLATE = """<!doctype html>
     <button id="addZone" title="Repeat the whole marked zone once more, on the ticked tracks. Useful for stretching a settled stretch to fit a longer line of narration.">&#65291; Zone</button>
     <button id="delZone" title="Remove the whole marked zone from the ticked tracks. Mark either side of what you want gone, then press this.">&#65293; Zone</button>
     <span class="vsep"></span>
+    <button id="copyFrame" title="Copy the frame on screen. It is remembered by POSITION, not as a picture — pasting it later inserts the very same frame, with no re-encoding. Hold Shift as you click to put the picture on the Mac clipboard as well, for pasting into another app.">⧉ Copy</button>
+    <button id="pasteFrame" disabled title="Paste the copied frame in after the frame on screen, on the ticked tracks. Nothing is copied yet — press Copy first.">⧉ Paste</button>
+    <span class="vsep"></span>
     <button id="cutBtn" title="Cut this scene into separate files at every mark, writing them to the store's segments folder. It never changes the scene you are editing — it only writes new numbered files.">&#9986; Cut scene</button>
     <button id="saveBtn" title="Write this scene's edits back over its file in sandbox/. The current file is archived to z_History/ first. This is the one control here that changes a file you already had.">&#128190; Save scene</button>
   </div>
@@ -2255,6 +2258,179 @@ SEQ_TEMPLATE = """<!doctype html>
   // decides add vs remove; the ticked layers decide what is touched, exactly
   // as the per-row +/- do. Sequential per layer: both writes touch the same
   // cache tree.
+  // Ask the SERVER how long each layer of a scene really is, and correct the
+  // page. The page keeps its own count and updates it after every edit — which
+  // works until one edit fails, a cache is rebuilt, or two tabs touch the same
+  // clip. Then it drifts silently and every later edit is aimed at the wrong
+  // frame. Measured: the page said 478 where the cache held 476, so deleting
+  // frame 477 clamped to the end and took the last frame instead.
+  async function resync(i) {{
+    const fixed = [];
+    for (const w of ['base', 'overlay']) {{
+      const slug = slugOf(i, w);
+      if (!slug) continue;
+      try {{
+        const r = await fetch(`/api/frames/map?slug=${{encodeURIComponent(slug)}}`);
+        const d = await r.json();
+        if (d.error || typeof d.nb_frames !== 'number') continue;
+        const was = lenOf(i, w);
+        if (was !== d.nb_frames) {{
+          if (w === 'base') SEQ[i].base_n = d.nb_frames; else SEQ[i].over_n = d.nb_frames;
+          fixed.push(`${{w === 'base' ? 'segment' : 'overlay'}} ${{was}}\u2192${{d.nb_frames}}`);
+        }}
+      }} catch (e) {{ /* keep the page's number; the next edit refuses loudly */ }}
+    }}
+    if (fixed.length) {{ reindex(); rebuildBar(); renderScenes(); }}
+    return fixed;
+  }}
+
+
+  // ── copy and paste a frame ──────────────────────────────────────────────
+  // CLIP holds a POSITION, not a picture: which scene, which frame, on which
+  // tracks. Pasting re-inserts that very frame — the map records the same
+  // source frame the original showed, so nothing is decoded, re-encoded or
+  // guessed at. A trip out to the system clipboard and back would cost a PNG
+  // round trip and leave the map describing a frame it no longer knows.
+  let CLIP = null;
+
+  function paintPaste() {{
+    const b = $('pasteFrame');
+    if (!b) return;
+    b.disabled = !CLIP;
+    const tip = CLIP
+      ? `Paste a copy of scene ${{CLIP.n}}'s frame ${{CLIP.local}} in after the `
+        + `frame on screen, on the ticked tracks. Copied from `
+        + `${{CLIP.layers.map(w => w === 'base' ? 'segment' : 'overlay').join(' + ')}}.`
+      : 'Nothing copied yet — press Copy first.';
+    b.dataset.tip = tip;
+    b.title = tip;
+  }}
+
+  // The picture, for pasting into something else on the Mac. Separate from the
+  // internal copy on purpose: this one IS a picture, and is no use for putting
+  // a frame back into a clip.
+  async function toMacClipboard(i, local) {{
+    const s = SEQ[i];
+    const url = `../${{s.base_slug}}/frames/frame_${{pad(Math.min(local, s.base_n))}}${{s.base_ext}}?v=${{ver}}`;
+    try {{
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      c.getContext('2d').drawImage(img, 0, 0);
+      // PNG because that is the only image type browsers reliably write to a
+      // clipboard; the frame itself is untouched either way.
+      const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+      await navigator.clipboard.write([new ClipboardItem({{ 'image/png': blob }})]);
+      return `${{img.naturalWidth}}\u00d7${{img.naturalHeight}}`;
+    }} catch (e) {{
+      return null;
+    }}
+  }}
+
+  async function copyFrame(alsoMac) {{
+    const i = curI();
+    if (i < 0 || !SEQ[i]) return;
+    const n = SEQ[i].n;
+    const layers = ['base', 'overlay'].filter(w => !isLocked(n, w) && slugOf(i, w));
+    if (!layers.length) {{
+      status(`Scene ${{n}}: tick the segment or the overlay first — nothing to copy.`);
+      return;
+    }}
+    const {{ local }} = at(+$('slider').value);
+    CLIP = {{ i, n, local, layers, label: SEQ[i].label }};
+    paintPaste();
+    let extra = '';
+    if (alsoMac) {{
+      const size = await toMacClipboard(i, local);
+      extra = size ? ` The picture is on the Mac clipboard too (${{size}}).`
+                   : ' The Mac clipboard refused it — the browser only allows that '
+                     + 'from a real click on a focused page.';
+    }}
+    status(`Copied scene ${{n}} frame ${{local}} `
+         + `(${{layers.map(w => w === 'base' ? 'segment' : 'overlay').join(' + ')}}).`
+         + ` Move to where you want it and press Paste.${{extra}}`);
+  }}
+
+  async function pasteFrame() {{
+    if (!CLIP) return;
+    const i = curI();
+    if (i < 0 || !SEQ[i]) return;
+    const n = SEQ[i].n;
+    if (i !== CLIP.i) {{
+      status(`The copied frame is from scene ${{CLIP.n}}, and the playhead is on `
+           + `scene ${{n}}. A paste stays inside one scene — the two clips are `
+           + `different files.`);
+      return;
+    }}
+    const layers = ['base', 'overlay'].filter(w => !isLocked(n, w) && slugOf(i, w)
+                                                   && CLIP.layers.includes(w));
+    if (!layers.length) {{
+      status(`Nothing to paste onto: the copy came from `
+           + `${{CLIP.layers.join(' + ')}}, and those tracks are not ticked now.`);
+      return;
+    }}
+    stop();
+    const fixed = await resync(i);
+    if (fixed.length) {{
+      status(`Scene ${{n}}: this page was out of step with the clip `
+           + `(${{fixed.join(', ')}}). Corrected — try the paste again.`);
+      return;
+    }}
+    const before = await snapshot(i, layers);
+    const {{ local }} = at(+$('slider').value);
+
+    // CHECK EVERY TRACK BEFORE WRITING ANY. The two tracks are routinely
+    // different lengths — 480 segment against 442 avatar is normal — so a frame
+    // that exists in one can be past the end of the other. Writing them in turn
+    // and stopping at the first error left the segment pasted and the avatar
+    // refused: a half-done edit, reported as a failure. It happened four times
+    // in a row, each adding a frame to one track only.
+    const tooShort = layers.filter(w => local > lenOf(i, w) || CLIP.local > lenOf(i, w));
+    if (tooShort.length) {{
+      const names = tooShort.map(w => w === 'base' ? 'segment' : 'overlay');
+      alert(`Frame ${{local}} is past the end of the `
+          + `${{names.join(' and ')}} on scene ${{n}}.\n\n`
+          + layers.map(w => `  ${{w === 'base' ? 'segment' : 'overlay'}}: `
+                          + `${{lenOf(i, w)}} frames`).join('\\n')
+          + `\n\nNothing was pasted. The two tracks are different lengths, so a `
+          + `frame that exists in one can be past the end of the other — untick `
+          + `the shorter track, or move to a frame both of them have.`);
+      return;
+    }}
+
+    const done = [];
+    for (const w of layers) {{
+      try {{
+        const r = await fetch('/api/frames/paste', {{ method: 'POST',
+          headers: {{ 'Content-Type': 'application/json' }},
+          body: JSON.stringify({{ slug: slugOf(i, w),
+                                 from: CLIP.local, at: local }}) }});
+        const d = await r.json();
+        if (d.error) {{
+          // Past the pre-flight and still refused: something changed under us.
+          // Say what DID happen, because a track already written is not nothing.
+          alert(`Paste failed on the ${{w === 'base' ? 'segment' : 'overlay'}}: ${{d.error}}\n\n`
+              + (done.length ? `The ${{done.join(', ')}} was already written. Use Undo `
+                             + `to take it back.` : 'Nothing was written.'));
+          if (done.length) pushHist(i, before);
+          reindex(); rebuildBar(); renderScenes();
+          return;
+        }}
+        if (w === 'base') SEQ[i].base_n = d.nb_frames; else SEQ[i].over_n = d.nb_frames;
+        done.push(`${{w === 'base' ? 'segment' : 'overlay'}} ${{d.nb_frames}}`);
+      }} catch (e) {{ status(`Paste failed: ${{e}}`); return; }}
+    }}
+    pushHist(i, before);
+    ver++;
+    reindex(); rebuildBar(); renderScenes();
+    const g = starts[i] + Math.min(local + 1, lenOf(i, 'base'));
+    $('slider').value = g; show(g);
+    status(`Pasted scene ${{CLIP.n}}'s frame ${{CLIP.local}} after frame ${{local}} — `
+         + `${{done.join(', ')}}. Timeline is ${{(total / (SEQ[0].fps || 25)).toFixed(2)}}s.`);
+  }}
+
   async function doEdit(kind, span) {{
     const i = curI();
     if (i < 0 || !SEQ[i]) return;
@@ -2265,9 +2441,35 @@ SEQ_TEMPLATE = """<!doctype html>
       return;
     }}
     stop();
+    // Straighten the page's counts BEFORE aiming an edit at a frame number.
+    const fixed = await resync(i);
+    if (fixed.length) {{
+      status(`Scene ${{n}}: this page was out of step with the clip `
+           + `(${{fixed.join(', ')}}). Corrected — try that edit again.`);
+      return;
+    }}
     // Snapshot BEFORE the write, and of exactly the layers about to change.
     const before = await snapshot(i, layers);
     const {{ local }} = at(+$('slider').value);
+    // CHECK EVERY TICKED TRACK BEFORE WRITING ANY. The two are routinely
+    // different lengths — 480 segment against 442 avatar is normal — so the
+    // frame on screen can exist in one and be past the end of the other. This
+    // loop used to `continue` past a refusal, which changed the tracks that
+    // worked and skipped the rest: a half-done edit that reads as an error.
+    if (!span) {{
+      const short = layers.filter(w => local > lenOf(i, w));
+      if (short.length) {{
+        alert(`Frame ${{local}} is past the end of the `
+            + `${{short.map(w => w === 'base' ? 'segment' : 'overlay').join(' and ')}} `
+            + `on scene ${{n}}.\n\n`
+            + layers.map(w => `  ${{w === 'base' ? 'segment' : 'overlay'}}: `
+                            + `${{lenOf(i, w)}} frames`).join('\\n')
+            + `\n\nNothing was changed. Untick the shorter track, or move to a `
+            + `frame both of them have.`);
+        return;
+      }}
+    }}
+
     // ONE zone, decided BEFORE anything is written. Editing the first layer
     // shifts its marks, so recomputing the zone for the second layer read the
     // ALREADY-MOVED marks and gave a different, larger span: a 35-frame zone
@@ -2282,18 +2484,24 @@ SEQ_TEMPLATE = """<!doctype html>
         const z = zone;
         path = kind === 'dup' ? '/api/frames/dup-span' : '/api/frames/del-span';
         body = {{ slug: slugOf(i, w), a: Math.min(z.a, len), b: Math.min(z.b, len) }};
+      // NOTE: neither branch clamps with lenOf(). That clamp read this page's
+      // OWN idea of the length, and when it had drifted below the cache's real
+      // one — 478 here against 476 there — every frame past its number silently
+      // became the LAST frame, so deleting frame 477 took one off the END
+      // instead of the frame on screen. The server validates a span against the
+      // real length and refuses outside it, so sending the frame unclamped
+      // turns a drift into a visible refusal instead of a wrong deletion.
       }} else if (kind === 'dup') {{
         // Insert the copy immediately AFTER the frame on screen, so the new
         // frame is the one the playhead lands on below.
         path = '/api/frames/dup';
-        body = {{ slug: slugOf(i, w), at: Math.min(local, len), count: 1, side: 'right' }};
+        body = {{ slug: slugOf(i, w), at: local, count: 1, side: 'right' }};
       }} else {{
         // Delete the frame ON SCREEN. The single-frame endpoint deletes to one
         // SIDE of the current frame and so could never remove the frame you are
         // looking at; a one-frame span is exactly that frame.
         path = '/api/frames/del-span';
-        const f = Math.min(local, len);
-        body = {{ slug: slugOf(i, w), a: f, b: f }};
+        body = {{ slug: slugOf(i, w), a: local, b: local }};
       }}
       let d;
       try {{
@@ -2391,6 +2599,8 @@ SEQ_TEMPLATE = """<!doctype html>
       + repCell('overlay', track('overlay'), 'ovl');
   }}
 
+  $('copyFrame').onclick = ev => copyFrame(ev.shiftKey);
+  $('pasteFrame').onclick = () => pasteFrame();
   $('addFrame').onclick = () => doEdit('dup', false);
   $('delFrame').onclick = () => doEdit('del', false);
   $('addZone').onclick  = () => doEdit('dup', true);
@@ -3096,6 +3306,7 @@ SEQ_TEMPLATE = """<!doctype html>
   function renderNote() {{}}
 
   reindex(); rebuildBar(); paint(); renderNote(); loadScenes(); show(1);
+  paintPaste();
   loadRenumberState();
   loadVtt();
   renderReport();   // row 4 must say something before the first click
