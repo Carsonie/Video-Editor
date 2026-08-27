@@ -9,8 +9,9 @@ cd .claude/agent-tools/6_end-customer-help-video-creations/video_players
 python3 tests/test_editor.py
 ```
 
-86 checks in 27 steps — one step per disk function, plus building the store.
-About 90 seconds cold, 25 warm. Exit code is non-zero if any fail.
+141 checks in 35 steps — one per endpoint, plus the behaviour steps that
+cross several: alpha survival, cache locking, the join's gap filler.
+About 90 seconds cold, 30 warm. Exit code is non-zero if any fail.
 
 Every run writes a log next to the test:
 

@@ -48,6 +48,23 @@ import fixture  # noqa: E402
 PLAYERS = os.path.dirname(HERE)
 SERVE = os.path.join(PLAYERS, "shared", "serve.py")
 
+ENDPOINTS_TESTED = ENDPOINTS_TOTAL = 0
+
+
+def endpoint_counts():
+    """How many endpoints the server has, and how many this file names.
+
+    Read from the SOURCE rather than written down. A hardcoded "28 of 28" went
+    stale the moment an endpoint was added, and read as full coverage while one
+    was untested — which is exactly what happened to /api/frames/paste.
+    """
+    src = open(os.path.join(PLAYERS, "shared", "serve.py")).read()
+    total = set(re.findall(r'parsed\.path == "(/api/[a-z/-]+)"', src))
+    mine = set(re.findall(r'"(/api/[a-z/-]+)"', open(__file__).read()))
+    return len(total & mine), len(total)
+
+
+
 BASE = None            # set by main()
 RESULTS = []           # (name, ok, detail)
 LOG = []               # every line, for the log file
@@ -548,14 +565,20 @@ def s_pages_parse():
         check("node is available to parse the pages", False,
               "install node, or this can never catch a broken page again")
         return
-    seg = f"{fixture.ROOT_REL}/sandbox/03-charlie-scene/segment.mp4"
-    av = f"{fixture.ROOT_REL}/sandbox/03-charlie-scene/avatar.webm"
+    # Read the folder from the SCRIPT. Naming one directly fails here: this
+    # runs last, and the join and split above have renamed every scene by now.
+    doc = json.load(open(os.path.join(fixture.STORE, "video", "script.json")))
+    sc = doc["scenes"][-1]
+    folder = f"{sc['n']:02d}-{sc['label']}"
+    seg = f"{fixture.ROOT_REL}/sandbox/{folder}/segment.mp4"
+    av = f"{fixture.ROOT_REL}/sandbox/{folder}/avatar.webm"
     pages = {}
     d, _ = get("/api/open", path=seg)
     pages["MP4 Splitter"] = d.get("url")
     d, _ = get("/api/open-pair", base=seg, overlay=av)
     pages["Segment and Avatar Editor (layered)"] = f"{d.get('slug')}/viewer.html"
-    d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns="1,2,3")
+    ns = ",".join(str(x["n"]) for x in doc["scenes"])
+    d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns=ns)
     pages["Segment and Avatar Editor (timeline)"] = f"{d.get('slug')}/viewer.html"
 
     for name, url in pages.items():
@@ -580,6 +603,175 @@ def s_pages_parse():
               else next((l for l in first if "Error" in l), first[0] if first else ""))
 
 
+def live_clip(folder="03-charlie-scene", name="segment.mp4"):
+    """Open a clip and return its cache slug.
+
+    The steps below run AFTER reset-editor has deleted the slug the earlier
+    ones shared, so each opens its own. Reusing a slug across a reset is how
+    the first version of these steps failed — with a KeyError, which reads as a
+    test bug rather than as "that cache is gone".
+    """
+    d, _ = get("/api/open", path=f"{fixture.ROOT_REL}/sandbox/{folder}/{name}")
+    return (d.get("url") or "").split("/")[0]
+
+
+def s_paste():
+    step("/api/frames/paste — copy a frame, put it somewhere else")
+    slug = live_clip()
+    d, _ = get("/api/frames/map", slug=slug)
+    before, m0 = d["nb_frames"], d["frame_map"]
+
+    must("/api/frames/paste", slug=slug, **{"from": 5, "at": 20})
+    d, _ = get("/api/frames/map", slug=slug)
+    m1 = d["frame_map"]
+    eq("one more frame", d["nb_frames"], before + 1)
+    # The whole point: the pasted frame IS frame 5, not a picture of it.
+    eq("the pasted frame carries frame 5's SOURCE number", m1[20], m0[4])
+    eq("the frame it was pasted after is untouched", m1[19], m0[19])
+    eq("everything after it shifted right by one", m1[21], m0[20])
+    check("and the frame it was copied FROM still stands", m1[4] == m0[4], "")
+
+    _, code = post("/api/frames/paste", slug=slug, **{"from": 5, "at": 9999})
+    eq("refuses a target past the end", code, 400)
+    _, code = post("/api/frames/paste", slug=slug, **{"from": 9999, "at": 5})
+    eq("refuses a source past the end", code, 400)
+    _, code = post("/api/frames/paste", slug="../escape", **{"from": 1, "at": 1})
+    eq("refuses a slug with a separator", code, 400)
+
+    must("/api/frames/restore", slug=slug, frame_map=m0)
+    d, _ = get("/api/frames/map", slug=slug)
+    eq("put back for the steps that follow", d["nb_frames"], before)
+
+
+def s_alpha_survives():
+    step("alpha survives a rebuild — the bug that made the avatar vanish")
+    # An OVERLAY is extracted as PNG with real transparency. clear-edits and
+    # save both re-extract with force=True, and both used to drop alpha_png —
+    # so the clip came back as flat JPEG, named .jpg while the page asks for
+    # .png. Every overlay frame 404s and the avatar is simply not there.
+    av = f"{fixture.ROOT_REL}/sandbox/03-charlie-scene/avatar.webm"
+    d, _ = get("/api/open", path=av)
+    slug = (d.get("url") or "").split("/")[0]
+    check("an alpha clip opened", bool(slug), slug)
+
+    meta = os.path.join(PLAYERS, "cache", slug, "meta.json")
+    m = json.load(open(meta))
+    eq("extracted as PNG, with alpha", m.get("ext"), ".png")
+    check("and the flag is recorded", m.get("alpha_png") is True, str(m.get("alpha_png")))
+
+    must("/api/clear-edits", slug=slug)
+    m = json.load(open(meta))
+    eq("clear-edits keeps it PNG", m.get("ext"), ".png")
+    check("clear-edits keeps the alpha flag", m.get("alpha_png") is True,
+          str(m.get("alpha_png")))
+
+    must("/api/frames/dup", slug=slug, at=3, count=1, side="right")
+    must("/api/save", slug=slug)
+    m = json.load(open(meta))
+    eq("a SAVE keeps it PNG too", m.get("ext"), ".png")
+    check("a save keeps the alpha flag", m.get("alpha_png") is True,
+          str(m.get("alpha_png")))
+    check("and the written file still has real alpha",
+          fixture.probe_pix_fmt(os.path.join(fixture.STORE, "sandbox",
+                                             "03-charlie-scene", "avatar.webm")) == "yuva420p",
+          fixture.probe_pix_fmt(os.path.join(fixture.STORE, "sandbox",
+                                             "03-charlie-scene", "avatar.webm")))
+
+
+def s_restore_is_safe():
+    step("/api/frames/restore — refuses without destroying anything")
+    slug = live_clip("03-charlie-scene")
+    d, _ = get("/api/frames/map", slug=slug)
+    n, m0 = d["nb_frames"], d["frame_map"]
+    # It used to re-extract FIRST and validate second, so a map that failed the
+    # check had already wiped the edits it was meant to restore.
+    _, code = post("/api/frames/restore", slug=slug,
+                   frame_map=list(range(1, n + 500)))
+    eq("an impossible map is refused", code, 400)
+    d, _ = get("/api/frames/map", slug=slug)
+    eq("and the cache is untouched", d["nb_frames"], n)
+    check("byte for byte, the same map", d["frame_map"] == m0, "")
+
+    _, code = post("/api/frames/restore", slug=slug, frame_map=[])
+    eq("an empty map is refused", code, 400)
+
+
+def s_one_writer_per_cache():
+    step("one writer per cache folder — six edits at once stay consistent")
+    # The server is threaded. Nothing used to lock a cache folder, so two
+    # clicks a second apart re-extracted into the same frames/ directory and
+    # stomped on each other: a 440-frame clip ended up with a 204-frame cache.
+    import threading
+    slug = live_clip("03-charlie-scene")
+    d, _ = get("/api/frames/map", slug=slug)
+    start = d["nb_frames"]
+    errs = []
+
+    def hit():
+        d, c = post("/api/frames/dup", slug=slug, at=10, count=1, side="right")
+        if c != 200 or d.get("error"):
+            errs.append(d.get("error", c))
+
+    ts = [threading.Thread(target=hit) for _ in range(6)]
+    for t in ts:
+        t.start()
+    for t in ts:
+        t.join()
+    eq("all six succeeded", errs, [])
+    d, _ = get("/api/frames/map", slug=slug)
+    files = len(os.listdir(os.path.join(PLAYERS, "cache", slug, "frames")))
+    eq("the count is exactly six more", d["nb_frames"], start + 6)
+    eq("and the files on disk agree", files, start + 6)
+
+    must("/api/frames/restore", slug=slug, frame_map=list(range(1, start + 1)))
+    d, _ = get("/api/frames/map", slug=slug)
+    eq("put back", d["nb_frames"], start)
+
+
+def s_bookends_and_gaps():
+    step("bookends and missing tracks — what a join refuses, and what it fills")
+    d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns="1,2,3")
+    seq_slug = d.get("slug")
+    page = open(os.path.join(PLAYERS, "cache", seq_slug, "viewer.html")).read()
+    check("the manifest marks which scenes are in the script",
+          '"in_script"' in page, "in_script")
+    check("and which have a narration render",
+          '"has_narration"' in page, "has_narration")
+
+    # A scene with no narration joined to scenes that have one. Without
+    # fill_gaps the next scene's narration would start at frame 1.
+    #
+    # The folder is read from the SCRIPT, not assumed: by this point the join
+    # and split above have renamed every scene, so 01-alpha-scene is long gone.
+    # Naming it directly made this step delete nothing and then assert on a gap
+    # that was never created.
+    doc = json.load(open(os.path.join(fixture.STORE, "video", "script.json")))
+    first = doc["scenes"][0]
+    folder = f"{first['n']:02d}-{first['label']}"
+    nar = os.path.join(fixture.STORE, "sandbox", folder, "narration.webm")
+    check(f"scene 1 is {folder}, and it has a narration to remove",
+          os.path.isfile(nar), folder)
+    os.remove(nar)
+    seg1 = fixture.frames(os.path.join(fixture.STORE, "sandbox", folder, "segment.mp4"))
+    d, code = post("/api/join", root=fixture.ROOT_REL, ns=[1, 2], label="mixed",
+                   tracks=["segment", "avatar"])
+    eq("refuses a mixed narration without being told to fill", code, 400)
+    eq("and names the track", d.get("gap"), "narration")
+    eq("and the scene missing it", d.get("scenes_missing"), [1])
+
+    d, _ = post("/api/join", root=fixture.ROOT_REL, ns=[1, 2], label="mixed",
+                tracks=["segment", "avatar"], fill_gaps=True)
+    check("with fill_gaps it joins", "error" not in d, d.get("error", ""))
+    filled = d.get("filled") or []
+    eq("and says what it filled", [f["scene"] for f in filled], [1])
+    nar_n = fixture.frames(os.path.join(fixture.STORE, "sandbox", "01-mixed",
+                                        "narration.webm"), alpha=True)
+    eq("the filler is as long as the scene that had none",
+       filled[0]["frames"], seg1)
+    check("so the narration is the filler plus the one that existed",
+          nar_n > seg1, f"{nar_n} frames, filler was {seg1}")
+
+
 # Every disk function, in dependency order. The count in the log's footer is
 # taken from this list, so a new endpoint that is not here is visibly missing.
 FUNCTIONS = [
@@ -590,7 +782,8 @@ FUNCTIONS = [
     s_save, s_clear_edits, s_cut, s_reset_editor,
     s_vtt, s_line,
     s_join, s_renumber_state, s_renumber_clear, s_split,
-    s_handoff, s_archive,
+    s_paste, s_alpha_survives, s_restore_is_safe, s_one_writer_per_cache,
+    s_handoff, s_archive, s_bookends_and_gaps,
     s_pages_parse,
 ]
 
@@ -605,12 +798,15 @@ def main():
     a = ap.parse_args()
     BASE = f"http://localhost:{a.port}"
 
+    global ENDPOINTS_TESTED, ENDPOINTS_TOTAL
+    ENDPOINTS_TESTED, ENDPOINTS_TOTAL = endpoint_counts()
     ver = open(os.path.join(PLAYERS, "segment_avatar_editor", "VERSION")).read().strip()
     started = time.time()
     stamp = time.strftime("%H_%M_%S")
     name = f"editor_{stamp}.log"
     out(f"Editor Test:  {time.strftime('%Y-%m-%dT%H:%M:%S')}")
     out(f"Player:       Segment and Avatar Editor v{ver}")
+    out(f"Endpoints:    {ENDPOINTS_TESTED} of {ENDPOINTS_TOTAL} exercised")
     out(f"Store:        {fixture.ROOT_REL}  (built, used, deleted)")
     out(f"Target:       local → {BASE}")
     out(f"Log:          {name}")
@@ -652,7 +848,10 @@ def main():
     for num, title, idxs in STEPS:
         ok = all(RESULTS[i][1] for i in idxs)
         out(f"  {'✅' if ok else '❌'} Step {num}: {title}")
-    out(f"\n  Steps:      {len(FUNCTIONS)} + the store build")
+    # Counted from the source, not written down — a new endpoint then shows
+    # up as a smaller number here instead of quietly going untested.
+    out(f"\n  Endpoints:  {ENDPOINTS_TESTED}/{ENDPOINTS_TOTAL} exercised")
+    out(f"  Steps:        {len(FUNCTIONS)} + the store build")
     out(f"  Checks:     {len(RESULTS) - len(bad)}/{len(RESULTS)} passed")
     out(f"  Elapsed:    {time.time() - started:.0f}s")
     out(f"  Result:     {'PASS' if not bad else 'FAIL'}")

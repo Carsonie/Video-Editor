@@ -80,6 +80,17 @@ def frames(path, alpha=False):
     return int(out) if out.isdigit() else None
 
 
+def probe_pix_fmt(path):
+    """The pixel format, with the decoder FORCED. Plain ffprobe reports an alpha
+    WebM as yuv420p and hands back the wrong answer — which is exactly what the
+    alpha test exists to catch."""
+    r = subprocess.run(["ffprobe", "-v", "error", "-c:v", "libvpx-vp9",
+                        "-i", path, "-select_streams", "v",
+                        "-show_entries", "stream=pix_fmt", "-of", "csv=p=0"],
+                       capture_output=True, text=True)
+    return r.stdout.strip()
+
+
 def cut(src, dst, n, alpha):
     """First `n` frames of `src`. -frames:v, never -t: a duration cutoff drops
     the frame that lands on the boundary, which is the bug that made Save write
