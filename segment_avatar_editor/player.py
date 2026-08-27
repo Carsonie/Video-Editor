@@ -937,21 +937,53 @@ SEQ_TEMPLATE = """<!doctype html>
   .scene .ovv {{ font-size:10px; padding:0 4px; border:1px solid #444; border-radius:3px; }}
   #rebuildBtn {{ width:100%; margin-top:8px; font-size:12px; }}
   #rebuildBtn:not(:disabled) {{ background:#1f5c2e; border-color:#2ecc40; }}
+  /* A FIXED height, not a max. It used to be `max-height:300px`, so the panel
+     was as tall as its contents until they passed 300 — and the active row
+     swaps a one-line label for a textarea, which is more than twice as tall.
+     Every scene boundary therefore changed the panel's own height and shoved
+     the page up and down under the playhead. Now the box never moves and the
+     rows scroll inside it.
+
+     Sized for about SEVEN rows: six collapsed at ~29px plus the open one at
+     ~66px, under a 30px heading. */
   #vtt {{ width:var(--box); border:1px solid #3a4248; border-radius:8px;
-          background:#1b1f22; max-height:300px; overflow:auto; }}
-  #vttHead {{ position:sticky; top:0; background:#1b1f22; z-index:1;
+          background:#1b1f22; height:270px; overflow:hidden;
+          display:flex; flex-direction:column; }}
+  #vttHead {{ flex:none; background:#1b1f22;
               padding:7px 10px; border-bottom:1px solid #3a4248;
               font-size:11px; letter-spacing:.05em; text-transform:uppercase;
               color:#9aa; font-weight:600; }}
+  /* `position:relative` so a row's offsetTop is measured against THIS box —
+     the centring maths reads it, and against any other offsetParent it would
+     scroll to the wrong place.
+
+     The padding is three rows deep at each end, which is what lets scene 1 and
+     the last scene sit in the middle like every other one instead of being
+     stuck against an edge. */
+  #vttRows {{ flex:1 1 auto; overflow-y:auto; position:relative;
+              padding-block:87px; scroll-behavior:smooth; }}
   #vttSum {{ float:right; text-transform:none; letter-spacing:0; color:#7d868d;
              font-weight:400; }}
   .vt {{ display:grid; grid-template-columns:22px 1fr auto; gap:2px 8px;
          padding:6px 10px; border-bottom:1px solid #262c31; cursor:text;
-         text-align:left; }}
+         text-align:left; align-items:center; min-height:29px; }}
   .vt:last-child {{ border-bottom:none; }}
   .vt .vn {{ color:#8a949b; font-size:12px; text-align:right; }}
-  .vt .vl {{ color:#cfd6da; font-size:12px; overflow:hidden;
+  .vt .vl {{ color:#cfd6da; font-size:14px; overflow:hidden;
              text-overflow:ellipsis; white-space:nowrap; }}
+  /* The ACTIVE line wraps. One-line-with-an-ellipsis is right for the rows you
+     are skimming, and useless for the one being spoken: most of the line is
+     off the end, so the word being highlighted would be hidden more often
+     than not. The panel is a fixed height now, so a taller row scrolls
+     instead of moving the page. */
+  .vt.on .vl {{ white-space:normal; overflow:visible; line-height:1.45; }}
+  /* The word being spoken, near enough. Its position is ESTIMATED from the
+     scene's elapsed time and the voice's measured words-per-second — there are
+     no per-word timings anywhere in this pipeline, and HeyGen does not return
+     any. It is an aid for lining the picture up against the line, not a
+     measurement: a long word and a short one get the same slice. */
+  .vt .wnow {{ background:#f5e08a; color:#1b1f22; border-radius:3px;
+               padding:0 2px; }}
   .vt .vt3 {{ font-size:11px; font-variant-numeric:tabular-nums; color:#8b949c;
               white-space:nowrap; }}
   /* The gap is the number the table exists for: how long she sits frozen with
@@ -961,13 +993,17 @@ SEQ_TEMPLATE = """<!doctype html>
   .vt .gapNeg {{ color:#e05c5c; font-weight:600; }}
   .vt textarea {{ grid-column:2 / span 2; background:#151a1d; color:#dfe4e7;
                   border:1px solid #333b41; border-radius:5px; padding:5px 7px;
-                  font:inherit; font-size:12px; line-height:1.35; resize:vertical;
+                  font:inherit; font-size:14px; line-height:1.35; resize:vertical;
                   width:100%; box-sizing:border-box; display:none; }}
   /* Only the scene under the pointer opens its editor. Every line as a textarea
      at once is a wall of boxes, and only one of them is the line being watched. */
   .vt.on {{ background:#1f262b; }}
-  .vt.on .vl {{ display:none; }}
-  .vt.on textarea {{ display:block; }}
+  /* Being the scene under the playhead no longer means "being edited". The
+     active row now shows its LINE, so the spoken word can be highlighted in
+     it; the box opens when you click the row, and closes when you click away.
+     A textarea cannot carry a highlight inside it. */
+  .vt.editing .vl {{ display:none; }}
+  .vt.editing textarea {{ display:block; }}
   .vt.on .vn {{ color:#dfe4e7; font-weight:600; }}
   .vt textarea:focus {{ outline:none; border-color:#2ecc40; }}
   .vt.dirty textarea {{ border-color:#e0c060; }}
@@ -1411,7 +1447,13 @@ SEQ_TEMPLATE = """<!doctype html>
     }}
     $('pos').innerHTML = `timeline <b>${{g}}</b> / ${{total}} &middot; ` +
       `${{((g - 1) / (s.fps || 25)).toFixed(2)}}s of ${{(total / (s.fps || 25)).toFixed(2)}}s`;
-    if (i !== curScene) {{ curScene = i; onSceneChange(i, local); loadMarks(i); paintVtt(); }}
+    if (i !== curScene) {{ curScene = i; onSceneChange(i, local); loadMarks(i); }}
+    // EVERY frame, not only at a boundary. The highlighted word moves WITHIN a
+    // scene, and this call used to sit inside the branch above — so the word lit
+    // up as a scene started and then sat on the first word until the next one.
+    // Cheap to run: paintVtt() returns early per row whose state has not
+    // changed, and only re-centres when the scene actually moved.
+    paintVtt();
     renderReport();
     paintBar();
   }}
@@ -2767,7 +2809,11 @@ SEQ_TEMPLATE = """<!doctype html>
           }}
           if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) ta.blur();
         }});
-        ta.addEventListener('blur', () => saveLine(sc.n));
+        ta.addEventListener('blur', () => {{
+          // Closing the box hands the row back to the highlighter.
+          row.classList.remove('editing');
+          saveLine(sc.n);
+        }});
         row.appendChild(ta);
       }}
       row.addEventListener('click', () => {{
@@ -2775,7 +2821,9 @@ SEQ_TEMPLATE = """<!doctype html>
         const g = starts[i] + 1;
         if (at(+$('slider').value).i !== i) {{ $('slider').value = g; show(g); }}
         const ta = row.querySelector('textarea');
-        if (ta) ta.focus();
+        // Shown BEFORE focusing: a display:none element cannot take focus, so
+        // focusing first would silently do nothing and the box would stay shut.
+        if (ta) {{ row.classList.add('editing'); ta.focus(); }}
       }});
       box.appendChild(row);
       paintVttRow(row, i);
@@ -2788,7 +2836,16 @@ SEQ_TEMPLATE = """<!doctype html>
     const c = clipS(i);
     const lab = row.querySelector('.vl');
     const txt = vLine[sc.n] || '';
-    lab.textContent = r ? (txt || '— no line yet —') : sc.label;
+    // Per-WORD spans, so the one being spoken can be picked out. Escaped by
+    // hand rather than trusted: this is the store's own narration copy, and an
+    // ampersand or an angle bracket in it is ordinary text, not markup.
+    if (r && txt) {{
+      lab.innerHTML = txt.split(/\\s+/).filter(Boolean).map(w =>
+        `<span class="w">${{w.replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                            .replace(/>/g, '&gt;')}}</span>`).join(' ');
+    }} else {{
+      lab.textContent = r ? '— no line yet —' : sc.label;
+    }}
     lab.title = txt;
     const cell = row.querySelector('.vt3');
     if (!r) {{ cell.textContent = `${{c.toFixed(1)}}s`; return; }}
@@ -2820,6 +2877,89 @@ SEQ_TEMPLATE = """<!doctype html>
   }}
 
   // The row for whatever is on screen, opened for editing and scrolled to.
+  // The row the playhead is inside, held in the MIDDLE of the panel, with the
+  // scenes ahead of it coming down from the top and the ones behind leaving out
+  // the bottom.
+  //
+  // Centred by setting scrollTop outright rather than with scrollIntoView.
+  // `block:'nearest'` scrolls the least it can get away with, so a row that was
+  // already just-visible never moved and one that was not jumped to the edge:
+  // the list twitched at every boundary and never settled anywhere you could
+  // read ahead from.
+  // WHICH WORD IS BEING SAID.
+  //
+  // The words are spread across the RUNS OF SPEECH, not across the scene and
+  // not across one outer span. Both of those were tried and both drifted:
+  //
+  //   From frame 1 at the voice's average rate — seconds ahead. Sarah settles
+  //   into shot before she talks, and on ski-demo's opening that is 1.64s of
+  //   nothing while the highlight was already a third of the way down.
+  //
+  //   Evenly across first-word-to-last-word — ahead, then waiting, then ahead
+  //   again. She pauses between sentences and speaks faster in between. That
+  //   opening is 13.88s of talking inside a 19.28s scene: five and a half
+  //   seconds of silence that an even spread hands words to.
+  //
+  // So each run gets a share of the line in proportion to how long it lasts,
+  // and inside a run the words are even. Through a pause the highlight HOLDS
+  // on the last word said, which is what she is doing.
+  //
+  // Still an approximation inside a run: there are no per-word timings
+  // anywhere in this pipeline and HeyGen returns none, so a long word and a
+  // short one get the same slice. It is an aid for lining the picture up
+  // against the line, not a measurement — nothing that writes a file reads it.
+  function paintSpokenWord(row, i) {{
+    if (!row || !VTT) return;
+    const words = row.querySelectorAll('.vl .w');
+    if (!words.length) return;
+    const s = SEQ[i], W = words.length;
+    const t = (at(+$('slider').value).local - 1) / (s.fps || 25);
+    const runs = s.speech_runs || [];
+    let k = -1;
+
+    if (runs.length) {{
+      const D = runs.reduce((sum, r) => sum + (r[1] - r[0]), 0);
+      if (D > 0 && t < runs[0][0]) {{
+        // She has not started. Nothing is lit — that is the honest picture,
+        // and it is also the clearest way to see how long the lead-in is.
+        k = -1;
+      }} else if (D > 0) {{
+        let acc = 0;
+        for (const r of runs) {{
+          const share = ((r[1] - r[0]) / D) * W;
+          // Between sentences: HOLD where the last run ended.
+          //
+          // `acc` here is the shares of every run already passed, and the last
+          // word of that run was floor(acc + share) — which is floor(acc)
+          // exactly. Holding anything else moves the highlight while she is
+          // silent. This said `floor(acc) - 1`, so at every pause the tracer
+          // stepped BACK a word and then forward again when she resumed.
+          if (t < r[0]) {{ k = Math.floor(acc); break; }}
+          if (t <= r[1]) {{ k = Math.floor(acc + ((t - r[0]) / (r[1] - r[0])) * share); break; }}
+          acc += share;
+        }}
+        // Past the last run: she has finished, so the line ends lit on its
+        // last word rather than going dark while the footage plays on.
+        if (k === -1) k = W - 1;
+        k = Math.max(0, Math.min(W - 1, k));
+      }}
+    }} else {{
+      // No measurement for this clip — a scene with no avatar, or one whose
+      // audio could not be read. Fall back to the voice's average rate from
+      // the scene's own start, and say nothing more confident than that.
+      k = Math.max(-1, Math.min(W - 1, Math.floor(t * VTT.wps)));
+    }}
+
+    for (let j = 0; j < W; j++) words[j].classList.toggle('wnow', j === k);
+  }}
+
+  let vttCentred = -1;
+  function centreVtt(row) {{
+    const box = $('vttRows');
+    if (!box || !row) return;
+    box.scrollTop = row.offsetTop + row.offsetHeight / 2 - box.clientHeight / 2;
+  }}
+
   function paintVtt() {{
     const rows = [...document.querySelectorAll('#vttRows .vt')];
     if (!rows.length) return;
@@ -2833,8 +2973,24 @@ SEQ_TEMPLATE = """<!doctype html>
       // decision to leave is actually made.
       if (!on && row.classList.contains('dirty')) saveLine(SEQ[+row.dataset.i].n);
       row.classList.toggle('on', on);
-      if (on) row.scrollIntoView({{ block: 'nearest' }});
     }});
+    // AFTER the classes are set, so the open row has its real height — and only
+    // when the scene actually changed. Re-centring every frame would fight the
+    // scrollbar while someone is reading, and would pull the panel out from
+    // under a line being typed.
+    const active = rows.find(r => +r.dataset.i === cur);
+    if (cur !== vttCentred) {{
+      vttCentred = cur;
+      centreVtt(active);
+      // The row just left goes back to plain text. A word left lit on a scene
+      // that is no longer playing points at nothing.
+      rows.forEach(r => r.querySelectorAll('.vl .wnow')
+                         .forEach(w => w.classList.remove('wnow')));
+    }}
+    // Every frame, not only at a boundary: this is the thing that moves. Not
+    // while the box is open — the highlight lives in the label, which is
+    // hidden then, and there is nothing to light.
+    if (active && !active.classList.contains('editing')) paintSpokenWord(active, cur);
   }}
 
   // Closing the tab with an edit still in the box. fetch() with keepalive
