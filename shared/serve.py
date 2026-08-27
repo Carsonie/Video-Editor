@@ -980,6 +980,20 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 # behind it. A join across that gap has to fill it or the next
                 # scene's narration slides forward on top of the opening.
                 "has_narration": bool(sb["narration"]) if sb else False,
+                # HAS THIS TRACK GOT EDITS THAT THE FILE HAS NOT?
+                #
+                # Read from the CACHE, which is where an edit actually lives
+                # until it is saved. The page used to decide this from its own
+                # undo history, and a reload throws that away — so ten scenes
+                # padded by Update Frame Imbalance came back reading as
+                # pristine, and Save All answered "no scene has unsaved edits"
+                # over a cache full of them.
+                #
+                # `edited` is not derivable from the frame count either: equal
+                # adds and deletes leave the count where it started with the
+                # clip genuinely changed.
+                "base_edited": bool(bm.get("edited")),
+                "over_edited": bool(om.get("edited")) if om else False,
                 "base_slug": os.path.basename(bdir), "base_n": bm["nb_frames"],
                 "base_ext": bm.get("ext", ".jpg"), "base_audio": bool(bm.get("has_audio")),
                 # WHEN THE VOICE STARTS, per scene. Sarah settles into shot
@@ -1341,7 +1355,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
         marks = [m for m in load_marks(outdir) if 1 <= m <= n]
         save_marks(outdir, marks)
-        self.send_json({"nb_frames": n, "marks": sorted(marks)})
+        # Whether the clip is still edited AFTER the undo. Undoing the last
+        # change takes a clip back to the file on disk, and only the server
+        # knows it has: the caller cannot tell from the frame count, and a page
+        # that assumes "still edited" leaves Save armed with nothing to save.
+        meta = json.load(open(os.path.join(outdir, "meta.json")))
+        self.send_json({"nb_frames": n, "marks": sorted(marks),
+                        "edited": bool(meta.get("edited"))})
 
     def api_vtt(self, qs):
         """
