@@ -7,6 +7,9 @@ It runs BESIDE the working editors, on its own port and its own frame cache.
 Nothing here replaces anything yet, and `shared/serve.py` keeps working
 untouched the whole time.
 
+**`HANDOFF.md` is where the open work is** — what the rebuild cannot do yet,
+ranked, with the measurements behind each item.
+
 ```
 next-editor-version/
   server/          Phase 1 — the Go backend
