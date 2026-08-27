@@ -364,6 +364,56 @@ def group_frame_runs(seq):
     return runs
 
 
+def paste_frame(outdir, from_frame, at):
+    """
+    Put a COPY of frame `from_frame` immediately after frame `at`.
+
+    Duplicate with two positions instead of one: the pixels come from
+    `from_frame`, the insert happens at `at`. Everything after `at` shifts right
+    by one, renamed in DESCENDING order so a shift never overwrites a file it
+    has not read yet — the same rule duplicate_frame_right follows, for the same
+    reason.
+
+    EXACT, and that is the whole point. The frame map records the SOURCE frame
+    the copy shows, so a pasted frame is the same frame the original was, not a
+    re-encode of a picture of it. Going out to the system clipboard and back
+    would cost a decode, a PNG round trip and an encode, and the map would have
+    no idea what the pasted frame was — it would be a new picture that merely
+    looks the same.
+
+    Returns (new_nb_frames, new_current_frame) — the viewer lands ON the pasted
+    frame, which is the one you want to look at after pasting.
+    """
+    meta = load_meta(outdir)
+    n = meta["nb_frames"]
+    for name, f in (("source", from_frame), ("target", at)):
+        if not (1 <= f <= n):
+            raise RuntimeError(f"{name} frame {f} is outside 1..{n}")
+    frames_dir = os.path.join(outdir, "frames")
+    ext = meta.get("ext", ".jpg")
+    path = lambda f: os.path.join(frames_dir, f"frame_{f:05d}{ext}")
+
+    # Read the pixels BEFORE any renaming — from_frame may itself be one of the
+    # frames about to move.
+    with open(path(from_frame), "rb") as r:
+        pixels = r.read()
+    fmap = get_frame_map(meta)
+    src_index = fmap[from_frame - 1]
+
+    for f in range(n, at, -1):
+        os.rename(path(f), path(f + 1))
+        _restamp(path(f + 1))
+    with open(path(at + 1), "wb") as w:
+        w.write(pixels)
+    _restamp(path(at + 1))
+
+    fmap[at:at] = [src_index]
+    meta["frame_map"] = fmap
+    meta["nb_frames"] = n + 1
+    save_meta(outdir, meta)
+    return n + 1, at + 1
+
+
 def duplicate_frame_right(outdir, at, count):
     """
     Insert `count` copies of frame `at` immediately to its right, in the

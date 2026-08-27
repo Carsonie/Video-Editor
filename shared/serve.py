@@ -179,6 +179,7 @@ ACTIONS = {
     "/api/frames/dup-span": ("+ Zone",       ("a", "b")),
     "/api/frames/del-span": ("- Zone",       ("a", "b")),
     "/api/frames/restore":  ("Undo",         ()),
+    "/api/frames/paste":    ("Paste frame",  ("from", "at")),
     "/api/mark":            ("Mark",         ("frame", "on")),
     "/api/clear-marks":     ("Unmark all",   ()),
     "/api/save":            ("Save scene",   ()),
@@ -660,6 +661,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.api_clear_marks(payload)
         if parsed.path == "/api/frames/dup":
             return self.api_frames_dup(payload)
+        if parsed.path == "/api/frames/paste":
+            return self.api_paste(payload)
         if parsed.path == "/api/frames/del":
             return self.api_frames_del(payload)
         if parsed.path == "/api/renumber-clear":
@@ -1145,6 +1148,31 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             marks = load_marks(outdir)
         self.send_json({"nb_frames": new_n, "current": new_cur, "actual": actual,
                          "dropped_marks": dropped, "marks": sorted(marks)})
+
+    def api_paste(self, payload):
+        """
+        Paste a copy of one frame after another, inside the same clip.
+
+        `from` and `at` are both CACHE positions. The copy carries the source
+        frame the original showed, so the map stays truthful and a pasted frame
+        is the same frame, not a picture of one.
+        """
+        outdir = resolve_outdir(payload.get("slug"), payload.get("which"))
+        if outdir is None:
+            return self.send_json({"error": "unknown slug"}, 400)
+        try:
+            frm, at = int(payload.get("from")), int(payload.get("at"))
+        except (TypeError, ValueError):
+            return self.send_json({"error": "from and at must be integers"}, 400)
+        try:
+            n, cur = build_mod.paste_frame(outdir, frm, at)
+        except Exception as e:
+            return self.send_json({"error": str(e)}, 400)
+        # A paste inserts one frame, so a mark AFTER the insert shifts by one.
+        marks = [m + 1 if m > at else m for m in load_marks(outdir)]
+        save_marks(outdir, marks)
+        self.send_json({"nb_frames": n, "current": cur, "marks": marks,
+                        "frame_map": build_mod.get_frame_map(build_mod.load_meta(outdir))})
 
     def api_span(self, payload, mode):
         """
@@ -1978,8 +2006,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         # the shortened file no longer has. build_segment() seeks by frame
         # number, so a SECOND save would rebuild against the wrong frames and
         # silently write a wrong, shorter clip.
+        # alpha_png from the meta being replaced — SAME trap as clear-edits. An
+        # overlay re-extracted without it comes back as flat JPEG: no alpha, and
+        # named .jpg while the page asks for .png, so every overlay frame 404s
+        # and Sarah simply is not there. This one fires after every SAVE of an
+        # overlay, which is worse.
         build_mod.build_frames(src, out=outdir, box=meta.get("box", 750),
                                 force=True,
+                                alpha_png=(meta.get("ext") == ".png"),
                                 log=lambda m: sys.stderr.write(m + "\n"))
         save_marks(outdir, [])
         new_meta = json.load(open(os.path.join(outdir, "meta.json")))
@@ -2017,7 +2051,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if not os.path.isfile(src):
             return self.send_json({"error": f"source no longer exists: {src}"}, 500)
         try:
+            # alpha_png carried over from the meta being replaced. Without it an
+            # OVERLAY came back as flat JPEG — no alpha, and named .jpg while the
+            # page asks for .png. Every overlay frame then 404s, so the avatar
+            # vanishes and only the background shows through. Silent: the clip is
+            # still there, still the right length, just not transparent and not
+            # where the page looks. restore_map already did this; this did not.
             build_mod.build_frames(src, out=outdir, box=box, force=True,
+                                    alpha_png=(meta.get("ext") == ".png"),
                                     log=lambda m: sys.stderr.write(m + "\n"))
         except RuntimeError as e:
             return self.send_json({"error": str(e)}, 500)
