@@ -1,0 +1,181 @@
+/* What Mantine does not do for us: the stage, the timeline and the tick strip.
+   All three are pixel work measured against a frame count, so they are hand
+   drawn — a component library has no opinion about where frame 437 sits. */
+
+:root {
+  color-scheme: dark;
+  --bg: #1a1a1a;
+  --panel: #212629;
+  --panel2: #2c3236;
+  --line: #353c42;
+  --line2: #4a5259;
+  --text: #eee;
+  --dim: #8b949c;
+  --dimmer: #6d757b;
+  --warn: #e0c060;
+  --bad: #e05555;
+  /* the break-point colour, swapped wholesale when an alpha clip is open */
+  --mark: #2ecc40;
+  --markHi: #5aff70;
+  --markGlow: rgba(46, 204, 64, 0.35);
+}
+
+:root[data-alpha='true'] {
+  --mark: #a56cff;
+  --markHi: #c9a3ff;
+  --markGlow: rgba(165, 108, 255, 0.4);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  padding: 14px 0 26px;
+}
+
+/* ── the stage ──────────────────────────────────────────────────────────── */
+
+.stage {
+  background: #000;
+  border: 1px solid #333;
+  position: relative;
+  line-height: 0;
+}
+
+.stage img { display: block; }
+
+/* The marked-frame indicator is CSS drawn ON TOP of the image, never part of
+   the pixels. Cutting reads the ORIGINAL source file with ffmpeg, which has no
+   idea this element exists, so this colour can never end up in an output file
+   no matter what. */
+.markOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--mark) 30%, transparent);
+  border: 4px solid var(--mark);
+}
+
+/* ── the timeline ───────────────────────────────────────────────────────── */
+
+.sliderWrap { width: 100%; }
+
+/* The segment bar sits ABOVE the slider and is the same width, so a band lines
+   up with the frames it covers. */
+.segbar {
+  position: relative;
+  height: 17px;
+  margin-bottom: 3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.segband {
+  position: absolute;
+  top: 0;
+  height: 17px;
+  border-radius: 3px;
+  background: var(--panel2);
+  border: 1px solid var(--line2);
+  color: var(--dim);
+  font-size: 10px;
+  line-height: 15px;
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.segband.here {
+  background: color-mix(in srgb, var(--mark) 22%, var(--panel2));
+  border-color: var(--mark);
+  color: var(--text);
+}
+
+.sliderRow { position: relative; }
+
+/* The native range input, restyled. It is kept rather than replaced because a
+   range input is the one control that already does keyboard, drag, click-to-
+   position and accessibility correctly, and this timeline needs all four. */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 22px;
+  background: transparent;
+  margin: 0;
+  display: block;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-runnable-track {
+  height: 6px;
+  background: var(--panel2);
+  border: 1px solid var(--line2);
+  border-radius: 3px;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 18px;
+  margin-top: -7px;
+  border-radius: 3px;
+  background: #cfd6dc;
+  border: 1px solid #1a1a1a;
+}
+
+.slider::-moz-range-track {
+  height: 6px;
+  background: var(--panel2);
+  border: 1px solid var(--line2);
+  border-radius: 3px;
+}
+
+.slider::-moz-range-thumb {
+  width: 12px;
+  height: 18px;
+  border-radius: 3px;
+  background: #cfd6dc;
+  border: 1px solid #1a1a1a;
+}
+
+/* Break-point ticks, drawn UNDER the slider at the same fractional positions.
+   Clicking one jumps to it — checking a cut means visiting every boundary in
+   turn, and without this that is a manual scrub through thousands of frames. */
+.ticks {
+  position: relative;
+  height: 12px;
+  margin-top: 1px;
+}
+
+.tick {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 9px;
+  margin-left: -1px;
+  background: var(--mark);
+  border-radius: 1px;
+  cursor: pointer;
+}
+
+.tick:hover { background: var(--markHi); box-shadow: 0 0 4px var(--markGlow); }
+
+.tick.here { background: var(--markHi); box-shadow: 0 0 6px var(--markGlow); }
+
+/* ── readouts ───────────────────────────────────────────────────────────── */
+
+.num { font-variant-numeric: tabular-nums; }
+
+.rowbar {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 8px 10px;
+}
+
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }

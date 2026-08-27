@@ -666,6 +666,44 @@ def live_clip(folder="03-charlie-scene", name="segment.mp4"):
     return (d.get("url") or "").split("/")[0]
 
 
+def s_clip():
+    step("/api/clip — the clip's own facts, for a front end that was not generated")
+    # THE ONE ENDPOINT THE REBUILD ADDS. The Python players baked these values
+    # straight into the page — `const N = 40; const FPS = 25.0;` were written
+    # into the JavaScript at extraction time, so the page never had to ask. A
+    # React front end is served as a static bundle and handed a slug, so it does.
+    #
+    # Skipped against the Python server, which has no such endpoint and needs
+    # none. Saying so beats a red tick that means "not applicable".
+    if SERVER != "go":
+        check("only the Go backend serves this — nothing to check here", True,
+              "the Python players generate their pages instead")
+        return
+    slug = live_clip("03-charlie-scene")
+    d, _ = get("/api/clip", slug=slug)
+    eq("the frame count matches the fixture", d.get("nb_frames"), 25)
+    eq("and the frame rate", d.get("fps"), 25.0)
+    eq("an opaque clip is extracted as JPEG", d.get("ext"), ".jpg")
+    check("it names the source file", str(d.get("source", "")).endswith("segment.mp4"),
+          os.path.basename(str(d.get("source"))))
+    check("and says where a cut would land — derived in the BACKEND, so the "
+          "page never has to know the folder rules",
+          "_cuts" in str(d.get("cuts_dir")), str(d.get("cuts_dir"))[-40:])
+
+    # An alpha clip. `alpha` is what swaps the break-point colour from green to
+    # purple, and in the single-clip view the marks are the ONLY thing that can
+    # say which kind of file is open.
+    av = live_clip("03-charlie-scene", "avatar.webm")
+    d, _ = get("/api/clip", slug=av)
+    check("an avatar clip reports itself as alpha", d.get("alpha") is True,
+          f"ext={d.get('ext')}")
+    eq("and is extracted as PNG, which is what carries the transparency",
+       d.get("ext"), ".png")
+
+    d, code = get("/api/clip", slug="../escape")
+    eq("refuses a slug with a separator", code, 400)
+
+
 def s_paste():
     step("/api/frames/paste — copy a frame, put it somewhere else")
     slug = live_clip()
@@ -833,7 +871,7 @@ FUNCTIONS = [
     s_save, s_clear_edits, s_cut, s_reset_editor,
     s_vtt, s_line,
     s_join, s_renumber_state, s_renumber_clear, s_split,
-    s_paste, s_alpha_survives, s_restore_is_safe, s_one_writer_per_cache,
+    s_clip, s_paste, s_alpha_survives, s_restore_is_safe, s_one_writer_per_cache,
     s_handoff, s_archive, s_bookends_and_gaps,
     s_pages_parse,
 ]

@@ -214,6 +214,7 @@ func (s *Server) routes() {
 		"/api/vtt":            s.apiVTT,
 		"/api/frames/map":     s.apiMap,
 		"/api/marks":          s.apiMarks,
+		"/api/clip":           s.apiClip,
 	}
 	posts := map[string]postHandler{
 		"/api/mark":            s.apiMark,

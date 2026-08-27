@@ -87,4 +87,57 @@ it. Point them at one folder deliberately with `--cache`, never by accident.
 
 ## Phase 2 — the MP4 Splitter in React
 
+**Done.** Everything the old splitter does, driven and checked in a browser:
+mark, step, zone, Frame Editor, Undo, Cut, and the hand-off.
+
+```bash
+cd next-editor-version/web
+npm install
+npm run dev            # http://localhost:5180
+```
+
+It needs the Go server up on 8870. The front-end server proxies two kinds of
+path across to it — `/api/*`, and `/<slug>/frames/*` for the extracted frames
+and each clip's audio. The second cannot be matched by prefix, because a cache
+slug is an arbitrary name, so it is matched by SHAPE.
+
+Point it somewhere else with `EDITOR_API=http://host:port npm run dev`.
+
+### The layout is the argument
+
+The frame takes the whole main column. ONE toolbar under it, in three rows with
+one job each — **where you are**, **how you move**, **what you change**.
+Anything touched once a session lives in the drawer on the right, behind a tab,
+where it cannot be hit by accident.
+
+That is not decoration. The frame counter used to sit in the same row as the
+delete buttons, and Reset Editor — the most destructive control in the tool —
+used to sit at the bottom of a scroll with the same weight as Browse.
+
+### What was kept, deliberately
+
+- **The native range input.** It is the one control that already does keyboard,
+  drag, click-to-position and accessibility correctly, and this timeline needs
+  all four. It is restyled, not replaced.
+- **Every tooltip.** Several are a paragraph, because several controls need one.
+- **The keyboard.** `←/→` one frame, `Shift` ten, `Alt` the next break point,
+  `[`/`]` the same, `space` play, `m` mark. Alt is checked FIRST — without that,
+  `Alt+←` steps a frame as well and lands one frame off the mark, which is the
+  exact error being checked for.
+- **The green.** Break points are green on an mp4 and purple on a WebM. In this
+  view there is no layer toggle to read, so the marks are the only thing that
+  can say which kind of file is open.
+
+### The one endpoint the rebuild adds
+
+`/api/clip`. The Python players baked the clip's facts into the generated page
+— `const N = 40; const FPS = 25.0;` were written into the JavaScript at
+extraction time, so the page never had to ask. A React bundle is static and is
+handed a slug, so it does. No new behaviour, and nothing on disk that was not
+already inside `meta.json`.
+
+`tests/test_editor.py --server go` covers it: **30/30 endpoints, 149 checks.**
+The Python run stays at 29/29 and the step says why it skipped, rather than
+showing a green tick that means "not applicable".
+
 ## Phase 3 — the Segment and Avatar Editor in React
