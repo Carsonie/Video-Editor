@@ -6,6 +6,13 @@ disposable store built from real footage.
     python3 tests/test_editor.py              # build, run, tear down
     python3 tests/test_editor.py --keep       # leave the store to poke at
     python3 tests/test_editor.py --port 8899  # if 8850 is busy
+    python3 tests/test_editor.py --server go   # drive the Go rebuild instead
+
+WHY ONE SUITE FOR TWO SERVERS
+    Every check here drives HTTP. Nothing in it knows or cares what language
+    answers, which is exactly what makes it the right thing to validate a
+    rewrite with: point it at the Go backend and it says, in the same checks,
+    which of the 29 endpoints that backend has got right.
 
 WHAT IT TESTS AND WHAT IT CANNOT
     Every editor control ends in an HTTP call, and this drives those calls
@@ -47,21 +54,65 @@ import fixture  # noqa: E402
 
 PLAYERS = os.path.dirname(HERE)
 SERVE = os.path.join(PLAYERS, "shared", "serve.py")
+GO_SERVER = os.path.join(PLAYERS, "next-editor-version", "server")
+
+# Which server this run is driving. Set by main(); everything below reads these
+# rather than assuming, so the suite itself stays ONE file.
+#
+#   python   shared/serve.py — the players in use today
+#   go       next-editor-version — the rebuild's backend
+SERVER = "python"
+CACHE = None            # set by main() — a cache each, see the note there
 
 ENDPOINTS_TESTED = ENDPOINTS_TOTAL = 0
 
 
+def cache_for(server):
+    return os.path.join(PLAYERS, "cache" if server == "python" else "cache-go")
+
+
 def endpoint_counts():
-    """How many endpoints the server has, and how many this file names.
+    """How many endpoints the server under test has, and how many this file names.
 
     Read from the SOURCE rather than written down. A hardcoded "28 of 28" went
     stale the moment an endpoint was added, and read as full coverage while one
     was untested — which is exactly what happened to /api/frames/paste.
+
+    Each server declares its routes in its own shape, so the pattern follows the
+    server. Both answer the same question: what does this thing actually serve?
     """
-    src = open(os.path.join(PLAYERS, "shared", "serve.py")).read()
-    total = set(re.findall(r'parsed\.path == "(/api/[a-z/-]+)"', src))
     mine = set(re.findall(r'"(/api/[a-z/-]+)"', open(__file__).read()))
+    if SERVER == "go":
+        src = open(os.path.join(GO_SERVER, "internal", "editor", "server.go")).read()
+        total = set(re.findall(r'"(/api/[a-z/-]+)":', src))
+    else:
+        src = open(os.path.join(PLAYERS, "shared", "serve.py")).read()
+        total = set(re.findall(r'parsed\.path == "(/api/[a-z/-]+)"', src))
     return len(total & mine), len(total)
+
+
+def start_server(port):
+    """Bring the server under test up, and hand back the process.
+
+    The Go one is BUILT first, into a temp binary. `go run` would work and would
+    make this test's failure modes worse: it holds the compiler open under the
+    server, and a compile error then arrives as a dead port rather than as the
+    error it is.
+    """
+    if SERVER == "go":
+        binary = os.path.join(tempfile.gettempdir(), "editord_test")
+        r = subprocess.run(["go", "build", "-o", binary, "./cmd/editord"],
+                           cwd=GO_SERVER, capture_output=True, text=True)
+        if r.returncode != 0:
+            sys.exit(f"  the Go server does not build:\n{r.stderr}")
+        return subprocess.Popen(
+            [binary, "--port", str(port), "--no-session-log",
+             "--root", PLAYERS, "--cache", CACHE],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    return subprocess.Popen(
+        [sys.executable, SERVE, "--port", str(port), "--no-session-log"],
+        cwd=os.path.join(PLAYERS, "shared"),
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 
@@ -654,7 +705,7 @@ def s_alpha_survives():
     slug = (d.get("url") or "").split("/")[0]
     check("an alpha clip opened", bool(slug), slug)
 
-    meta = os.path.join(PLAYERS, "cache", slug, "meta.json")
+    meta = os.path.join(CACHE, slug, "meta.json")
     m = json.load(open(meta))
     eq("extracted as PNG, with alpha", m.get("ext"), ".png")
     check("and the flag is recorded", m.get("alpha_png") is True, str(m.get("alpha_png")))
@@ -719,7 +770,7 @@ def s_one_writer_per_cache():
         t.join()
     eq("all six succeeded", errs, [])
     d, _ = get("/api/frames/map", slug=slug)
-    files = len(os.listdir(os.path.join(PLAYERS, "cache", slug, "frames")))
+    files = len(os.listdir(os.path.join(CACHE, slug, "frames")))
     eq("the count is exactly six more", d["nb_frames"], start + 6)
     eq("and the files on disk agree", files, start + 6)
 
@@ -732,7 +783,7 @@ def s_bookends_and_gaps():
     step("bookends and missing tracks — what a join refuses, and what it fills")
     d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns="1,2,3")
     seq_slug = d.get("slug")
-    page = open(os.path.join(PLAYERS, "cache", seq_slug, "viewer.html")).read()
+    page = open(os.path.join(CACHE, seq_slug, "viewer.html")).read()
     check("the manifest marks which scenes are in the script",
           '"in_script"' in page, "in_script")
     check("and which have a narration render",
@@ -795,17 +846,27 @@ def main():
     ap.add_argument("--port", type=int, default=8850)
     ap.add_argument("--keep", action="store_true",
                     help="leave the test store and the server up afterwards")
+    ap.add_argument("--server", choices=("python", "go"), default="python",
+                    help="which backend to drive (default: the Python one)")
     a = ap.parse_args()
     BASE = f"http://localhost:{a.port}"
+
+    global SERVER, CACHE
+    SERVER = a.server
+    # A cache each. The two servers derive an extraction's mtime independently,
+    # so ONE shared folder would have each of them decide the other's work was
+    # stale and redo it — slow, and confusing to read afterwards.
+    CACHE = cache_for(SERVER)
 
     global ENDPOINTS_TESTED, ENDPOINTS_TOTAL
     ENDPOINTS_TESTED, ENDPOINTS_TOTAL = endpoint_counts()
     ver = open(os.path.join(PLAYERS, "segment_avatar_editor", "VERSION")).read().strip()
     started = time.time()
     stamp = time.strftime("%H_%M_%S")
-    name = f"editor_{stamp}.log"
+    name = f"editor_{stamp}.log" if SERVER == "python" else f"editor_go_{stamp}.log"
     out(f"Editor Test:  {time.strftime('%Y-%m-%dT%H:%M:%S')}")
     out(f"Player:       Segment and Avatar Editor v{ver}")
+    out(f"Backend:      {'Go — next-editor-version' if SERVER == 'go' else 'Python — shared/serve.py'}")
     out(f"Endpoints:    {ENDPOINTS_TESTED} of {ENDPOINTS_TOTAL} exercised")
     out(f"Store:        {fixture.ROOT_REL}  (built, used, deleted)")
     out(f"Target:       local → {BASE}")
@@ -818,10 +879,7 @@ def main():
 
     # --no-session-log: the test writes its own log, and its fixture traffic
     # must not bury a day of real editing in the editor's session log.
-    srv = subprocess.Popen([sys.executable, SERVE, "--port", str(a.port),
-                            "--no-session-log"],
-                           cwd=os.path.join(PLAYERS, "shared"),
-                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    srv = start_server(a.port)
     try:
         for _ in range(40):                     # wait for it to answer
             time.sleep(0.25)

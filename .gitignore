@@ -15,6 +15,10 @@ Customers/
 # Extracted frames. One extraction of a clip serves every player, and it is
 # rebuilt from the source video on first open.
 cache/
+# The rebuild's own cache. A folder EACH, because the two servers derive an
+# extraction's mtime independently — sharing one would have each of them decide
+# the other's work was stale and redo it.
+cache-go/
 
 # Run logs: the record of one machine's work, not source.
 logs/*.log
