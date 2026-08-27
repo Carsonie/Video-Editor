@@ -751,7 +751,15 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if target is None or not os.path.isfile(target) or not target.lower().endswith(VIDEO_EXTS):
             return self.send_json({"error": f"not a video under Customers/: {rel}"}, 400)
         try:
-            outdir = build_mod.build_frames(target, log=lambda m: sys.stderr.write(m + "\n"))
+            # An ALPHA clip has to be extracted as PNG or its transparency is
+            # gone. .webm was added to VIDEO_EXTS so an avatar could be opened
+            # here and inspected frame by frame like anything else — but this
+            # never passed alpha_png, so it came back flat, and the very thing
+            # you open an avatar to look at was the thing that got dropped.
+            # open-pair and open-seq both got this right; this did not.
+            outdir = build_mod.build_frames(
+                target, alpha_png=is_alpha(target),
+                log=lambda m: sys.stderr.write(m + "\n"))
         except RuntimeError as e:
             return self.send_json({"error": str(e)}, 500)
         slug = os.path.basename(outdir)
