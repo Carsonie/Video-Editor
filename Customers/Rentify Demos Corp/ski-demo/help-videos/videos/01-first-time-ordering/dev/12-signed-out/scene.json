@@ -1,0 +1,14 @@
+{
+  "n": 12,
+  "label": "signed-out",
+  "line": "Thank you for renting with Ski Demo. We hope you have a great time on the slopes!",
+  "segment": "Num_12-v6-segment.mp4",
+  "cut-map": "Logout",
+  "estimated-word-time": "4.9 seconds.",
+  "target-length": "6.1 seconds.",
+  "segment-length": "6.10 seconds.",
+  "segment-frames": "152 frames.",
+  "target-shortfall": "0.0 seconds.",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here.",
+  "actual-word-time": "4.2 seconds."
+}

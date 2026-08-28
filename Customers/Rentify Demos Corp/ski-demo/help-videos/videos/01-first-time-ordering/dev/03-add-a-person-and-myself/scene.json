@@ -1,0 +1,14 @@
+{
+  "n": 3,
+  "label": "add-a-person-and-myself",
+  "line": "We need to add a person to the order. You can add yourself, or invite a party member.",
+  "segment": "Num_3-v6-segment.mp4",
+  "cut-map": "Add a Person",
+  "estimated-word-time": "5.2 seconds.",
+  "target-length": "6.4 seconds.",
+  "segment-length": "6.42 seconds.",
+  "segment-frames": "160 frames.",
+  "target-shortfall": "0.0 seconds.",
+  "actual-word-time": "4.4 seconds.",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here."
+}

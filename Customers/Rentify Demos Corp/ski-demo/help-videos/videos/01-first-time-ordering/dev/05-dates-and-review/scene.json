@@ -1,0 +1,14 @@
+{
+  "n": 5,
+  "label": "dates-and-review",
+  "line": "Select your rental starting date, and then your return date. For a one day rental, select the same day twice. You will see the start and end date, as well as the number rental days you have chosen in the status bar. Review your order, taking a moment to check that your rental dates and the prices are correct.",
+  "segment": "Num_5-v6-segment.mp4",
+  "cut-map": "Select dates",
+  "estimated-word-time": "17.2 seconds.",
+  "target-length": "18.4 seconds.",
+  "segment-length": "18.42 seconds.",
+  "segment-frames": "460 frames.",
+  "target-shortfall": "0.0 seconds.",
+  "actual-word-time": "17.3 seconds.",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here."
+}

@@ -1,0 +1,74 @@
+{
+  "store": "alpine-sports",
+  "title": "First Time Ordering",
+  "_note": "Source of truth for this video's narration. Edit lines here, then regenerate the VTT with agent-tools/6_end-customer-help-video-creations/vtt.py. Never retype lines into chat or docs — this file is the copy.",
+  "words_per_second": 3.44,
+  "_wps_note": "Measured from the two rendered clips: 31 words / 9.01s. Re-derive if the voice or its speed setting changes.",
+  "rendered": [
+    {
+      "id": "intro",
+      "label": "Intro (full screen)",
+      "duration": null,
+      "line": "Hi, I'm Sarah. Let me show you how to place your first order with Alpine Sports."
+    },
+    {
+      "id": "bridge",
+      "label": "Corner transition",
+      "duration": null,
+      "line": "Let's get started. Here are the steps to complete your first rental."
+    }
+  ],
+  "_shape": "10 scenes — no question set, so no requirements form and no separate checkout page. Detected from the flow log before slicing: requirements -> checkout was 0.44s.",
+  "scenes": [
+    {
+      "n": 1,
+      "line": "Enter your email, and we'll send you a 4 digit verification code you can add here to sign in securely.",
+      "segment": "segment-01-login.mp4"
+    },
+    {
+      "n": 2,
+      "line": "From your dashboard, tap New Order to begin. This is also where your orders are listed, so you can find them again later.",
+      "segment": "segment-02-neworder.mp4"
+    },
+    {
+      "n": 3,
+      "line": "Add a person to the order — yourself, or a party member — so we know who the gear is for.",
+      "segment": "segment-03-addmyself.mp4"
+    },
+    {
+      "n": 4,
+      "line": "Search for the gear you need, or choose from a collection. The collections hold groups of items, which can come in different sizes and colours.",
+      "segment": "segment-04-search.mp4"
+    },
+    {
+      "n": 5,
+      "line": "Select your rental starting date, then your return date. You'll see the number of days update as you choose, so you can check the length of your rental before you continue.",
+      "segment": "segment-05-dates.mp4"
+    },
+    {
+      "n": 6,
+      "line": "Add the item to your order.",
+      "segment": "segment-06-additem.mp4"
+    },
+    {
+      "n": 7,
+      "line": "Please review and agree to the rental terms, then save. There are no extra questions for this rental, so you're nearly done.",
+      "segment": "segment-07-terms.mp4"
+    },
+    {
+      "n": 8,
+      "line": "Enter your credit card details to complete your rental order. Your payment is processed securely.",
+      "segment": "segment-08-payment.mp4"
+    },
+    {
+      "n": 9,
+      "line": "That's it — your order is complete. Your invoice is ready and your gear will be waiting for you.",
+      "segment": "segment-09-complete.mp4"
+    },
+    {
+      "n": 10,
+      "line": "You'll always find your rental in your order history, so you can check the details any time. Enjoy the mountain!",
+      "segment": "segment-10-history.mp4"
+    }
+  ]
+}

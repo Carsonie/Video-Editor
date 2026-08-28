@@ -1,0 +1,14 @@
+{
+  "n": 7,
+  "label": "checkout-pay-with-stripe",
+  "line": "Review your total, then continue to payment. Take a moment to check your rental dates and the price are correct.",
+  "segment": "Num_7-v6-segment.mp4",
+  "cut-map": "Save and Continue",
+  "estimated-word-time": "5.8 seconds.",
+  "target-length": "7.0 seconds.",
+  "segment-length": "7.02 seconds.",
+  "segment-frames": "175 frames.",
+  "target-shortfall": "0.0 seconds.",
+  "actual-word-time": "6.1 seconds.",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here."
+}

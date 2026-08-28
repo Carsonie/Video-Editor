@@ -1,0 +1,78 @@
+{
+  "store": "bike-demo",
+  "title": "First Time Ordering",
+  "_note": "Source of truth for this video's narration. Edit lines here, then regenerate the VTT with agent-tools/6_end-customer-help-video-creations/vtt.py. Never retype lines into chat or docs — this file is the copy.",
+  "words_per_second": 3.44,
+  "_wps_note": "Measured from the two rendered clips: 31 words / 9.01s. Re-derive if the voice or its speed setting changes.",
+  "rendered": [
+    {
+      "id": "intro",
+      "label": "Intro (full screen)",
+      "duration": null,
+      "line": "Hi, I'm Sarah. Let me show you how to place your first order with Bike Demo, Collingwood."
+    },
+    {
+      "id": "bridge",
+      "label": "Corner transition",
+      "duration": null,
+      "line": "Let's get started. Here are the steps to complete your first bike rental."
+    }
+  ],
+  "scenes": [
+    {
+      "n": 1,
+      "line": "Enter your email, and we'll send you a 4 digit verification code you can add here to sign in securely.",
+      "segment": "segment-01-login.mp4"
+    },
+    {
+      "n": 2,
+      "line": "From your dashboard, tap New Order to begin. This is also where your orders are listed, so you can find them again later.",
+      "segment": "segment-02-neworder.mp4"
+    },
+    {
+      "n": 3,
+      "line": "We need to add a person to the order. You can add yourself, or invite a party member, so we know who's riding.",
+      "segment": "segment-03-addmyself.mp4"
+    },
+    {
+      "n": 4,
+      "line": "Search for a bike, or choose one from a collection. The collections hold groups of bikes, which can come in variants, such as different sizes or colours.",
+      "segment": "segment-04-search.mp4"
+    },
+    {
+      "n": 5,
+      "line": "Select your rental starting date, then your return date. You'll see the number of days update as you choose.",
+      "segment": "segment-05-dates.mp4"
+    },
+    {
+      "n": 6,
+      "line": "Add the bike to your order.",
+      "segment": "segment-06-additem.mp4"
+    },
+    {
+      "n": 7,
+      "line": "We need to ask you to answer some questions here, so we can set your bike up before you arrive. Please review and agree to the rental terms and save.",
+      "segment": "segment-07-requirements.mp4"
+    },
+    {
+      "n": 8,
+      "line": "Review your total, then continue to payment. Take a moment to check your rental dates and the price are correct.",
+      "segment": "segment-08-checkout.mp4"
+    },
+    {
+      "n": 9,
+      "line": "Enter your credit card details to complete your rental order.",
+      "segment": "segment-09-payment.mp4"
+    },
+    {
+      "n": 10,
+      "line": "That's it — your order is complete. Your invoice is ready, and your bike will be waiting for you at the store.",
+      "segment": "segment-10-complete.mp4"
+    },
+    {
+      "n": 11,
+      "line": "You'll always find your rental in your order history. Enjoy the ride!",
+      "segment": "segment-11-history.mp4"
+    }
+  ]
+}

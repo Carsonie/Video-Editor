@@ -9,7 +9,36 @@
 #
 # Both repos live on the same machine, so the data is one command away:
 #     python3 setup_demo.py
-Customers/
+Customers/**
+
+# ── except the WORDS, which are small and are the thing worth keeping ────────
+# Added 2026-08-28. `script.json` is the source of truth for a video's copy, and
+# every one of them was git-tracked in Basic_E2E_Testing until the working files
+# moved here — so a blanket `Customers/` would have quietly demoted four stores'
+# scripts to disk-only, on the same day the folders they live in were rearranged.
+#
+# These are kilobytes of text and they carry what cost real money: the exact
+# lines HeyGen was paid to speak, and which build each one produced. The video
+# they describe stays out.
+#
+# The directory re-includes come FIRST and must: git does not descend into an
+# excluded directory, so a `!` on a file inside one is silently ignored.
+!Customers/
+!Customers/**/
+Customers/**/z_History/**
+!Customers/*/*/help-videos/**/*.json
+!Customers/*/*/help-videos/**/*.md
+!Customers/*/*/help-videos/**/*.txt
+!Customers/*/*/help-videos/**/.gitkeep
+# The cut plan's contact sheet — 65 KB, and the tool tells you to look at it
+# before cutting. It was tracked in Basic_E2E_Testing for the same reason;
+# keep it, or the boundaries.json beside it names frames nobody can see.
+!Customers/*/*/help-videos/**/work/boundaries.png
+# ...but not these. `.render_jobs.json` holds live HeyGen job ids, and a frame
+# map is regenerable diagnostics that runs to thousands of lines.
+Customers/**/.render_jobs.json
+Customers/**/cache/**
+Customers/**/_cuts/**
 
 # ── regenerable ─────────────────────────────────────────────────────────────
 # Extracted frames. One extraction of a clip serves every player, and it is

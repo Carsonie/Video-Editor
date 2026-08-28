@@ -1,0 +1,14 @@
+{
+  "n": 1,
+  "label": "login-and-code",
+  "line": "Enter your email, and we'll send you a 4 digit verification code you can enter here to sign in and create your account.",
+  "segment": "Num_1-v6-segment.mp4",
+  "cut-map": "Login (",
+  "estimated-word-time": "6.7 seconds.",
+  "target-length": "7.9 seconds.",
+  "segment-length": "7.94 seconds.",
+  "segment-frames": "198 frames.",
+  "target-shortfall": "0.0 seconds.",
+  "actual-word-time": "6.2 seconds.",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here."
+}

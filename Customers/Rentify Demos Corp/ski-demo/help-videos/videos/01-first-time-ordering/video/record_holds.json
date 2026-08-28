@@ -1,0 +1,60 @@
+{
+  "_note": "Generated from ../../Customers/Rentify Demos Corp/ski-demo/help-videos/final/video/script.json by scripts/make_record_holds.ts. Each value is that scene's target-shortfall — how much longer the segment must run to fit its narration. Regenerate after any re-cut. Hand-tuning individual numbers is fine and expected.",
+  "_default": 0.8,
+  "_max": 12,
+  "holds": [
+    [
+      "Login (",
+      3.3
+    ],
+    [
+      "Click",
+      1.6
+    ],
+    [
+      "Add a Person",
+      2.0
+    ],
+    [
+      "Check availability",
+      5.1
+    ],
+    [
+      "Select dates",
+      8.8
+    ],
+    [
+      "Add Item",
+      5
+    ],
+    [
+      "Complete requirements",
+      2.4
+    ],
+    [
+      "Save and Continue",
+      5.2
+    ],
+    [
+      "Pay (",
+      0.8
+    ],
+    [
+      "Wait for order completion",
+      6.3
+    ],
+    [
+      "Verify the order appears",
+      7.3
+    ],
+    [
+      "Logout menu open",
+      3.1
+    ],
+    [
+      "Logout",
+      7.2
+    ]
+  ],
+  "_adjust_log": "2026-08-21: +1.5s each on 'Add a Person', 'Select dates' and 'Complete requirements'. Those three scenes measured within 0.1s of target on the v3 cut, and the next cut SNAPS boundaries forward by a non-constant amount (+0.26s to +3.15s observed), which can shrink a segment. ADJUSTED, not regenerated — regenerating reads target-shortfall, which the holds have already driven to ~0, and would erase every hold. See scripts/make_record_holds.ts."
+}
