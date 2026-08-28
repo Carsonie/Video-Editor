@@ -22,19 +22,16 @@
   "scenes": [
     {
       "n": 1,
-      "label": "opening-with-login",
-      "line": "Hi, I'm Sarah. Let me show you how to place your first order with us at Ski Demo rentals. Let's get started. Here are the steps to completing your first ski rental. Enter your email, and we'll send you a 4 digit verification code you can enter here to sign in and create your account.",
-      "_joined_from": [
-        {
-          "n": 1,
-          "label": "opening"
-        },
-        {
-          "n": 2,
-          "label": "login-and-code"
-        }
-      ],
-      "_joined_on": "20260826-133450"
+      "label": "login-and-code",
+      "line": "Enter your email, and we'll send you a 4 digit verification code you can enter here to sign in and create your account.",
+      "segment": "Num_1-v6-segment.mp4",
+      "cut-map": "Login (",
+      "estimated-word-time": "6.7 seconds.",
+      "target-length": "7.9 seconds.",
+      "segment-length": "7.94 seconds.",
+      "segment-frames": "198 frames.",
+      "target-shortfall": "0.0 seconds.",
+      "actual-word-time": "8.56 seconds."
     },
     {
       "n": 2,
