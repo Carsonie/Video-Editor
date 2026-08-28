@@ -339,7 +339,7 @@ changed line under an unchanged filename is the exact failure worth catching.
 |---|---|---|---|---|
 | ski-demo | 11 | **dev**, split into `videos/01-first-time-ordering/` | `Num_N-vV` → `segment-v6` | v1, and BUILT |
 | canoe-demo | 10 | flat | legacy `segment-NN-name` | none |
-| bike-demo | 11 | flat | legacy `segment-NN-name` | none |
+| bike-demo | 11 | **dev**, split into `videos/01-first-time-ordering/` | legacy `segment-NN-name` → `segment-v1` | in `sandbox/` only, and BUILT (v2, scenes only) |
 | alpine-sports | 10 | flat | legacy `segment-NN-name` | none |
 
 ski-demo went from 12 scenes to 11 on 2026-08-26: `11-logout-menu` and
@@ -356,11 +356,22 @@ them.
 store it found nothing and reported every scene missing. A flat store still
 resolves, which is why the bug hid: it only bit AFTER a migration.
 
-The three flat stores also have **no per-scene avatar overlays**. Build them
-with `make overlays STORE="<Business>/<store>"` *before* migrating, or their
-`dev/` folders will have no `avatar-v1.webm` and the editor will show `none` on
-every row. That is not fatal — it is just a worse starting point than it needs
-to be.
+The remaining flat stores also have **no per-scene avatar overlays**. Build
+them with `make overlays STORE="<Business>/<store>"` *before* migrating, or
+their `dev/` folders will have no `avatar-v1.webm` and the editor will show
+`none` on every row. That is not fatal — it is just a worse starting point
+than it needs to be.
+
+**bike-demo did not go through `make overlays`.** It was migrated first
+(2026-08-28, via `migrate_to_dev.py` — also fixed a `sys.path` bug in that
+script pointing at `build/` instead of `shared/`), then its avatar clips were
+built by hand straight into `sandbox/*/avatar.webm`, bypassing both `make
+overlays` and `migrate_to_dev.py`'s own avatar-file handling. Net effect:
+`dev/` here has segment + narration + `scene.json` only, no `avatar-v1.webm`
+— the avatar only exists in `sandbox/`, which is fine per `sandbox/README.md`
+(sandbox overrides dev) but means **`dev/` alone cannot rebuild this store**;
+losing `sandbox/` loses the avatar work. `build_scenes.py` passes all 11
+scenes and `--join 2` was built (scenes only, no opening/bridge yet).
 
 ⚠ Their footage is also **30fps and un-held** — recorded before the 2026-08-19
 switch to 25fps and before the per-step holds. Migrating the folders does not
