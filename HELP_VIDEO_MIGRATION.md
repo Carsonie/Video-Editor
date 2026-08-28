@@ -338,7 +338,7 @@ changed line under an unchanged filename is the exact failure worth catching.
 | store | scenes | layout | segment naming | avatar set |
 |---|---|---|---|---|
 | ski-demo | 11 | **dev**, split into `videos/01-first-time-ordering/` | `Num_N-vV` → `segment-v6` | v1, and BUILT |
-| canoe-demo | 10 | **dev**, split into `videos/01-first-time-ordering/` | legacy `segment-NN-name` → `segment-v1` | none |
+| canoe-demo | 10 | **dev**, split into `videos/01-first-time-ordering/` | legacy `segment-NN-name` → `segment-v1` | v1, and BUILT — RELEASED as v2 |
 | bike-demo | 11 | **dev**, split into `videos/01-first-time-ordering/` | legacy `segment-NN-name` → `segment-v1` | in `sandbox/` only, and BUILT (v2, scenes only) |
 | alpine-sports | 10 | **dev**, split into `videos/01-first-time-ordering/` | legacy `segment-NN-name` → `segment-v1` | none |
 
@@ -361,15 +361,24 @@ new `sandbox/`. No store remains flat.
 store it found nothing and reported every scene missing. A flat store still
 resolves, which is why the bug hid: it only bit AFTER a migration.
 
-**canoe-demo and alpine-sports also have no per-scene avatar overlays**, same
-as bike-demo before it — they were migrated without first running `make
-overlays STORE="<Business>/<store>"`, so their `dev/` folders have no
-`avatar-v1.webm` and the editor will show `none` on every row. That is not
-fatal — it is just a worse starting point than it needs to be, and the fix is
-the same one bike-demo used: build `avatar.webm` by hand into `sandbox/` (or
-run `make overlays` now, after the fact) and copy the result into
-`dev/<label>/avatar-v1.webm` right after, per the warning in bike-demo's own
-`HANDOFF.md`.
+**alpine-sports still has no per-scene avatar overlays**, same as bike-demo
+before it — it was migrated without first running `make overlays
+STORE="<Business>/<store>"`, so its `dev/` folder has no `avatar-v1.webm`
+and the editor will show `none` on every row. That is not fatal — it is
+just a worse starting point than it needs to be, and the fix is the one
+canoe-demo already went through: build `avatar.webm` per scene with
+`morph_avatar_corner.py --src ... --outdir ... --canvas 1152 --corner 320`
+(then composite it onto a full 1152×1152 canvas — see the `sae-video-building`
+skill's step 6 for the exact command and the shape-mismatch trap to avoid),
+and copy the result into `dev/<label>/avatar-v1.webm` right after, so
+`sandbox/` isn't the only copy of the work.
+
+**canoe-demo went through this on 2026-08-28.** All 10 scenes got
+`avatar.webm` built in `sandbox/`, copied into `dev/<label>/avatar-v1.webm`
+so both folders agree, `qualify_avatar.py` passed clean, and the full video
+was assembled with `assemble_video.py` and released as v2 — 70.15s against
+v1's 70.0s, same 1152×1152, matching quality. v1 was archived, not deleted,
+by `release_video.py` itself.
 
 **bike-demo did not go through `make overlays`.** It was migrated first
 (2026-08-28, via `migrate_to_dev.py` — also fixed a `sys.path` bug in that
