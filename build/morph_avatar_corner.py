@@ -68,7 +68,11 @@ def measure(src, at):
     """
     tmp = tempfile.mkdtemp()
     mask = os.path.join(tmp, "mask.png")
-    run(["ffmpeg", "-v", "error", "-c:v", "libvpx-vp9", "-ss", str(at), "-i", src,
+    # The VP9 decoder is forced for a WebM and ONLY for a WebM: without it the
+    # alpha is silently dropped, and with it a still PNG cannot be opened at
+    # all. Same rule as dec_for() elsewhere — the decoder follows the file.
+    dec = ["-c:v", "libvpx-vp9"] if src.lower().endswith(".webm") else []
+    run(["ffmpeg", "-v", "error"] + dec + ["-ss", str(at), "-i", src,
          "-vf", "alphaextract", "-frames:v", "1", "-update", "1", "-y", mask])
     im = Image.open(mask).convert("L")
     w, h = im.size
