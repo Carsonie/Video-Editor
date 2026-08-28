@@ -617,9 +617,14 @@ def build_segment(src, fps, runs, dst, tmp_dir):
 
     if len(runs) == 1 and runs[0][0] == "cut":
         _, s, e = runs[0]
+        # Stamped here as well. This is the path an UNEDITED clip takes, and a
+        # clip that arrived with a broken clock has to leave with a right one —
+        # otherwise a re-save silently preserves the fault it was meant to fix.
         return subprocess.run(
             ["ffmpeg", "-v", "error"] + dec + ["-ss", f"{(s - 1) / fps:.6f}", "-i", src,
-             "-frames:v", str(e - s + 1)] + enc + ["-y", dst],
+             "-frames:v", str(e - s + 1),
+             "-vf", f"setpts=N/{fps:g}/TB", "-fps_mode", "passthrough"]
+            + enc + ["-y", dst],
             capture_output=True, text=True)
 
     parts = []
@@ -629,7 +634,9 @@ def build_segment(src, fps, runs, dst, tmp_dir):
             part = os.path.join(tmp_dir, f"p{i}_cut{ext}")
             r = subprocess.run(
                 ["ffmpeg", "-v", "error"] + dec + ["-ss", f"{(s - 1) / fps:.6f}", "-i", src,
-                 "-frames:v", str(e - s + 1)] + enc + ["-y", part],
+                 "-frames:v", str(e - s + 1),
+                 "-vf", f"setpts=N/{fps:g}/TB", "-fps_mode", "passthrough"]
+                + enc + ["-y", part],
                 capture_output=True, text=True)
         else:
             _, frame, count = piece
@@ -646,8 +653,9 @@ def build_segment(src, fps, runs, dst, tmp_dir):
             r = subprocess.run(
                 ["ffmpeg", "-v", "error", "-loop", "1", "-i", still,
                  "-frames:v", str(count),
-                 "-vf", f"fps={fps:g},format=yuva420p" if is_alpha(src)
-                 else f"fps={fps:g}"] + enc + ["-y", part],
+                 "-vf", (f"fps={fps:g},setpts=N/{fps:g}/TB,format=yuva420p" if is_alpha(src)
+                         else f"fps={fps:g},setpts=N/{fps:g}/TB"),
+                 "-fps_mode", "passthrough"] + enc + ["-y", part],
                 capture_output=True, text=True)
         if r.returncode != 0:
             return r
@@ -660,8 +668,32 @@ def build_segment(src, fps, runs, dst, tmp_dir):
     # result still comes out `yuva420p`, because the encoder happily writes an
     # alpha plane that is 100% opaque. Measured exactly that before this line
     # was fixed: a saved clip reported the right pixel format and was solid.
+    # ── THE CLOCK IS RESTAMPED HERE, BY FRAME INDEX ─────────────────────────
+    # `setpts=N/FRAME_RATE/TB` gives frame N the time N/fps, so a clip's
+    # DURATION always follows from its frame COUNT. Without it a piece keeps
+    # whatever presentation times its source had, and the concat writes them
+    # through unchanged.
+    #
+    # Measured, on all eleven of ski-demo's avatars: 100% of them were short on
+    # the clock. Update Frame Imbalance repeats the LAST frame to even the two
+    # tracks up, and a tail pad is the final run in the map — so the frames went
+    # in and the duration did not move. Scene 11 held 275 frames inside the 7.99
+    # seconds its 266 originals had spanned, reading as 34.42fps. The build
+    # matches streams by TIME, so it silently dropped frames (248 became 246 on
+    # scene 4) and every clip's audio ended up to 3 seconds before its picture.
+    #
+    # Nothing was ever lost — the editor counts frames and was right all along.
+    # What was missing was the clock, and this is where it is put back.
     return subprocess.run(
         ["ffmpeg", "-v", "error"] + dec + ["-f", "concat", "-safe", "0", "-i", lst]
+        # NO setpts here. `N` RESTARTS on every concatenated segment, so a
+        # three-part rebuild ended on the last part's own clock: 274 frames
+        # reported as 6.56s, which is 164/25 — exactly the length of the final
+        # piece. The pieces are each stamped correctly on the way in, and the
+        # concat demuxer offsets them by their own durations, so the join is
+        # right by construction. Only passthrough is needed, to stop ffmpeg
+        # resampling what it was handed.
+        + ["-fps_mode", "passthrough"]
         + enc + ["-y", dst],
         capture_output=True, text=True)
 
