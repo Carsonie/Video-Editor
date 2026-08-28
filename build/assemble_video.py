@@ -93,9 +93,11 @@ FADE_CAP = 9.0
 # inspection to have her mid-word. Render idle footage; do not mine for it.
 #
 # ⚠ 25fps native, like every HeyGen render.
+# ⚠ STALE THE SAME WAY REST_POSE WAS, and this one fills every pause in the
+# video. Three levels up at Basic_E2E_Testing's old `Help_Videos/HeyGen/Sarah/`,
+# which does not exist here. One level up from build/ is where it lives.
 IDLE_CLIP = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                         "..", "..", "..", "Help_Videos", "HeyGen", "Sarah",
-                         "idle", "sarah-idle-20s-alpha.webm")
+                         os.pardir, "Sarah", "idle", "sarah-idle-20s-alpha.webm")
 IDLE_MIN_SECS = 0.5     # below this a hold is too short for motion to read
 IDLE_CAP = 9.0          # seam limit, same corner-space calibration as FADE_CAP
 
@@ -104,20 +106,88 @@ IDLE_CAP = 9.0          # seam limit, same corner-space calibration as FADE_CAP
 # expression (kept as the "Uncertainty" standard), so the close is built from
 # the canonical frame instead. Framing matches within 2px across renders
 # (head_cx 321 vs 319), so it drops in with no visible jump.
+#
+# ⚠ THIS PATH WAS STALE and the failure was silent. It pointed three levels up
+# at `Help_Videos/HeyGen/Sarah/`, which is Basic_E2E_Testing's old layout — a
+# folder that does not exist in this repo. The reference resolved to nothing,
+# and the build carried on and ENDED THE VIDEO ON SCENE 11'S OWN LAST FRAME
+# instead, which is the softer asymmetric look kept as the "Uncertainty"
+# standard. It said so in one warning line among forty and shipped anyway.
+#
+# The file has lived at <repo>/Sarah/ since the migration. One level up from
+# build/, not three.
 REST_POSE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                         "..", "..", "..", "Help_Videos", "HeyGen", "Sarah",
-                         "sarah-rest-pose-full-alpha.png")
+                         os.pardir, "Sarah", "sarah-rest-pose-full-alpha.png")
 
 
 def dur(p, alpha=False):
     c = ["ffprobe", "-v", "error"] + (["-c:v", "libvpx-vp9"] if alpha else []) + \
         ["-show_entries", "format=duration", "-of", "csv=p=0", p]
-    return float(subprocess.run(c, capture_output=True, text=True).stdout.strip())
+    out = subprocess.run(c, capture_output=True, text=True).stdout.strip()
+    # A still image has no duration and ffprobe answers with nothing. Zero is
+    # the honest length of one frame's worth of picture, and it is what lets the
+    # rest-pose PNG go through the same measuring path as every clip.
+    return float(out) if out and out != "N/A" else 0.0
+
+
+def _has_subject(src, at):
+    """Is there anything opaque at `at`? One extracted alpha frame, nothing more."""
+    tmp = tempfile.mkdtemp(prefix="sample_")
+    try:
+        m = os.path.join(tmp, "a.png")
+        r = subprocess.run(["ffmpeg", "-v", "error", "-c:v", "libvpx-vp9",
+                            "-ss", f"{at:.3f}", "-i", src, "-vf", "alphaextract",
+                            "-frames:v", "1", "-update", "1", "-y", m],
+                           capture_output=True, text=True)
+        if r.returncode != 0 or not os.path.isfile(m):
+            return False
+        from PIL import Image
+        im = Image.open(m).convert("L")
+        w, h = im.size
+        px = im.load()
+        for y in range(0, h, 4):
+            if any(px[x, y] > 32 for x in range(0, w, 6)):
+                return True
+        return False
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def sample_time(src):
+    """
+    A moment in `src` where the subject is actually on screen.
+
+    This used to be a flat `min(1.0, duration/2)`, which assumes she is there
+    one second in. A JOINED scene breaks that assumption by design: when one
+    half has no narration render and the other does, the join fills the gap
+    with a TRANSPARENT silent clip so the later narration cannot slide forward
+    on top of the earlier footage. ski-demo's opening is exactly that — scenes
+    1 and 2 merged, the first with no render — so its narration is empty for
+    the first eight seconds, and measuring at 1.0s found nothing and stopped
+    the build with "no subject found - is the alpha channel actually present?".
+
+    The alpha was present. She was not, yet.
+
+    The old point is tried FIRST, so every clip that already worked is measured
+    at exactly the same place and no existing build moves. Only a clip that is
+    empty there pays for the search.
+    """
+    d = dur(src, True)
+    first = min(1.0, d / 2)
+    if _has_subject(src, first):
+        return first
+    for frac in (0.25, 0.4, 0.55, 0.7, 0.85, 0.95):
+        t = d * frac
+        if _has_subject(src, t):
+            print(f"  {os.path.basename(src)}: nothing at {first:.2f}s "
+                  f"(a filled gap) - measured at {t:.2f}s instead")
+            return t
+    return first          # nothing anywhere; let measure() say so
 
 
 def corner_crop(src):
     """Head-and-shoulders square, centred on the head - never the frame."""
-    m = measure(src, min(1.0, dur(src, True) / 2))
+    m = measure(src, sample_time(src))
     pad = int((m["shoulder"] - m["top"]) * 0.08)
     side = int((m["shoulder"] - m["top"] + pad) * 1.35)
     return clamp_box(m["head_cx"], m["top"] - pad + side // 2, side, m["w"], m["h"])
@@ -392,9 +462,51 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("folder")
     ap.add_argument("--out", default="FINAL_video.mp4")
+    ap.add_argument("--scenes", default="",
+                    help="build only these scene numbers, e.g. 1,2. For ITERATING "
+                         "on the opening or a seam without paying for the whole "
+                         "video — a full ski-demo build is four minutes and the "
+                         "first two scenes are twenty seconds. The output is not "
+                         "a deliverable; name it so nobody mistakes it for one.")
+    ap.add_argument("--skip-qualify", action="store_true",
+                    help="build anyway, without checking the frames first. "
+                         "For when you KNOW a fault is there and want the "
+                         "output regardless — it is never the normal path.")
     a = ap.parse_args()
     F = a.folder
+
+    # ── THE GATE ────────────────────────────────────────────────────────────
+    # Every frame is staged and qualified BEFORE a single one is composited.
+    #
+    # This build has twice produced a wrong video and reported success. A
+    # joined scene's narration was transparent for its first 285 frames and
+    # 11.4 seconds of nothing was composited over the footage; and the two
+    # tracks drift apart as scenes are edited, which is papered over by holding
+    # whichever is short — right for a few frames, wrong for a few hundred, and
+    # silent either way.
+    #
+    # Neither was visible in the editor, because the editor shows avatar.webm
+    # and this composites narration.webm. So the check has to live here, where
+    # the decision is actually made.
+    if not a.skip_qualify:
+        gate = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "qualify_avatar.py")
+        r = subprocess.run([sys.executable, gate, F, "--quiet", "--log"],
+                           capture_output=True, text=True)
+        if r.returncode != 0:
+            sys.stderr.write(r.stdout + r.stderr)
+            sys.exit("\n  Nothing was built. Fix the frames, or pass --skip-qualify "
+                     "to build over the fault deliberately.")
+        print("  frames qualified — every pair staged, every frame a known shape")
     cfg = json.load(open(script_path(F)))
+    if a.scenes:
+        want = {int(x) for x in a.scenes.split(",") if x.strip()}
+        keep = [x for x in cfg["scenes"] if x["n"] in want]
+        if not keep:
+            sys.exit(f"  none of {sorted(want)} are in the script")
+        cfg["scenes"] = keep
+        print(f"  PARTIAL BUILD — scenes {sorted(x['n'] for x in keep)} only. "
+              f"Not a deliverable.")
     tmp = tempfile.mkdtemp()
     P = lambda *x: os.path.join(F, *x)
 
@@ -500,19 +612,43 @@ def main():
             fv = silent_front(tmp, F, n, front[-1], cd, x, y)
             front.append(fv)
         else:
-            # A `-paused-` variant, when one exists, wins over the plain render —
-            # it carries the pauses cut in after rendering. Checked in BOTH
-            # layouts before falling back to the resolver's answer.
-            SC = scene_clips_dir(F)
-            paused = os.path.join(SC, f"sarah-scene-{n:02d}-paused-alpha.webm")
-            sd = PTH.scene_dir(F, n, s.get("label"))
-            paused_dev = os.path.join(sd, "narration-paused.webm")
-            nar = (paused if os.path.exists(paused)
-                   else paused_dev if os.path.exists(paused_dev)
-                   else PTH.narration(F, n, s.get("label")))
+            # ── THE SCENE'S SARAH COMES FROM THE SANDBOX ────────────────
+            # avatar.webm — the file the editor shows and the one you approve.
+            #
+            # This used to composite narration.webm instead: the raw 1920x1080
+            # HeyGen render, cropped to her head here and scaled into the
+            # corner. The reasoning was sound — the master is sharper, and the
+            # crop is measured rather than inherited — and it was still wrong,
+            # because it meant the picture that shipped was never the picture
+            # anyone looked at.
+            #
+            # What that cost:
+            #
+            #   A joined scene's narration was TRANSPARENT for its first 285
+            #   frames — the join filled the gap so the login line could not
+            #   slide forward over the intro — while its avatar carried the
+            #   opening's Sarah correctly. The editor was right and the video
+            #   had an 11.4 second hole.
+            #
+            #   Frame counts were balanced against the AVATAR (482/482) and the
+            #   build paired against the NARRATION (499), so it stretched eight
+            #   of eleven scenes to lengths nobody chose. 0.68s of held frame in
+            #   scene 1 alone.
+            #
+            # The avatar needs none of the old machinery: it is already
+            # 1152x1152 with real alpha, already in the corner, and carries her
+            # voice. So it is laid on as it is.
+            #
+            # The OPENING and CLOSING are untouched by this. They are built from
+            # sarah_clips/ and never came from the sandbox.
+            nar = PTH.avatar(F, n, s.get("label"))
             if nar is None:
-                sys.exit(f"  no narration for scene {n} ({s.get('label','')}) — "
-                         f"looked in dev/ and scenes/")
+                sys.exit(f"  no avatar for scene {n} ({s.get('label','')}) — "
+                         f"the editor writes sandbox/<NN>-<label>/avatar.webm, "
+                         f"and that is what a scene is built from.")
+            if PTH.source_of(F, nar) != "sandbox":
+                print(f"  ⚠ scene {n}: the avatar came from {PTH.source_of(F, nar)}/, "
+                      f"not sandbox/ — this is not the clip the editor shows.")
             nd = dur(nar, True)
             on = max(nd, cd)
             plan.append((n, cd, nd, on))
@@ -526,13 +662,20 @@ def main():
             else:
                 pad_v, breath_secs = freeze, 0.0
 
-            box = corner_crop(nar)
-            cw = box[2] - box[0]
+            # NO crop, NO scale, NO placing. The avatar is already the finished
+            # canvas — 1152x1152, alpha, Sarah in the corner where the editor
+            # put her. Every one of those steps was a chance to differ from
+            # what was approved, and each of them has.
+            #
+            # It is still SCALED TO THE CANVAS, and only that: a defensive fit
+            # for a clip that is not 1152 square, so an odd file lands whole
+            # rather than half off the edge.
             fv = f"{tmp}/f_{n:02d}.webm"
             run(["ffmpeg", "-v", "error", "-c:v", "libvpx-vp9", "-i", nar, "-filter_complex",
                  f"color=c=black@0.0:s={CANVAS}x{CANVAS}:r={FPS},format=yuva420p[bg];"
-                 f"[0:v]crop={cw}:{cw}:{box[0]}:{box[1]},scale={CORNER}:{CORNER},fps={FPS},format=yuva420p[c];"
-                 f"[bg][c]overlay=x={x}:y={y}:shortest=1,"
+                 f"[0:v]scale={CANVAS}:{CANVAS}:force_original_aspect_ratio=decrease,"
+                 f"fps={FPS},format=yuva420p[c];"
+                 f"[bg][c]overlay=x=(W-w)/2:y=(H-h)/2:shortest=1,"
                  # clone, NOT add. `add` pads with transparent frames, which made Sarah
                  # VANISH the instant her line ended. Cloning holds her last frame —
                  # and every HeyGen clip ENDS on the settled rest pose (eyes open,
@@ -570,11 +713,23 @@ def main():
     # ---- closing hold: end on the standard rest pose --------------------
     if os.path.exists(REST_POSE):
         fend = f"{tmp}/f_end.webm"
+        # MEASURED AGAINST THE REST POSE ITSELF, not inherited from the last
+        # scene. `box`/`cw` are still in scope from the loop above, and using
+        # them here crops one image with another image's coordinates: the last
+        # narration is 1920x1080 and this PNG is 608x1080, so the box started at
+        # x=745 on a picture 608 wide — entirely off the right edge. What
+        # survived was dropped in the corner at full size, cut off by the frame.
+        #
+        # It shipped because this branch had NEVER RUN: REST_POSE pointed at
+        # Basic_E2E_Testing's old layout, the file was not there, and the build
+        # took the other path every time. Fixing the path switched on dead code.
+        rbox = corner_crop(REST_POSE)
+        rcw = rbox[2] - rbox[0]
         run(["ffmpeg", "-v", "error", "-loop", "1", "-t", f"{END_HOLD:.3f}", "-i", REST_POSE,
              "-f", "lavfi", "-t", f"{END_HOLD:.3f}", "-i", "anullsrc=r=48000:cl=stereo",
              "-filter_complex",
              f"color=c=black@0.0:s={CANVAS}x{CANVAS}:r={FPS},format=yuva420p[bg];"
-             f"[0:v]crop={cw}:{cw}:{box[0]}:{box[1]},scale={CORNER}:{CORNER},fps={FPS},format=yuva420p[c];"
+             f"[0:v]crop={rcw}:{rcw}:{rbox[0]}:{rbox[1]},scale={CORNER}:{CORNER},fps={FPS},format=yuva420p[c];"
              f"[bg][c]overlay=x={x}:y={y}:shortest=1,format=yuva420p[v]",
              "-map", "[v]", "-map", "1:a", "-c:v", "libvpx-vp9", "-pix_fmt", "yuva420p",
              "-b:v", "2M", "-c:a", "libopus", "-y", fend])
