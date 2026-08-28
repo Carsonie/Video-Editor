@@ -338,9 +338,9 @@ changed line under an unchanged filename is the exact failure worth catching.
 | store | scenes | layout | segment naming | avatar set |
 |---|---|---|---|---|
 | ski-demo | 11 | **dev**, split into `videos/01-first-time-ordering/` | `Num_N-vV` → `segment-v6` | v1, and BUILT |
-| canoe-demo | 10 | flat | legacy `segment-NN-name` | none |
+| canoe-demo | 10 | **dev**, split into `videos/01-first-time-ordering/` | legacy `segment-NN-name` → `segment-v1` | none |
 | bike-demo | 11 | **dev**, split into `videos/01-first-time-ordering/` | legacy `segment-NN-name` → `segment-v1` | in `sandbox/` only, and BUILT (v2, scenes only) |
-| alpine-sports | 10 | flat | legacy `segment-NN-name` | none |
+| alpine-sports | 10 | **dev**, split into `videos/01-first-time-ordering/` | legacy `segment-NN-name` → `segment-v1` | none |
 
 ski-demo went from 12 scenes to 11 on 2026-08-26: `11-logout-menu` and
 `12-signed-out` were always one action, and `99-closing` moved to `Sarah/closing/`
@@ -348,7 +348,12 @@ because it is the same in every video. **A store need not keep a 99.**
 
 All four stores live in THIS repo as of 2026-08-28. The three flat ones came
 across from `Basic_E2E_Testing` exactly as they were — the move did not migrate
-them.
+them. **All four are now migrated onto the `dev` layout as of 2026-08-28** —
+ski-demo first (2026-08-22), bike-demo, then canoe-demo and alpine-sports, both
+the same day via `migrate_to_dev.py --apply` followed by the same manual steps
+bike-demo got: `final/` renamed to `videos/01-first-time-ordering/`, the five
+`sarah-*.webm` files moved into `sarah_clips/`, and `dev/` copied by hand into a
+new `sandbox/`. No store remains flat.
 
 `make overlays` reads its narration through `paths.narration()` as of
 2026-08-22 — sandbox, then dev, then flat. Before that it read
@@ -356,11 +361,15 @@ them.
 store it found nothing and reported every scene missing. A flat store still
 resolves, which is why the bug hid: it only bit AFTER a migration.
 
-The remaining flat stores also have **no per-scene avatar overlays**. Build
-them with `make overlays STORE="<Business>/<store>"` *before* migrating, or
-their `dev/` folders will have no `avatar-v1.webm` and the editor will show
-`none` on every row. That is not fatal — it is just a worse starting point
-than it needs to be.
+**canoe-demo and alpine-sports also have no per-scene avatar overlays**, same
+as bike-demo before it — they were migrated without first running `make
+overlays STORE="<Business>/<store>"`, so their `dev/` folders have no
+`avatar-v1.webm` and the editor will show `none` on every row. That is not
+fatal — it is just a worse starting point than it needs to be, and the fix is
+the same one bike-demo used: build `avatar.webm` by hand into `sandbox/` (or
+run `make overlays` now, after the fact) and copy the result into
+`dev/<label>/avatar-v1.webm` right after, per the warning in bike-demo's own
+`HANDOFF.md`.
 
 **bike-demo did not go through `make overlays`.** It was migrated first
 (2026-08-28, via `migrate_to_dev.py` — also fixed a `sys.path` bug in that
