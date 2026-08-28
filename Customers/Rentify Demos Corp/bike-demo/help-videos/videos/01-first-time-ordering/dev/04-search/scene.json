@@ -1,0 +1,6 @@
+{
+  "n": 4,
+  "line": "Search for a bike, or choose one from a collection. The collections hold groups of bikes, which can come in variants, such as different sizes or colours.",
+  "segment": "segment-04-search.mp4",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here."
+}

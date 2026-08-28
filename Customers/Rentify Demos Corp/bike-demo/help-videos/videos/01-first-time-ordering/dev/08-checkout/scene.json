@@ -1,0 +1,6 @@
+{
+  "n": 8,
+  "line": "Review your total, then continue to payment. Take a moment to check your rental dates and the price are correct.",
+  "segment": "segment-08-checkout.mp4",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here."
+}

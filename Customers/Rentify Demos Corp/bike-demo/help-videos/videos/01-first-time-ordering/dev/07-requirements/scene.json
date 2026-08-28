@@ -1,0 +1,6 @@
+{
+  "n": 7,
+  "line": "We need to ask you to answer some questions here, so we can set your bike up before you arrive. Please review and agree to the rental terms and save.",
+  "segment": "segment-07-requirements.mp4",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here."
+}

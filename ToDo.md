@@ -51,6 +51,34 @@ file history. **My call, not asked for** — worth confirming or changing.
 It came across with the players and nothing imports it. Either it earns its
 place or it goes.
 
+### P3.4 bike-demo's `TRACK_*` files — moved aside, not read by any build
+
+`Customers/Rentify Demos Corp/bike-demo/help-videos/final/` held three files
+no script or doc references: `TRACK_front_full.webm`, `TRACK_front_sarah.webm`,
+`TRACK_rear_full.mp4`. They look like an earlier, abandoned compositing
+attempt — not the `sarah-*-alpha.webm` / `segments/` files the actual v1
+build reads.
+
+**Moved 2026-08-28** out of `final/` into
+`z_History/2026-08-28_v1/`, so they stop cluttering the working folder
+without deleting anything yet.
+
+`Customers/` is gitignored, so there is no commit history to date them by.
+**Last usage** below is each file's on-disk modified time from before the
+move — the best signal available, and only a proxy for "last touched," not
+"last built from."
+
+| File | Last usage (mtime) |
+|---|---|
+| `TRACK_front_sarah.webm` | 2026-08-19 22:52 |
+| `TRACK_front_full.webm` | 2026-08-19 23:02 |
+| `TRACK_rear_full.mp4` | 2026-08-19 23:02 |
+
+If no future bike-demo rebuild reads these, delete them from
+`z_History/2026-08-28_v1/`. Don't delete on this entry alone — confirm first
+that a rebuild of bike-demo (once it's migrated off the old `final/` layout
+per P4.1) still doesn't touch them.
+
 ---
 
 ## P4 — later, by design
