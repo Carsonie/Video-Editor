@@ -340,7 +340,7 @@ changed line under an unchanged filename is the exact failure worth catching.
 | ski-demo | 11 | **dev**, split into `videos/01-first-time-ordering/` | `Num_N-vV` → `segment-v6` | v1, and BUILT |
 | canoe-demo | 10 | **dev**, split into `videos/01-first-time-ordering/` | legacy `segment-NN-name` → `segment-v1` | v1, and BUILT — RELEASED as v2 |
 | bike-demo | 11 | **dev**, split into `videos/01-first-time-ordering/` | legacy `segment-NN-name` → `segment-v1` | in `sandbox/` only, and BUILT (v2, scenes only) |
-| alpine-sports | 10 | **dev**, split into `videos/01-first-time-ordering/` | legacy `segment-NN-name` → `segment-v1` | none |
+| alpine-sports | 10 | **dev**, split into `videos/01-first-time-ordering/` | legacy `segment-NN-name` → `segment-v1` | v1, and BUILT — RELEASED as v2 |
 
 ski-demo went from 12 scenes to 11 on 2026-08-26: `11-logout-menu` and
 `12-signed-out` were always one action, and `99-closing` moved to `Sarah/closing/`
@@ -361,24 +361,38 @@ new `sandbox/`. No store remains flat.
 store it found nothing and reported every scene missing. A flat store still
 resolves, which is why the bug hid: it only bit AFTER a migration.
 
-**alpine-sports still has no per-scene avatar overlays**, same as bike-demo
-before it — it was migrated without first running `make overlays
-STORE="<Business>/<store>"`, so its `dev/` folder has no `avatar-v1.webm`
-and the editor will show `none` on every row. That is not fatal — it is
-just a worse starting point than it needs to be, and the fix is the one
-canoe-demo already went through: build `avatar.webm` per scene with
-`morph_avatar_corner.py --src ... --outdir ... --canvas 1152 --corner 320`
-(then composite it onto a full 1152×1152 canvas — see the `sae-video-building`
-skill's step 6 for the exact command and the shape-mismatch trap to avoid),
-and copy the result into `dev/<label>/avatar-v1.webm` right after, so
-`sandbox/` isn't the only copy of the work.
+**No store is left without per-scene avatar overlays as of 2026-08-28.**
+bike-demo, canoe-demo and alpine-sports were all migrated without first
+running `make overlays STORE="<Business>/<store>"`, so each one's `dev/`
+folder started with no `avatar-v1.webm`. The fix used for all three: build
+`avatar.webm` per scene with `morph_avatar_corner.py --src ... --outdir ...
+--canvas 1152 --corner 320` (then composite it onto a full 1152×1152 canvas
+— see the `sae-video-building` skill's step 6 for the exact command and the
+shape-mismatch trap to avoid), and copy the result into
+`dev/<label>/avatar-v1.webm` right after, so `sandbox/` isn't the only copy
+of the work.
 
-**canoe-demo went through this on 2026-08-28.** All 10 scenes got
-`avatar.webm` built in `sandbox/`, copied into `dev/<label>/avatar-v1.webm`
-so both folders agree, `qualify_avatar.py` passed clean, and the full video
-was assembled with `assemble_video.py` and released as v2 — 70.15s against
-v1's 70.0s, same 1152×1152, matching quality. v1 was archived, not deleted,
+**canoe-demo and alpine-sports both went through this on 2026-08-28.** Each
+got `avatar.webm` built in `sandbox/` for all 10 scenes, copied into
+`dev/<label>/avatar-v1.webm` so both folders agree, and a full video
+assembled with `assemble_video.py` and released as v2 — canoe-demo 70.15s
+against v1's 70.0s, alpine-sports 69.88s against v1's 69.73s, both
+1152×1152, matching quality. Each store's v1 was archived, not deleted,
 by `release_video.py` itself.
+
+**alpine-sports' `assemble_video.py` build needed `--skip-qualify`, and by a
+wide margin.** Two scenes (payment, order-complete) have footage far shorter
+than their narration — 3.9s of footage against a 5.5s line, and 2.6s against
+5.3s. `qualify_avatar.py` refuses anything over a 30-frame (~1.2s) gap
+between footage and the avatar overlay; these were 38 and 68 frames, more
+than double canoe-demo's worst case (29 frames, which passed). Checked
+against `dev/`'s original, untouched `segment-v1.mp4` before overriding —
+the gap predates this migration and isn't something the rebuild introduced,
+so it was safe to proceed. The build holds the last frame for the gap, same
+mechanism as any smaller hold, just for longer (up to ~2.7s on the worst
+scene) — worth a look in the finished video before calling a store done,
+since a hold that long is a real judgment call about whether it still reads
+as first-time-ordering quality, not just a mechanical pass/fail.
 
 **bike-demo did not go through `make overlays`.** It was migrated first
 (2026-08-28, via `migrate_to_dev.py` — also fixed a `sys.path` bug in that
