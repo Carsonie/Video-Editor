@@ -1,0 +1,6 @@
+{
+  "n": 2,
+  "line": "From your dashboard, tap New Order to begin. This is also where your orders are listed, so you can find them again later.",
+  "segment": "segment-02-neworder.mp4",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here."
+}

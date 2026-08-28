@@ -1,0 +1,6 @@
+{
+  "n": 10,
+  "line": "You'll always find your rental in your order history, so you can check the details any time. Enjoy the water!",
+  "segment": "segment-10-history.mp4",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here."
+}

@@ -1,0 +1,6 @@
+{
+  "n": 7,
+  "line": "Please review and agree to the rental terms, then save. There are no extra questions for this rental, so you're nearly done.",
+  "segment": "segment-07-terms.mp4",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here."
+}

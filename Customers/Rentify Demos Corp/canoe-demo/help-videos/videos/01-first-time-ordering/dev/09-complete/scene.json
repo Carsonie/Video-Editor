@@ -1,0 +1,6 @@
+{
+  "n": 9,
+  "line": "That's it — your order is complete. Your invoice is ready, and your canoe will be waiting for you at the store.",
+  "segment": "segment-09-complete.mp4",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here."
+}

@@ -1,0 +1,6 @@
+{
+  "n": 3,
+  "line": "Add a person to the order — yourself, or a party member — so we know who the gear is for.",
+  "segment": "segment-03-addmyself.mp4",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here."
+}

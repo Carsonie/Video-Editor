@@ -1,0 +1,6 @@
+{
+  "n": 6,
+  "line": "Add the canoe to your order.",
+  "segment": "segment-06-additem.mp4",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here."
+}

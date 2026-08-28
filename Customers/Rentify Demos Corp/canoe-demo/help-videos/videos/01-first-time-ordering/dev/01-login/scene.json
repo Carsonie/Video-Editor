@@ -1,0 +1,6 @@
+{
+  "n": 1,
+  "line": "Enter your email, and we'll send you a 4 digit verification code you can add here to sign in securely.",
+  "segment": "segment-01-login.mp4",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here."
+}

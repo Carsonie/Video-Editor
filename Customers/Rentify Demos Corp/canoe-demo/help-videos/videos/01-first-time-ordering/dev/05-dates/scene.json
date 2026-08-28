@@ -1,0 +1,6 @@
+{
+  "n": 5,
+  "line": "Select your rental starting date, then your return date. You'll see the number of days update as you choose, so you can check the length of your trip before you continue.",
+  "segment": "segment-05-dates.mp4",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here."
+}

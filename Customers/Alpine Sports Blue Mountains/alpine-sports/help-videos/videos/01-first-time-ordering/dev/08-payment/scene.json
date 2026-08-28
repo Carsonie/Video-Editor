@@ -1,0 +1,6 @@
+{
+  "n": 8,
+  "line": "Enter your credit card details to complete your rental order. Your payment is processed securely.",
+  "segment": "segment-08-payment.mp4",
+  "_note": "This scene's node, copied from video/script.json so this folder is self-describing. script.json remains the source of truth — edit it there, not here."
+}
