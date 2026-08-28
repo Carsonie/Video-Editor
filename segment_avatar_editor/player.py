@@ -830,6 +830,22 @@ SEQ_TEMPLATE = """<!doctype html>
   .wrap {{ padding:14px; display:flex; gap:16px; align-items:flex-start;
            justify-content:center; }}
   .left {{ display:flex; flex-direction:column; gap:10px; align-items:center; }}
+  /* SOLO — one track on its own.
+     The checkerboard is not decoration. Sarah is a VP9 clip with a real alpha
+     channel, and the one fault it can carry is a bad EDGE: a black fringe, or
+     a matte flattened somewhere upstream. Against the footage you cannot see
+     it. Against a pattern you can see straight through, you can. */
+  #stage.solo-ov #baseImg {{ display:none; }}
+  #stage.solo-base #overImg {{ display:none; }}
+  #stage.solo-ov {{
+    background-color:#1e1e1e;
+    background-image:
+      linear-gradient(45deg,#2c2c2c 25%,transparent 25%,transparent 75%,#2c2c2c 75%),
+      linear-gradient(45deg,#2c2c2c 25%,transparent 25%,transparent 75%,#2c2c2c 75%);
+    background-size:24px 24px;
+    background-position:0 0, 12px 12px;
+  }}
+  #soloBtn.on {{ border-color:#a56cff; color:#dcc9ff; }}
   #stage {{ position:relative; width:var(--box); height:var(--box);
             background:#232323; border:2px solid var(--active); border-radius:8px;
             overflow:hidden; transition:border-color .12s; }}
@@ -1313,6 +1329,7 @@ SEQ_TEMPLATE = """<!doctype html>
    <div id="ctls">
   <div class="ctlrow" data-r="1"><button id="playBtn" title="Play or pause the timeline. Space does the same. Playback starts from wherever the pointer is, so drag it first to watch a particular moment.">&#9654; Play</button>
     <button id="muteBtn" title="Mute the narration. The picture is unaffected — useful when you are judging motion and the voice is a distraction.">&#128266;</button>
+    <button id="soloBtn" title="Show one track on its own (keyboard: s). AVATAR hides the footage and puts a checkerboard behind Sarah, so her edges are against something you can see through &mdash; that is where a bad alpha shows. FOOTAGE hides her instead. It changes nothing on disk; it is only what you are looking at.">&#9673; Both</button>
     <select id="rateSel" title="Playback speed. Slow right down to judge a seam: at 25fps a cut is over in 40ms, and 0.125x stretches that to 320ms. Below 0.25x the browser will not play audio, so those speeds are silent.">
       <option value="2">2x</option>
       <option value="1" selected>1x</option>
@@ -1428,6 +1445,35 @@ SEQ_TEMPLATE = """<!doctype html>
   const slugOf = (i, w) => (w || which) === 'base' ? SEQ[i].base_slug : SEQ[i].over_slug;
   const lenOf  = (i, w) => (w || which) === 'base' ? SEQ[i].base_n    : SEQ[i].over_n;
 
+  // ── solo ────────────────────────────────────────────────────────────────
+  // Both -> Avatar -> Footage -> Both. A VIEW control: it changes nothing on
+  // disk, does not touch the per-scene edit ticks, and is not remembered
+  // anywhere. It is what you are LOOKING at, not what you are working on.
+  //
+  // Avatar-only puts a checkerboard behind her, because the fault this exists
+  // to find is a bad ALPHA EDGE — a black fringe, or a matte flattened
+  // somewhere upstream — and that is invisible against the footage.
+  const SOLO_STEPS = [
+    {{ key: 'both',    cls: '',          label: '&#9673; Both' }},
+    {{ key: 'overlay', cls: 'solo-ov',   label: '&#9673; Avatar' }},
+    {{ key: 'base',    cls: 'solo-base', label: '&#9673; Footage' }},
+  ];
+  let SOLO = 0;
+  function paintSolo() {{
+    const st = $('stage'), b = $('soloBtn');
+    if (!st || !b) return;
+    for (const s of SOLO_STEPS) if (s.cls) st.classList.remove(s.cls);
+    const cur = SOLO_STEPS[SOLO];
+    if (cur.cls) st.classList.add(cur.cls);
+    b.innerHTML = cur.label;
+    b.classList.toggle('on', SOLO !== 0);
+  }}
+  // Guarded. A bare .onclick on a missing element throws, and a throw at load
+  // kills every line after it — this exact button did that: the scene list
+  // never rendered and the stage never got a frame, from one absent control.
+  if ($('soloBtn')) $('soloBtn').onclick = () =>
+    {{ SOLO = (SOLO + 1) % SOLO_STEPS.length; paintSolo(); }};
+  paintSolo();
   function paint() {{
     // The Background/Overlay/Solo row is gone: the scene rows' ticks say which
     // layer an edit touches, so a second control saying it again was one more
@@ -1455,7 +1501,14 @@ SEQ_TEMPLATE = """<!doctype html>
                   .getPropertyValue(varName).trim();
     document.documentElement.style.setProperty('--active', lit);
     $('stage').style.borderColor = lit;
-    $('stage').className = '';
+    // The border is the only thing this function owns, so it must not clear
+    // classes it did not set. `className = ''` wiped SOLO on every scene
+    // change: the button still read "Avatar" while the footage came back,
+    // which is worse than not having the control — it lied about the view.
+    //
+    // Nothing puts a class on #stage for the border any more; it is an inline
+    // style two lines up. So there is nothing here to clear.
+    paintSolo();
   }}
 
   function show(g) {{
@@ -3297,6 +3350,7 @@ SEQ_TEMPLATE = """<!doctype html>
     if (e.key === 'ArrowLeft')  {{ e.altKey ? jumpMark(-1) : jump(e.shiftKey ? -10 : -1); e.preventDefault(); }}
     if (e.key === 'ArrowRight') {{ e.altKey ? jumpMark(1)  : jump(e.shiftKey ?  10 :  1); e.preventDefault(); }}
     if (e.key === 'm' || e.key === 'M') {{ $('markBtn').click(); e.preventDefault(); }}
+    if (e.key === 's' || e.key === 'S') {{ $('soloBtn').click(); e.preventDefault(); }}
     if (e.key === '[') {{ $('prevScene').click(); e.preventDefault(); }}
     if (e.key === ']') {{ $('nextScene').click(); e.preventDefault(); }}
   }});
