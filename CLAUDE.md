@@ -46,16 +46,61 @@ Never print it, never commit it.
 mp4_splitter/            MP4 Splitter — cut a recording into segments
 segment_avatar_editor/   Segment and Avatar Editor — finish them
 shared/                  serve.py  frames.py  paths.py  vtt.py
-build/                   the 9 tools that make the finished video
-tests/                   106 checks over every endpoint
+build/                   the tools that make the finished video
+Sarah/                   her standards, and the clips every video reuses
+tests/                   142 checks over every endpoint
 Customers/               the video data — GITIGNORED
 ```
 
 Flatter than `Basic_E2E_Testing` by one level: no `video_players/`, because
-nothing sits beside the players here. `paths.py` and `vtt.py` moved down into
-`shared/`, which is what let that level go — they were the only reason
-`serve.py` had to climb out of the tree. **Do not reintroduce a level above the
+nothing sits beside the players here. **Do not reintroduce a level above the
 players.**
+
+---
+
+## ⚠ Build the SCENES first, and prove them, before joining
+
+**Never build the whole video to find out whether it works.**
+
+```bash
+python3 build/build_scenes.py "<video folder>"            # every scene, checked
+python3 build/build_scenes.py "<video folder>" --join 28  # only once they pass
+```
+
+Each scene is checked three ways — decoded frame count against its avatar's,
+duration against that frame count, audio against the picture — and the tool
+**refuses to join while any scene fails**. That refusal is the point of it.
+
+Four whole-video builds shipped faults that one scene would have shown in
+seconds: an 11.4-second hole (v23), a doubled opening (v25), a section cut 2.4s
+short and a voice that never caught up (v26). Each cost a full rebuild and a
+viewing to find. A joined video hides its faults inside 110 seconds; a scene
+cannot.
+
+**Whatever is in `sandbox/` after Carson's editing pass is the master version.**
+Build that. Do not composite a different file because it looks more correct —
+that mistake is exactly what produced v23 through v26.
+
+---
+
+## This repo owns ALL video work. `Basic_E2E_Testing` gets the release only.
+
+Split 2026-08-28. Over there, a store's `help-videos/` holds finished videos and
+a README, and nothing else — so "which file does a customer get?" is answered by
+the folder. Before the split both repos held the same working files and
+ski-demo's customer folder carried v10 through v22 beside 2.2 GB of raw
+recordings.
+
+```bash
+python3 build/release_video.py "<video folder>" --version 28
+```
+
+**That is the only thing that may write there.** It refuses a build whose clock
+and frame count disagree, and refuses to put different bytes under a version
+number already released.
+
+Raw captures now land here directly — `record_flow.ts` in that repo writes into
+this one's `raw_mp4/` (override with `VIDEO_EDITOR_REPO`).
 
 ---
 
@@ -71,6 +116,17 @@ python3 setup_demo.py          # the 150 MB subset the editors and tests need
 python3 setup_demo.py --check  # what is here, copies nothing
 ```
 
+**`z_History` is therefore the only undo there is**, which is also why it grows
+without limit. Trim it:
+
+```bash
+python3 build/trim_history.py "Customers"           # shows, deletes nothing
+python3 build/trim_history.py "Customers" --apply   # keeps the 3 newest
+```
+
+It removes every `z_History` nested inside another one first — a backup does not
+keep backups, and that alone was 514 MB of ski-demo's 1.3 GB.
+
 The whole ski-demo store is already here (2.2 GB). Both repos are on one APFS
 volume, so a copy shares blocks — it took 0.16 seconds and no disk.
 
@@ -78,25 +134,36 @@ volume, so a copy shares blocks — it took 0.16 seconds and no disk.
 
 ## The pipeline
 
-`PIPELINE.md` is the full playbook — four shipped videos and every trap found
-paying for them. Read it before building anything.
+`PIPELINE.md` is the full playbook — every trap found paying for it, and the
+nine steps in order. **Twenty-three more videos follow it.** Read it before
+building anything; if a step there cannot be followed cold, fix it there.
 
 The short version:
 
 ```
-raw_mp4/  →  cut_segments.py or the MP4 Splitter  →  dev/
-          →  the Segment and Avatar Editor        →  sandbox/
-          →  vtt.py            check the timing, FREE
-          →  render_narration.py   THE ONLY PAID STEP
-          →  assemble_video.py →  video/<store>_<title>_vNN.mp4
+raw_mp4/  →  MP4 Splitter (or cut_segments.py)     →  dev/
+          →  copy BY HAND                          →  sandbox/
+          →  vtt.py + preview_narration.py    check the timing, FREE
+          →  render_narration.py              THE ONLY PAID STEP
+          →  morph_avatar_corner.py           →  avatar.webm
+          →  the Segment and Avatar Editor    Carson adjusts
+          →  build_scenes.py                  every scene, checked
+          →  build_scenes.py --join <N>       →  video/<store>_<title>_v<N>.mp4
+          →  release_video.py                 →  Basic_E2E_Testing
 ```
 
 Everything after the narration render is local ffmpeg and free.
 
+⚠ **`assemble_video.py` is not in that list.** It was the whole-video builder
+until 2026-08-27 and it composited `narration.webm` — the raw 1920×1080 HeyGen
+render — while the editor shows `avatar.webm`. So every frame balanced in the
+editor was balancing a file the build never opened. It is kept for its opening
+and closing handling; it is not how a video gets built.
+
 ### The folders, and what each is
 
-- **`raw_mp4/`** — the recording, whole and uncut. Imported from
-  `Basic_E2E_Testing`, where `A#5` writes it after an E2E run.
+- **`raw_mp4/`** — the recording, whole and uncut. `A#5` writes it here
+  directly after an E2E run, from the other repo.
 - **`dev/`** — where a video starts. The splitter deposits its named cut here.
   Files are versioned: `segment-v1.mp4`.
 - **`sandbox/`** — the Segment and Avatar Editor's ground. Files carry no

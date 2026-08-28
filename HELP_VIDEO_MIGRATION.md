@@ -293,6 +293,22 @@ Customers/*/*/help-videos/**/sandbox/**
 
 Always verify with `git check-ignore -v <path>`, never by reading the rules.
 
+**The rule in THIS repo is different, and simpler** (2026-08-28). Here
+`Customers/**` is excluded and only text under a store's `help-videos/` is
+re-included — `.json`, `.md`, `.txt`, `.gitkeep`, plus `work/boundaries.png`:
+
+```
+Customers/**
+!Customers/
+!Customers/**/
+!Customers/*/*/help-videos/**/*.json
+```
+
+Same trap, third time: the directory re-includes come first and are their own
+lines. And it bit in the DANGEROUS direction while being written — `Customers/*`
+with `!Customers/**/` staged **3.5 GB** of video before `git status` was read.
+Check what a rule stages, not only what it ignores.
+
 ## Files that look like leftovers and are not
 
 `TRACK_front_full.webm` and `TRACK_rear_full.mp4` sit loose in `final/` and

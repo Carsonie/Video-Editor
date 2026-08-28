@@ -28,6 +28,15 @@ simpler path to the same paid endpoint is a way to lose money quietly.
 
 Where these documents mention those scripts, read it as history.
 
+## `z_History/`
+
+`PIPELINE_pre-2026-08-28.md` — the playbook as it stood before it was rewritten,
+1,323 lines of it. It had become a record of the struggle rather than the
+procedure: three dated session logs correcting each other, a `final/` layout no
+store uses, an `assemble_video.py` build that was abandoned, and a HeyGen-native
+pivot that was tried and dropped. Kept because it holds real findings that were
+paid for. **It is not instructions.**
+
 ## These are records, not instructions
 
 They were written across the HeyGen work from June onwards. Where one disagrees

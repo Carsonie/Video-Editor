@@ -27,21 +27,7 @@ endpoint perfectly — that already happened once.
 data folder has to carry `Basic_E2E_Testing`'s name for it. Make the root
 configurable — an argument or an env var — with `Customers/` the default.
 
-### P2.2 No script imports a raw recording FROM `Basic`
-
-`A#5` records an E2E run and writes it to
-`Basic/Customers/<Business>/<store>/help-videos/raw_mp4/`. That agent stays
-there, because it wraps a test run. Pulling the file here is a manual `cp`
-today.
-
-Wanted: pick a store, list its recordings, bring one over. On one APFS volume a
-clone is instant and free — 2.2 GB took 0.16 seconds.
-
-### P2.3 No script returns a finished video TO `Basic`
-
-The other half of the contract in `SVM.md`. The finished
-`video/<store>_<title>_vNN.mp4` goes back into that customer's folder — and
-**nothing else**. Not the working files, not the archives, not the cuts.
+*(P2.2 and P2.3 were both done 2026-08-28 — see Done.)*
 
 ---
 
@@ -69,10 +55,7 @@ place or it goes.
 
 ## P4 — later, by design
 
-### P4.1 The other customers' `help-videos/` come over as they are worked on
-
-canoe-demo, bike-demo and alpine-sports are still only in `Basic`. No reason to
-move them before there is a video to make.
+*(P4.1 was done 2026-08-28 — see Done.)*
 
 ### P4.2 `dev` → `sandbox` stays a MANUAL copy — decided, not outstanding
 
@@ -84,6 +67,20 @@ is a deliberate human step.
 ---
 
 ## Done
+
+- ~~P2.2 import a raw recording from `Basic`~~ — **not needed**: `record_flow.ts`
+  over there now writes the capture straight into this repo's `raw_mp4/`, so
+  there is no import step to build (2026-08-28)
+- ~~P2.3 return a finished video to `Basic`~~ — `build/release_video.py`. Copies
+  one blessed build, stands the previous release down into `z_History/`, refuses
+  a build whose clock and frame count disagree (2026-08-28)
+- ~~P4.1 bring the other stores over~~ — canoe-demo, bike-demo and alpine-sports
+  moved 2026-08-28, on their old `final/` layout, unchanged. `Basic` now keeps
+  released videos only
+- ~~A garbage-collection strategy~~ — `build/trim_history.py`. Nested history
+  deleted outright, 3 newest kept per bucket. Freed 974 MB first run (2026-08-28)
+- ~~Reproducible builds~~ — `build/build_scenes.py`. The per-scene recipe that
+  produced v27 existed only in a shell history until 2026-08-28
 
 - ~~Decide git vs LFS for the video~~ — neither; `setup_demo.py` copies it and
   `Customers/` is gitignored
