@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# Two reminders, neither of which blocks. Both print every time, so the
+# question gets asked while the change is still in your head.
+#
+#   1. HELP_VIDEO_MIGRATION.md when a commit touches what it documents.
+#   2. The player commit rules when a commit touches one of the video players.
+#
+# Enabled by:  git config core.hooksPath .githooks
+set -u
+staged=$(git diff --cached --name-only)
+
+# ── 1. the migration runbook ──────────────────────────────────────────────
+DOC="HELP_VIDEO_MIGRATION.md"
+watch='(agent-tools/6_end-customer-help-video-creations/(paths|migrate_to_dev|make_scene_overlays|assemble_video)\.py|video_players/shared/(serve|frames)\.py|video_players/[a-z0-9_]+/player\.py|^Makefile$|^\.gitignore$|help-videos/.*/(dev|sandbox|segments|scenes)/)'
+if echo "$staged" | grep -qE "$watch"; then
+  if echo "$staged" | grep -q "^$DOC$"; then
+    printf '\n  \033[32m*\033[0m %s is in this commit. Good.\n' "$DOC"
+  else
+    printf '\n  \033[33m!\033[0m This commit touches the help-video migration surface:\n'
+    echo "$staged" | grep -E "$watch" | sed 's/^/       /'
+    printf '\n    %s is NOT staged. Does it need updating?\n' "$DOC"
+    printf '    The "Current state" table goes stale fastest.\n'
+  fi
+fi
+
+# ── 2. the player commit rules ────────────────────────────────────────────
+# A player is any folder under video_players/ that has a VERSION file. The
+# rules exist so the history of each player reads as its own changelog:
+#
+#   * one player per commit — never two in the same one
+#   * bump that player's VERSION
+#   * subject: "<Player Name> v<N> ADDED: <what it does now>"
+#
+# Shared code is exempt: shared/ belongs to no single player. So is anything
+# else under video_players/ that is not a player — tests/, for one.
+#
+# A player is recognised by its VERSION FILE, not by name. That is what the
+# comment above always claimed and what the check used to get wrong: it
+# excluded `shared/` by name and treated every other folder as a player, so
+# adding tests/ produced "tests: VERSION is NOT staged — bump it". Reading the
+# disk instead means a NEW player is covered the moment it has a VERSION in it,
+# and a new non-player folder is never nagged about.
+# The match keeps the WHOLE path, not just the part from agent-tools/ onwards.
+# A staged path starts at `.claude/`, so the shorter match could not be used to
+# test the file on disk — and the VERSION-staged check below reads better
+# against a full path too.
+PLAYER_DIRS=$(echo "$staged" \
+  | grep -oE '^[a-z0-9_]+/' \
+  | sort -u \
+  | while read -r d; do [ -f "${d}VERSION" ] && echo "$d"; done)
+
+if [ -n "${PLAYER_DIRS}" ]; then
+  count=$(echo "${PLAYER_DIRS}" | grep -c .)
+  printf '\n  \033[36mi\033[0m Player commit rules apply. This commit touches:\n'
+  echo "${PLAYER_DIRS}" | sed 's|/$||' | sed 's/^/       /'
+
+  if [ "${count}" -gt 1 ]; then
+    printf '\n  \033[33m!\033[0m %s players in ONE commit. Split them —\n' "${count}"
+    printf '    a player history is only readable if each commit is about one player.\n'
+  fi
+
+  for d in ${PLAYER_DIRS}; do
+    name=$(basename "${d}")
+    # No ^ anchor: PLAYER_DIRS is captured by grep -o, which drops the
+    # leading ".claude/" that the staged path still carries. Anchoring here
+    # made the check never match, so a bumped VERSION still read as missing.
+    if echo "$staged" | grep -q "${d}VERSION$"; then
+      printf '  \033[32m*\033[0m %s: VERSION is staged.\n' "${name}"
+    else
+      printf '  \033[33m!\033[0m %s: VERSION is NOT staged — bump it.\n' "${name}"
+    fi
+  done
+  printf '\n    Subject line:  <Player Name> v<N> ADDED: <what it does now>\n'
+  printf '    Not blocking - commit again to proceed either way.\n\n'
+fi
+exit 0
