@@ -67,10 +67,11 @@ TEMPLATE = """<!doctype html>
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 14px; width: 100px; padding-top: 130px;
   }}
-  #jump {{
-    width: 74px; background: #0f1214; color: var(--text); border: 1px solid var(--border);
-    border-radius: 6px; padding: 9px 8px; text-align: center; font: 15px/1 monospace;
+  #speedSel {{
+    width: 108px; background: #0f1214; color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; padding: 9px 6px; text-align: center; font: 13px/1 -apple-system, sans-serif;
   }}
+  #speedSel:disabled {{ opacity: .5; }}
   #jumpLabel {{ font-size: 10px; text-transform: uppercase; letter-spacing: .08em;
     color: var(--sub); text-align: center; }}
   .navrow {{ display: flex; justify-content: center; align-items: center; gap: 14px; margin: 22px 0 6px; }}
@@ -86,6 +87,10 @@ TEMPLATE = """<!doctype html>
     box-shadow: 0 4px 14px rgba(46,204,64,.35);
   }}
   #plusBtn:active {{ transform: scale(.94); }}
+  /* Red while auto-blending — press again (same button) to stop early. */
+  #plusBtn.running {{
+    background: #e0554f; box-shadow: 0 4px 14px rgba(224,85,79,.4);
+  }}
   /* Focus stays on this button after every combine (see the click handler),
      so a visible ring here is what shows the run-of-frames workflow is
      ready for the next Enter/Space press. */
@@ -114,7 +119,7 @@ TEMPLATE = """<!doctype html>
     border: 1px solid var(--border); background-size: cover; background-position: center;
     opacity: .85;
   }}
-  .totals {{ text-align: center; margin-top: 16px; font-size: 12px; color: var(--sub); }}
+  .totals {{ text-align: center; margin-top: 16px; font-size: 16px; color: var(--sub); }}
   .totals b {{ color: var(--accent); }}
   .brightness {{ margin-top: 6px; font-size: 11px; color: var(--sub); }}
 </style>
@@ -131,8 +136,14 @@ TEMPLATE = """<!doctype html>
     </div>
 
     <div class="mid">
-      <div id="jumpLabel">Frame</div>
-      <input id="jump" type="number" min="1" max="{max_n}" value="1">
+      <div id="jumpLabel">Speed</div>
+      <select id="speedSel" title="Single: + combines the current frame, then steps to the next. A speed: + auto-blends one frame after another at that rate until the last frame or until + (now red) is pressed again.">
+        <option value="single" selected>Single (1 click)</option>
+        <option value="4">4 fps</option>
+        <option value="8">8 fps</option>
+        <option value="12">12 fps</option>
+        <option value="25">25 fps</option>
+      </select>
     </div>
 
     <div class="panel">
@@ -186,7 +197,6 @@ TEMPLATE = """<!doctype html>
     overImg.src = OVER(Math.min(n, {over_n}));
     document.getElementById('baseN').textContent = Math.min(n, {base_n});
     document.getElementById('overN').textContent = Math.min(n, {over_n});
-    document.getElementById('jump').value = n;
     document.getElementById('prevBtn').disabled = n <= 1;
     document.getElementById('nextBtn').disabled = n >= MAXN;
   }}
@@ -221,14 +231,12 @@ TEMPLATE = """<!doctype html>
     }});
   }}
 
-  // One click does three jobs: land on whatever frame number is in the box,
-  // combine it, THEN step to the next frame and keep the + button focused —
-  // so combining a run of frames is type-once, then just press + (or Enter,
-  // or Space, since focus stays put) over and over.
-  const plusBtn = document.getElementById('plusBtn');
-  plusBtn.onclick = async () => {{
-    n = Math.max(1, Math.min(MAXN, +document.getElementById('jump').value || 1));
-    render();
+  // Combine the CURRENT frame (n) and step to the next one, leaving the
+  // canvas/status showing what was just built (see showFrame()'s own
+  // comment for why that is a separate call from render()). Returns false
+  // once it has just combined the LAST frame — the signal both the single
+  // click handler and the auto-run loop use to know there is nothing left.
+  async function combineCurrentFrame() {{
     canvas.style.display = 'block';
     await drawCombined();
     if (!combined.has(n)) {{
@@ -244,18 +252,56 @@ TEMPLATE = """<!doctype html>
       tile.title = `frame ${{n}}`;
       strip.appendChild(tile);
     }}
-    const didCombine = `Frame ${{n}} combined.`;
-    // showFrame(), not render(): advance the PICKER to the next frame so it
-    // is ready to go, but leave the canvas and status alone — they should
-    // keep showing what was just built, not flip to the new frame's
-    // (not-yet-combined) empty state the instant it appears.
-    if (n < MAXN) {{ n++; showFrame(); }}
-    status.textContent = didCombine;
-    plusBtn.focus();
+    status.textContent = `Frame ${{n}} combined.`;
+    const hadNext = n < MAXN;
+    if (hadNext) {{ n++; showFrame(); }}
+    return hadNext;
+  }}
+
+  const plusBtn = document.getElementById('plusBtn');
+  const speedSel = document.getElementById('speedSel');
+  let running = false;
+
+  function setRunning(on) {{
+    running = on;
+    plusBtn.classList.toggle('running', on);
+    plusBtn.textContent = on ? '■' : '+';
+    plusBtn.title = on ? 'Stop auto-blending' : '+';
+    speedSel.disabled = on;
+  }}
+
+  // Auto-blend: combine, wait one frame-interval at the chosen fps, repeat
+  // — until the last frame combines itself (hadNext comes back false) or
+  // `running` goes false from the stop click below, whichever first.
+  async function runAuto(fps) {{
+    setRunning(true);
+    const delayMs = 1000 / fps;
+    while (running) {{
+      const hadNext = await combineCurrentFrame();
+      if (!hadNext || !running) break;
+      await new Promise(r => setTimeout(r, delayMs));
+    }}
+    setRunning(false);
+  }}
+
+  // Single mode: exactly the old one-click-one-frame behaviour, focus kept
+  // on + so a run of manual clicks (or repeated Enter/Space) still works.
+  // A speed selected instead turns + into a start/stop toggle for
+  // runAuto() — press once to start blending at that rate, press the same
+  // (now red) button again to stop early.
+  plusBtn.onclick = async () => {{
+    if (running) {{ running = false; return; }}   // this click is the STOP
+    const speed = speedSel.value;
+    if (speed === 'single') {{
+      await combineCurrentFrame();
+      plusBtn.focus();
+    }} else {{
+      runAuto(+speed);   // not awaited — a stop click must reach the loop above
+    }}
   }};
 
-  document.getElementById('prevBtn').onclick = () => {{ if (n > 1) {{ n--; render(); }} }};
-  document.getElementById('nextBtn').onclick = () => {{ if (n < MAXN) {{ n++; render(); }} }};
+  document.getElementById('prevBtn').onclick = () => {{ if (!running && n > 1) {{ n--; render(); }} }};
+  document.getElementById('nextBtn').onclick = () => {{ if (!running && n < MAXN) {{ n++; render(); }} }};
   document.addEventListener('keydown', e => {{
     if (e.key === 'ArrowLeft') document.getElementById('prevBtn').click();
     if (e.key === 'ArrowRight') document.getElementById('nextBtn').click();
