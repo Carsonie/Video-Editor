@@ -122,7 +122,7 @@ def main():
     F = os.path.abspath(a.folder)
     script = PTH.script(F)
     if not os.path.isfile(script):
-        sys.exit(f"  no video/script.json under {F}")
+        sys.exit(f"  no script.json under {F}")
     doc = json.load(open(script))
     wps = doc.get("words_per_second", 3.44)
     scenes = [s for s in doc.get("scenes", [])

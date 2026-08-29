@@ -111,7 +111,7 @@ def build(quiet=False):
         if not os.path.isfile(p):
             sys.exit(f"fixture: source clip missing: {p}")
     shutil.rmtree(STORE, ignore_errors=True)
-    os.makedirs(os.path.join(STORE, "video"))
+    os.makedirs(os.path.join(STORE, "sandbox"))
     say = (lambda m: None) if quiet else (lambda m: print(m))
 
     doc = {"store": "_editor_test", "title": "Editor Test", "words_per_second": 3.44,
@@ -124,7 +124,8 @@ def build(quiet=False):
         cut(SRC_AV, os.path.join(d, "avatar.webm"), na, True)
         cut(SRC_NAR, os.path.join(d, "narration.webm"), nn, True)
         say(f"    {n:02d}-{label}: segment={ns} avatar={na} narration={nn}")
-    with open(os.path.join(STORE, "video", "script.json"), "w") as fh:
+    # sandbox/script.json 2026-08-29 — was video/script.json; see paths.script().
+    with open(os.path.join(STORE, "sandbox", "script.json"), "w") as fh:
         json.dump(doc, fh, indent=2)
     return STORE
 

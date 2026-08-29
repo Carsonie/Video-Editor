@@ -866,8 +866,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         """
         For the timeline editor's Load button, added 2026-08-29: every
         Business/store under Customers/ that has at least one video folder
-        with a video/script.json ready to open, and for each, that store's
-        list of video folders with their scene numbers.
+        with a script.json ready to open (see paths.script() for where that
+        can live), and for each, that store's list of video folders with
+        their scene numbers.
 
         script.json is the check, not sandbox/ — a video can exist with a
         script and no sandbox yet built (a fresh store, before its first
@@ -1137,14 +1138,23 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if target is None or not os.path.isfile(target):
             return self.send_json({"error": f"not a file under Customers/: {rel}"}, 400)
 
-        # Walk up to the store's `final/` — the folder holding video/script.json.
+        # Walk up to the store's `final/` — the folder holding script.json,
+        # wherever PTH.script() currently resolves that to for this store.
+        #
+        # NEVER stop ON `sandbox/` or `dev/` themselves, only above them.
+        # script.json can live INSIDE sandbox/ now (see paths.script()), so
+        # while walking up FROM a scene folder the climb passes straight
+        # through sandbox/ — and PTH.script(sandbox_dir) would find that
+        # very file via its own flat-fallback tier, stopping one level too
+        # early and leaving every path below built from the wrong `final`.
         final = os.path.dirname(target)
         for _ in range(4):
-            if os.path.isfile(os.path.join(final, "video", "script.json")):
+            if (os.path.basename(final) not in ("sandbox", "dev")
+                    and os.path.isfile(PTH.script(final))):
                 break
             final = os.path.dirname(final)
-        if not os.path.isfile(os.path.join(final, "video", "script.json")):
-            return self.send_json({"error": f"no video/script.json above {rel}"}, 400)
+        if not os.path.isfile(PTH.script(final)):
+            return self.send_json({"error": f"no script.json above {rel}"}, 400)
 
         # SANDBOX ONLY. The editor does not read dev/ — see paths.sandbox_only().
         # A scene with no sandbox copy is shown as missing rather than silently
@@ -1470,7 +1480,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.send_json({"error": f"not a folder under Customers/: {root_rel}"}, 400)
         script_p = PTH.script(final)
         if not os.path.isfile(script_p):
-            return self.send_json({"error": "this store has no video/script.json"}, 400)
+            return self.send_json({"error": "this store has no script.json"}, 400)
         doc = json.load(open(script_p))
         rows = []
         for sc in doc.get("scenes", []):
@@ -1514,7 +1524,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         line = " ".join(line.split())
         script_p = PTH.script(final)
         if not os.path.isfile(script_p):
-            return self.send_json({"error": "this store has no video/script.json"}, 400)
+            return self.send_json({"error": "this store has no script.json"}, 400)
         doc = json.load(open(script_p))
         node = next((x for x in doc.get("scenes", []) if x["n"] == n), None)
         if node is None:
@@ -1611,16 +1621,20 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         "add-v" naming, just kept in a folder of its own) — every scene
         folder in sandbox/, PLUS the narrative script.
 
-        The script is a late addition to this endpoint: Carson asked for
-        "the current scenes and the narration script" archived together, but
-        the narration lives at video/script.json — a SIBLING of sandbox/, not
-        inside it — so sweeping sandbox/'s own contents alone would leave it
-        out. Copied in here as script.json at the top of the archive folder,
-        beside the scene folders, so one archive actually holds both halves
-        of what "the current scenes and the narration" means. (Its own
-        per-edit history stays exactly where it already was, at
-        z_History/line-edits/ under the video folder root — this is an
-        additional whole-generation copy, not a replacement for that.)
+        The script used to be a special case here: Carson asked for "the
+        current scenes and the narration script" archived together, but
+        script.json lived at video/script.json — a SIBLING of sandbox/, not
+        inside it — so sweeping sandbox/'s own contents alone left it out,
+        and this endpoint copied it in as an extra step. As of the
+        2026-08-29 move (see paths.script()) script.json normally lives
+        INSIDE sandbox/ now, so the ordinary sweep already carries it —
+        this only still copies it separately for a store that has not been
+        migrated yet (PTH.script() falls back to video/ or the bare flat
+        location for those, and archive_contents() only ever reaches
+        inside `folder`, i.e. sandbox/ itself). Its own per-edit history
+        stays exactly where it already was, at z_History/line-edits/ under
+        the video folder root — this is an additional whole-generation
+        copy, not a replacement for that.
 
         A COPY, not a literal move. Carson asked for the old generation moved
         out before the new one lands, but api_save's own rebuild reads each
@@ -1640,19 +1654,24 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if not os.path.isdir(folder):
             return self.send_json({"error": "this video has no sandbox/ folder"}, 400)
         script_p = PTH.script(final)
-        has_script = os.path.isfile(script_p)
+        # Only a special case for a store PTH.script() had to fall back for —
+        # once script.json lives in sandbox/, the ordinary sweep below already
+        # carries it, and copying it a second time here would just duplicate it.
+        needs_extra_copy = (os.path.isfile(script_p)
+                            and os.path.dirname(os.path.abspath(script_p))
+                                != os.path.abspath(folder))
         if payload.get("dry"):
             skip = {PTH.ARCHIVE_DIR, "1000_archive"}
             holds = [x for x in sorted(os.listdir(folder))
                      if x not in skip and not x.startswith(".")]
-            if has_script:
-                holds.append("script.json (video/)")
+            if needs_extra_copy:
+                holds.append(f"script.json ({os.path.relpath(os.path.dirname(script_p), final)}/)")
             would = os.path.join(folder, "1000_archive", PTH.archive_name_v(folder, archive_dir="1000_archive"))
             return self.send_json({"folder": folder, "would_archive": holds,
                                    "into": would, "empty": not holds})
         dest = PTH.archive_contents(folder, move=False, naming="add-v",
                                     archive_dir="1000_archive")
-        if dest is None and not has_script:
+        if dest is None and not needs_extra_copy:
             return self.send_json({"folder": folder, "archived_to": None, "empty": True})
         if dest is None:
             # Sandbox had nothing, but the script still needs somewhere to
@@ -1661,7 +1680,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             dest = os.path.join(folder, "1000_archive",
                                 PTH.archive_name_v(folder, archive_dir="1000_archive"))
             os.makedirs(dest, exist_ok=True)
-        if has_script:
+        if needs_extra_copy:
             shutil.copy2(script_p, os.path.join(dest, "script.json"))
         self.send_json({"folder": folder, "archived_to": dest, "empty": False})
 
@@ -1814,7 +1833,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         Join several scenes into one, in the store's sandbox.
 
         WHAT THIS TOUCHES, because it is more than media. A scene is a folder of
-        clips AND an entry in video/script.json carrying its narration line, and
+        clips AND an entry in script.json carrying its narration line, and
         script.json is read by nine tools in this pipeline including the one
         that spends money on renders. Joining therefore:
 
@@ -1847,7 +1866,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
         script_p = PTH.script(final)
         if not os.path.isfile(script_p):
-            return self.send_json({"error": "this store has no video/script.json"}, 400)
+            return self.send_json({"error": "this store has no script.json"}, 400)
         doc = json.load(open(script_p))
         scenes = doc.get("scenes", [])
         by_n = {s["n"]: s for s in scenes}
@@ -2022,7 +2041,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
         script_p = PTH.script(final)
         if not os.path.isfile(script_p):
-            return self.send_json({"error": "this store has no video/script.json"}, 400)
+            return self.send_json({"error": "this store has no script.json"}, 400)
         doc = json.load(open(script_p))
         scenes = doc.get("scenes", [])
         node = next((x for x in scenes if x["n"] == n), None)

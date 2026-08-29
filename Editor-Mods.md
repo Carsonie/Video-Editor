@@ -508,3 +508,124 @@ is the honest number for whatever version of this file no longer tests
 them.
 
 ---
+
+## 2026-08-29 — `script.json` moved: `video/` → `sandbox/`
+
+**Requested by Carson**: "I want to keep all the data together in one
+folder... I want the editor to load and save the json file to the
+sandbox folder." This is the second such move — `script.json` went from
+a bare `<final>/script.json` to `<final>/video/script.json` on
+2026-08-20; this moves it again, to `<final>/sandbox/script.json`,
+following the exact same pattern the first move already established.
+
+### What changed
+
+**Files:** `shared/paths.py`, `shared/serve.py`, `shared/vtt.py`,
+`build/assemble_video.py`, `build/cut_segments.py`,
+`build/render_narration.py`, `build/make_scene_overlays.py`,
+`build/preview_narration.py`, `build/migrate_to_dev.py`,
+`tests/fixture.py`, `tests/test_editor.py`, plus the 4 real stores' data.
+
+1. **`PTH.script(final)`** (`shared/paths.py`) — now a 3-tier resolver:
+   `sandbox/script.json` (new) → `video/script.json` (2026-08-20 through
+   today) → bare `script.json` (original). Whichever exists is returned;
+   nothing is ever WRITTEN to an old tier — a store starts saving to
+   sandbox/ the moment its file is physically there, same as the
+   2026-08-20 move worked. This one function is what every server
+   endpoint (`/api/line`, `/api/vtt`, `/api/join`, `/api/split`, etc.)
+   and several build tools (`build_scenes.py`, `onepass_narration.py`,
+   `qualify_avatar.py`, `preview_narration.py`) already read through, so
+   fixing it here fixed all of them at once.
+2. **Four standalone build tools had their OWN duplicate copy** of the
+   same resolver, from before `paths.py` existed as the shared version:
+   `shared/vtt.py`, `build/assemble_video.py`, `build/cut_segments.py`,
+   `build/render_narration.py`. Each updated in lockstep — same 3-tier
+   logic, same fallback warning message, so the whole pipeline agrees
+   with itself again rather than three tools finding one location and a
+   fourth finding another.
+3. **`build/make_scene_overlays.py`** had a fifth, simpler hardcoded copy
+   (`os.path.join(F, "video", "script.json")`, no fallback at all) —
+   replaced with a call to `assemble_video.py`'s own `script_path()`,
+   which it already imports.
+4. **`api_save_archive`** (Backup Scenes' archive step, built earlier
+   today): its special-case "copy script.json in separately, since it's
+   a sandbox/ sibling" logic is now conditional — it only still does that
+   extra copy for a store `PTH.script()` had to fall back for. For an
+   already-migrated store the ordinary sandbox sweep carries script.json
+   along with the scene folders on its own, so the special case would
+   otherwise just duplicate it.
+5. **`api_siblings`'s walk-up-to-root loop** (`/api/siblings`) had a real
+   bug from this, caught by the test suite before it shipped: walking up
+   from a scene file, it used to stop at the first directory whose
+   `PTH.script()` resolved to something real — but climbing from
+   `sandbox/<scene>/` passes THROUGH `sandbox/` itself, and now that
+   script.json can live directly inside sandbox/, the old-flat fallback
+   tier matched AT sandbox/, stopping the climb one level too early and
+   building every downstream path from the wrong root. Fixed by never
+   treating a directory literally named `sandbox` or `dev` as a
+   candidate root.
+6. **Data migration**: all 4 real stores' `video/script.json` moved to
+   `sandbox/script.json` via `git mv` (alpine-sports, bike-demo,
+   canoe-demo, ski-demo) — same command, so history follows the file
+   rather than showing a delete and an unrelated add.
+7. **`tests/fixture.py`** now builds its test store's script.json directly
+   in `sandbox/` (no `video/` folder created at all — nothing else in the
+   fixture used it). **`tests/test_editor.py`**'s 4 direct reads of the
+   fixture's script.json updated to match, plus `s_save_archive`'s
+   assertions reworked for the new reality (script.json is now an
+   ordinary top-level sandbox entry, not a special extra) and two stale
+   comments fixed.
+8. User-facing error strings ("this store has no video/script.json", "no
+   video/script.json above …") shortened to drop the now-sometimes-wrong
+   "video/" — `shared/serve.py`, `build/preview_narration.py`. A note
+   string WRITTEN INTO every scene's `dev/scene.json` by
+   `build/migrate_to_dev.py` had the same wording baked into actual
+   output files — fixed there too, not just in comments.
+
+**Deliberately NOT touched:** `setup_demo.py`'s `video/script.json`
+reference (line 54) — it copies FROM `~/Rentify/Basic_E2E_Testing`, a
+different repo whose current data shape wasn't investigated as part of
+this change. If that repo's own copy is still at the old location, this
+line still works via the fallback the source side doesn't need to know
+about; if `setup_demo.py` itself needs updating, that's a separate,
+smaller follow-up.
+
+### A bug found and fixed by the test suite before this shipped
+
+First test run after this change failed with a crash, not a check
+failure: `/api/siblings` threw `AttributeError: 'NoneType' object has no
+attribute 'endswith'` — item 5 above. The walk-up-to-root logic had been
+touched to route through `PTH.script()`'s new fallback chain, and that
+introduced the sandbox/-stops-the-climb-early bug described there. Found
+immediately because the suite runs, not just parses — exactly the class
+of fault this project's own test philosophy exists to catch.
+
+### Verified
+
+- `python3 -c "import ast; ast.parse(...)"` on all 11 touched `.py`
+  files — parses.
+- `python3 tests/test_editor.py` — **161/161 checks pass**, 31/31
+  endpoints exercised. Failed once first (the bug above), fixed, reran
+  clean.
+- Confirmed all 4 real stores' `sandbox/script.json` exists with correct
+  content (ski-demo's scene 1 checked specifically — the long line
+  Carson had just written into it survived the move intact).
+- `/api/vtt` and the live EVTT panel (browser, ski-demo's real timeline)
+  both confirmed reading the new location correctly.
+- `/api/save-archive`'s dry-run confirmed script.json now appears as a
+  plain, unmarked entry in `would_archive` (no more `"(video/)"` suffix)
+  — the ordinary sweep, not the special case, is what is finding it now.
+- Server restarted (PID 31008 → 34048).
+
+### To revert
+
+Change `PTH.script()` back to the single `os.path.join(final, "video",
+"script.json")` line, revert the 4 standalone tools' `script_path()`
+functions to their 2-tier form, revert `make_scene_overlays.py`,
+`api_save_archive`, and the `api_siblings` walk-up loop, restore
+`tests/fixture.py`'s `video/` folder and script location, revert the 4
+`test_editor.py` path references, and `git mv` each real store's
+`sandbox/script.json` back to `video/script.json`. Restart the server
+afterward.
+
+---

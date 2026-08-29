@@ -97,7 +97,7 @@ def main():
         dest = os.path.join(P.dev_root(final), P.slugify(label, n))
         os.makedirs(dest, exist_ok=True)
         node = dict(nodes[n])
-        node["_note"] = ("This scene's node, copied from video/script.json so this folder is "
+        node["_note"] = ("This scene's node, copied from script.json so this folder is "
                          "self-describing. script.json remains the source of truth — edit it "
                          "there, not here.")
         with open(os.path.join(dest, "scene.json"), "w") as fh:

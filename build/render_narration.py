@@ -114,24 +114,30 @@ def script_path(folder):
     """
     Locate a video's script.
 
-    It lives in `<final>/video/script.json`, beside the videos it produced —
-    moved there 2026-08-20 so the copy and the cuts it made sit together. The
-    old `<final>/script.json` is still accepted so an un-migrated store keeps
-    working rather than failing obscurely.
+    Moved to `<final>/sandbox/script.json` 2026-08-29 -- Carson's own call,
+    to keep the script beside the scene folders it describes rather than a
+    level up. `<final>/video/script.json` (2026-08-20 through 2026-08-29)
+    and the bare `<final>/script.json` before that are both still accepted,
+    so an un-migrated store keeps working rather than failing obscurely.
 
     Versioned snapshots (`script_v13.json`) are RECORDS written when a build is
     copied to a version, not inputs. At edit time the next version number is not
     known yet, so the working file stays unversioned.
     """
     import os
-    new = os.path.join(folder, "video", "script.json")
+    new = os.path.join(folder, "sandbox", "script.json")
+    mid = os.path.join(folder, "video", "script.json")
     old = os.path.join(folder, "script.json")
     if os.path.exists(new):
         return new
+    if os.path.exists(mid):
+        print(f"  ⚠ using {mid} — move it to sandbox/script.json")
+        return mid
     if os.path.exists(old):
-        print(f"  ⚠ using {old} — move it to video/script.json")
+        print(f"  ⚠ using {old} — move it to sandbox/script.json")
         return old
-    raise SystemExit(f"no script.json in {os.path.join(folder,'video')} or {folder}")
+    raise SystemExit(f"no script.json in {os.path.join(folder,'sandbox')}, "
+                     f"{os.path.join(folder,'video')}, or {folder}")
 
 
 def scene_clips_dir(folder):

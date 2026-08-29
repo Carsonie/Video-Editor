@@ -198,12 +198,12 @@ def frames(rel, alpha=False):
 
 
 def scenes_now():
-    p = os.path.join(fixture.STORE, "video", "script.json")
+    p = os.path.join(fixture.STORE, "sandbox", "script.json")
     return [(s["n"], s["label"]) for s in json.load(open(p))["scenes"]]
 
 
 def line_of(n):
-    p = os.path.join(fixture.STORE, "video", "script.json")
+    p = os.path.join(fixture.STORE, "sandbox", "script.json")
     node = next((s for s in json.load(open(p))["scenes"] if s["n"] == n), None)
     return node.get("line") if node else None
 
@@ -608,11 +608,10 @@ def s_save_archive():
     # A SECOND archive endpoint, added 2026-08-29 for Backup Scenes and Save
     # All's own pre-step — distinct from /api/archive above: the destination
     # is sandbox/1000_archive/ (never sandbox/z_History/), naming is always
-    # Add-V, and video/script.json — a SIBLING of sandbox/, not something a
-    # sandbox-only sweep would ever reach on its own — is copied in beside
-    # the scene folders. That last part is the one this endpoint exists to
-    # get right: "the current scenes and the narration script" archived
-    # together, not the scenes alone.
+    # Add-V. script.json lives INSIDE sandbox/ now (moved there the same
+    # day, see paths.script()), so the ordinary sweep below carries it
+    # along with the scene folders on its own — the checks below just
+    # confirm it actually lands, not HOW.
     d, _ = post("/api/save-archive", root=fixture.ROOT_REL, dry=True)
     check("dry run says what it WOULD archive, before anyone agrees to it",
           isinstance(d.get("would_archive"), list), str(d.get("would_archive"))[:70])
@@ -629,13 +628,14 @@ def s_save_archive():
     check("archived somewhere real", bool(dest) and os.path.isdir(str(dest)), dest)
     # z_History is excluded too — it's the OTHER archive scheme (s_archive,
     # above, already left one behind in this same sandbox) and must never
-    # end up nested inside this one's snapshot.
+    # end up nested inside this one's snapshot. script.json is compared
+    # separately below — it's a real top-level entry in sandbox/ now, same
+    # as any scene folder, so it belongs in `kept` but is its own check.
     kept = sorted(x for x in os.listdir(os.path.join(fixture.STORE, "sandbox"))
-                  if not x.startswith(".") and x not in ("1000_archive", "z_History"))
+                  if not x.startswith(".") and x not in ("1000_archive", "z_History", "script.json"))
     check("sandbox is COPIED, not moved — the scenes stay put", bool(kept), f"{len(kept)} kept")
-    snapshot = sorted(os.listdir(dest))
-    eq("the snapshot holds the same scene folders",
-       [x for x in snapshot if x != "script.json"], kept)
+    snapshot = sorted(x for x in os.listdir(dest) if x != "script.json")
+    eq("the snapshot holds the same scene folders", snapshot, kept)
     check("PLUS the narrative script, copied in beside them",
           os.path.isfile(os.path.join(dest, "script.json")), dest)
 
@@ -655,7 +655,7 @@ def s_stores():
     # checking against the fixture: _Editor_Test sits directly under
     # Customers/ with no Business/store/help-videos/videos nesting, so it
     # must NOT be mistaken for a real business just because it happens to
-    # have a video/script.json two folders up from where this endpoint
+    # have a sandbox/script.json two folders up from where this endpoint
     # looks. A depth assumption that only happens to hold is not verified.
     d, code = get("/api/stores")
     eq("answers 200", code, 200)
@@ -698,7 +698,7 @@ def s_pages_parse():
         return
     # Read the folder from the SCRIPT. Naming one directly fails here: this
     # runs last, and the join and split above have renamed every scene by now.
-    doc = json.load(open(os.path.join(fixture.STORE, "video", "script.json")))
+    doc = json.load(open(os.path.join(fixture.STORE, "sandbox", "script.json")))
     sc = doc["scenes"][-1]
     folder = f"{sc['n']:02d}-{sc['label']}"
     seg = f"{fixture.ROOT_REL}/sandbox/{folder}/segment.mp4"
@@ -914,7 +914,7 @@ def s_bookends_and_gaps():
     # and split above have renamed every scene, so 01-alpha-scene is long gone.
     # Naming it directly made this step delete nothing and then assert on a gap
     # that was never created.
-    doc = json.load(open(os.path.join(fixture.STORE, "video", "script.json")))
+    doc = json.load(open(os.path.join(fixture.STORE, "sandbox", "script.json")))
     first = doc["scenes"][0]
     folder = f"{first['n']:02d}-{first['label']}"
     nar = os.path.join(fixture.STORE, "sandbox", folder, "narration.webm")

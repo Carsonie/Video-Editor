@@ -252,7 +252,33 @@ def source_of(final, path):
 
 
 def script(final):
-    return os.path.join(final, "video", "script.json")
+    """
+    Locate a video's narrative script.
+
+    Moved to sandbox/script.json 2026-08-29, Carson's own call: "I want to
+    keep all the data together in one folder" — the script sits beside the
+    scene folders it describes instead of one level up, and Backup Scenes'
+    whole-generation archive can sweep it up with everything else instead
+    of needing a special-case copy for it (see api_save_archive's own
+    docstring in shared/serve.py, which no longer needs that).
+
+    video/script.json — where it lived 2026-08-20 through 2026-08-29 — is
+    still accepted, and the bare `<final>/script.json` before that. Both
+    older locations are only ever FOUND here, never written to again;
+    saving through this path always lands wherever the store already is,
+    so a store starts writing to sandbox/ the moment its file is moved
+    there and not a moment before. An unmigrated store keeps working
+    rather than failing obscurely — same reasoning the 2026-08-20 move
+    used, one tier deeper.
+    """
+    new = os.path.join(final, "sandbox", "script.json")
+    mid = os.path.join(final, "video", "script.json")
+    old = os.path.join(final, "script.json")
+    if os.path.exists(new):
+        return new
+    if os.path.exists(mid):
+        return mid
+    return old
 
 
 def videos(final):

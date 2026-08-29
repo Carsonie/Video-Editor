@@ -53,9 +53,7 @@ def main():
     if len(sys.argv) < 2:
         sys.exit('usage: make_scene_overlays.py "<store>/help-videos/final"')
     F = os.path.abspath(sys.argv[1])
-    cfg_path = os.path.join(F, "video", "script.json")
-    if not os.path.isfile(cfg_path):
-        sys.exit(f"no script.json at {cfg_path}")
+    cfg_path = av.script_path(F)
     cfg = json.load(open(cfg_path))
     root = os.path.join(av.sarah_dir(F), "scene_overlays")
     os.makedirs(root, exist_ok=True)
