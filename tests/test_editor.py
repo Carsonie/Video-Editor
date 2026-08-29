@@ -603,6 +603,86 @@ def s_archive():
     eq("refuses a path outside Customers/", code, 400)
 
 
+def s_save_archive():
+    step("/api/save-archive — Backup Scenes' whole-generation snapshot")
+    # A SECOND archive endpoint, added 2026-08-29 for Backup Scenes and Save
+    # All's own pre-step — distinct from /api/archive above: the destination
+    # is sandbox/1000_archive/ (never sandbox/z_History/), naming is always
+    # Add-V, and video/script.json — a SIBLING of sandbox/, not something a
+    # sandbox-only sweep would ever reach on its own — is copied in beside
+    # the scene folders. That last part is the one this endpoint exists to
+    # get right: "the current scenes and the narration script" archived
+    # together, not the scenes alone.
+    d, _ = post("/api/save-archive", root=fixture.ROOT_REL, dry=True)
+    check("dry run says what it WOULD archive, before anyone agrees to it",
+          isinstance(d.get("would_archive"), list), str(d.get("would_archive"))[:70])
+    check("and names the narrative script alongside the scene folders",
+          any("script.json" in x for x in d.get("would_archive", [])),
+          str(d.get("would_archive")))
+    eq("into sandbox/1000_archive/, not sandbox/z_History/",
+       "1000_archive" in str(d.get("into")), True)
+    check("nothing moved by a dry run",
+          os.path.isdir(os.path.join(fixture.STORE, "sandbox")), "")
+
+    d = must("/api/save-archive", root=fixture.ROOT_REL)
+    dest = d.get("archived_to")
+    check("archived somewhere real", bool(dest) and os.path.isdir(str(dest)), dest)
+    # z_History is excluded too — it's the OTHER archive scheme (s_archive,
+    # above, already left one behind in this same sandbox) and must never
+    # end up nested inside this one's snapshot.
+    kept = sorted(x for x in os.listdir(os.path.join(fixture.STORE, "sandbox"))
+                  if not x.startswith(".") and x not in ("1000_archive", "z_History"))
+    check("sandbox is COPIED, not moved — the scenes stay put", bool(kept), f"{len(kept)} kept")
+    snapshot = sorted(os.listdir(dest))
+    eq("the snapshot holds the same scene folders",
+       [x for x in snapshot if x != "script.json"], kept)
+    check("PLUS the narrative script, copied in beside them",
+          os.path.isfile(os.path.join(dest, "script.json")), dest)
+
+    d2 = must("/api/save-archive", root=fixture.ROOT_REL)
+    check("a second archive the same day is _v2, not a clash",
+          str(d2.get("archived_to", "")).endswith("_v2"),
+          os.path.basename(str(d2.get("archived_to"))))
+
+    d, code = post("/api/save-archive", root="../outside")
+    eq("refuses a path outside Customers/", code, 400)
+
+
+def s_stores():
+    step("/api/stores — every store with a video ready to load, for Load")
+    # Walks the REAL Customers/ tree, not a fixture — that is the point of
+    # this endpoint, so there is nothing to isolate it from. What IS worth
+    # checking against the fixture: _Editor_Test sits directly under
+    # Customers/ with no Business/store/help-videos/videos nesting, so it
+    # must NOT be mistaken for a real business just because it happens to
+    # have a video/script.json two folders up from where this endpoint
+    # looks. A depth assumption that only happens to hold is not verified.
+    d, code = get("/api/stores")
+    eq("answers 200", code, 200)
+    stores = d.get("stores")
+    check("a list of stores comes back", isinstance(stores, list), str(stores)[:60])
+    businesses = [s.get("business") for s in (stores or [])]
+    check("the fixture's folder is not mistaken for a business — wrong depth, correctly excluded",
+          fixture.ROOT_REL not in businesses, businesses)
+    if stores:
+        s = stores[0]
+        check("each store names its business",
+              isinstance(s.get("business"), str) and bool(s["business"]), s)
+        check("and its own store name", isinstance(s.get("store"), str) and bool(s["store"]), s)
+        vids = s.get("videos")
+        check("and lists at least one video", isinstance(vids, list) and bool(vids), vids)
+        v = vids[0] if vids else {}
+        check("each video names its scene numbers",
+              isinstance(v.get("scenes"), list) and bool(v["scenes"]), v)
+        check("and a root path Load can hand straight to open-seq-go",
+              isinstance(v.get("root"), str) and v.get("root", "").endswith(v.get("name", "\0")), v)
+        check("and whether sandbox/ has been built yet",
+              isinstance(v.get("has_sandbox"), bool), v)
+    else:
+        check("(no real store on this machine to check the per-video shape against — "
+              "the list-shape and fixture-exclusion checks above still ran)", True)
+
+
 def s_pages_parse():
     step("both players' pages — does the JavaScript actually run?")
     # The gap that let a broken page ship. Every check here drives HTTP, so a
@@ -872,7 +952,7 @@ FUNCTIONS = [
     s_vtt, s_line,
     s_join, s_renumber_state, s_renumber_clear, s_split,
     s_clip, s_paste, s_alpha_survives, s_restore_is_safe, s_one_writer_per_cache,
-    s_handoff, s_archive, s_bookends_and_gaps,
+    s_handoff, s_archive, s_save_archive, s_stores, s_bookends_and_gaps,
     s_pages_parse,
 ]
 

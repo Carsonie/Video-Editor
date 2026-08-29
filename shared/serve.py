@@ -192,6 +192,7 @@ ACTIONS = {
     "/api/renumber-clear":  ("Lift lock",    ()),
     "/api/handoff":         ("Hand off",     ("version", "names")),
     "/api/archive":         ("Archive",      ("folder",)),
+    "/api/save-archive":    ("Save All archive", ("root",)),
     "/api/open":            ("Open clip",    ("path",)),
     "/api/open-pair":       ("Open layered", ("base",)),
     "/api/open-seq":        ("Open timeline", ("root", "ns")),
@@ -717,6 +718,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def route_get(self, parsed):
         if parsed.path == "/api/list":
             return self.api_list(urllib.parse.parse_qs(parsed.query))
+        if parsed.path == "/api/stores":
+            return self.api_stores()
         if parsed.path == "/api/open":
             return self.api_open(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/open-pair":
@@ -787,6 +790,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.api_handoff(payload)
         if parsed.path == "/api/archive":
             return self.api_archive(payload)
+        if parsed.path == "/api/save-archive":
+            return self.api_save_archive(payload)
         if parsed.path == "/api/line":
             return self.api_line(payload)
         if parsed.path == "/api/frames/restore":
@@ -856,6 +861,56 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             parts = rel.strip("/").split("/")[:-1]
             parent = "/".join(parts)
         self.send_json({"path": rel.strip("/"), "parent": parent, "dirs": dirs, "files": files})
+
+    def api_stores(self):
+        """
+        For the timeline editor's Load button, added 2026-08-29: every
+        Business/store under Customers/ that has at least one video folder
+        with a video/script.json ready to open, and for each, that store's
+        list of video folders with their scene numbers.
+
+        script.json is the check, not sandbox/ — a video can exist with a
+        script and no sandbox yet built (a fresh store, before its first
+        Backup Scenes/rebuild), and Load should still be able to find it;
+        /api/open-seq-go is what actually needs sandbox/ scene folders to
+        exist, and fails on its own if they don't, same as it always has.
+
+        Two levels down from Customers/ is assumed to be Business/store —
+        the same assumption /api/list's own STORE-folder detection makes,
+        just walked directly here instead of one click at a time, since a
+        picker choosing between two whole customer businesses first is a
+        step nobody asked for.
+        """
+        out = []
+        if not os.path.isdir(CUSTOMERS_ROOT):
+            return self.send_json({"stores": out})
+        for biz in sorted(os.listdir(CUSTOMERS_ROOT), key=str.lower):
+            biz_dir = os.path.join(CUSTOMERS_ROOT, biz)
+            if biz.startswith(".") or not os.path.isdir(biz_dir):
+                continue
+            for store in sorted(os.listdir(biz_dir), key=str.lower):
+                store_dir = os.path.join(biz_dir, store)
+                videos_root = os.path.join(store_dir, "help-videos", "videos")
+                if store.startswith(".") or not os.path.isdir(videos_root):
+                    continue
+                videos = []
+                for vname in sorted(os.listdir(videos_root), key=str.lower):
+                    vdir = os.path.join(videos_root, vname)
+                    script_p = PTH.script(vdir)
+                    if vname.startswith(".") or not os.path.isfile(script_p):
+                        continue
+                    try:
+                        doc = json.load(open(script_p))
+                        ns = sorted(x["n"] for x in doc.get("scenes", []) if "n" in x)
+                    except (OSError, ValueError, KeyError):
+                        ns = []
+                    has_sandbox = os.path.isdir(PTH.sandbox_root(vdir))
+                    videos.append({"name": vname,
+                                   "root": f"{biz}/{store}/help-videos/videos/{vname}",
+                                   "scenes": ns, "has_sandbox": has_sandbox})
+                if videos:
+                    out.append({"business": biz, "store": store, "videos": videos})
+        self.send_json({"stores": out})
 
     def api_open(self, qs):
         rel = qs.get("path", [""])[0]
@@ -1547,6 +1602,69 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                         "archived": holds, "empty": False,
                         "moved": which == "dev"})
 
+    def api_save_archive(self, payload):
+        """
+        Save All / Backup Scenes' own pre-step, added 2026-08-29: before the
+        editor's current state lands, snapshot the GENERATION about to be
+        overwritten into sandbox/1000_archive/<Add-V name>/ (26-8-29_v1,
+        26-8-29_v2, ... one sequence per day, same convention as api_archive's
+        "add-v" naming, just kept in a folder of its own) — every scene
+        folder in sandbox/, PLUS the narrative script.
+
+        The script is a late addition to this endpoint: Carson asked for
+        "the current scenes and the narration script" archived together, but
+        the narration lives at video/script.json — a SIBLING of sandbox/, not
+        inside it — so sweeping sandbox/'s own contents alone would leave it
+        out. Copied in here as script.json at the top of the archive folder,
+        beside the scene folders, so one archive actually holds both halves
+        of what "the current scenes and the narration" means. (Its own
+        per-edit history stays exactly where it already was, at
+        z_History/line-edits/ under the video folder root — this is an
+        additional whole-generation copy, not a replacement for that.)
+
+        A COPY, not a literal move. Carson asked for the old generation moved
+        out before the new one lands, but api_save's own rebuild reads each
+        scene's video straight off its sandbox path (meta.json's "source" —
+        see build_frames()) and refuses to run if that file is gone
+        (`source no longer exists`). Moving it away first would make every
+        save in the batch fail. Copying first gets the same end state Carson
+        asked for — 1000_archive holds exactly the old generation, sandbox
+        ends up holding exactly the new one — without breaking the save that
+        has to read the old file to build the new one.
+        """
+        root_rel = payload.get("root", "")
+        final = safe_join(root_rel)
+        if final is None or not os.path.isdir(final):
+            return self.send_json({"error": f"not a folder under Customers/: {root_rel}"}, 400)
+        folder = PTH.sandbox_root(final)
+        if not os.path.isdir(folder):
+            return self.send_json({"error": "this video has no sandbox/ folder"}, 400)
+        script_p = PTH.script(final)
+        has_script = os.path.isfile(script_p)
+        if payload.get("dry"):
+            skip = {PTH.ARCHIVE_DIR, "1000_archive"}
+            holds = [x for x in sorted(os.listdir(folder))
+                     if x not in skip and not x.startswith(".")]
+            if has_script:
+                holds.append("script.json (video/)")
+            would = os.path.join(folder, "1000_archive", PTH.archive_name_v(folder, archive_dir="1000_archive"))
+            return self.send_json({"folder": folder, "would_archive": holds,
+                                   "into": would, "empty": not holds})
+        dest = PTH.archive_contents(folder, move=False, naming="add-v",
+                                    archive_dir="1000_archive")
+        if dest is None and not has_script:
+            return self.send_json({"folder": folder, "archived_to": None, "empty": True})
+        if dest is None:
+            # Sandbox had nothing, but the script still needs somewhere to
+            # go — this endpoint's own promise is "scenes AND script", not
+            # "script only when scenes also moved".
+            dest = os.path.join(folder, "1000_archive",
+                                PTH.archive_name_v(folder, archive_dir="1000_archive"))
+            os.makedirs(dest, exist_ok=True)
+        if has_script:
+            shutil.copy2(script_p, os.path.join(dest, "script.json"))
+        self.send_json({"folder": folder, "archived_to": dest, "empty": False})
+
     def api_handoff(self, payload):
         """
         Hand a cut's segments over to the sandbox, named.
@@ -2168,26 +2286,42 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         # named .jpg while the page asks for .png, so every overlay frame 404s
         # and Sarah simply is not there. This one fires after every SAVE of an
         # overlay, which is worse.
-        build_mod.build_frames(src, out=outdir, box=meta.get("box", 750),
-                                force=True,
-                                alpha_png=(meta.get("ext") == ".png"),
-                                log=lambda m: sys.stderr.write(m + "\n"))
-        save_marks(outdir, [])
-        new_meta = json.load(open(os.path.join(outdir, "meta.json")))
-
-        # VERIFY WHAT WAS WRITTEN, in FRAMES. build_segment rebuilds a clip by
-        # TIME (-ss/-t per piece) and each piece rounds on its own, so an edited
-        # clip comes back short of the length that was on screen: measured, a
-        # 89-frame preview wrote 87, one frame lost per cut. That is exactly the
-        # class of fault this whole tool exists to catch, so a save says so
-        # instead of letting it pass.
-        wrote = build_mod.decoded_frames(src, dec_for(src))
+        #
+        # This step can fail on its own — ffmpeg has thrown on a source with a
+        # single bad-pts frame (non-monotonic dts) mid-extraction — and the FILE
+        # is already saved by this point (src was overwritten above). Before
+        # this was caught, that raised straight out of the handler: no response
+        # ever went back, and the browser's fetch() reported it as a network
+        # failure ("TypeError: Failed to fetch") on a scene that had, in fact,
+        # already landed — which read as the save itself failing and left that
+        # scene's edited-flag stuck on, re-arming a save that had nothing left
+        # to do. Caught here, it is reported as what it is: saved, cache stale.
+        nb_frames = wrote = None
         warning = None
-        if wrote is not None and wrote != want_frames:
-            warning = (f"wrote {wrote} frames, expected {want_frames} — the rebuild "
-                       f"is time-based and loses a frame per cut")
+        try:
+            build_mod.build_frames(src, out=outdir, box=meta.get("box", 750),
+                                    force=True,
+                                    alpha_png=(meta.get("ext") == ".png"),
+                                    log=lambda m: sys.stderr.write(m + "\n"))
+            save_marks(outdir, [])
+            new_meta = json.load(open(os.path.join(outdir, "meta.json")))
+            nb_frames = new_meta["nb_frames"]
+
+            # VERIFY WHAT WAS WRITTEN, in FRAMES. build_segment rebuilds a clip by
+            # TIME (-ss/-t per piece) and each piece rounds on its own, so an edited
+            # clip comes back short of the length that was on screen: measured, a
+            # 89-frame preview wrote 87, one frame lost per cut. That is exactly the
+            # class of fault this whole tool exists to catch, so a save says so
+            # instead of letting it pass.
+            wrote = build_mod.decoded_frames(src, dec_for(src))
+            if wrote is not None and wrote != want_frames:
+                warning = (f"wrote {wrote} frames, expected {want_frames} — the rebuild "
+                           f"is time-based and loses a frame per cut")
+        except RuntimeError as e:
+            warning = (f"saved, but the live preview cache could not be refreshed "
+                       f"({e}). Reload this scene to see the new frames.")
         self.send_json({"path": src, "archived_to": archived, "duration_s": round(got, 3),
-                        "nb_frames": new_meta["nb_frames"],
+                        "nb_frames": nb_frames,
                         "frames_written": wrote, "frames_expected": want_frames,
                         "warning": warning})
 

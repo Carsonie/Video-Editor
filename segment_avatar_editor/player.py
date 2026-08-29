@@ -1191,13 +1191,13 @@ SEQ_TEMPLATE = """<!doctype html>
           display:flex; flex-direction:column; gap:6px; }}
   .bulkrow {{ display:flex; gap:6px; }}
   .bulkrow button {{ flex:1; }}
-  #balanceBtn, #backupBtn {{ width:100%; }}
-  #backupBtn {{ margin-top:6px; }}
+  #balanceBtn {{ width:100%; }}
   /* GREEN when a join or split has left a renumber note outstanding — the one
      moment this button has a second job to do, and the moment it is easiest to
      walk away from. It stays enabled the rest of the time: a backup is worth
      taking whenever, and gating it behind a rare event would put the only
-     revert this data has behind a door. */
+     revert this data has behind a door. Lives in row 4 now, alongside the
+     other whole-session actions — see that row's own comment. */
   #backupBtn.pending {{ border-color:#2ecc40; color:#dff5e2;
                         box-shadow:0 0 0 1px rgba(46,204,64,.35); }}
   #balanceBtn:not(:disabled) {{ border-color:#4a8fbf; color:#cfe6f5; }}
@@ -1255,6 +1255,21 @@ SEQ_TEMPLATE = """<!doctype html>
   #mErr {{ min-height:16px; font-size:11px; color:#e05555; margin-top:6px; }}
   .mrow {{ display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }}
   #mOk {{ border-color:#2ecc40; color:#cdf3d4; }}
+  /* Load's modal, added 2026-08-29. Same #modal.on show/hide toggle and the
+     same .mbox box as the name-input modal above — a second top-level
+     overlay div rather than a second use of #modal, because its body is a
+     picked LIST, not a form, and the two never need to be open together. */
+  #loadModal {{ position:fixed; inset:0; z-index:200; display:none;
+               background:rgba(8,10,12,.72); align-items:center; justify-content:center; }}
+  #loadModal.on {{ display:flex; }}
+  .loadList {{ display:flex; flex-direction:column; gap:6px; max-height:50vh;
+              overflow-y:auto; margin-bottom:4px; }}
+  .loadList button {{ width:100%; text-align:left; padding:9px 12px; }}
+  .loadList button .sub {{ display:block; font-size:10px; color:#8b949c; margin-top:2px; }}
+  .loadList .empty {{ font-size:12px; color:#8b949c; padding:6px 2px; }}
+  #loadErr {{ min-height:16px; font-size:11px; color:#e05555; margin-top:6px; }}
+  #loadBack {{ display:none; }}
+  #loadBack.on {{ display:inline-block; }}
   /* An action and the tracks it acts on, joined into one control. The border
      colour is the SAME language the viewer frame and the row ticks already
      use: green for both tracks, blue for the segment, purple for the overlay.
@@ -1317,15 +1332,21 @@ SEQ_TEMPLATE = """<!doctype html>
        <button id="selNone" title="Untick every scene. Then tick just the few you want to compare, and rebuild.">Unselect all</button>
      </div>
      <button id="balanceBtn" title="Make each ticked scene's two tracks the same length, by repeating the LAST frame of whichever is shorter. The last frame is the settled end of the shot, so the repeat is invisible. Undoable per scene.">&#8646; Update Frame Imbalance</button>
-     <button id="backupBtn" title="Copy every scene folder in sandbox/ into sandbox/z_History/26-8-27_v1 &mdash; a whole-set backup, because none of this is in git. A COPY: your scenes stay where they are. If a join or split has renumbered the scenes, it also clears that note, which is the only thing left outstanding after one.">&#9707; Backup Scenes</button>
      <div id="balNote"></div>
    </div>
 
-   <!-- Four rows, each answering one question, in the order the work happens:
-        1. where am I    2. what is marked    3. change it    4. what is selected
+   <!-- Five rows, each answering one question, in the order the work happens:
+        1. where am I    2. what is marked    3. change it
+        4. commit it, or start over    5. what is selected
         They were one undifferentiated pile before, so "play a bit" and
         "overwrite a file" sat side by side. Under the viewer until the block
-        moved here, which is why the page used to run off the bottom. -->
+        moved here, which is why the page used to run off the bottom.
+
+        Row 4 added 2026-08-29: every action here reaches beyond the one scene
+        on screen — Save Timeline and Save all write to sandbox/, Backup
+        Scenes archives and refills the whole thing, Clear All empties this
+        editor session, Load starts a different one. Row 3 stays scoped to
+        the frame under the pointer; this is everything a step up from that. -->
    <div id="ctls">
   <div class="ctlrow" data-r="1"><button id="playBtn" title="Play or pause the timeline. Space does the same. Playback starts from wherever the pointer is, so drag it first to watch a particular moment.">&#9654; Play</button>
     <button id="muteBtn" title="Mute the narration. The picture is unaffected — useful when you are judging motion and the voice is a distraction.">&#128266;</button>
@@ -1378,12 +1399,24 @@ SEQ_TEMPLATE = """<!doctype html>
     <span class="vsep"></span>
     <button id="copyFrame" title="Copy the frame on screen. It is remembered by POSITION, not as a picture — pasting it later inserts the very same frame, with no re-encoding. Hold Shift as you click to put the picture on the Mac clipboard as well, for pasting into another app.">⧉ Copy</button>
     <button id="pasteFrame" disabled title="Paste the copied frame in after the frame on screen, on the ticked tracks. Nothing is copied yet — press Copy first.">⧉ Paste</button>
-    <span class="vsep"></span>
-    <button id="cutBtn" title="Write every scene ON THIS TIMELINE that has unsaved edits back over its file in sandbox/. Each file keeps its previous version in its own scene's z_History/. No whole-set backup is taken and no renumber note is cleared &mdash; Backup Scenes does both of those.">&#128190; Save Scenes</button>
-    <button id="saveBtn" title="Write every scene with unsaved edits back over its file in sandbox/. Same set as Save Scenes: a rebuild reloads the page, so a scene taken off the timeline takes its pending edits with it and there is no third set to reach.">&#10515; Save All</button>
   </div>
 
-  <div class="ctlrow report" data-r="4"><span id="rep"></span>
+  <!-- Row 4, added 2026-08-29: the five actions that reach past one scene —
+       three write to sandbox/ in three different amounts (a tracked edit, a
+       tracked edit plus its line, or the whole timeline regardless), one
+       empties this editor session, one starts a different one. Ordered
+       smallest-effect to largest, left to right, ending at Load because
+       loading a different video is the one action here that leaves this
+       session behind entirely. -->
+  <div class="ctlrow" data-r="4">
+    <button id="saveTimelineBtn" title="Write every scene ON THIS TIMELINE that has unsaved edits back over its file in sandbox/. Narrative lines are untouched — Save all covers those too. Each file keeps its previous version in its own scene's z_History/. No whole-set backup is taken and no renumber note is cleared &mdash; Backup Scenes does those.">&#128190; Save Timeline</button>
+    <button id="saveAllBtn" title="Write every scene with unsaved video edits, AND every scene with an unsaved narrative line, back over their files. Same reach as Save Timeline, plus the lines that changed. Untouched scenes and untouched lines are left alone. Each file keeps its previous version in its own scene's z_History/.">&#128221; Save all</button>
+    <button id="backupBtn" title="First copies the current sandbox/ whole into sandbox/1000_archive/ (dated and numbered for today) &mdash; a full snapshot of the generation about to be replaced. Then writes EVERY scene on this timeline back over its file in sandbox/, exactly as configured here right now, whether or not it was marked as edited, LOCKED tracks included, and every narrative line to script.json unconditionally. If a join or split has renumbered the scenes, that note is cleared too &mdash; the only thing left outstanding after one.">&#9707; Backup Scenes</button>
+    <button id="clearAllBtn" title="Empty this editor session: every scene, the narrative table, every mark, lock and undo step. Nothing on sandbox/ is touched &mdash; this only clears what THIS BROWSER TAB is holding, so you can load a different video into a clean editor.">&#128465; Clear All</button>
+    <button id="loadBtn" title="Open a different video in this editor: pick a store, then which of its videos, then its sandbox/ scenes and narrative load in fresh. Anything unsaved in the current session is lost &mdash; Save Timeline or Save all first if you want it kept.">&#128194; Load</button>
+  </div>
+
+  <div class="ctlrow report" data-r="5"><span id="rep"></span>
   </div>
   </div>
 
@@ -1401,6 +1434,21 @@ SEQ_TEMPLATE = """<!doctype html>
   <div class="mrow">
     <button id="mCancel" title="Close this without changing anything. Nothing has been written yet — a join or split only touches your files once you confirm here.">Cancel</button>
     <button id="mOk" title="Do it. This writes to disk immediately: folders are created and removed in sandbox/ and script.json is rewritten, all in one go. The previous state is archived to z_History/ first, so it is recoverable but not undoable from the editor.">Confirm</button>
+  </div>
+</div></div>
+
+<!-- Load's own modal, added 2026-08-29: a two-step pick (store, then which of
+     its videos) rather than the single name-input #modal above — different
+     enough in shape that reusing #modal would mean two unrelated bodies
+     fighting for the same markup. Shares .mbox for the box itself, so it
+     still looks like part of the same editor. -->
+<div id="loadModal"><div class="mbox">
+  <h5 id="loadTitle">Load a video</h5>
+  <div id="loadBody"><div id="loadList" class="loadList"></div></div>
+  <div id="loadErr"></div>
+  <div class="mrow">
+    <button id="loadBack" title="Back to the store list.">&#8592; Back</button>
+    <button id="loadCancel" title="Close this without loading anything. The current editor session is unaffected.">Cancel</button>
   </div>
 </div></div>
   <div class="playerName">{player_label}</div>
@@ -2009,66 +2057,126 @@ SEQ_TEMPLATE = """<!doctype html>
   }}
   $('joinBtn').onclick = joinTimeline;
 
-  // ── save every scene that has pending work ──────────────────────────────
-  // The only way to save once a join has renumbered things, and useful before
-  // that too: a set written together is a set whose numbers agree.
   // ── Backup Scenes ─────────────────────────────────────────────────────
-  // Copy every scene folder in sandbox/ into sandbox/z_History/26-8-27_v1.
+  // Redefined 2026-08-29 (moved here from the scene list panel, and absorbed
+  // what used to be the force branch of Save All): archive the sandbox
+  // GENERATION about to be replaced, then write the CURRENT editor state —
+  // every scene, every layer, whether or not it was tracked as edited, LOCKED
+  // tracks included, plus every narrative line — back over sandbox/,
+  // unconditionally. This is the one button that never asks whether
+  // something changed; it always makes sandbox/ match this timeline exactly,
+  // and always keeps a full copy of what it just replaced.
   //
-  // WHY IT EXISTS: none of this is in git. The video is hundreds of megabytes
-  // and git keeps every version of every file forever, so the whole Customers/
-  // tree is ignored — which leaves no revert at all. A per-file z_History
-  // covers "undo that save"; this covers "put the whole set back".
+  // WHY THE ARCHIVE STEP EXISTS: none of this is in git. The video is
+  // hundreds of megabytes and git keeps every version of every file forever,
+  // so the whole Customers/ tree is ignored — which leaves no revert at all.
+  // A per-file z_History (api_save's own) covers "undo that one save"; this
+  // covers "put the whole generation back". A COPY into 1000_archive, not a
+  // move — api_save's rebuild reads each scene straight off its sandbox
+  // path, so the file has to still be there when the write below runs.
   //
-  // A COPY, NOT A MOVE. A backup that empties the folder it backed up is not a
-  // backup. The sandbox is edited in place, one scene at a time, and moving it
-  // would take away every scene this backup is not about.
-  //
-  // The second job, and the only conditional one: a join or a split leaves a
-  // `_was_n` marker on every scene whose number moved. The files themselves
-  // were already written — atomically, by the join — so the marker is the ONLY
-  // thing left outstanding, and clearing it is what "I accept this reorder"
-  // means. The button turns green while one is pending.
+  // The renumber note: a join or split leaves a `_was_n` marker on every
+  // scene whose number moved. The files themselves were already written —
+  // atomically, by the join — so the marker is the ONLY thing left
+  // outstanding, and clearing it is what "I accept this reorder" means. The
+  // button turns green while one is pending.
   async function backupScenes() {{
     let plan = null;
     try {{
-      const r = await fetch('/api/archive', {{ method: 'POST',
+      const r = await fetch('/api/save-archive', {{ method: 'POST',
         headers: {{ 'Content-Type': 'application/json' }},
-        body: JSON.stringify({{ root: ROOT_REL, folder: 'sandbox',
-                              naming: 'add-v', dry: true }}) }});
+        body: JSON.stringify({{ root: ROOT_REL, dry: true }}) }});
       plan = await r.json();
     }} catch (e) {{ /* fall through — the message says so rather than guessing */ }}
     if (!plan || plan.error) {{ status(`Could not read the sandbox: ${{plan && plan.error}}`); return; }}
-    if (plan.empty) {{ status('The sandbox is empty — nothing to back up.'); return; }}
 
-    const dirty = SEQ.filter(s => histOf(s.n).length).map(s => s.n);
-    if (!confirm(`Back up ${{plan.would_archive.length}} scene folder(s)?\n\n`
-               + `COPYING TO\n${{plan.into}}\n\n`
-               + `Your scenes stay exactly where they are — this is a copy, `
-               + `taken because none of this is in git.\n\n`
-               + (dirty.length
-                  ? `⚠ Scene(s) ${{dirty.join(', ')}} have UNSAVED edits. A backup `
-                    + `copies the FILES ON DISK, so those edits are not in it. `
-                    + `Save All first if you want them.\n\n`
-                  : ``)
+    const withWork = SEQ.map((s, i) => ({{ i, n: s.n,
+        layers: ['base', 'overlay'].filter(w => slugOf(i, w)) }}))
+        .filter(x => x.layers.length);
+    const scriptTargets = SEQ.filter(s => VTT && VTT.byN[s.n]);
+    if (plan.empty && !withWork.length && !scriptTargets.length) {{
+      status(`Nothing on the timeline to write, and the sandbox is already empty.`);
+      return;
+    }}
+    if (!confirm(`Back up and refill the sandbox?\n\n`
+               + (plan.empty
+                  ? `The sandbox is currently empty — nothing to archive first.\n\n`
+                  : `COPYING ${{plan.would_archive.length}} scene folder(s) TO\n`
+                    + `${{plan.into}}\n\n`)
+               + `Then every scene on this timeline (${{withWork.length}}) is `
+               + `written to sandbox/ exactly as configured here right now, `
+               + `whether or not it was marked as edited — LOCKED tracks `
+               + `included — and every narrative line is written to `
+               + `script.json, unconditionally.\n\n`
                + (RENUMBERED
                   ? `A join or split renumbered the scenes. That note is cleared `
                     + `too — it is the only thing left outstanding after one.`
                   : `No renumber note is outstanding.`))) return;
     stop();
-    let dest = null;
+    let archivedTo = null;
     try {{
-      const r = await fetch('/api/archive', {{ method: 'POST',
+      const r = await fetch('/api/save-archive', {{ method: 'POST',
         headers: {{ 'Content-Type': 'application/json' }},
-        body: JSON.stringify({{ root: ROOT_REL, folder: 'sandbox',
-                              naming: 'add-v' }}) }});
+        body: JSON.stringify({{ root: ROOT_REL }}) }});
       const d = await r.json();
-      if (d.error) {{ status(`Backup failed: ${{d.error}}`); return; }}
-      dest = d.archived_to;
-    }} catch (e) {{ status(`Backup failed: ${{e}}`); return; }}
+      if (d.error) {{ status(`Backup Scenes stopped — could not archive the ` +
+        `current sandbox first: ${{d.error}}`); return; }}
+      archivedTo = d.archived_to;
+    }} catch (e) {{
+      status(`Backup Scenes stopped — could not archive the current sandbox ` +
+        `first: ${{e}}`);
+      return;
+    }}
 
-    // Only AFTER the copy landed. Clearing the marker first would leave the
-    // note gone and the backup missing if the copy then failed.
+    const btn = $('backupBtn');
+    const total_ = withWork.reduce((n, x) => n + x.layers.length, 0);
+    let wrote = 0;
+    const busy = () => {{ if (btn) {{ btn.classList.add('working'); btn.disabled = true;
+      btn.innerHTML = `Saving ${{wrote}} / ${{total_}}…`; }} }};
+    const rest = () => {{ if (btn) {{ btn.classList.remove('working'); btn.disabled = false;
+      btn.innerHTML = '&#9707; Backup Scenes'; }} }};
+    busy();
+
+    const done = [], failed = [], warn = [];
+    for (const x of withWork) {{
+      let ok = true;
+      for (const w of x.layers) {{
+        let d;
+        try {{
+          const r = await fetch('/api/save', {{ method: 'POST',
+            headers: {{ 'Content-Type': 'application/json' }},
+            body: JSON.stringify({{ slug: slugOf(x.i, w) }}) }});
+          d = await r.json();
+        }} catch (e) {{ failed.push(`scene ${{x.n}} ${{w}}: ${{e}}`); ok = false; continue; }}
+        if (d.error) {{ failed.push(`scene ${{x.n}} ${{w}}: ${{d.error}}`); ok = false; continue; }}
+        if (d.warning) warn.push(`scene ${{x.n}} ${{w}}: ${{d.warning}}`);
+        setEditedOf(x.i, w, false);
+        wrote++;
+        busy();
+      }}
+      if (ok) {{ histOf(x.n).length = 0; done.push(x.n); }}
+    }}
+
+    const lineDone = [], lineFailed = [];
+    for (const s of scriptTargets) {{
+      const text = vLine[s.n] !== undefined ? vLine[s.n] : VTT.byN[s.n].line;
+      try {{
+        const r = await fetch('/api/line', {{ method: 'POST',
+          headers: {{ 'Content-Type': 'application/json' }},
+          body: JSON.stringify({{ root: ROOT_REL, n: s.n, line: text }}) }});
+        const d = await r.json();
+        if (d.error) {{ lineFailed.push(`scene ${{s.n}}: ${{d.error}}`); continue; }}
+        VTT.byN[s.n].line = d.line;
+        VTT.byN[s.n].words = d.words;
+        vLine[s.n] = d.line;
+        vDirty.delete(s.n);
+        lineDone.push(s.n);
+      }} catch (e) {{ lineFailed.push(`scene ${{s.n}}: ${{e}}`); }}
+    }}
+    if (scriptTargets.length) paintVttSum();
+
+    // Only AFTER the writes landed. Clearing the marker first would leave the
+    // note gone and nothing actually written if a save below then failed.
     let cleared = '';
     if (RENUMBERED) {{
       try {{
@@ -2079,9 +2187,17 @@ SEQ_TEMPLATE = """<!doctype html>
         cleared = ' The renumber note is cleared.';
       }} catch (e) {{ cleared = ' ⚠ The renumber note could not be cleared.'; }}
     }}
+    rest();
     paintBackupBtn();
     renderScenes();
-    status(`Backed up to:\n${{dest}}${{cleared}}`);
+    status(`Archived to:\n${{archivedTo || '(sandbox was already empty)'}}\n`
+         + `Saved ${{done.length}} of ${{withWork.length}} scene(s)`
+         + (done.length ? `: ${{done.join(', ')}}` : '') + '.'
+         + ` Lines saved for ${{lineDone.length}} of ${{scriptTargets.length}} scene(s).`
+         + cleared
+         + (failed.length ? `\\n⚠ ${{failed.join('; ')}}` : '')
+         + (warn.length ? `\\n⚠ ${{warn.join('; ')}}` : '')
+         + (lineFailed.length ? `\\n⚠ line: ${{lineFailed.join('; ')}}` : ''));
   }}
 
   // GREEN while a join or split has left a note outstanding — the one moment
@@ -2094,25 +2210,153 @@ SEQ_TEMPLATE = """<!doctype html>
     if (b) b.classList.toggle('pending', RENUMBERED);
   }}
 
-  // ── Save All ──────────────────────────────────────────────────────────
-  // Writes every dirty scene back over its file. THAT IS ALL IT DOES.
+  // ── Clear All ────────────────────────────────────────────────────────
+  // Added 2026-08-29. Empties this BROWSER TAB's session — SEQ and every
+  // other piece of state this page has accumulated — so Load can put a
+  // different video into a genuinely clean editor rather than one still
+  // carrying another video's marks, locks and undo history underneath it.
   //
-  // It used to also snapshot the whole sandbox and clear the renumber note, so
-  // one click could do any of three different jobs and nothing on screen said
-  // which. Those two moved to Backup Scenes; each button now does one thing
-  // that can be named in the label.
-  async function saveAllScenes() {{
+  // Touches NOTHING on disk. sandbox/ is exactly as it was before this ran;
+  // this is memory only, the same memory a page reload already empties —
+  // Clear All just does it without leaving the page and losing ROOT_REL.
+  //
+  // Direct DOM resets below rather than routing through paint()/show()/
+  // renderScenes() — every one of those assumes at least one scene exists
+  // (SEQ[0], curI(), at(g) all dereference it), and making the zero-scene
+  // case safe through all of them is a bigger audit than this button is
+  // worth. Simplest correct thing: blank exactly what those functions would
+  // have painted, directly.
+  function clearAllScenes() {{
+    if (!confirm(`Clear this editor session?\n\n`
+               + `Removes every scene, the narrative table, every mark, `
+               + `lock and undo step this tab is holding.\n\n`
+               + `Nothing on sandbox/ is touched — this only clears what `
+               + `THIS BROWSER TAB has in memory.`)) return;
+    stop();
+    SEQ.length = 0;
+    starts = []; total = 0; which = 'base'; SOLO = 0; vttCentred = -1;
+    Object.keys(MARKS).forEach(k => delete MARKS[k]);
+    Object.keys(HIST).forEach(k => delete HIST[k]);
+    Object.keys(vLine).forEach(k => delete vLine[k]);
+    LOCKED.clear();
+    vDirty.clear();
+    ON.clear();
+    RENUMBERED = false;
+    VTT = null;
+
+    $('sceneList').innerHTML = '';
+    $('baseImg').removeAttribute('src');
+    $('overImg').removeAttribute('src');
+    $('segbar').innerHTML = '';
+    $('ticks').innerHTML = '';
+    $('slider').max = 1;
+    $('slider').value = 1;
+    $('pos').textContent = '';
+    $('vttRows').innerHTML = '';
+    $('vttSum').textContent = '';
+    $('rep').textContent = '';
+    $('rebuildBtn').disabled = true;
+    $('rebuildBtn').innerHTML = 'Tick at least one scene';
+    paintBackupBtn();
+    status('Editor cleared — nothing loaded. Use Load to open a video.');
+  }}
+  $('clearAllBtn').onclick = clearAllScenes;
+
+  // ── Load ─────────────────────────────────────────────────────────────
+  // Added 2026-08-29: open a different video without leaving the page or
+  // hand-building a URL. Two picks — store, then which of its videos — then
+  // straight to /api/open-seq-go, the same redirect Rebuild already uses.
+  //
+  // Re-fetches /api/stores every time the modal opens rather than caching
+  // it for the session: a store list is cheap to compute and a stale one
+  // — missing a video someone just built — is the one failure mode worth
+  // avoiding here.
+  async function openLoadModal() {{
+    const box = $('loadModal'), list = $('loadList'), err = $('loadErr');
+    box.classList.add('on');
+    err.textContent = '';
+    $('loadBack').classList.remove('on');
+    $('loadTitle').textContent = 'Load a video — choose a store';
+    list.innerHTML = '<div class="empty">Loading stores…</div>';
+    let stores;
+    try {{
+      const r = await fetch('/api/stores');
+      const d = await r.json();
+      stores = d.stores || [];
+    }} catch (e) {{ list.innerHTML = ''; err.textContent = `Could not list stores: ${{e}}`; return; }}
+    renderStoreList(stores);
+
+    const close = () => {{
+      box.classList.remove('on');
+      document.removeEventListener('keydown', key, true);
+      box.onmousedown = null;
+    }};
+    const key = e => {{ if (e.key === 'Escape') {{ e.stopPropagation(); close(); }} }};
+    document.addEventListener('keydown', key, true);
+    box.onmousedown = e => {{ if (e.target === box) close(); }};
+    $('loadCancel').onclick = close;
+
+    function renderStoreList(stores) {{
+      $('loadTitle').textContent = 'Load a video — choose a store';
+      $('loadBack').classList.remove('on');
+      err.textContent = '';
+      list.innerHTML = '';
+      if (!stores.length) {{
+        list.innerHTML = '<div class="empty">No store with a ready video was found under Customers/.</div>';
+        return;
+      }}
+      for (const s of stores) {{
+        const b = document.createElement('button');
+        b.innerHTML = `${{s.store}}<span class="sub">${{s.business}} — `
+          + `${{s.videos.length}} video${{s.videos.length === 1 ? '' : 's'}}</span>`;
+        b.onclick = () => renderVideoList(s);
+        list.appendChild(b);
+      }}
+    }}
+    function renderVideoList(s) {{
+      $('loadTitle').textContent = `Load a video — ${{s.store}}`;
+      $('loadBack').classList.add('on');
+      $('loadBack').onclick = () => renderStoreList(stores);
+      err.textContent = '';
+      list.innerHTML = '';
+      for (const v of s.videos) {{
+        const b = document.createElement('button');
+        const reason = !v.scenes.length ? 'its script has no scenes'
+          : !v.has_sandbox ? 'no sandbox/ built yet' : null;
+        b.innerHTML = `${{v.name}}<span class="sub">${{v.scenes.length}} `
+          + `scene${{v.scenes.length === 1 ? '' : 's'}}`
+          + (reason ? ` — ${{reason}}` : ``) + `</span>`;
+        b.disabled = !!reason;
+        b.onclick = () => confirmLoad(s, v);
+        list.appendChild(b);
+      }}
+    }}
+    function confirmLoad(s, v) {{
+      if (!confirm(`Load ${{s.store}} — ${{v.name}}?\n\n${{v.scenes.length}} scene(s).\n\n`
+                 + `Anything unsaved in the current session is lost — Save `
+                 + `Timeline or Save all first if you want it kept.`)) return;
+      close();
+      status(`Loading ${{s.store}} — ${{v.name}}…`);
+      location.href = `/api/open-seq-go?root=${{encodeURIComponent(v.root)}}&ns=${{v.scenes.join(',')}}`;
+    }}
+  }}
+  $('loadBtn').onclick = openLoadModal;
+
+  // ── Save Timeline / Save all ────────────────────────────────────────────
+  // Both DIRTY-only — the unconditional, everything-regardless-of-state job
+  // lives on Backup Scenes now, not here. The only difference between these
+  // two is reach: Save Timeline writes video layers pendingOf(i) tracks as
+  // edited; Save all does that AND every narrative line vDirty tracks as
+  // edited. Neither touches a line or a layer that isn't flagged dirty, and
+  // neither archives anything first — Backup Scenes is the one button with
+  // a "put the whole generation back" answer.
+  async function saveScenes(includeNarrative) {{
     const withWork = SEQ.map((s, i) => ({{ i, n: s.n, layers: pendingOf(i) }}))
-                        .filter(x => x.layers.length);
-    const held = SEQ.flatMap((s, i) => heldBackOf(i).map(w =>
-      `  scene ${{s.n}}: ${{w === 'base' ? 'segment' : 'overlay'}} is unticked`));
-    if (!withWork.length) {{
-      // Nothing to write. If a join or split left a note outstanding, say
-      // WHICH button clears it rather than quietly doing it from here — that
-      // silent second job is what made this button unreadable.
-      // Say WHY there is nothing, when a lock is the reason. "No scene has
-      // unsaved edits" over a scene you know you edited is the answer that
-      // sends someone looking for a bug that is not there.
+        .filter(x => x.layers.length);
+    const lineWork = includeNarrative ? SEQ.filter(s => vDirty.has(s.n)) : [];
+    if (!withWork.length && !lineWork.length) {{
+      const held = SEQ.flatMap((s, i) => heldBackOf(i).map(w =>
+        `  scene ${{s.n}}: ${{w === 'base' ? 'segment' : 'overlay'}} is unticked`));
       status(held.length
         ? `Nothing to save — every edit is on a track you have unticked:\n`
           + held.join(`\n`)
@@ -2127,38 +2371,31 @@ SEQ_TEMPLATE = """<!doctype html>
       const sizes = x.layers.map(w => `${{lenOf(x.i, w)}}f`);
       return `  scene ${{x.n}}: ${{names.join(' and ')}} (${{sizes.join(', ')}})`;
     }}).join(`\n`);
-    if (!confirm(`Save ${{withWork.length}} scene(s)?\n\n${{lines}}\n\n`
-               + `WRITING TO\n${{ROOT_REL}}/sandbox/\n\n`
+    const lineList = lineWork.map(s => `  scene ${{s.n}}: narrative line`).join(`\n`);
+    if (!confirm(`Save ${{withWork.length}} scene(s)`
+               + (lineWork.length ? ` and ${{lineWork.length}} line(s)` : ``)
+               + `?\n\n${{lines}}`
+               + (lineWork.length ? `\n${{lineList}}` : ``)
+               + `\n\nWRITING TO\n${{ROOT_REL}}/sandbox/\n\n`
                + `Each file keeps its previous version in its own scene's `
                + `z_History/.\n\n`
-               + (held.length ? `Left alone, because you unticked them:\n`
-                                     + held.join(`\n`) + `\n\n` : ``)
                + `No whole-set backup is taken and no renumber note is cleared. `
                + `Backup Scenes does both of those.`)) return;
     stop();
-    // Both buttons that reach this call, because either could be the one you
-    // pressed. `busy` is written into the label rather than beside it, so the
-    // count is where the eye already is.
-    const btns = ['saveBtn', 'cutBtn'].map(id => $(id)).filter(Boolean);
+    const btn = $(includeNarrative ? 'saveAllBtn' : 'saveTimelineBtn');
+    const label = includeNarrative ? '&#128221; Save all' : '&#128190; Save Timeline';
     const total_ = withWork.reduce((n, x) => n + x.layers.length, 0);
     let wrote = 0;
-    const busy = () => btns.forEach(b => {{
-      b.classList.add('working');
-      b.disabled = true;
-      b.innerHTML = `Saving ${{wrote}} / ${{total_}}…`;
-    }});
-    const rest = () => btns.forEach((b, k) => {{
-      b.classList.remove('working');
-      b.disabled = false;
-      b.innerHTML = k === 0 ? '&#10515; Save All' : '&#128190; Save Scenes';
-    }});
+    const busy = () => {{ if (btn) {{ btn.classList.add('working'); btn.disabled = true;
+      btn.innerHTML = `Saving ${{wrote}} / ${{total_}}…`; }} }};
+    const rest = () => {{ if (btn) {{ btn.classList.remove('working'); btn.disabled = false;
+      btn.innerHTML = label; }} }};
     busy();
 
     const done = [], failed = [], warn = [];
     for (const x of withWork) {{
-      const layers = x.layers;
       let ok = true;
-      for (const w of layers) {{
+      for (const w of x.layers) {{
         let d;
         try {{
           const r = await fetch('/api/save', {{ method: 'POST',
@@ -2179,14 +2416,35 @@ SEQ_TEMPLATE = """<!doctype html>
       // failed keeps them, so it can be retried or walked back.
       if (ok) {{ histOf(x.n).length = 0; done.push(x.n); }}
     }}
+
+    const lineDone = [], lineFailed = [];
+    for (const s of lineWork) {{
+      const text = vLine[s.n];
+      try {{
+        const r = await fetch('/api/line', {{ method: 'POST',
+          headers: {{ 'Content-Type': 'application/json' }},
+          body: JSON.stringify({{ root: ROOT_REL, n: s.n, line: text }}) }});
+        const d = await r.json();
+        if (d.error) {{ lineFailed.push(`scene ${{s.n}}: ${{d.error}}`); continue; }}
+        VTT.byN[s.n].line = d.line;
+        VTT.byN[s.n].words = d.words;
+        vLine[s.n] = d.line;
+        vDirty.delete(s.n);
+        lineDone.push(s.n);
+      }} catch (e) {{ lineFailed.push(`scene ${{s.n}}: ${{e}}`); }}
+    }}
+    if (lineWork.length) paintVttSum();
+
     // Put the labels back BEFORE anything else, so a failure below cannot
-    // leave two buttons spinning over a run that has stopped.
+    // leave the button spinning over a run that has stopped.
     rest();
     renderScenes();
     status(`Saved ${{done.length}} of ${{withWork.length}} scene(s)`
          + (done.length ? `: ${{done.join(', ')}}` : '') + '.'
-         + (failed.length ? `\\n\u26a0 ${{failed.join('; ')}}` : '')
-         + (warn.length ? `\\n\u26a0 ${{warn.join('; ')}}` : ''));
+         + (includeNarrative ? ` Lines saved for ${{lineDone.length}} of ${{lineWork.length}} scene(s).` : '')
+         + (failed.length ? `\\n⚠ ${{failed.join('; ')}}` : '')
+         + (warn.length ? `\\n⚠ ${{warn.join('; ')}}` : '')
+         + (lineFailed.length ? `\\n⚠ line: ${{lineFailed.join('; ')}}` : ''));
   }}
   $('backupBtn').onclick = backupScenes;
 
@@ -2867,27 +3125,14 @@ SEQ_TEMPLATE = """<!doctype html>
   }}
 
 
-  // ── Save Scenes ───────────────────────────────────────────────────────
-  // Every scene on THIS TIMELINE that has unsaved edits, written back over its
-  // file in sandbox/.
-  //
-  // This slot used to be Cut scene, and it went for three reasons. It wrote
-  // loose numbered files into the MP4 Splitter's dev/_cuts/, which are not
-  // scenes and need a hand-off before they are. It took only ONE layer — the
-  // segment whenever the segment was ticked — with nothing on screen saying so.
-  // And Split already does the job properly: it names both halves and rewrites
-  // the scene list. The slot went to what is actually reached for from here.
-  $('cutBtn').onclick = saveAllScenes;
-
-  // ── Save All ──────────────────────────────────────────────────────────
-  // The SAME set as Save Scenes, and there is no third set to reach: Rebuild
-  // navigates the page, so a scene taken off the timeline takes its pending
-  // edits with it. Two ways to one call, because that is where the hand is.
-  //
-  // It used to save a SINGLE layer of the current scene and leave that scene's
-  // undo history untouched, while the save icon on the scene row saved every
-  // dirty layer and cleared it. Per-scene saving lives on those icons now.
-  $('saveBtn').onclick = saveAllScenes;
+  // ── Save Timeline / Save all ────────────────────────────────────────────
+  // Renamed and moved to row 4 2026-08-29 (was Save Scenes / Save All, in
+  // row 3). Same saveScenes() function, called with different reach —
+  // Save Timeline is video only, Save all also covers dirty narrative lines.
+  // See saveScenes()'s own comment for why the unconditional job moved out
+  // to Backup Scenes instead of staying a third mode of this call.
+  $('saveTimelineBtn').onclick = () => saveScenes(false);
+  $('saveAllBtn').onclick = () => saveScenes(true);
 
   // ── audio ────────────────────────────────────────────────────────────
   // ONE element, re-pointed at each boundary. Two alternating elements would

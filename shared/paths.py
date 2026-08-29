@@ -327,10 +327,10 @@ ARCHIVE_DIR = "z_History"
 _ARCHIVE_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})-v_(\d+)$")
 
 
-def archive_name(folder, day=None):
+def archive_name(folder, day=None, archive_dir=ARCHIVE_DIR):
     """The next archive name for `folder`, e.g. 2026-08-26-v_3."""
     day = day or time.strftime("%Y-%m-%d")
-    root = os.path.join(folder, ARCHIVE_DIR)
+    root = os.path.join(folder, archive_dir)
     seen = 0
     if os.path.isdir(root):
         for d in os.listdir(root):
@@ -360,12 +360,12 @@ def archive_name(folder, day=None):
 _ADDV_RE = re.compile(r"^(\d{2})-(\d{1,2})-(\d{1,2})_v(\d+)$")
 
 
-def archive_name_v(folder, day=None):
+def archive_name_v(folder, day=None, archive_dir=ARCHIVE_DIR):
     """The next Add-V archive name for `folder`, e.g. 26-8-27_v3."""
     now = time.localtime()
     yy, mm, dd = (now.tm_year % 100, now.tm_mon, now.tm_mday) if day is None else day
     stem = f"{yy}-{mm}-{dd}"
-    root = os.path.join(folder, ARCHIVE_DIR)
+    root = os.path.join(folder, archive_dir)
     seen = 0
     if os.path.isdir(root):
         for d in os.listdir(root):
@@ -383,9 +383,10 @@ def archive_name_v(folder, day=None):
     return f"{stem}_v{seen + 1}"
 
 
-def archive_contents(folder, keep=(), move=True, only=None, naming=None):
+def archive_contents(folder, keep=(), move=True, only=None, naming=None,
+                      archive_dir=ARCHIVE_DIR):
     """
-    Put `folder`'s current generation into folder/z_History/<date>-v_N/.
+    Put `folder`'s current generation into folder/<archive_dir>/<date>-v_N/.
 
     `move` decides which of the two shapes this is:
 
@@ -396,27 +397,35 @@ def archive_contents(folder, keep=(), move=True, only=None, naming=None):
       COPY  — the folder is being edited in place, as when the sandbox is saved.
               Moving there would take away the scenes this save is not touching.
 
-    `keep` names entries that never move — z_History itself, and any staging
-    folder the caller is about to read from. `only` narrows it to specific
-    entries, for a folder that holds more than one kind of thing.
+    `keep` names entries that never move — the archive folder itself, and any
+    staging folder the caller is about to read from. `only` narrows it to
+    specific entries, for a folder that holds more than one kind of thing.
 
     `naming` picks the folder name: the default `2026-08-26-v_1`, or `"add-v"`
     for `26-8-27_v1`. See archive_name_v().
+
+    `archive_dir` picks WHERE the snapshot lands — `z_History` (the default,
+    used everywhere else this project archives something) or a caller-named
+    alternative, e.g. Save All's own `1000_archive`. Whichever is passed, both
+    it and the default `z_History` are always skipped from what gets swept up
+    — an archive folder must never end up archiving itself, or a copy of the
+    other archive scheme sitting beside it.
 
     Returns the archive path, or None when there was nothing to archive. Doing
     nothing is the normal case for a first run and must not look like a failure.
     """
     if not os.path.isdir(folder):
         return None
-    skip = set(keep) | {ARCHIVE_DIR}
+    skip = set(keep) | {ARCHIVE_DIR, archive_dir}
     names = [x for x in sorted(os.listdir(folder))
              if x not in skip and not x.startswith(".")]
     if only is not None:
         names = [x for x in names if x in set(only)]
     if not names:
         return None
-    name = archive_name_v(folder) if naming == "add-v" else archive_name(folder)
-    dest = os.path.join(folder, ARCHIVE_DIR, name)
+    name = (archive_name_v(folder, archive_dir=archive_dir) if naming == "add-v"
+            else archive_name(folder, archive_dir=archive_dir))
+    dest = os.path.join(folder, archive_dir, name)
     os.makedirs(dest, exist_ok=True)
     for x in names:
         src = os.path.join(folder, x)

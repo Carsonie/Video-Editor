@@ -57,6 +57,12 @@ tests/log_reports/*.log
 # batch. Under Customers/ and so already ignored, but named here because the
 # rule is about what they ARE, not where they sit.
 **/z_History/
+# Same reasoning, added 2026-08-29 for the two other generation-snapshot
+# folders this project now makes: Backup Scenes' own archive (holds a copy
+# of script.json alongside the scene folders, which the re-includes above
+# would otherwise let back in), and an ad-hoc personal backup folder.
+**/1000_archive/
+**/sandbox_editor_bkup/
 
 # ── secrets ─────────────────────────────────────────────────────────────────
 # The HeyGen key. Every render against it is a real charge, so this must never
