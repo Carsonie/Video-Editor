@@ -54,15 +54,19 @@ Inside one video folder:
                                scene.json            this scene's script node
   sandbox/05-dates-and-review/ segment.mp4           YOUR edit, overrides dev
   sandbox/_builds/                                   videos built from edits
+  sandbox/script.json          the narrative — moved here 2026-08-29, was video/
   video/                       finished videos, v#
   sarah_clips/                 opening + closing pieces (NOT per-scene)
   work/                        boundaries.json — the cut plan
   z_History/segments|scenes|sarah_clips|video/       history by ORIGINAL folder
 ```
 
-⚠ `video/` holds BOTH `script.json` and the finished `v#` videos. That reads
-oddly and was kept deliberately: `paths.script()` returns `<root>/video/script.json`
-and renaming it buys nothing but churn.
+⚠ `script.json` lives in `sandbox/` as of 2026-08-29 (Carson: "I want to keep
+all the data together in one folder"), not `video/` — `paths.script()` checks
+`<root>/sandbox/script.json` first, then `<root>/video/script.json`, then the
+original bare `<root>/script.json`, in that order, so an un-migrated store
+keeps working rather than failing obscurely. `video/` now holds only the
+finished `v#` videos.
 
 **`paths.py` takes the ROOT as a parameter and never hardcodes a folder name.**
 That is why adding the video dimension was a folder move plus one Makefile
