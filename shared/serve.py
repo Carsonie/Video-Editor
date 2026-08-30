@@ -125,6 +125,30 @@ ENCODE_ALPHA = ["-c:v", "libvpx-vp9", "-pix_fmt", "yuva420p", "-auto-alt-ref", "
                 "-b:v", "2M", "-c:a", "libopus"]
 
 
+def cache_state(path, log=None):
+    """
+    (slug, edited) for a file, via ITS OWN cache — the same one /api/save
+    writes against, and the same `edited` flag api_open_seq reads for the
+    Timeline Scenes dirty icon. Used by api_siblings so a second tool
+    (Frame Blender) can show the SAME pristine/dirty state and save through
+    the SAME slug, rather than tracking either one separately.
+
+    Building the cache here (if it doesn't exist yet) costs what open_seq
+    already costs to show a store's scene list — not a new expense, just
+    the same one paid from a second call site. Guarded because a listing
+    should degrade to "can't tell" on one bad file, not fail entirely.
+    """
+    if not path or not os.path.isfile(path):
+        return None, False
+    try:
+        outdir = build_mod.build_frames(path, box=750, alpha_png=is_alpha(path),
+                                         log=log or (lambda m: None))
+        meta = json.load(open(os.path.join(outdir, "meta.json")))
+        return os.path.basename(outdir), bool(meta.get("edited"))
+    except Exception:
+        return None, False
+
+
 def is_alpha(path):
     """A `.webm` here always means a transparent avatar render — that is the
     only kind this pipeline produces or consumes."""
@@ -198,6 +222,15 @@ ACTIONS = {
     "/api/open-seq":        ("Open timeline", ("root", "ns")),
     "/api/open-pair-go":    ("Open layered", ("base",)),
     "/api/open-seq-go":     ("Open timeline", ("root", "ns")),
+    "/api/load_video":      ("FB: Load video", ("root",)),
+    # Frame Blender's own actions — /api/save and /api/frames/restore already
+    # log themselves when it proxies to them, so only its three UN-proxied
+    # actions need an entry here. Logged into this SAME file (same day, same
+    # repo, same path formula) even though frame_blender/serve.py is a
+    # separate process — one editing record regardless of which tool acted.
+    "/build_clip":          ("FB: Build clip", ("n",)),
+    "/api/save_mp4":        ("FB: Save MP4",   ("n",)),
+    "/api/load_store":      ("FB: Load store", ("path",)),
 }
 # result keys worth showing, in the order they read best
 RESULT_KEYS = ("nb_frames", "count", "version", "duration_s", "joined", "split",
@@ -1172,6 +1205,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     dur = round(float(build_mod.probe(seg, "duration")), 2)
                 except (ValueError, RuntimeError):
                     dur = None
+            base_slug, base_edited = cache_state(seg)
+            over_slug, over_edited = cache_state(av)
             items.append({
                 "n": n, "label": label,
                 "name": os.path.basename(seg) if seg else "—",
@@ -1183,6 +1218,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 "missing": seg is None,
                 "frames": nfr, "frames_exact": nex,
                 "overlay_frames": ofr, "overlay_frames_exact": oex,
+                "base_slug": base_slug, "base_edited": base_edited,
+                "over_slug": over_slug, "over_edited": over_edited,
                 "current": bool(seg) and os.path.abspath(seg) == os.path.abspath(target)})
 
         # BOOKENDS and anything else living in sandbox that is not a script scene.
@@ -1211,6 +1248,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     pass
                 bfr, bex = frame_count(seg)
                 afr, aex = (frame_count(av) if os.path.isfile(av) else (None, False))
+                base_slug, base_edited = cache_state(seg)
+                over_slug, over_edited = cache_state(av) if os.path.isfile(av) else (None, False)
                 items.append({
                     "n": n, "label": m.group(2), "name": "segment.mp4", "dur": dur,
                     "frames": bfr, "frames_exact": bex,
@@ -1219,6 +1258,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     "overlay": os.path.relpath(av, CUSTOMERS_ROOT) if os.path.isfile(av) else None,
                     "src": "sandbox", "overlay_src": "sandbox" if os.path.isfile(av) else None,
                     "missing": False, "extra": True,
+                    "base_slug": base_slug, "base_edited": base_edited,
+                    "over_slug": over_slug, "over_edited": over_edited,
                     "current": os.path.abspath(seg) == os.path.abspath(target)})
         items.sort(key=lambda it: it["n"])
 

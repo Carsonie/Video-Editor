@@ -242,6 +242,15 @@ def s_siblings():
     check("pairs the segment with its avatar",
           any(r.get("overlay", "").endswith("avatar.webm") for r in rows),
           f"scope={d.get('editor_scope')}")
+    # base_slug/base_edited (and the overlay pair) are what Frame Blender's
+    # Timeline Scenes panel reads for its dirty dot and its Save button's
+    # slug — added so a second tool can show the SAME pristine/dirty state
+    # this endpoint already computes, rather than tracking its own. A row
+    # missing these silently breaks that panel without failing this test
+    # suite, which is exactly the gap worth a real assertion here.
+    row1 = next(r for r in rows if r["n"] == 1)
+    check("reports a real base_slug", bool(row1.get("base_slug")), row1.get("base_slug"))
+    eq("scene 1 has not been edited yet", row1.get("base_edited"), False)
 
 
 def s_open():
@@ -402,6 +411,26 @@ def s_save():
        frames("sandbox/01-alpha-scene/segment.mp4"), 45)
     check("archived the previous file", bool(d.get("archived_to")),
           os.path.basename(str(d.get("archived_to"))))
+
+
+def s_save_stale():
+    """
+    /api/save refuses when the file changed since this cache was built —
+    the check added for two tools (or two tabs) sharing one sandbox folder.
+    Simulated the same way a second tool actually would trigger it: touch
+    the file on disk, behind this cache's back, then try to save.
+    """
+    step("/api/save — refuses when the file changed elsewhere first")
+    seg_path = os.path.join(fixture.STORE, "sandbox", "01-alpha-scene", "segment.mp4")
+    os.utime(seg_path, None)   # bump mtime without changing a byte — same
+                               # signal a real overwrite from elsewhere gives
+    d, code = post("/api/save", slug=SEG)
+    eq("refused with 409", code, 409)
+    eq("named as a stale conflict", d.get("error"), "stale")
+    check("says why, so a caller can act on it", "changed on disk" in d.get("message", ""),
+          d.get("message"))
+    d2 = must("/api/save", slug=SEG, force=True)
+    check("force overrides the refusal", not d2.get("error"), d2)
 
 
 def s_clear_edits():
@@ -948,7 +977,7 @@ FUNCTIONS = [
     s_open_seq, s_open_seq_go,
     s_dup, s_del, s_dup_span, s_del_span, s_restore,
     s_mark, s_marks, s_clear_marks,
-    s_save, s_clear_edits, s_cut, s_reset_editor,
+    s_save, s_save_stale, s_clear_edits, s_cut, s_reset_editor,
     s_vtt, s_line,
     s_join, s_renumber_state, s_renumber_clear, s_split,
     s_clip, s_paste, s_alpha_survives, s_restore_is_safe, s_one_writer_per_cache,
