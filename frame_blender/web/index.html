@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Frame Blender</title>
+<link rel="stylesheet" href="/web/app.css">
+</head>
+<body>
+<h1 id="pageTitle">Frame Blender — nothing loaded</h1>
+  <div class="sub">Overlay (left) + base (right) &rarr; one combined frame of the finished video.</div>
+
+  <div class="row">
+    <div class="panel libpanel">
+      <h3>sarah_clips/libs</h3>
+      <div class="libstatus" id="libStatus">Loading…</div>
+      <div class="libgroups" id="libGroups"></div>
+
+      <div class="libinspector" id="libInspector" hidden>
+        <h4>Frame Selector</h4>
+        <div class="imgwrap checker"><img id="libViewerImg" alt="library frame"></div>
+        <button class="count framepick" id="libPickBtn" title="Copy this frame into the Clip-Gap Builder below">Frame <b id="libN">—</b> / <b id="libTotal">—</b></button>
+        <input type="range" id="libSlider" min="0" max="0" value="0" step="1">
+        <div class="libframerow" id="libFrameRow"></div>
+      </div>
+
+      <div class="libinspector" id="builderPanel" hidden>
+        <h4>Clip-Gap Builder</h4>
+        <div class="imgwrap checker"><img id="builderViewerImg" alt="builder frame"></div>
+        <div class="count">Frame <b id="builderN">—</b> / <b id="builderTotal">—</b></div>
+        <input type="range" id="builderSlider" min="0" max="0" value="0" step="1" disabled>
+        <div class="libframerow" id="builderFrameRow"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Overlay</h3>
+      <div class="imgwrap checker"><img id="overImg" alt="overlay frame"></div>
+      <div class="count">Frame <b id="overN">—</b> / <b id="overTotal">—</b></div>
+    </div>
+
+    <div class="mid">
+      <div id="jumpLabel">Speed</div>
+      <select id="speedSel" title="Single: + combines the current frame, then steps to the next. A speed: + auto-blends one frame after another at that rate until the last frame or until + (now red) is pressed again. Build: + skips the frame-by-frame animation entirely and asks the server to build the real mp4 directly — its own speed, not a chosen fps.">
+        <option value="single" selected>Single (1 click)</option>
+        <option value="4">4 fps</option>
+        <option value="8">8 fps</option>
+        <option value="12">12 fps</option>
+        <option value="25">25 fps</option>
+        <option value="build">Build (real speed)</option>
+      </select>
+      <button class="nav" id="playVideoBtn" disabled title="No built video yet">&#9654; Play video</button>
+    </div>
+
+    <div class="panel">
+      <h3>Base</h3>
+      <div class="imgwrap"><img id="baseImg" alt="base frame"></div>
+      <div class="count">Frame <b id="baseN">—</b> / <b id="baseTotal">—</b></div>
+    </div>
+
+    <div class="panel tlscenes">
+      <h3>Timeline Scenes</h3>
+      <div class="pillrow">
+        <button class="pill" id="tlClearBtn" title="Empty this panel and forget the loaded store. Does not touch any file.">&#128465; Clear</button>
+        <button class="pill" id="tlLoadBtn" title="Load every scene in this pair's store from sandbox/ — the same list and pristine/dirty state the Segment and Avatar Editor shows.">&#128193; Load</button>
+        <button class="pill" id="tlSaveMp4Btn" disabled title="Build a clip first (the speed dropdown's Build option, or the Build MP4 flow) — this saves THAT file into video/sandbox_mp4_scenes/.">&#128190; Save MP4</button>
+      </div>
+      <div class="tlstatus" id="tlStatus">Nothing loaded — click Load.</div>
+      <div class="tlrows" id="tlRows"></div>
+    </div>
+  </div>
+
+  <div class="navrow">
+    <button class="nav" id="prevBtn">&#9664; prev frame</button>
+    <button id="plusBtn" title="Jump to the frame above and combine it">+</button>
+    <button class="nav" id="nextBtn">next frame &#9654;</button>
+  </div>
+  <div class="status" id="status"></div>
+
+  <div class="totals">Combined so far: <b id="combinedCount">0</b> / <b id="totalFrames">—</b> frames</div>
+
+  <div class="resultWrap">
+    <h3>Combined &mdash; this frame, as it lands in the finished mp4</h3>
+    <canvas id="resultCanvas" width="700" height="700"></canvas>
+    <div class="scrub">
+      <input type="range" id="scrubSlider" min="0" max="0" value="0" step="1" disabled>
+      <div id="scrubLabel">No frames combined yet</div>
+    </div>
+  </div>
+
+  <div class="filmstrip" id="filmstrip"></div>
+
+  <div class="status" id="buildStatus"></div>
+  <video id="clipVideo" controls></video>
+
+  <div class="modalback" id="pickBack" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pickTitle">
+      <header>
+        <h3 id="pickTitle">Load</h3>
+        <span class="crumb" id="pickCrumb"></span>
+      </header>
+      <div class="body" id="pickBody"></div>
+      <footer>
+        <button class="pill" id="pickBackBtn" style="flex:0 0 auto" hidden>&#8592; Back</button>
+        <button class="pill" id="pickCancel" style="flex:0 0 auto;margin-left:auto">Cancel</button>
+      </footer>
+    </div>
+  </div>
+
+<script src="/web/app.js"></script>
+</body>
+</html>

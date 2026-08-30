@@ -1,0 +1,231 @@
+:root {
+    --bg: #0f1214; --panel: #171b1e; --border: #3a4248; --text: #dfe4e7;
+    --sub: #8b949c; --accent: #2ecc40; --accent2: #7aa7ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 14px/1.4 -apple-system, system-ui, sans-serif;
+    padding: 20px;
+  }
+  h1 { font-size: 16px; margin: 0 0 4px; }
+  .sub { color: var(--sub); font-size: 12px; margin-bottom: 18px; }
+  .row {
+    display: flex; align-items: flex-start; justify-content: center;
+    gap: 24px; flex-wrap: wrap;
+  }
+  .panel {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px; width: 320px; text-align: center;
+  }
+  .panel h3 { margin: 0 0 10px; font-size: 12px; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--sub); }
+  .imgwrap {
+    width: 100%; aspect-ratio: 1/1; border-radius: 6px; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border);
+  }
+  .imgwrap.checker {
+    background-image:
+      linear-gradient(45deg, #2a2a2a 25%, transparent 25%),
+      linear-gradient(-45deg, #2a2a2a 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #2a2a2a 75%),
+      linear-gradient(-45deg, transparent 75%, #2a2a2a 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    background-color: #1a1a1a;
+  }
+  .imgwrap img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .count { margin-top: 10px; font-size: 13px; }
+  .count b { color: var(--text); font-variant-numeric: tabular-nums; }
+  .mid {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; width: 100px; padding-top: 130px;
+  }
+  #speedSel {
+    width: 108px; background: #0f1214; color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; padding: 9px 6px; text-align: center; font: 13px/1 -apple-system, sans-serif;
+  }
+  #speedSel:disabled { opacity: .5; }
+  #playVideoBtn { width: 108px; padding: 8px 6px; font-size: 12px; }
+  #jumpLabel { font-size: 10px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--sub); text-align: center; }
+  .navrow { display: flex; justify-content: center; align-items: center; gap: 14px; margin: 22px 0 6px; }
+  button.nav {
+    background: #2c3236; color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px 16px; font-size: 13px; cursor: pointer;
+  }
+  button.nav:hover { border-color: var(--accent2); }
+  button.nav:disabled { opacity: .35; cursor: default; }
+  #plusBtn {
+    width: 56px; height: 56px; border-radius: 50%; font-size: 26px;
+    background: var(--accent); color: #06210a; border: none; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(46,204,64,.35);
+  }
+  #plusBtn:active { transform: scale(.94); }
+  /* Red while auto-blending — press again (same button) to stop early. */
+  #plusBtn.running {
+    background: #e0554f; box-shadow: 0 4px 14px rgba(224,85,79,.4);
+  }
+  /* Focus stays on this button after every combine (see the click handler),
+     so a visible ring here is what shows the run-of-frames workflow is
+     ready for the next Enter/Space press. */
+  #plusBtn:focus-visible, #plusBtn:focus {
+    outline: 3px solid var(--accent2); outline-offset: 3px;
+  }
+  .resultWrap { margin-top: 26px; display: flex; flex-direction: column; align-items: center; }
+  .resultWrap h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--sub); margin: 0 0 10px; }
+  #resultCanvas {
+    width: 340px; height: 340px; border-radius: 8px; border: 1px solid var(--border);
+    background:
+      linear-gradient(45deg, #232323 25%, transparent 25%),
+      linear-gradient(-45deg, #232323 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #232323 75%),
+      linear-gradient(-45deg, transparent 75%, #232323 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    background-color: #1a1a1a;
+    display: none;
+  }
+  .status { text-align: center; color: var(--sub); font-size: 12px; margin-top: 12px; min-height: 16px; }
+  .scrub {
+    margin-top: 16px; display: flex; flex-direction: column; align-items: center;
+    gap: 6px; width: 100%;
+  }
+  .scrub input[type=range] { width: 100%; accent-color: var(--accent2); }
+  .scrub input[type=range]:disabled { opacity: .35; }
+  #scrubLabel { font-size: 12px; color: var(--sub); }
+  #scrubLabel b { color: var(--text); font-variant-numeric: tabular-nums; }
+  #buildStatus { text-align: center; color: var(--sub); font-size: 12px; margin-top: 8px; min-height: 16px; }
+  #clipVideo {
+    display: none; margin: 16px auto 0; max-width: 100%; width: 500px;
+    border-radius: 8px; border: 1px solid var(--border);
+  }
+  .filmstrip { margin-top: 24px; display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; max-width: 100%; }
+  .filmstrip div {
+    width: 46px; height: 46px; border-radius: 4px; overflow: hidden;
+    border: 1px solid var(--border); background-size: cover; background-position: center;
+    opacity: .85;
+  }
+  .tlscenes { width: 340px; text-align: left; display: flex; flex-direction: column; }
+  .tlscenes h3 { text-align: center; }
+  .libpanel { width: 260px; text-align: left; display: flex; flex-direction: column; }
+  .libpanel h3 { text-align: center; }
+  .libstatus { font-size: 11.5px; color: var(--sub); margin-bottom: 8px; }
+  .libgroups { display: flex; flex-direction: column; gap: 10px; max-height: 640px; overflow: auto; }
+  .libgroup h4 {
+    margin: 0 0 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--sub);
+  }
+  .libfile {
+    display: flex; align-items: center; justify-content: space-between; gap: 6px;
+    font-size: 11.5px; padding: 3px 6px; border-radius: 4px; border: 1px solid var(--border);
+    background: var(--panel); margin-bottom: 3px;
+  }
+  .libfile input[type=checkbox] { flex: none; margin: 0; accent-color: var(--accent2); }
+  .libfile .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 auto; }
+  .libfile .meta { color: var(--sub); flex: none; font-variant-numeric: tabular-nums; }
+  .libempty { font-size: 11.5px; color: var(--sub); font-style: italic; }
+
+  .libinspector { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .libinspector h4 {
+    margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--sub); text-align: center;
+  }
+  .libinspector .imgwrap { width: 100%; height: 160px; }
+  .libinspector .count { text-align: center; }
+  button.count.framepick {
+    width: 100%; display: block; text-align: center; font-size: 13px; margin-top: 10px;
+    background: #1b2024; color: var(--text); border: 1px solid var(--border);
+    border-radius: 5px; padding: 6px 0; cursor: pointer;
+  }
+  button.count.framepick:hover { border-color: var(--accent2); }
+  button.count.framepick b { color: var(--text); font-variant-numeric: tabular-nums; }
+  #libSlider, #builderSlider { width: 100%; accent-color: var(--accent2); margin-top: 8px; }
+  #builderSlider:disabled { opacity: .35; }
+  .libframerow {
+    margin-top: 8px; display: flex; gap: 3px; flex-wrap: wrap; max-height: 140px;
+    overflow: auto;
+  }
+  .libframe {
+    width: 32px; height: 32px; border-radius: 3px; overflow: hidden; flex: none;
+    border: 1px solid var(--border); background-size: cover; background-position: center;
+    opacity: .8; cursor: pointer;
+  }
+  .libframe:hover { opacity: 1; }
+  .libframe.cur { border-color: var(--accent2); opacity: 1; }
+  .pillrow { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .pill {
+    flex: 1 1 auto; background: #1b2024; color: var(--text); border: 1px solid var(--border);
+    border-radius: 8px; padding: 9px 10px; font-size: 12.5px; cursor: pointer; white-space: nowrap;
+  }
+  .pill:hover { border-color: var(--accent2); }
+  .pill:disabled { opacity: .4; cursor: default; }
+  .tlstatus {
+    font-size: 11.5px; color: var(--sub); border: 1px solid var(--border); border-radius: 6px;
+    padding: 8px 10px; margin-bottom: 10px; min-height: 14px; line-height: 1.4;
+  }
+  .tlrows { display: flex; flex-direction: column; gap: 4px; max-height: 520px; overflow: auto; }
+  .tlrow {
+    display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--panel); font-size: 12px;
+  }
+  .tlrow.cur { border-color: var(--accent2); }
+  .tlrow .n { color: var(--sub); width: 16px; text-align: right; flex: none; }
+  .tlrow .lab { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tlrow .dur { color: var(--sub); flex: none; font-variant-numeric: tabular-nums; }
+  .tlrow .dot {
+    width: 9px; height: 9px; border-radius: 50%; flex: none; background: #3a4248;
+    title: 'pristine';
+  }
+  .tlrow .dot.dirty { background: #e0a93f; box-shadow: 0 0 0 2px rgba(224,169,63,.25); }
+  .tlrow .ibtn {
+    background: #0f1214; color: var(--text); border: 1px solid var(--border); border-radius: 4px;
+    width: 22px; height: 22px; font-size: 12px; cursor: pointer; flex: none; line-height: 1;
+  }
+  .tlrow .ibtn:disabled { opacity: .3; cursor: default; }
+  .tlrow .ibtn.save.dirty { border-color: #e0a93f; color: #ffdc9a; }
+  .totals { text-align: center; margin-top: 16px; font-size: 16px; color: var(--sub); }
+  .totals b { color: var(--accent); }
+  .brightness { margin-top: 6px; font-size: 11px; color: var(--sub); }
+
+/* ── the Load picker ──────────────────────────────────────────────────────
+   A real modal rather than another panel on the page: picking a store and
+   then a video is a two-step decision, and it should sit on top of what you
+   were doing rather than reshuffle it. */
+.modalback {
+  position: fixed; inset: 0; background: rgba(0,0,0,.62);
+  display: flex; align-items: center; justify-content: center; z-index: 50;
+}
+.modalback[hidden] { display: none; }
+.modal {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  width: 520px; max-width: calc(100vw - 40px); max-height: calc(100vh - 80px);
+  display: flex; flex-direction: column; box-shadow: 0 18px 50px rgba(0,0,0,.5);
+}
+.modal header {
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.modal header h3 {
+  margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--text); flex: 1 1 auto;
+}
+.modal .crumb { font-size: 11.5px; color: var(--sub); }
+.modal .body { padding: 12px 16px 16px; overflow: auto; }
+.modal footer {
+  padding: 10px 16px; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.pickitem {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+  background: #1b2024; color: var(--text); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 12px; font-size: 13px; cursor: pointer;
+  margin-bottom: 6px;
+}
+.pickitem:hover { border-color: var(--accent2); }
+.pickitem .biz { color: var(--sub); font-size: 11.5px; }
+.pickitem .meta { margin-left: auto; color: var(--sub); font-size: 11.5px; flex: none; }
+.pickitem:disabled { opacity: .4; cursor: default; }
+.modalmsg { color: var(--sub); font-size: 12px; padding: 6px 2px; }
