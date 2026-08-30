@@ -2268,6 +2268,27 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         src, fps, nb_frames = meta["source"], meta["fps"], meta["nb_frames"]
         if not os.path.isfile(src):
             return self.send_json({"error": f"source no longer exists: {src}"}, 500)
+
+        # STALENESS CHECK. meta.json already stamps the source's size+mtime
+        # from the moment this cache was built — that stamp normally only
+        # changes when THIS save writes it. If it differs now, something
+        # else (another tab, another tool, Frame Blender) already overwrote
+        # this file since this editor session loaded it, and this save is
+        # about to clobber that work with a cache that never saw it. Refused
+        # unless the caller explicitly says `force` — set only after the
+        # browser has shown the user this exact situation and they chose to
+        # overwrite anyway.
+        st = os.stat(src)
+        stale = (st.st_size != meta.get("size") or st.st_mtime != meta.get("mtime"))
+        if stale and not payload.get("force"):
+            return self.send_json({
+                "error": "stale",
+                "message": f"{os.path.basename(src)} changed on disk since this was "
+                           f"loaded here — probably saved from another tab or tool. "
+                           f"Reload it to see the new version, or save again with "
+                           f"force to overwrite it anyway.",
+            }, 409)
+
         frame_map = build_mod.get_frame_map(meta)
         want_frames = len(frame_map)
 

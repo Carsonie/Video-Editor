@@ -2392,17 +2392,21 @@ SEQ_TEMPLATE = """<!doctype html>
       btn.innerHTML = label; }} }};
     busy();
 
-    const done = [], failed = [], warn = [];
+    const done = [], failed = [], warn = [], stale = [];
+    const saveOne = (i, w, force) => fetch('/api/save', {{ method: 'POST',
+        headers: {{ 'Content-Type': 'application/json' }},
+        body: JSON.stringify({{ slug: slugOf(i, w), force }}) }}).then(r => r.json());
     for (const x of withWork) {{
       let ok = true;
       for (const w of x.layers) {{
         let d;
         try {{
-          const r = await fetch('/api/save', {{ method: 'POST',
-            headers: {{ 'Content-Type': 'application/json' }},
-            body: JSON.stringify({{ slug: slugOf(x.i, w) }}) }});
-          d = await r.json();
+          d = await saveOne(x.i, w, false);
         }} catch (e) {{ failed.push(`scene ${{x.n}} ${{w}}: ${{e}}`); ok = false; continue; }}
+        // STALE scenes are set aside rather than asked about one at a time —
+        // a confirm() per scene would mean a wall of popups on a big batch.
+        // They get ONE combined question after this loop finishes.
+        if (d.error === 'stale') {{ stale.push({{i: x.i, n: x.n, w, message: d.message}}); ok = false; continue; }}
         if (d.error) {{ failed.push(`scene ${{x.n}} ${{w}}: ${{d.error}}`); ok = false; continue; }}
         if (d.warning) warn.push(`scene ${{x.n}} ${{w}}: ${{d.warning}}`);
         // This track's file now matches its cache. Marked per TRACK, so a
@@ -2415,6 +2419,25 @@ SEQ_TEMPLATE = """<!doctype html>
       // The undo snapshots go only when the whole scene wrote — one that
       // failed keeps them, so it can be retried or walked back.
       if (ok) {{ histOf(x.n).length = 0; done.push(x.n); }}
+    }}
+
+    if (stale.length) {{
+      const list = stale.map(s => `  scene ${{s.n}}: ${{s.w === 'base' ? 'segment' : 'overlay'}}`).join(`\n`);
+      const overwrite = confirm(
+        `${{stale.length}} track(s) changed on disk since this page loaded them — `
+        + `probably saved from another tab or Frame Blender:\n\n${{list}}\n\n`
+        + `Overwrite them with THIS page's version anyway?`);
+      for (const s of stale) {{
+        if (!overwrite) {{ failed.push(`scene ${{s.n}} ${{s.w}}: ${{s.message}}`); continue; }}
+        let d;
+        try {{ d = await saveOne(s.i, s.w, true); }}
+        catch (e) {{ failed.push(`scene ${{s.n}} ${{s.w}}: ${{e}}`); continue; }}
+        if (d.error) {{ failed.push(`scene ${{s.n}} ${{s.w}}: ${{d.error}}`); continue; }}
+        if (d.warning) warn.push(`scene ${{s.n}} ${{s.w}}: ${{d.warning}}`);
+        setEditedOf(s.i, s.w, false);
+        wrote++; busy();
+        if (!pendingOf(s.i).length) {{ histOf(s.n).length = 0; done.push(s.n); }}
+      }}
     }}
 
     const lineDone = [], lineFailed = [];
@@ -2720,11 +2743,22 @@ SEQ_TEMPLATE = """<!doctype html>
     const done = [], warn = [];
     for (const w of layers) {{
       let d;
-      try {{
-        const r = await fetch('/api/save', {{ method: 'POST',
+      const attempt = force => fetch('/api/save', {{ method: 'POST',
           headers: {{ 'Content-Type': 'application/json' }},
-          body: JSON.stringify({{ slug: slugOf(i, w) }}) }});
-        d = await r.json();
+          body: JSON.stringify({{ slug: slugOf(i, w), force }}) }}).then(r => r.json());
+      try {{
+        d = await attempt(false);
+        // STALE: this file changed on disk since this page loaded it — most
+        // likely another tab or Frame Blender already saved something here.
+        // One extra confirm, then retry with force, rather than silently
+        // overwriting whatever that other save just wrote.
+        if (d.error === 'stale') {{
+          if (!confirm(`${{d.message}}\n\nOverwrite it anyway?`)) {{
+            status(`Save stopped on ${{w}} of scene ${{n}} — ${{d.message}}`);
+            return;
+          }}
+          d = await attempt(true);
+        }}
       }} catch (e) {{ status(`Save failed on ${{w}}: ${{e}}`); return; }}
       if (d.error) {{ status(`Save failed on ${{w}} of scene ${{n}}: ${{d.error}}`); return; }}
       done.push(`${{w === 'base' ? 'segment' : 'overlay'}} ${{d.duration_s}}s`);
