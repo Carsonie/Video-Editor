@@ -1,10 +1,166 @@
-# HANDOFF — bike-demo, "First Time Ordering"
+# HANDOFF
 
-Written 2026-08-28. Covers: migrating this store off the old `final/` layout,
-rebuilding its missing avatar files, and producing a full video that matches
-v1's quality. The reusable procedure (for canoe-demo, alpine-sports, or a
-new store) is in the personal skill **`sae-video-building`** — this file is
-the record of what actually happened here, plus the two things still open.
+Newest work first. One file so there is one place to check for open work.
+
+---
+
+## 2026-08-30 (later) — Frame Blender restructured, and Load actually loads
+
+### What we succeeded on
+
+1. **The root cause of three separate "bugs" turned out to be one shape.**
+   The server used to render the whole page *around* one scene, baking its
+   name, frame counts and file ids into the HTML, and remembering that
+   scene in module globals. That is why Clear could never clear (the scene
+   was the page), why Load could list scenes but never open one (the page
+   could not change scene), and why two tabs would have fought over one
+   remembered pair. Restructured rather than patched again:
+   - **The page ships empty.** `frame_blender/web/index.html` has no scene
+     in it. `SCENE` in `app.js` is the one thing that says what is loaded,
+     and `null` is a normal state.
+   - **The server is stateless.** Every request that acts on a scene names
+     that scene. `/api/clear` was deleted — there is nothing left to clear.
+   - **Clear is now one line** (`SCENE = null`), not three patches.
+2. **Split out of the Python string.** `player.py` (755 lines of HTML+CSS+JS
+   inside a `str.format()` template, every brace doubled) is gone, replaced
+   by real `web/index.html`, `web/app.css`, `web/app.js`. `node --check`
+   works on the JS now — and immediately found a **real syntax error** that
+   had been shipping silently, because nothing can lint code trapped in a
+   Python string.
+3. **Browser caching was part of the "same problem???" round.** `app.js` is
+   served `no-store` now, with a test asserting it. A fix that silently did
+   not apply is worse than no fix.
+4. **Load actually loads — a two-step popup.** Pick a store (all four, read
+   from `Customers/`), then pick one of that store's video folders, then it
+   loads **every scene in that video's `sandbox/` plus its `script.json`**
+   and opens the first scene. Back / Cancel / click-outside / Esc all work.
+   - `1000_archive` is excluded **by rule, not by name** — a scene folder
+     is `<digits>-<label>`, so `z_History`, `_builds` and any future sibling
+     are skipped by the same rule with nothing to maintain. Asserted in the
+     suite.
+   - The loaded `script.json` is visible: hover a scene row to see the line
+     Sarah says over it, and the status line reports how many lines loaded.
+   - Clicking a scene row switches the viewer to that scene. That is what
+     "Load" always implied and never did.
+5. **Tests: 217/217 passing** (was 192). The Frame Blender suite went 25 →
+   50 checks, including new steps asserting the page ships empty, that the
+   server is genuinely stateless, and that the Load picker behaves.
+
+### What's still open
+
+1. **`tests/test_frame_blender.py` writes into a REAL store.** `build_clip`
+   and `save_mp4` need release-shaped footage (1152² canvas, an avatar clip
+   carrying a voice track) and the disposable fixture is deliberately
+   lighter than that, so those two steps borrow bike-demo's scene 1. The
+   run cleans up after itself and only ever reads that scene — but a
+   fixture that could stand in for a real release build would be better.
+2. **Undo is still a disabled icon** in Frame Blender's scene rows. It
+   needs a snapshot of the previous state, and this tool has no edit action
+   of its own yet that would create one.
+3. Everything under "What's still open" in the section below is unchanged —
+   **scene 1's frozen tail is still frozen**, and that is still the next
+   real piece of work.
+
+---
+
+## 2026-08-30 (earlier) — Frame Blender gains real teeth, and ski-demo scene 1's fix is half-done
+
+### What we succeeded on
+
+1. **Cross-tool save safety.** `/api/save` now refuses to overwrite a file
+   that changed on disk since its cache was built (another tab, or Frame
+   Blender, already saved something here) — a 409 unless the caller passes
+   `force`. Shared by both editors, not duplicated. Verified against the
+   live server: a normal save is unaffected, a real conflict is refused,
+   force overrides it correctly.
+2. **Frame Blender is no longer read-only.** Added, and each piece proven
+   against a real server, not just written:
+   - A **Timeline Scenes** panel reading the SAME per-scene pristine/dirty
+     state the main editor computes — proven end to end: edited a scene in
+     the main editor, watched it show dirty here, saved it from here,
+     confirmed the file on disk actually changed.
+   - **Clear / Load / Save MP4** buttons. Save MP4 writes a real, dated,
+     versioned copy into `video/sandbox_mp4_scenes/`.
+   - A **"Build (real speed)"** option that skips the frame-by-frame
+     animation and asks the server to build the real mp4 directly, plus a
+     **Play video** button and a full-width scrub slider through every
+     combined frame.
+   - A **sarah_clips/libs** viewer panel, read-only, listing whatever's in
+     the library for the open store.
+3. **Two real bugs, found only by testing for real, both fixed:**
+   - Any error message containing an em dash (this whole codebase's own
+     writing style) crashed Frame Blender's server outright —
+     `http.server`'s `send_error()` encodes into latin-1. Existed since the
+     very first version of the "Build" feature, not just from this session.
+     Replaced every error response with a proper JSON one.
+   - Save MP4's versioning never actually incremented — it asked
+     `archive_name_v()` for a bare name with no extension to match against
+     files that all had `.mp4` on them, so it silently found "no existing
+     versions" every time and handed out `v1` forever. Fixed with an
+     extension-aware version scan; regression-tested.
+   - The **Clear button** only reset the Timeline Scenes list, not the
+     actual frame viewer, filmstrip, or build state — found by Carson
+     directly. Fixed to wipe everything reachable from the page; confirmed
+     with a real screenshot after a real click.
+4. **Testing and logging, both upgraded for real.** A new
+   `tests/test_frame_blender.py` (25 checks, starts both servers for real)
+   plus 2 new checks in the main suite for the staleness behavior — **192/192
+   passing**. Frame Blender's own actions (Build, Save MP4, Load) now write
+   into the SAME daily session log the main editor already keeps.
+5. **`sarah_clips/libs/` exists for ski-demo** — idle footage, still poses,
+   and a generic transition, copied in from the shared `Sarah/` reference
+   folder (nothing moved, nothing that already worked was touched). Its own
+   README documents exactly what's there, and confirms **no 5-second idle
+   render exists anywhere** — only 10s and 20s, checked directly.
+6. **`build/sarah_transitions.py`** — three reusable pieces, each run against
+   real ski-demo footage and verified, not just written:
+   - `gap_filler()` — a fixed-length, corner-composited slice of idle
+     footage, on the same canvas a scene's `avatar.webm` actually uses.
+   - `opening_transition()` / `closing_transition()` — a fixed 5-frame blend
+     either side of a gap-filler. **Caught a real bug here**: the first
+     Closing attempt blended against the "-full-" still (the tall
+     full-figure portrait) instead of the "-corner-" crop, and Sarah
+     stretched across nearly the whole frame instead of staying in her
+     corner. Checked pixel-by-pixel, found it, fixed the function to
+     require the corner variant, and made it **refuse outright** if handed
+     the wrong one again.
+
+### What's still open
+
+1. **Scene 1's frozen tail (frames 442–482) is still frozen.** Nothing was
+   changed on the real file — the whole exercise ran against a throwaway
+   `/tmp/avatar_candidate.webm`, confirmed never to have touched
+   `sandbox/01-opening-with-login/avatar.webm`. The math is confirmed
+   correct: 441 real frames + 5 opening + **31**-frame filler + 5 closing =
+   482, matching the file exactly. A real second bug was found while
+   assembling it — the concatenated result's audio track ran ~1.6s longer
+   than its video (the same class of drift this codebase's own "four
+   rules" warn about) — and a fix (`atrim` then `apad` to the video's exact
+   frame-counted length) is written into `replace_frozen_tail()` in
+   `build/sarah_transitions.py`, but **was not re-run or re-verified**
+   before this was stopped. Next session: rerun the `replace-tail`
+   subcommand, confirm frame count is 482 **and** duration is ~19.28s
+   (matching the untouched original), only then back up and swap in the
+   real file.
+2. **Opening/Closing/gap-filler are command-line only** — not wired into
+   Frame Blender's UI yet.
+3. **Only one gap-filler is saved to the library** — `gap-filler-1.0s.webm`
+   (25 frames). None of the four originally-planned standard sizes
+   (0.5/1/1.5/2s) exist yet, and the 31-frame one scene 1 actually needs
+   was built inside a temp folder during the interrupted run, not saved.
+4. A **crossfade feature is mid-development** in `build/assemble_video.py`
+   by someone else — still sitting uncommitted, still not ours to touch or
+   commit over.
+
+---
+
+## 2026-08-28 — bike-demo, "First Time Ordering"
+
+Covers: migrating this store off the old `final/` layout, rebuilding its
+missing avatar files, and producing a full video that matches v1's quality.
+The reusable procedure (for canoe-demo, alpine-sports, or a new store) is in
+the personal skill **`sae-video-building`** — this section is the record of
+what actually happened here, plus the two things still open.
 
 ---
 
