@@ -14,6 +14,17 @@ folders — and receives finished videos.
 
 ---
 
+## When Carson asks for a "vtt" / "VTT"
+
+Read **`.claude/skills/vtt/SKILL.md`** first, every time. It is the source of
+truth for what "show me the vtt" means (a combined table — timing, frame
+counts, and the narration line under each row — not `vtt.py`'s plain output),
+and it also defines the EVTT (the editor's own live panel) as a separate,
+third thing. Don't rebuild this from memory of a past answer; the skill is
+the one place this is written down, and it can change.
+
+---
+
 ## ⚠ Money: ask before every HeyGen render
 
 `build/render_narration.py` is the **only** thing here that spends real money —
