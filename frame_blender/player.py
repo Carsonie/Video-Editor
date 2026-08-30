@@ -72,6 +72,7 @@ TEMPLATE = """<!doctype html>
     border-radius: 6px; padding: 9px 6px; text-align: center; font: 13px/1 -apple-system, sans-serif;
   }}
   #speedSel:disabled {{ opacity: .5; }}
+  #playVideoBtn {{ width: 108px; padding: 8px 6px; font-size: 12px; }}
   #jumpLabel {{ font-size: 10px; text-transform: uppercase; letter-spacing: .08em;
     color: var(--sub); text-align: center; }}
   .navrow {{ display: flex; justify-content: center; align-items: center; gap: 14px; margin: 22px 0 6px; }}
@@ -113,7 +114,20 @@ TEMPLATE = """<!doctype html>
     display: none;
   }}
   .status {{ text-align: center; color: var(--sub); font-size: 12px; margin-top: 12px; min-height: 16px; }}
-  .filmstrip {{ margin-top: 24px; display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; max-width: 900px; }}
+  .scrub {{
+    margin-top: 16px; display: flex; flex-direction: column; align-items: center;
+    gap: 6px; width: 100%;
+  }}
+  .scrub input[type=range] {{ width: 100%; accent-color: var(--accent2); }}
+  .scrub input[type=range]:disabled {{ opacity: .35; }}
+  #scrubLabel {{ font-size: 12px; color: var(--sub); }}
+  #scrubLabel b {{ color: var(--text); font-variant-numeric: tabular-nums; }}
+  #buildStatus {{ text-align: center; color: var(--sub); font-size: 12px; margin-top: 8px; min-height: 16px; }}
+  #clipVideo {{
+    display: none; margin: 16px auto 0; max-width: 100%; width: 500px;
+    border-radius: 8px; border: 1px solid var(--border);
+  }}
+  .filmstrip {{ margin-top: 24px; display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; max-width: 100%; }}
   .filmstrip div {{
     width: 46px; height: 46px; border-radius: 4px; overflow: hidden;
     border: 1px solid var(--border); background-size: cover; background-position: center;
@@ -137,13 +151,15 @@ TEMPLATE = """<!doctype html>
 
     <div class="mid">
       <div id="jumpLabel">Speed</div>
-      <select id="speedSel" title="Single: + combines the current frame, then steps to the next. A speed: + auto-blends one frame after another at that rate until the last frame or until + (now red) is pressed again.">
+      <select id="speedSel" title="Single: + combines the current frame, then steps to the next. A speed: + auto-blends one frame after another at that rate until the last frame or until + (now red) is pressed again. Build: + skips the frame-by-frame animation entirely and asks the server to build the real mp4 directly — its own speed, not a chosen fps.">
         <option value="single" selected>Single (1 click)</option>
         <option value="4">4 fps</option>
         <option value="8">8 fps</option>
         <option value="12">12 fps</option>
         <option value="25">25 fps</option>
+        <option value="build">Build (real speed)</option>
       </select>
+      <button class="nav" id="playVideoBtn" disabled title="No built video yet">&#9654; Play video</button>
     </div>
 
     <div class="panel">
@@ -165,9 +181,16 @@ TEMPLATE = """<!doctype html>
   <div class="resultWrap">
     <h3>Combined &mdash; this frame, as it lands in the finished mp4</h3>
     <canvas id="resultCanvas" width="700" height="700"></canvas>
+    <div class="scrub">
+      <input type="range" id="scrubSlider" min="0" max="0" value="0" step="1" disabled>
+      <div id="scrubLabel">No frames combined yet</div>
+    </div>
   </div>
 
   <div class="filmstrip" id="filmstrip"></div>
+
+  <div class="status" id="buildStatus"></div>
+  <video id="clipVideo" controls></video>
 
 <script>
   const MAXN = {max_n};
@@ -213,8 +236,11 @@ TEMPLATE = """<!doctype html>
 
   // Returns once BOTH layers are actually painted, so a caller that wants
   // the finished picture (the filmstrip thumbnail, below) can wait for it
-  // instead of reading the canvas mid-draw.
-  function drawCombined() {{
+  // instead of reading the canvas mid-draw. Takes an explicit frame number
+  // rather than always reading the global `n`, so the scrub slider (below)
+  // can redraw an already-combined frame for review without disturbing
+  // whichever frame the nav buttons are currently sitting on.
+  function drawCombinedAt(fn) {{
     return new Promise(resolve => {{
       const b = new Image(), o = new Image();
       let loaded = 0;
@@ -227,9 +253,10 @@ TEMPLATE = """<!doctype html>
         resolve();
       }};
       b.onload = done; o.onload = done;
-      b.src = BASE(Math.min(n, {base_n})); o.src = OVER(Math.min(n, {over_n}));
+      b.src = BASE(Math.min(fn, {base_n})); o.src = OVER(Math.min(fn, {over_n}));
     }});
   }}
+  const drawCombined = () => drawCombinedAt(n);
 
   // Combine the CURRENT frame (n) and step to the next one, leaving the
   // canvas/status showing what was just built (see showFrame()'s own
@@ -251,11 +278,80 @@ TEMPLATE = """<!doctype html>
       tile.style.backgroundImage = `url(${{canvas.toDataURL('image/jpeg', 0.85)}})`;
       tile.title = `frame ${{n}}`;
       strip.appendChild(tile);
+      updateScrub();
     }}
     status.textContent = `Frame ${{n}} combined.`;
     const hadNext = n < MAXN;
     if (hadNext) {{ n++; showFrame(); }}
     return hadNext;
+  }}
+
+  // The scrub slider walks the frames that have ACTUALLY been combined so
+  // far, in order — not the full 1..MAXN range, since most of that may not
+  // exist yet. Its position is an index into that sorted list, not a frame
+  // number itself, so it always spans exactly "first combined" to "last
+  // combined" with no dead space on either end.
+  const scrubSlider = document.getElementById('scrubSlider');
+  const scrubLabel = document.getElementById('scrubLabel');
+
+  function combinedSorted() {{
+    return [...combined].sort((a, b) => a - b);
+  }}
+
+  function scrubTo(idx) {{
+    const arr = combinedSorted();
+    if (!arr.length) return;
+    idx = Math.max(0, Math.min(idx, arr.length - 1));
+    scrubSlider.value = idx;
+    const frameNum = arr[idx];
+    scrubLabel.innerHTML = `Frame <b>${{frameNum}}</b> &middot; ${{idx + 1}} / ${{arr.length}} combined`;
+    canvas.style.display = 'block';
+    drawCombinedAt(frameNum);
+  }}
+
+  // Called every time a new frame joins `combined` — grows the slider's
+  // range and jumps it to the frame just built, so running a batch (the
+  // auto-blend speeds above) tracks live, and once it stops you can drag
+  // back through everything it made.
+  function updateScrub() {{
+    const arr = combinedSorted();
+    scrubSlider.disabled = arr.length === 0;
+    scrubSlider.max = Math.max(0, arr.length - 1);
+    if (arr.length) scrubTo(arr.length - 1);
+  }}
+
+  scrubSlider.oninput = () => scrubTo(+scrubSlider.value);
+
+  const buildStatus = document.getElementById('buildStatus');
+  const clipVideo = document.getElementById('clipVideo');
+  const playVideoBtn = document.getElementById('playVideoBtn');
+
+  // Only ever enabled once a real, playable video exists — disabled the
+  // moment a new build starts (the old file is about to be replaced) and
+  // re-enabled only once the new one has actually landed.
+  playVideoBtn.onclick = () => {{
+    clipVideo.scrollIntoView({{behavior: 'smooth', block: 'center'}});
+    clipVideo.play();
+  }};
+
+  // The one real request to the server behind the "Build" dropdown choice
+  // — picture + voice together in a single ffmpeg pass. Its running time
+  // is however long THAT takes, not a chosen fps: there is no per-frame
+  // delay to configure here, unlike the browser-side auto-blend.
+  async function buildClip(want) {{
+    playVideoBtn.disabled = true;
+    playVideoBtn.title = 'Building...';
+    buildStatus.textContent = `Building ${{want}} frame(s) — picture and her voice, in one pass...`;
+    clipVideo.style.display = 'none';
+    const res = await fetch(`/build_clip?n=${{want}}`);
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    clipVideo.src = data.url + `?t=${{Date.now()}}`;   // cache-bust a rebuild at the same N
+    clipVideo.style.display = 'block';
+    buildStatus.textContent = `Built ${{data.frames}} frame(s) — playable above.`;
+    playVideoBtn.disabled = false;
+    playVideoBtn.title = 'Play the built video';
+    return data;
   }}
 
   const plusBtn = document.getElementById('plusBtn');
@@ -284,17 +380,44 @@ TEMPLATE = """<!doctype html>
     setRunning(false);
   }}
 
+  // Build the WHOLE scene (frame 1 through MAXN) via the server, and mark
+  // every one of those frames as combined here too — so the filmstrip count,
+  // the totals line and the scrub slider all agree with reality afterward,
+  // even though this path never drew them one at a time in the browser.
+  // Not stoppable like the fps loop below: it's one request, not a series of
+  // waits, so there's nothing meaningful for a second click to interrupt.
+  async function runBuild() {{
+    plusBtn.disabled = true;
+    speedSel.disabled = true;
+    try {{
+      await buildClip(MAXN);
+      for (let f = 1; f <= MAXN; f++) combined.add(f);
+      document.getElementById('combinedCount').textContent = combined.size;
+      updateScrub();
+      n = MAXN;
+      render();
+    }} catch (e) {{
+      buildStatus.textContent = `Build failed: ${{e.message}}`;
+    }} finally {{
+      plusBtn.disabled = false;
+      speedSel.disabled = false;
+    }}
+  }}
+
   // Single mode: exactly the old one-click-one-frame behaviour, focus kept
   // on + so a run of manual clicks (or repeated Enter/Space) still works.
   // A speed selected instead turns + into a start/stop toggle for
   // runAuto() — press once to start blending at that rate, press the same
-  // (now red) button again to stop early.
+  // (now red) button again to stop early. Build skips that animation
+  // entirely: its pace is the ffmpeg process, not a chosen fps.
   plusBtn.onclick = async () => {{
     if (running) {{ running = false; return; }}   // this click is the STOP
     const speed = speedSel.value;
     if (speed === 'single') {{
       await combineCurrentFrame();
       plusBtn.focus();
+    }} else if (speed === 'build') {{
+      runBuild();   // not awaited — button disables itself for its own duration
     }} else {{
       runAuto(+speed);   // not awaited — a stop click must reach the loop above
     }}

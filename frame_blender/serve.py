@@ -34,11 +34,67 @@ import urllib.parse
 HERE = os.path.dirname(os.path.abspath(__file__))       # <repo>/frame_blender
 ROOT = os.path.dirname(HERE)                             # <repo>
 CACHE = os.path.join(ROOT, "cache")                       # SAME cache the editor uses
+PREVIEWS = os.path.join(CACHE, "_previews")               # this tool's own mp4 output
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "shared"))
+sys.path.insert(0, os.path.join(ROOT, "build"))
 import frames as build_mod                               # noqa: E402
 from serve import safe_join, CUSTOMERS_ROOT               # noqa: E402
 import player as fb_player                                # noqa: E402
+import build_scenes                                       # noqa: E402  reuse its real ffmpeg recipe
+
+# The pair currently open in the browser — set by open_pair(), read by
+# build_clip(). This tool only ever shows one pair at a time (see the
+# module docstring), so a global is the actual state, not a shortcut.
+LAST_BASE = None
+LAST_OVER = None
+
+
+def build_preview_clip(seg, av, n, out):
+    """
+    The SAME one-pass recipe build_scenes.py uses for a real release build —
+    picture and voice combined in a single ffmpeg call, never two passes —
+    just capped to the first `n` frames instead of the whole scene. Reuses
+    build_scenes' own probe()/run()/CANVAS/FPS rather than re-typing them,
+    so this can't quietly drift from the tool that makes the real thing.
+
+    `n` is clamped to the avatar's actual frame count — asking for more
+    frames than exist would either error deep in ffmpeg or silently hold
+    on nothing, neither of which says "you asked for too many" plainly.
+    """
+    B, P, R = build_scenes, build_scenes.probe, build_scenes.run
+    CANVAS, FPS = B.CANVAS, B.FPS
+
+    avail, _, aw, ah, _ = P(av, alpha=True)
+    n = max(1, min(n, avail))
+    if (aw, ah) != (CANVAS, CANVAS):
+        return None, f"avatar is {aw}x{ah}, expected {CANVAS}x{CANVAS}"
+
+    _, _, sw, sh, _ = P(seg)
+    vf = ["setpts=PTS-STARTPTS"]
+    if (sw, sh) != (CANVAS, CANVAS):
+        vf.append(f"scale={CANVAS}:-2")
+        vf.append(f"pad={CANVAS}:{CANVAS}:(ow-iw)/2:(oh-ih)/2:color=black")
+    vf.append("setsar=1")
+    vf.append("tpad=stop_mode=clone:stop_duration=60")   # hold if footage runs short
+
+    dur = n / FPS
+    R(["ffmpeg", "-v", "error",
+       "-i", seg,
+       "-c:v", "libvpx-vp9", "-i", av,          # the decoder MUST precede -i
+       "-filter_complex",
+       f"[0:v]{','.join(vf)}[bg];"
+       f"[1:v]setpts=PTS-STARTPTS,format=yuva420p[fg];"
+       f"[bg][fg]overlay=0:0:format=auto[v]",
+       "-map", "[v]",
+       "-map", "1:a",
+       "-af", f"apad=whole_dur={dur:.6f}",       # pad HER VOICE to the picture's exact length
+       "-frames:v", str(n),                      # -frames:v, never -t — see build_scenes.py
+       "-c:v", "libx264", "-preset", "medium", "-crf", "20",
+       "-pix_fmt", "yuv420p", "-r", str(FPS),
+       "-c:a", "aac", "-b:a", "128k",
+       "-movflags", "+faststart", "-y", out])
+    return n, None
 
 # The default pair this tool was built to chase down — ski-demo scene 1's
 # blank-background-at-the-start finding. Overridable via ?base=&overlay=.
@@ -53,6 +109,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         parsed = urllib.parse.urlsplit(self.path)
         if parsed.path == "/":
             return self.open_pair(urllib.parse.parse_qs(parsed.query))
+        if parsed.path == "/build_clip":
+            return self.build_clip(urllib.parse.parse_qs(parsed.query))
         return super().do_GET()   # frame images, served from CACHE (see main())
 
     def open_pair(self, qs):
@@ -64,6 +122,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.send_error(400, f"not a file under Customers/: {base_rel}")
         if over_p is None or not os.path.isfile(over_p):
             return self.send_error(400, f"not a file under Customers/: {over_rel}")
+
+        global LAST_BASE, LAST_OVER
+        LAST_BASE, LAST_OVER = base_p, over_p
 
         # Same extraction every player already uses — box=750 matches the
         # editors' own default, alpha_png=True on the overlay so its real
@@ -83,6 +144,47 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         body = html.encode()
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def build_clip(self, qs):
+        """
+        GET /build_clip?n=<N> -> {"url": "/_previews/preview_N.mp4", "frames": N}
+
+        Builds a REAL mp4 of the first N frames of the pair currently open in
+        the browser — same one-pass picture+voice recipe as a production
+        build (see build_preview_clip's own docstring), just short. Exists so
+        "run 100 frames, then look at them as an actual video" doesn't need
+        the full scene finished first.
+        """
+        if LAST_BASE is None or LAST_OVER is None:
+            return self.send_error(400, "no pair open yet — load / first")
+        try:
+            n = int((qs.get("n") or [""])[0])
+        except ValueError:
+            return self.send_error(400, "n must be an integer frame count")
+        if n < 1:
+            return self.send_error(400, "n must be at least 1")
+
+        os.makedirs(PREVIEWS, exist_ok=True)
+        out = os.path.join(PREVIEWS, f"preview_{n}.mp4")
+        try:
+            got, err = build_preview_clip(LAST_BASE, LAST_OVER, n, out)
+        except SystemExit as e:
+            # build_scenes.run() exits the process on an ffmpeg failure — the
+            # right call in a one-shot CLI tool, the wrong one inside a
+            # request thread. Turn it back into an HTTP error instead of
+            # letting it kill this request's thread silently.
+            return self.send_error(500, str(e))
+        if err:
+            return self.send_error(400, err)
+
+        import json
+        body = json.dumps({"url": f"/_previews/{os.path.basename(out)}",
+                            "frames": got}).encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
