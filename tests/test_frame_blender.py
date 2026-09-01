@@ -28,8 +28,10 @@ WHAT THIS PROVES THAT test_editor.py CANNOT
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.parse
@@ -202,6 +204,16 @@ REAL_SEG = f"{REAL_STORE_REL}/sandbox/01-login/segment.mp4"
 REAL_AV = f"{REAL_STORE_REL}/sandbox/01-login/avatar.webm"
 SAVE_MP4_DIR = os.path.join(fixture.CUSTOMERS, REAL_STORE_REL, "video", "sandbox_mp4_scenes")
 
+# ski-demo is the one store with a real sarah_clips/libs/ — the Frame
+# Selector's own library — so these three tests borrow it the same way the
+# builds above borrow bike-demo. Read-only: /api/lib_frames only ever
+# EXTRACTS into cache/, it never writes into Customers/ itself.
+SKI_STORE_REL = "Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering"
+SKI_SEG = f"{SKI_STORE_REL}/sandbox/01-intro-and-login/segment.mp4"
+SKI_AV = f"{SKI_STORE_REL}/sandbox/01-intro-and-login/avatar.webm"
+SKI_LIB_CLIP = f"{SKI_STORE_REL}/sarah_clips/libs/gap-fillers/gap-filler-1.0s.webm"
+SKI_LIB_STILL = f"{SKI_STORE_REL}/sarah_clips/libs/stills/sarah-rest-pose-corner-300-alpha.png"
+
 
 def s_build_clip():
     step("/build_clip — the real one-pass picture+voice build")
@@ -250,6 +262,74 @@ def s_save_mp4_versions():
     SAVED_NAMES = names
 
 
+def s_libs_list_paths():
+    """
+    Each file /api/libs_list returns now carries its own `path` (relative
+    to Customers/), added specifically so the Frame Selector can hand it
+    straight to /api/lib_frames. A name alone can't do that — two different
+    library folders can hold a file with the same name.
+    """
+    step("/api/libs_list — every file carries a real, resolvable path")
+    d, code = fb_get("/api/libs_list", base=SKI_SEG, overlay=SKI_AV)
+    eq("200", code, 200)
+    files = [f for g in d.get("groups", []) for f in g.get("files", [])]
+    check("finds real library files", len(files) > 0, len(files))
+    check("every file has a path", all("path" in f for f in files), files[:1])
+    sample = files[0]
+    check("that path is a real file under Customers/",
+          os.path.isfile(os.path.join(fixture.CUSTOMERS, sample["path"])),
+          sample["path"])
+
+
+def s_lib_frames_clip():
+    """
+    /api/lib_frames on a real clip — the Frame Selector's own backend.
+    Goes through the SAME extraction every OVERLAY track already uses
+    (alpha_png=True, since every file in this library is a transparent
+    Sarah render), so its frames must be servable the identical way.
+    """
+    step("/api/lib_frames — a real .webm clip")
+    d, code = fb_get("/api/lib_frames", path=SKI_LIB_CLIP)
+    eq("200", code, 200)
+    eq("kind is clip", d.get("kind"), "clip")
+    check("has a real, multi-frame count", isinstance(d.get("n"), int) and d["n"] > 1, d.get("n"))
+    check("names a real cache slug", bool(d.get("slug")), d.get("slug"))
+    eq("frames are alpha PNGs, like any overlay track", d.get("ext"), ".png")
+
+    url = f"{FB_BASE}/{d['slug']}/frames/frame_00001{d['ext']}"
+    r = urllib.request.urlopen(url, timeout=10)
+    eq("frame 1 is really servable at that URL", r.status, 200)
+
+    _, code2 = fb_get("/api/lib_frames")
+    eq("a missing path is refused", code2, 400)
+    _, code3 = fb_get("/api/lib_frames", path="not/a/real/file.webm")
+    eq("a path that isn't a real file is refused, not a crash", code3, 400)
+
+
+def s_lib_frames_still():
+    """
+    A still has no frames to extract — it gets a hand-built ONE-frame cache
+    entry instead (see lib_frames()'s own docstring), so the page can
+    address it through the exact same slug+frame URL scheme as a real
+    clip, with no second code path in app.js just for stills.
+    """
+    step("/api/lib_frames — a still image gets a one-frame cache entry")
+    d, code = fb_get("/api/lib_frames", path=SKI_LIB_STILL)
+    eq("200", code, 200)
+    eq("kind is still", d.get("kind"), "still")
+    eq("exactly one frame", d.get("n"), 1)
+    eq("keeps its own PNG extension", d.get("ext"), ".png")
+
+    url = f"{FB_BASE}/{d['slug']}/frames/frame_00001{d['ext']}"
+    r = urllib.request.urlopen(url, timeout=10)
+    eq("that one frame is really servable", r.status, 200)
+
+    # Asking again must reuse the same cache entry, not duplicate or rebuild it.
+    d2, code2 = fb_get("/api/lib_frames", path=SKI_LIB_STILL)
+    eq("asking again still answers 200", code2, 200)
+    eq("same slug both times", d2.get("slug"), d.get("slug"))
+
+
 def s_stateless():
     """
     The restructure's actual promise: this server remembers no scene. A
@@ -282,8 +362,39 @@ def s_static_page():
     eq("app.js is no-store", r.headers.get("Cache-Control"), "no-store")
 
 
-FUNCTIONS = [s_static_page, s_stateless, s_load_picker, s_load_store, s_save_scene_proxy,
-             s_build_clip, s_save_mp4_versions]
+def s_app_js_parses():
+    """
+    The exact gap test_editor.py's own s_pages_parse() exists to close, for
+    THIS page: every check in this whole file drives HTTP, so a script that
+    throws on load would still answer every endpoint perfectly and this
+    suite would stay green regardless — it happened here for real, twice,
+    both times a syntax error that Python (there is none, in a static .js
+    file) could never have caught: doubled backslash-escapes surviving the
+    2026-08-30 extraction out of player.py's template, and later a modal's
+    markup sitting after its own <script> tag. Fetches the REAL served
+    file, not the one on disk, so a serving bug is caught too.
+    """
+    step("web/app.js — does the JavaScript actually parse?")
+    node = shutil.which("node")
+    if node is None:
+        check("node is available to parse it", False,
+              "install node, or this can never catch a broken page again")
+        return
+    js = urllib.request.urlopen(FB_BASE + "/web/app.js", timeout=10).read().decode()
+    tmp = os.path.join(tempfile.gettempdir(), "fb_app_check.js")
+    with open(tmp, "w") as fh:
+        fh.write(js)
+    r = subprocess.run([node, "--check", tmp], capture_output=True, text=True)
+    os.remove(tmp)
+    first = (r.stderr or "").strip().split("\n")
+    check("app.js parses", r.returncode == 0,
+          f"{len(js)} bytes" if r.returncode == 0
+          else next((l for l in first if "Error" in l), first[0] if first else ""))
+
+
+FUNCTIONS = [s_static_page, s_app_js_parses, s_stateless, s_load_picker, s_load_store,
+             s_save_scene_proxy, s_build_clip, s_save_mp4_versions,
+             s_libs_list_paths, s_lib_frames_clip, s_lib_frames_still]
 
 
 def main():

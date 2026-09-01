@@ -27,6 +27,147 @@
   const pairQS = () => new URLSearchParams(
       {base: SCENE.base_rel, overlay: SCENE.over_rel}).toString();
 
+  // ── persistence (the browser's own storage, not the server) ────────────────
+  // The server is deliberately stateless (2026-08-30 restructure, so two tabs
+  // can't fight over one remembered pair) — which also means it never had
+  // anywhere to remember Frame Selector picks, Clip-Gap Builder frames, or a
+  // Load result. Before this, a refresh silently threw all of that away; the
+  // only thing that ever survived was the open pair itself, and only by
+  // accident, because it happens to sit in the page's own URL.
+  //
+  // localStorage survives a refresh AND closing the tab, until something
+  // clears it — which here is only ever the Clear button (see showEmpty()).
+  // Wrapped in try/catch because storage can be unavailable (private
+  // browsing, quota) and that should degrade to "nothing persists this
+  // session," never a broken page.
+  const STORAGE_KEY = 'frameBlender.v1';
+  const pairKey = (baseRel, overRel) => `${baseRel}::${overRel}`;
+
+  function loadStore() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {pairs: {}};
+    } catch (e) { return {pairs: {}}; }
+  }
+  function saveStore(patch) {
+    try {
+      const cur = loadStore();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({...cur, ...patch}));
+    } catch (e) { /* storage unavailable — work continues, just unsaved */ }
+  }
+  function savePair(key, patch) {
+    const cur = loadStore();
+    cur.pairs = cur.pairs || {};
+    cur.pairs[key] = {...(cur.pairs[key] || {}), ...patch};
+    saveStore(cur);
+  }
+  function clearStore() {
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+  }
+
+  // The three things that are NOT tied to one scene: the Clip-Gap Builder's
+  // collection, the last Load result, and which view was showing. Called
+  // after every showEmpty()-driven reset (both a plain refresh and an
+  // in-session scene switch go through showEmpty() first, via openPair()) —
+  // NOT called by Clear, which empties storage first so there is nothing
+  // left for this to bring back.
+  function restoreGlobals() {
+    const s = loadStore();
+    if (Array.isArray(s.builderFrames) && s.builderFrames.length) {
+      BUILDER_FRAMES = s.builderFrames;
+      rebuildBuilderFrames(BUILDER_FRAMES.length - 1);
+    }
+    // Guarded on STORE_SCENES already being empty — showEmpty() does NOT
+    // reset it (see showEmpty()'s own comment on what it deliberately
+    // leaves alone), so loadVideo() calling this right after setting it
+    // fresh must not stomp that with the same data relabeled "restored".
+    if (s.storeScenes && !STORE_SCENES) {
+      STORE_SCENES = s.storeScenes;
+      SCRIPT = s.script || null;
+      tlRender();
+      tlStatus.textContent += ' (restored)';
+    }
+    if (s.gapBuilderView) setView(true);
+  }
+
+  // Frame Selector picks and frame-stepping progress ARE tied to one scene —
+  // restored once that scene's own pair is open, keyed the same way a save
+  // for it is: base_rel + over_rel, so re-opening the SAME scene later in
+  // the same session (not just after a refresh) brings its own work back.
+  //
+  // Called only from an explicit check/uncheck (toggleLibClip) — never from
+  // rebuildLibFrames() itself, which also runs during the RESET at the
+  // start of loading a pair (PICKED = [] before restorePairProgress() gets
+  // a chance to read what was saved), and saving there would overwrite the
+  // very data a refresh is about to restore before restore can read it.
+  function savePickedForCurrentPair() {
+    if (!SCENE) return;
+    savePair(pairKey(SCENE.base_rel, SCENE.over_rel), {picked: PICKED});
+  }
+  function saveProgressForCurrentPair() {
+    if (!SCENE) return;
+    savePair(pairKey(SCENE.base_rel, SCENE.over_rel), {n, combined: [...combined]});
+  }
+  async function restorePairProgress() {
+    if (!SCENE) return;
+    const rec = loadStore().pairs?.[pairKey(SCENE.base_rel, SCENE.over_rel)];
+    if (!rec || !Array.isArray(rec.combined) || !rec.combined.length) return;
+    combined.clear();
+    for (const f of rec.combined) combined.add(f);
+    document.getElementById('combinedCount').textContent = combined.size;
+    n = Math.min(rec.n || 1, SCENE.max_n);
+    render();
+    // Redraw thumbnails only for a hand-stepped batch small enough that this
+    // is instant. A "Build (real speed)" run marks the WHOLE scene combined
+    // in one call without ever drawing a thumbnail per frame either (see
+    // runBuild()'s own comment) — restoring hundreds one at a time here
+    // would be the one place slower than just re-combining them.
+    const arr = combinedSorted();
+    if (arr.length && arr.length <= 60) {
+      const strip = document.getElementById('filmstrip');
+      strip.innerHTML = '';
+      for (const fn of arr) {
+        await drawCombinedAt(fn);
+        const tile = document.createElement('div');
+        tile.style.backgroundImage = `url(${canvas.toDataURL('image/jpeg', 0.85)})`;
+        tile.title = `frame ${fn}`;
+        strip.appendChild(tile);
+      }
+    }
+    updateScrub();
+  }
+
+  // ── view toggle ──────────────────────────────────────────────────────────
+  // Two views share one area: the Frame Blender's own combine/build view
+  // (fbView) and the Gap Builder pair (gapBuilderView) added afterward.
+  // Only one is ever visible — the Gap Builder sections are only needed
+  // while fine-tuning one scene, not on every visit, so they stay out of
+  // the way until asked for. fbView is the default.
+  const fbView = document.getElementById('fbView');
+  const gapBuilderView = document.getElementById('gapBuilderView');
+  const viewToggleBtn = document.getElementById('viewToggleBtn');
+
+  // Deliberately does NOT save to storage — showEmpty() also calls this
+  // (setView(false), forcing the default) as part of the same reset that
+  // restoreGlobals() has to undo, and saving here would overwrite the real
+  // saved choice before restore ever gets to read it. Only the explicit
+  // click below saves.
+  function setView(showGapBuilder) {
+    fbView.hidden = showGapBuilder;
+    gapBuilderView.hidden = !showGapBuilder;
+    viewToggleBtn.innerHTML = showGapBuilder
+      ? '&#8646; Frame Blender view' : '&#8646; Gap Builder view';
+    viewToggleBtn.title = showGapBuilder
+      ? 'Switch back to the frame-stepping / combine / build view'
+      : 'Switch to the Frame Selector and Clip-Gap Builder view';
+  }
+
+  viewToggleBtn.onclick = () => {
+    const showGapBuilder = gapBuilderView.hidden;
+    setView(showGapBuilder);
+    saveStore({gapBuilderView: showGapBuilder});
+  };
+
   const pad = n => String(n).padStart(5, '0');
   const BASE = n => `/${SCENE.base_slug}/frames/frame_${pad(n)}${SCENE.base_ext}`;
   const OVER = n => `/${SCENE.over_slug}/frames/frame_${pad(n)}${SCENE.over_ext}`;
@@ -116,6 +257,7 @@
     status.textContent = `Frame ${n} combined.`;
     const hadNext = n < SCENE.max_n;
     if (hadNext) { n++; showFrame(); }
+    saveProgressForCurrentPair();
     return hadNext;
   }
 
@@ -345,6 +487,9 @@
   // explicitly now, so there is no server-side copy left to clear.
   document.getElementById('tlClearBtn').onclick = () => {
     if (running) running = false;
+    clearStore();                // the ONE point that erases what's persisted —
+                                  // otherwise the NEXT refresh or Load would
+                                  // just bring the Builder and picks right back
     showEmpty();                 // the scene itself
     STORE_SCENES = null;         // and the store listing beside it
     SCRIPT = null;
@@ -409,6 +554,7 @@
       updateScrub();
       n = SCENE.max_n;
       render();
+      saveProgressForCurrentPair();
     } catch (e) {
       buildStatus.textContent = `Build failed: ${e.message}`;
     } finally {
@@ -437,8 +583,8 @@
     }
   };
 
-  document.getElementById('prevBtn').onclick = () => { if (LOADED() && !running && n > 1) { n--; render(); } };
-  document.getElementById('nextBtn').onclick = () => { if (LOADED() && !running && n < SCENE.max_n) { n++; render(); } };
+  document.getElementById('prevBtn').onclick = () => { if (LOADED() && !running && n > 1) { n--; render(); saveProgressForCurrentPair(); } };
+  document.getElementById('nextBtn').onclick = () => { if (LOADED() && !running && n < SCENE.max_n) { n++; render(); saveProgressForCurrentPair(); } };
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft') document.getElementById('prevBtn').click();
     if (e.key === 'ArrowRight') document.getElementById('nextBtn').click();
@@ -546,6 +692,11 @@
     if (cur) cur.scrollIntoView({block: 'nearest', inline: 'center'});
   }
 
+  // Deliberately does NOT save to storage — it also runs during the RESET
+  // at the start of showEmpty() (BUILDER_FRAMES = [] before restoreGlobals()
+  // gets a chance to read what was saved), and saving there would overwrite
+  // the very collection a refresh is about to bring back before it can.
+  // Only the actual mutation site (libPickBtn.onclick, below) saves.
   function rebuildBuilderFrames(landOn) {
     builderSlider.max = Math.max(0, BUILDER_FRAMES.length - 1);
     builderSlider.disabled = BUILDER_FRAMES.length === 0;
@@ -565,12 +716,14 @@
     if (!f) return;
     BUILDER_FRAMES.push(f);
     rebuildBuilderFrames(BUILDER_FRAMES.length - 1);
+    saveStore({builderFrames: BUILDER_FRAMES});
   };
 
   async function toggleLibClip(f, checked) {
     if (!checked) {
       PICKED = PICKED.filter(c => c.path !== f.path);
       rebuildLibFrames();
+      savePickedForCurrentPair();
       return;
     }
     try {
@@ -579,6 +732,7 @@
       if (d.error) { libStatus.textContent = `${f.name}: ${d.error}`; return; }
       PICKED.push({path: f.path, name: f.name, n: d.n, slug: d.slug, ext: d.ext});
       rebuildLibFrames();
+      savePickedForCurrentPair();
     } catch (e) {
       libStatus.textContent = `${f.name}: ${e.message}`;
     }
@@ -596,6 +750,10 @@
       libStatus.textContent = `${d.root} — ${total} file(s)`;
       builderPanel.hidden = false;
       libGroups.innerHTML = '';
+      // What was checked for THIS pair last time — a refresh, or coming
+      // back to a scene already visited this session, both restore it.
+      const rec = SCENE && loadStore().pairs?.[pairKey(SCENE.base_rel, SCENE.over_rel)];
+      const savedPaths = new Set((rec?.picked || []).map(c => c.path));
       for (const g of d.groups) {
         const box = document.createElement('div');
         box.className = 'libgroup';
@@ -622,6 +780,10 @@
           metaEl.className = 'meta'; metaEl.textContent = meta;
           row.appendChild(cb); row.appendChild(name); row.appendChild(metaEl);
           box.appendChild(row);
+          if (savedPaths.has(f.path)) {
+            cb.checked = true;
+            toggleLibClip(f, true);
+          }
         }
         libGroups.appendChild(box);
       }
@@ -708,6 +870,7 @@
                     d.by_version[Object.keys(d.by_version)[0]])) || [];
     SCRIPT = d.script || null;
     tlRender();
+    saveStore({storeScenes: STORE_SCENES, script: SCRIPT});
     pickClose();
 
     const first = STORE_SCENES.find(it => it.path && it.overlay);
@@ -755,10 +918,12 @@
     builderPanel.hidden = true;
     BUILDER_FRAMES = [];
     rebuildBuilderFrames();
+    setView(false);
   }
 
   async function openPair(baseRel, overRel) {
     showEmpty();
+    restoreGlobals();
     status.textContent = 'Opening…';
     try {
       const q = new URLSearchParams({base: baseRel, overlay: overRel});
@@ -776,6 +941,7 @@
       playVideoBtn.title = 'Build the whole scene, then play it';
       render();
       loadLibs();
+      restorePairProgress();
       // Keep the URL honest, so a reload or a copied link reopens THIS pair
       // rather than whatever the server would have defaulted to.
       const u = new URL(location);
@@ -796,5 +962,6 @@
     openPair(qs.get('base'), qs.get('overlay'));
   } else {
     showEmpty();
+    restoreGlobals();
   }
 })();

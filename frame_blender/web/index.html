@@ -14,22 +14,7 @@
       <h3>sarah_clips/libs</h3>
       <div class="libstatus" id="libStatus">Loading…</div>
       <div class="libgroups" id="libGroups"></div>
-
-      <div class="libinspector" id="libInspector" hidden>
-        <h4>Frame Selector</h4>
-        <div class="imgwrap checker"><img id="libViewerImg" alt="library frame"></div>
-        <button class="count framepick" id="libPickBtn" title="Copy this frame into the Clip-Gap Builder below">Frame <b id="libN">—</b> / <b id="libTotal">—</b></button>
-        <input type="range" id="libSlider" min="0" max="0" value="0" step="1">
-        <div class="libframerow" id="libFrameRow"></div>
-      </div>
-
-      <div class="libinspector" id="builderPanel" hidden>
-        <h4>Clip-Gap Builder</h4>
-        <div class="imgwrap checker"><img id="builderViewerImg" alt="builder frame"></div>
-        <div class="count">Frame <b id="builderN">—</b> / <b id="builderTotal">—</b></div>
-        <input type="range" id="builderSlider" min="0" max="0" value="0" step="1" disabled>
-        <div class="libframerow" id="builderFrameRow"></div>
-      </div>
+      <button class="pill" id="viewToggleBtn" title="Switch the area below between the Frame Blender's combine/build view and the Gap Builder views">&#8646; Gap Builder view</button>
     </div>
 
     <div class="panel">
@@ -69,28 +54,52 @@
     </div>
   </div>
 
-  <div class="navrow">
-    <button class="nav" id="prevBtn">&#9664; prev frame</button>
-    <button id="plusBtn" title="Jump to the frame above and combine it">+</button>
-    <button class="nav" id="nextBtn">next frame &#9654;</button>
+  <!-- Two views sharing one area, only one visible at a time — toggled by
+       #viewToggleBtn at the bottom of the sarah_clips/libs column. Default
+       is the Frame Blender view (fbView), because these two Gap Builder
+       sections are only needed while fine-tuning one scene, not every time. -->
+  <div id="fbView">
+    <div class="navrow">
+      <button class="nav" id="prevBtn">&#9664; prev frame</button>
+      <button id="plusBtn" title="Jump to the frame above and combine it">+</button>
+      <button class="nav" id="nextBtn">next frame &#9654;</button>
+    </div>
+    <div class="status" id="status"></div>
+
+    <div class="totals">Combined so far: <b id="combinedCount">0</b> / <b id="totalFrames">—</b> frames</div>
+
+    <div class="resultWrap">
+      <h3>Combined &mdash; this frame, as it lands in the finished mp4</h3>
+      <canvas id="resultCanvas" width="700" height="700"></canvas>
+      <div class="scrub">
+        <input type="range" id="scrubSlider" min="0" max="0" value="0" step="1" disabled>
+        <div id="scrubLabel">No frames combined yet</div>
+      </div>
+    </div>
+
+    <div class="filmstrip" id="filmstrip"></div>
+
+    <div class="status" id="buildStatus"></div>
+    <video id="clipVideo" controls></video>
   </div>
-  <div class="status" id="status"></div>
 
-  <div class="totals">Combined so far: <b id="combinedCount">0</b> / <b id="totalFrames">—</b> frames</div>
+  <div class="libinspector-row" id="gapBuilderView" hidden>
+    <div class="libinspector" id="libInspector" hidden>
+      <h4>Frame Selector</h4>
+      <div class="imgwrap checker"><img id="libViewerImg" alt="library frame"></div>
+      <button class="count framepick" id="libPickBtn" title="Copy this frame into the Clip-Gap Builder below">Frame <b id="libN">—</b> / <b id="libTotal">—</b></button>
+      <input type="range" id="libSlider" min="0" max="0" value="0" step="1">
+      <div class="libframerow" id="libFrameRow"></div>
+    </div>
 
-  <div class="resultWrap">
-    <h3>Combined &mdash; this frame, as it lands in the finished mp4</h3>
-    <canvas id="resultCanvas" width="700" height="700"></canvas>
-    <div class="scrub">
-      <input type="range" id="scrubSlider" min="0" max="0" value="0" step="1" disabled>
-      <div id="scrubLabel">No frames combined yet</div>
+    <div class="libinspector" id="builderPanel" hidden>
+      <h4>Clip-Gap Builder</h4>
+      <div class="imgwrap checker"><img id="builderViewerImg" alt="builder frame"></div>
+      <div class="count">Frame <b id="builderN">—</b> / <b id="builderTotal">—</b></div>
+      <input type="range" id="builderSlider" min="0" max="0" value="0" step="1" disabled>
+      <div class="libframerow" id="builderFrameRow"></div>
     </div>
   </div>
-
-  <div class="filmstrip" id="filmstrip"></div>
-
-  <div class="status" id="buildStatus"></div>
-  <video id="clipVideo" controls></video>
 
   <div class="modalback" id="pickBack" hidden>
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pickTitle">

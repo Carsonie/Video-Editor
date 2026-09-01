@@ -128,28 +128,36 @@
   .libfile .meta { color: var(--sub); flex: none; font-variant-numeric: tabular-nums; }
   .libempty { font-size: 11.5px; color: var(--sub); font-style: italic; }
 
-  .libinspector { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+  /* Detached from libpanel/the checkbox list on purpose — its own full-width
+     row, sized independently, not squeezed into that narrow column. */
+  .libinspector-row {
+    display: flex; justify-content: center; gap: 32px; margin: 24px auto 0;
+  }
+  .libinspector {
+    width: 500px; flex: none; border: 1px solid var(--border); border-radius: 10px;
+    background: #1b2024; padding: 16px;
+  }
   .libinspector h4 {
-    margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+    margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em;
     color: var(--sub); text-align: center;
   }
-  .libinspector .imgwrap { width: 100%; height: 160px; }
-  .libinspector .count { text-align: center; }
+  .libinspector .imgwrap { width: 100%; height: 320px; }
+  .libinspector .count { text-align: center; font-size: 16px; }
   button.count.framepick {
-    width: 100%; display: block; text-align: center; font-size: 13px; margin-top: 10px;
+    width: 100%; display: block; text-align: center; font-size: 16px; margin-top: 14px;
     background: #1b2024; color: var(--text); border: 1px solid var(--border);
-    border-radius: 5px; padding: 6px 0; cursor: pointer;
+    border-radius: 6px; padding: 10px 0; cursor: pointer;
   }
   button.count.framepick:hover { border-color: var(--accent2); }
   button.count.framepick b { color: var(--text); font-variant-numeric: tabular-nums; }
-  #libSlider, #builderSlider { width: 100%; accent-color: var(--accent2); margin-top: 8px; }
+  #libSlider, #builderSlider { width: 100%; accent-color: var(--accent2); margin-top: 12px; }
   #builderSlider:disabled { opacity: .35; }
   .libframerow {
-    margin-top: 8px; display: flex; gap: 3px; flex-wrap: wrap; max-height: 140px;
+    margin-top: 12px; display: flex; gap: 6px; flex-wrap: wrap; max-height: 280px;
     overflow: auto;
   }
   .libframe {
-    width: 32px; height: 32px; border-radius: 3px; overflow: hidden; flex: none;
+    width: 64px; height: 64px; border-radius: 5px; overflow: hidden; flex: none;
     border: 1px solid var(--border); background-size: cover; background-position: center;
     opacity: .8; cursor: pointer;
   }
@@ -162,6 +170,7 @@
   }
   .pill:hover { border-color: var(--accent2); }
   .pill:disabled { opacity: .4; cursor: default; }
+  #viewToggleBtn { width: 100%; margin-top: 12px; }
   .tlstatus {
     font-size: 11.5px; color: var(--sub); border: 1px solid var(--border); border-radius: 6px;
     padding: 8px 10px; margin-bottom: 10px; min-height: 14px; line-height: 1.4;
