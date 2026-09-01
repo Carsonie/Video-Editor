@@ -114,20 +114,22 @@
 
     <!-- List only, for now — no click handlers wired yet. Buttons come
          before the actions behind them so the shape can be looked at and
-         reordered cheaply, before any of it does something real. -->
+         reordered cheaply, before any of it does something real. Each one
+         has its own id already, so wiring it later is filling in an
+         .onclick, not hunting for a way to address it. -->
     <div class="panel libpanel gapMenu">
       <h3>Gap Builder Controller Menu</h3>
       <div class="gapMenuList">
-        <button class="gapMenuBtn">Add Sarah Opening Still</button>
-        <button class="gapMenuBtn">Add Sarah Closing Still</button>
-        <button class="gapMenuBtn">Select One Frame</button>
-        <button class="gapMenuBtn">Select Multiple Frames</button>
-        <button class="gapMenuBtn">Paste One Frame</button>
-        <button class="gapMenuBtn">Paste Selected</button>
-        <button class="gapMenuBtn">Delete a Frame</button>
-        <button class="gapMenuBtn">Delete Selected</button>
-        <button class="gapMenuBtn">Duplicate One Frame</button>
-        <button class="gapMenuBtn">Duplicate Selected</button>
+        <button class="gapMenuBtn" id="gmAddOpeningStill">Add Sarah Opening Still</button>
+        <button class="gapMenuBtn" id="gmAddClosingStill">Add Sarah Closing Still</button>
+        <button class="gapMenuBtn" id="gmSelectOne">Select One Frame</button>
+        <button class="gapMenuBtn" id="gmSelectMultiple">Select Multiple Frames</button>
+        <button class="gapMenuBtn" id="gmPasteOne">Paste One Frame</button>
+        <button class="gapMenuBtn" id="gmPasteSelected">Paste Selected</button>
+        <button class="gapMenuBtn" id="gmDeleteOne">Delete a Frame</button>
+        <button class="gapMenuBtn" id="gmDeleteSelected">Delete Selected</button>
+        <button class="gapMenuBtn" id="gmDuplicateOne">Duplicate One Frame</button>
+        <button class="gapMenuBtn" id="gmDuplicateSelected">Duplicate Selected</button>
       </div>
     </div>
   </div>
@@ -146,6 +148,10 @@
     </div>
   </div>
 
+<!-- gap-builder.js first: app.js's bootstrap, at the bottom of the second
+     file, calls straight into functions this one defines (loadLibs,
+     rebuildLibFrames, rebuildBuilderFrames) — they have to exist already. -->
+<script src="/web/gap-builder.js"></script>
 <script src="/web/app.js"></script>
 </body>
 </html>

@@ -351,15 +351,24 @@ def s_static_page():
     check("says nothing is loaded", "nothing loaded" in html, html[:0] or "ok")
     for gone in ("base_slug", "over_slug", "01-opening-with-login"):
         check(f"no {gone} baked in", gone not in html)
-    for asset, ctype in (("/web/app.js", "javascript"), ("/web/app.css", "css")):
+    # gap-builder.js must be named BEFORE app.js — app.js's own bootstrap
+    # calls straight into functions gap-builder.js defines, so if load
+    # order here ever regressed, the page would fail at the very last line
+    # of app.js with everything above it having worked perfectly.
+    gb_pos = html.find("gap-builder.js")
+    app_pos = html.find('src="/web/app.js"')
+    check("gap-builder.js is named before app.js", -1 < gb_pos < app_pos, (gb_pos, app_pos))
+    for asset, ctype in (("/web/app.js", "javascript"), ("/web/gap-builder.js", "javascript"),
+                         ("/web/app.css", "css")):
         r = urllib.request.urlopen(FB_BASE + asset, timeout=10)
         eq(f"{asset} served", r.status, 200)
         check(f"{asset} content-type", ctype in r.headers.get("Content-Type", ""),
               r.headers.get("Content-Type"))
-    # A stale app.js is a fix that silently did not apply — it cost a real
-    # round of confusion before the restructure, so the header is asserted.
-    r = urllib.request.urlopen(FB_BASE + "/web/app.js", timeout=10)
-    eq("app.js is no-store", r.headers.get("Cache-Control"), "no-store")
+        # A stale copy is a fix that silently did not apply — it cost a real
+        # round of confusion before the restructure, so this is asserted for
+        # every script this page ships, not just the first one.
+        if asset.endswith(".js"):
+            eq(f"{asset} is no-store", r.headers.get("Cache-Control"), "no-store")
 
 
 def s_app_js_parses():
@@ -371,25 +380,43 @@ def s_app_js_parses():
     both times a syntax error that Python (there is none, in a static .js
     file) could never have caught: doubled backslash-escapes surviving the
     2026-08-30 extraction out of player.py's template, and later a modal's
-    markup sitting after its own <script> tag. Fetches the REAL served
-    file, not the one on disk, so a serving bug is caught too.
+    markup sitting after its own <script> tag.
+
+    Checks each file's OWN syntax first, then both CONCATENATED in the same
+    order the page loads them — gap-builder.js then app.js, exactly as
+    index.html names them, and deliberately neither file wrapped in its own
+    IIFE (see app.js's own header comment on why) specifically so each can
+    call the other's top-level declarations directly. That same flat shared
+    scope is also the one place a NEW kind of bug can now hide: two files
+    that each parse perfectly alone can still declare the same `let` or
+    `const` name and throw the moment they share a scope for real — a class
+    of bug neither file's own syntax check would ever catch alone. Fetches
+    the REAL served files, not the ones on disk, so a serving bug is
+    caught too.
     """
-    step("web/app.js — does the JavaScript actually parse?")
+    step("web/*.js — does the JavaScript actually parse, alone and together?")
     node = shutil.which("node")
     if node is None:
         check("node is available to parse it", False,
               "install node, or this can never catch a broken page again")
         return
+    gb = urllib.request.urlopen(FB_BASE + "/web/gap-builder.js", timeout=10).read().decode()
     js = urllib.request.urlopen(FB_BASE + "/web/app.js", timeout=10).read().decode()
-    tmp = os.path.join(tempfile.gettempdir(), "fb_app_check.js")
-    with open(tmp, "w") as fh:
-        fh.write(js)
-    r = subprocess.run([node, "--check", tmp], capture_output=True, text=True)
-    os.remove(tmp)
-    first = (r.stderr or "").strip().split("\n")
-    check("app.js parses", r.returncode == 0,
-          f"{len(js)} bytes" if r.returncode == 0
-          else next((l for l in first if "Error" in l), first[0] if first else ""))
+
+    def parses(name, text):
+        tmp = os.path.join(tempfile.gettempdir(), f"fb_{name}_check.js")
+        with open(tmp, "w") as fh:
+            fh.write(text)
+        r = subprocess.run([node, "--check", tmp], capture_output=True, text=True)
+        os.remove(tmp)
+        first = (r.stderr or "").strip().split("\n")
+        check(f"{name} parses", r.returncode == 0,
+              f"{len(text)} bytes" if r.returncode == 0
+              else next((l for l in first if "Error" in l), first[0] if first else ""))
+
+    parses("gap-builder.js", gb)
+    parses("app.js", js)
+    parses("gap-builder.js + app.js together (load order)", gb + "\n" + js)
 
 
 FUNCTIONS = [s_static_page, s_app_js_parses, s_stateless, s_load_picker, s_load_store,
