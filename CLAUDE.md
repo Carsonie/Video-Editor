@@ -1,7 +1,7 @@
 # Project rules
 
 This repo makes **help videos**: a HeyGen avatar narrating over a recording of
-the real Rentify UI. It holds the two editors, the build pipeline, and every
+the real Rentify UI. It holds the three editors, the build pipeline, and every
 customer's `help-videos/` working files while a video is being made.
 
 `Basic_E2E_Testing` keeps the E2E testing, the BCP work, and the customer
@@ -22,6 +22,17 @@ counts, and the narration line under each row — not `vtt.py`'s plain output),
 and it also defines the EVTT (the editor's own live panel) as a separate,
 third thing. Don't rebuild this from memory of a past answer; the skill is
 the one place this is written down, and it can change.
+
+---
+
+## When Carson asks to open, launch, start, or run an editor
+
+Read **`.claude/skills/editor-launchers/SKILL.md`** first, every time. There
+are three separate editors now (Segment and Avatar Editor, the next-gen web
+editor, Frame Blender), each its own process, and the next-gen one is
+secretly two processes — skip the skill and it's easy to start the UI without
+its API and get a page full of 502s. The launch.json these all run from lives
+in `Basic_E2E_Testing`, not here.
 
 ---
 
@@ -192,7 +203,7 @@ and closing handling; it is not how a video gets built.
 ## The two editors
 
 ```bash
-python3 shared/serve.py --port 8860
+python3 shared/serve.py --port 8842
 ```
 
 One server, both players, 28 endpoints. It prints its browse root and its
