@@ -42,6 +42,7 @@ WHAT IT SERVES
     GET  /build_clip?base=&overlay=&n=        build a real mp4 of N frames
     GET  /api/save_mp4?base=&n=               copy that build into the store
     POST /api/save_scene, /api/undo_scene     proxied to the main editor
+    POST /api/gap_log                         appends a Gap Builder click to logs/gap_builder_<date>.log
     GET  /<slug>/frames/frame_NNNNN.{jpg,png} the extracted frames
 """
 import argparse
@@ -59,6 +60,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))       # <repo>/frame_blender
 ROOT = os.path.dirname(HERE)                             # <repo>
 CACHE = os.path.join(ROOT, "cache")                       # SAME cache the editor uses
 PREVIEWS = os.path.join(CACHE, "_previews")               # this tool's own mp4 output
+GAP_LOG_DIR = os.path.join(ROOT, "logs")                  # same logs/ the editor's own daily log lives in
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "shared"))
 sys.path.insert(0, os.path.join(ROOT, "build"))
@@ -237,7 +239,32 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.save_scene(payload)
         if parsed.path == "/api/undo_scene":
             return self.undo_scene(payload)
+        if parsed.path == "/api/gap_log":
+            return self.client_log(payload)
         return self.json_error(404, f"no such route: {parsed.path}")
+
+    def client_log(self, payload):
+        """
+        POST {event, ...} -> appends one JSON line to logs/gap_builder_<date>.log.
+
+        A debugging aid for the Gap Builder Controller Menu specifically:
+        Carson tests through his own real browser tab, which this process
+        cannot see into — the only way to know what he actually clicked, in
+        order, and what state each click landed in, is if the page tells
+        this server itself (see gapLog() in gap-builder.js, wired into every
+        Controller Menu button plus both frame rows). Never raises: a log
+        that can break the page is worse than no log — same promise
+        shared/serve.py's own session_log() makes.
+        """
+        try:
+            os.makedirs(GAP_LOG_DIR, exist_ok=True)
+            path = os.path.join(GAP_LOG_DIR, f"gap_builder_{time.strftime('%Y%m%d')}.log")
+            line = {"t": time.strftime("%H:%M:%S"), **payload}
+            with open(path, "a") as fh:
+                fh.write(json.dumps(line, sort_keys=True) + "\n")
+        except Exception:
+            pass
+        self._relay(200, {"ok": True})
 
     def send_web(self, name, ctype=None):
         """

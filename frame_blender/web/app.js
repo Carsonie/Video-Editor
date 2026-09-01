@@ -775,7 +775,10 @@
     rebuildLibFrames();
     builderPanel.hidden = true;
     BUILDER_FRAMES = [];
+    SELECTED = new Set();
+    disarmSelectMode();
     rebuildBuilderFrames();
+    CLIPBOARD = [];
     setView(false);
   }
 

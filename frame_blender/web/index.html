@@ -124,12 +124,18 @@
         <button class="gapMenuBtn" id="gmAddClosingStill">Add Sarah Closing Still</button>
         <button class="gapMenuBtn" id="gmSelectOne">Select One Frame</button>
         <button class="gapMenuBtn" id="gmSelectMultiple">Select Multiple Frames</button>
-        <button class="gapMenuBtn" id="gmPasteOne">Paste One Frame</button>
-        <button class="gapMenuBtn" id="gmPasteSelected">Paste Selected</button>
+        <button class="gapMenuBtn unwired" id="gmPasteOne" title="Not wired yet.">Paste One Frame</button>
+        <button class="gapMenuBtn" id="gmPasteSelected" title="Turns green once Copy Selected has filled the clipboard. Click a frame below first to pick where, then click this — the clipboard's contents land right after it.">Paste Selected</button>
         <button class="gapMenuBtn" id="gmDeleteOne">Delete a Frame</button>
         <button class="gapMenuBtn" id="gmDeleteSelected">Delete Selected</button>
-        <button class="gapMenuBtn" id="gmDuplicateOne">Duplicate One Frame</button>
-        <button class="gapMenuBtn" id="gmDuplicateSelected">Duplicate Selected</button>
+        <button class="gapMenuBtn unwired" id="gmDuplicateOne" title="Not wired yet.">Duplicate One Frame</button>
+        <button class="gapMenuBtn unwired" id="gmDuplicateSelected" title="Not wired yet.">Duplicate Selected</button>
+        <button class="gapMenuBtn" id="gmClearAll" title="Empty the Clip-Gap Builder collection. Does not touch the Frame Selector, the loaded scene, or Timeline Scenes — only this list.">Clear All</button>
+        <hr class="gapMenuDivider">
+        <div class="gapMenuSectionTitle">Frame Selector</div>
+        <hr class="gapMenuDivider">
+        <button class="gapMenuBtn" id="gmSelectFrames" title="Arms selecting in the Frame Selector row above. Click 1: start frame. Click 2: end frame (or the same frame again for a one-frame selection). Click 3: reset, start over.">Select Frames</button>
+        <button class="gapMenuBtn" id="gmCopySelected" title="Copies whatever's selected in the Frame Selector's own row above (Select Frames), onto a clipboard — Paste (above) adds it to the Clip-Gap Builder.">Copy Selected</button>
       </div>
     </div>
   </div>

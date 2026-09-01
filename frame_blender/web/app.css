@@ -177,6 +177,38 @@
     color: var(--text); cursor: pointer;
   }
   .gapMenuBtn:hover { border-color: var(--accent2); }
+  /* Green while the click is actually being handled — added the instant
+     onclick starts, held for a minimum visible time even for something
+     synchronous (see withActiveFlash() in gap-builder.js), removed when
+     it's done. A flash, not a permanent state — it always ends back at
+     the plain label colour above. */
+  .gapMenuBtn.active { color: var(--accent); }
+  /* "Ready" — a selection is sitting there complete, waiting on a click on
+     Copy Selected to actually copy it. Unlike .active this is NOT a flash:
+     it stays on until that click happens (see gmSelectFrames's 3-click
+     cycle in gap-builder.js), then comes off inside the click handler. */
+  .gapMenuBtn.ready { color: var(--accent); }
+  /* "Armed" — waiting for a click on a frame (in the Clip-Gap Builder row,
+     or the Frame Selector row for gmSelectFrames) to actually do the
+     selecting. Same light-red the selected frame itself gets (below), so
+     the button and its effect read as one idea. Declared AFTER .active/
+     .ready so armed (still waiting on you) wins if more than one lands on
+     a button at once, same specificity either way. */
+  .gapMenuBtn.armed { border-color: #ff8a80; color: #ff8a80; }
+  /* Label text only, not the border — this is a "not built yet" flag, not
+     a state to click into. Same amber Timeline Scenes' own dirty dot and
+     Save icon already use for "this needs attention," so the colour means
+     the same thing everywhere on the page it appears. Remove this class
+     the same commit a button actually gets wired — it should never be
+     left on something that works. */
+  .gapMenuBtn.unwired { color: #e0a93f; }
+  .gapMenuDivider { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+  /* Same look as a libgroup's own header (GAP-FILLERS, IDLE, ...) — a
+     sub-section title reads as the same idea wherever it appears. */
+  .gapMenuSectionTitle {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--sub); text-align: center;
+  }
 
   /* Holds all three Gap Builder boxes side by side, sarah_clips/libs on the
      left — its own full-width row, top-aligned by nothing more than being
@@ -216,6 +248,15 @@
   }
   .libframe:hover { opacity: 1; }
   .libframe.cur { border-color: var(--accent2); opacity: 1; }
+  /* Selected FOR AN ACTION (Delete, Duplicate, Paste, ...) — a light red,
+     deliberately a different colour from .cur's blue (which only means
+     "currently shown"), and declared after it so a frame that is both
+     shows the red: which one is about to be acted on matters more here
+     than which one is on screen. */
+  .libframe.selected {
+    border-color: #ff8a80; opacity: 1;
+    box-shadow: 0 0 0 2px rgba(255, 138, 128, .25);
+  }
   .pillrow { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
   .pill {
     flex: 1 1 auto; background: #1b2024; color: var(--text); border: 1px solid var(--border);
