@@ -169,34 +169,34 @@ const builderTotalEl = document.getElementById('builderTotal');
 const libPickBtn = document.getElementById('libPickBtn');
 
 // Which BUILDER_FRAMES indices are selected FOR AN ACTION (Delete,
-// Duplicate, Paste, ...) — separate from which one is merely being VIEWED
-// (that's `showBuilderFrame`'s own job, the blue .cur highlight). A Set
-// from the start, even though "Select One" only ever holds one index,
-// because "Select Multiple" needs the exact same shape and the exact same
-// render/clear logic — no second implementation to keep in step later.
+// Duplicate, Copy Selected, ...) — separate from which one is merely being
+// VIEWED (that's `showBuilderFrame`'s own job, the blue .cur highlight).
 let SELECTED = new Set();
-// null (a thumbnail click just navigates, same as before this existed),
-// 'one' (the NEXT click replaces SELECTED with just that frame, then
-// disarms itself — a single-use pick, not a persistent tool), or
-// 'multiple' (the next TWO clicks are a range's two ends — see rangeStart
-// and renderBuilderFrameRow()'s own onclick).
-let selectMode = null;
-// The first of "multiple"'s two clicks, waiting on the second — null the
-// rest of the time, including the instant the range completes.
-let rangeStart = null;
+// Whether gmBuilderSelectFrames is armed — the SAME 3-click start/end/
+// reset cycle gmSelectFrames runs on the Frame Selector row (libArmed/
+// libPhase), just scoped to this row instead (see renderBuilderFrameRow's
+// onclick). Toggled by the button itself; turning it off mid-cycle only
+// stops arming FURTHER clicks — it does not clear a selection already
+// sitting there.
+let builderArmed = false;
+// 0: next click is click 1 (starts a selection). 1: next click is click 2
+// (finishes it — same frame as click 1 collapses it to one frame). 2: a
+// selection sits complete; the next click is click 3, a reset back to 0.
+let builderPhase = 0;
+// The pending start of a click-1/click-2 range pick — null except between
+// those two clicks (builderPhase === 1).
+let builderRangeStart = null;
 
-function setSelectMode(mode) {
-  selectMode = selectMode === mode ? null : mode;   // click again to cancel
-  rangeStart = null;   // any mode change abandons a half-picked range
-  gmSelectOne.classList.toggle('armed', selectMode === 'one');
-  gmSelectMultiple.classList.toggle('armed', selectMode === 'multiple');
-}
-
+// A full reset of the Builder's own select/copy mechanism — called at hard
+// reset points (a scene switch/Clear in app.js's showEmpty(), and
+// gmClearAll below), never from inside the 3-click cycle itself (which
+// only ever clears what its OWN click needs cleared).
 function disarmSelectMode() {
-  selectMode = null;
-  rangeStart = null;
-  gmSelectOne.classList.remove('armed');
-  gmSelectMultiple.classList.remove('armed');
+  builderArmed = false;
+  builderPhase = 0;
+  builderRangeStart = null;
+  gmBuilderSelectFrames.classList.remove('armed');
+  gmBuilderCopySelected.classList.remove('ready');
 }
 
 function setSelected(indices) {
@@ -212,37 +212,40 @@ function renderBuilderFrameRow() {
     d.style.backgroundImage = `url(${f.url})`;
     d.title = `${f.clip.name} — frame ${f.local + 1}/${f.clip.n}`;
     d.onclick = () => {
-      const modeAtClick = selectMode;   // logged below — mutated by this click
-      // Armed by Select One: THIS click is the pick, not a plain view —
-      // replaces whatever was selected, then disarms itself (a one-time
-      // action, not a tool that stays on).
-      if (selectMode === 'one') {
-        setSelected([i]);
-        disarmSelectMode();
-      // Armed by Select Multiple: the FIRST click marks one end (shown
-      // selected on its own, so there is visible confirmation of where it
-      // landed) and stays armed; the SECOND click is the other end, and
-      // everything BETWEEN the two — inclusive, whichever order they were
-      // clicked in — becomes the selection. Then it disarms, same as Select
-      // One's single click does.
-      } else if (selectMode === 'multiple') {
-        if (rangeStart === null) {
-          rangeStart = i;
+      // Same 3-click cycle as the Frame Selector's own row (see
+      // copySelectDblClick's old comment, now libPhase's) — click 1: start.
+      // Click 2: end (or the same frame again for a one-frame selection).
+      // Click 3: reset, and this click picks nothing on its own.
+      if (builderArmed) {
+        if (builderPhase === 0) {
+          builderRangeStart = i;
           setSelected([i]);
+          builderPhase = 1;
+        } else if (builderPhase === 1) {
+          if (i === builderRangeStart) {
+            setSelected([i]);
+          } else {
+            const lo = Math.min(builderRangeStart, i), hi = Math.max(builderRangeStart, i);
+            const range = [];
+            for (let k = lo; k <= hi; k++) range.push(k);
+            setSelected(range);
+          }
+          builderRangeStart = null;
+          builderPhase = 2;
+          gmBuilderCopySelected.classList.add('ready');
         } else {
-          const lo = Math.min(rangeStart, i), hi = Math.max(rangeStart, i);
-          const range = [];
-          for (let k = lo; k <= hi; k++) range.push(k);
-          setSelected(range);
-          disarmSelectMode();
+          setSelected([]);
+          builderRangeStart = null;
+          builderPhase = 0;
+          gmBuilderCopySelected.classList.remove('ready');
         }
       }
-      gapLog('builder_frame_click', {i, branch: modeAtClick || 'plain', after: gapSnapshot()});
-      // Still moves the viewer here too, same as an unarmed click always
-      // has, so you can see what you just picked either way — and THIS is
-      // what tells Paste Selected where "here" is: a plain click on a
-      // frame here, then Paste Selected, no arming step in between (see
-      // gmPasteSelected.onclick, which just reads builderSlider.value).
+      gapLog('builder_frame_click', {i, builderArmed, after: gapSnapshot()});
+      // Still moves the viewer here too, armed or not, same as before —
+      // and THIS is what tells Paste Selected where "here" is: a plain
+      // click on a frame here, then Paste Selected, no arming step of its
+      // own (see gmPasteSelected.onclick, which just reads
+      // builderSlider.value).
       builderSlider.value = i; showBuilderFrame(i);
     };
     builderFrameRow.appendChild(d);
@@ -291,10 +294,13 @@ function doPaste(insertAt) {
   CLIPBOARD = [];
   gmPasteSelected.classList.remove('ready');
   // The whole select → copy → paste cycle is done — every button that was
-  // part of it goes back to plain white, Select Frames included, exactly
-  // like finishing a copy already resets Copy Selected's own green.
+  // part of it goes back to plain white, both Select Frames buttons
+  // included (the clipboard could have come from either row), exactly
+  // like finishing a copy already resets its own Copy Selected's green.
   libArmed = false;
   gmSelectFrames.classList.remove('armed');
+  builderArmed = false;
+  gmBuilderSelectFrames.classList.remove('armed');
   rebuildBuilderFrames(landOn);
   saveStore({builderFrames: BUILDER_FRAMES});
   libStatus.textContent = insertAt > 0
@@ -396,22 +402,28 @@ async function loadLibs() {
 }
 
 // ── Gap Builder Controller Menu ──────────────────────────────────────────
-// The ten original action buttons live in index.html (gmAddOpeningStill,
-// gmAddClosingStill, gmSelectOne, gmSelectMultiple, gmPasteOne,
-// gmPasteSelected, gmDeleteOne, gmDeleteSelected, gmDuplicateOne,
-// gmDuplicateSelected), plus three Carson asked for directly: gmClearAll
-// (empties the collection outright, no selection needed) and, below a
-// divider + "Frame Selector" title, gmSelectFrames + gmCopySelected — the
-// two buttons here that act on the FRAME SELECTOR's own row, not the
-// Builder's. Ten are wired below; the remaining three (gmPasteOne,
-// gmDuplicateOne, gmDuplicateSelected) are the next piece of work, not
-// this one — all plain edits to BUILDER_FRAMES / SELECTED, same shape as
-// the ones already here.
+// All ten of the original placeholder buttons are gone or folded in now.
+// Select One Frame / Select Multiple Frames combined into
+// gmBuilderSelectFrames + gmBuilderCopySelected — the SAME 3-click cycle
+// and Copy Selected pairing gmSelectFrames/gmCopySelected already use on
+// the Frame Selector's row, just aimed at this one instead. Paste One
+// Frame dropped since Paste Selected already covers a single frame (Copy
+// Selected with just one frame picked). Duplicate One Frame / Duplicate
+// Selected dropped too, for the same reason as Paste One: select a range
+// here, Copy Selected, Paste Selected — that pastes a COPY back into this
+// same row, which already IS "duplicate a range in place." Delete a Frame
+// dropped for the identical reason: select just one frame with the same
+// 3-click cycle (click the same frame twice), then Delete Selected — one
+// selection mechanism serves every count instead of a redundant pair.
+//
+// What's left: gmAddOpeningStill, gmAddClosingStill, gmBuilderSelectFrames
+// + gmBuilderCopySelected, gmPasteSelected, gmDeleteSelected, gmClearAll —
+// all wired — plus, below a divider + "Frame Selector" title,
+// gmSelectFrames + gmCopySelected for that OTHER row.
 const gmAddOpeningStill = document.getElementById('gmAddOpeningStill');
 const gmAddClosingStill = document.getElementById('gmAddClosingStill');
-const gmSelectOne = document.getElementById('gmSelectOne');
-const gmSelectMultiple = document.getElementById('gmSelectMultiple');
-const gmDeleteOne = document.getElementById('gmDeleteOne');
+const gmBuilderSelectFrames = document.getElementById('gmBuilderSelectFrames');
+const gmBuilderCopySelected = document.getElementById('gmBuilderCopySelected');
 const gmDeleteSelected = document.getElementById('gmDeleteSelected');
 const gmClearAll = document.getElementById('gmClearAll');
 const gmSelectFrames = document.getElementById('gmSelectFrames');
@@ -503,7 +515,7 @@ async function fadeFrames(urlA, urlB, n) {
 function gapSnapshot() {
   return {
     libArmed, libPhase, libSelected: LIB_SELECTED.size, libRangeStart,
-    selectMode, rangeStart, selected: SELECTED.size,
+    builderArmed, builderPhase, builderRangeStart, selected: SELECTED.size,
     clipboard: CLIPBOARD.length, builderCur: +builderSlider.value,
     builderFrames: BUILDER_FRAMES.length, libFrames: LIB_FRAMES.length,
   };
@@ -589,42 +601,47 @@ gmAddClosingStill.onclick = withActiveFlash(gmAddClosingStill, async () => {
   saveStore({builderFrames: BUILDER_FRAMES});
 });
 
-// Arms single-pick mode — the NEXT click on a frame in the row below does
-// the actual selecting (see renderBuilderFrameRow()'s own onclick). Click
-// this again before picking anything to cancel.
-gmSelectOne.onclick = withActiveFlash(gmSelectOne, () => setSelectMode('one'));
-
-// Arms range-pick mode — the NEXT TWO clicks in the row below are the
-// range's two ends, in either order, and everything between them
-// (inclusive) becomes the selection. Click this again before the first of
-// those two clicks to cancel; after the first click, it cancels a
-// half-picked range the same way.
-gmSelectMultiple.onclick = withActiveFlash(gmSelectMultiple, () => setSelectMode('multiple'));
-
-// Removes the ONE selected frame. Refuses instead of guessing when there
-// isn't exactly one — deleting nothing, or deleting whatever the viewer
-// happens to be showing, would both be a different action pretending to
-// be this one.
-gmDeleteOne.onclick = withActiveFlash(gmDeleteOne, () => {
-  if (SELECTED.size !== 1) {
-    libStatus.textContent = 'Select one frame first (Select One Frame, then click it below).';
-    return;
-  }
-  const [i] = SELECTED;
-  BUILDER_FRAMES.splice(i, 1);
-  SELECTED = new Set();
-  rebuildBuilderFrames(Math.min(i, BUILDER_FRAMES.length - 1));
-  saveStore({builderFrames: BUILDER_FRAMES});
+// Arms/disarms the 3-click start/end/reset cycle on the Clip-Gap Builder
+// row below — same mechanism gmSelectFrames uses on the Frame Selector
+// row (see renderBuilderFrameRow's onclick and builderPhase). Click again
+// to disarm early — that only stops arming further clicks, it does not
+// clear a selection already sitting there.
+gmBuilderSelectFrames.onclick = withActiveFlash(gmBuilderSelectFrames, () => {
+  builderArmed = !builderArmed;
+  gmBuilderSelectFrames.classList.toggle('armed', builderArmed);
 });
 
-// Removes EVERY selected frame — one from Select One, or a whole range
-// from Select Multiple, whichever is currently in SELECTED. Indices are
-// removed HIGHEST first, so splicing one out never shifts the position of
-// another one still waiting to go — removing low-to-high would delete the
-// wrong frame the moment the first splice moved everything after it down.
+// Copies whatever's selected in the Clip-Gap Builder's own row (SELECTED,
+// filled by the gmBuilderSelectFrames cycle) onto CLIPBOARD — the SAME
+// clipboard Copy Selected/Paste Selected (Frame Selector side) already
+// use, so this doubles as "duplicate a range in place": select it here,
+// Copy Selected, then Paste Selected picks where the copy lands.
+gmBuilderCopySelected.onclick = withActiveFlash(gmBuilderCopySelected, () => {
+  if (!SELECTED.size) {
+    libStatus.textContent = 'Select Frames, then click a frame below to start a selection '
+      + '(click again to finish it) — then Copy Selected.';
+    return;
+  }
+  const indices = [...SELECTED].sort((a, b) => a - b);
+  CLIPBOARD = indices.map(i => BUILDER_FRAMES[i]);
+  libStatus.textContent = `Copied ${CLIPBOARD.length} frame(s) — Paste Selected is ready.`;
+  gmBuilderCopySelected.classList.remove('ready');
+  gmPasteSelected.classList.add('ready');
+  setSelected([]);
+  builderRangeStart = null;
+  builderPhase = 0;
+});
+
+// Removes EVERY selected frame — whatever the gmBuilderSelectFrames cycle
+// currently left in SELECTED, one frame (click the same frame twice) or a
+// whole range. One selection mechanism serves both counts, so there is no
+// separate Delete a Frame any more. Indices are removed HIGHEST first, so
+// splicing one out never shifts the position of another one still waiting
+// to go — removing low-to-high would delete the wrong frame the moment
+// the first splice moved everything after it down.
 gmDeleteSelected.onclick = withActiveFlash(gmDeleteSelected, () => {
   if (!SELECTED.size) {
-    libStatus.textContent = 'Select one or more frames first (Select One Frame or Select Multiple Frames).';
+    libStatus.textContent = 'Select Frames, then click one or more frames below, first.';
     return;
   }
   const indices = [...SELECTED].sort((a, b) => b - a);
