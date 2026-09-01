@@ -10,17 +10,13 @@
   <div class="sub">Overlay (left) + base (right) &rarr; one combined frame of the finished video.</div>
 
   <div class="row">
-    <div class="panel libpanel">
-      <h3>sarah_clips/libs</h3>
-      <div class="libstatus" id="libStatus">Loading…</div>
-      <div class="libgroups" id="libGroups"></div>
-      <button class="pill" id="viewToggleBtn" title="Switch the area below between the Frame Blender's combine/build view and the Gap Builder views">&#8646; Gap Builder view</button>
-    </div>
-
     <div class="panel">
       <h3>Overlay</h3>
       <div class="imgwrap checker"><img id="overImg" alt="overlay frame"></div>
-      <div class="count">Frame <b id="overN">—</b> / <b id="overTotal">—</b></div>
+      <div class="count">
+        <button class="flowToggle over" id="overFlowBtn"></button>
+        Frame <b id="overN">—</b> / <b id="overTotal">—</b>
+      </div>
     </div>
 
     <div class="mid">
@@ -34,12 +30,20 @@
         <option value="build">Build (real speed)</option>
       </select>
       <button class="nav" id="playVideoBtn" disabled title="No built video yet">&#9654; Play video</button>
+      <!-- Lives here, not inside the checklist it switches, because that
+           checklist now sits INSIDE the very view this button switches
+           away from — a button that disappears exactly when you need it
+           to come back is no button at all. Always-visible ground instead. -->
+      <button class="pill" id="viewToggleBtn" title="Switch the area below between the Frame Blender's combine/build view and the Gap Builder views">&#8646; Gap Builder view</button>
     </div>
 
     <div class="panel">
       <h3>Base</h3>
       <div class="imgwrap"><img id="baseImg" alt="base frame"></div>
-      <div class="count">Frame <b id="baseN">—</b> / <b id="baseTotal">—</b></div>
+      <div class="count">
+        <button class="flowToggle base" id="baseFlowBtn"></button>
+        Frame <b id="baseN">—</b> / <b id="baseTotal">—</b>
+      </div>
     </div>
 
     <div class="panel tlscenes">
@@ -55,9 +59,11 @@
   </div>
 
   <!-- Two views sharing one area, only one visible at a time — toggled by
-       #viewToggleBtn at the bottom of the sarah_clips/libs column. Default
-       is the Frame Blender view (fbView), because these two Gap Builder
-       sections are only needed while fine-tuning one scene, not every time. -->
+       #viewToggleBtn under Play video, above (always visible, unlike
+       everything it switches between). Default is the Frame Blender view
+       (fbView), because these two Gap Builder sections — sarah_clips/libs
+       included, it moved down to sit beside them — are only needed while
+       fine-tuning one scene, not every time. -->
   <div id="fbView">
     <div class="navrow">
       <button class="nav" id="prevBtn">&#9664; prev frame</button>
@@ -84,6 +90,12 @@
   </div>
 
   <div class="libinspector-row" id="gapBuilderView" hidden>
+    <div class="panel libpanel">
+      <h3>sarah_clips/libs</h3>
+      <div class="libstatus" id="libStatus">Loading…</div>
+      <div class="libgroups" id="libGroups"></div>
+    </div>
+
     <div class="libinspector" id="libInspector" hidden>
       <h4>Frame Selector</h4>
       <div class="imgwrap checker"><img id="libViewerImg" alt="library frame"></div>
@@ -98,6 +110,25 @@
       <div class="count">Frame <b id="builderN">—</b> / <b id="builderTotal">—</b></div>
       <input type="range" id="builderSlider" min="0" max="0" value="0" step="1" disabled>
       <div class="libframerow" id="builderFrameRow"></div>
+    </div>
+
+    <!-- List only, for now — no click handlers wired yet. Buttons come
+         before the actions behind them so the shape can be looked at and
+         reordered cheaply, before any of it does something real. -->
+    <div class="panel libpanel gapMenu">
+      <h3>Gap Builder Controller Menu</h3>
+      <div class="gapMenuList">
+        <button class="gapMenuBtn">Add Sarah Opening Still</button>
+        <button class="gapMenuBtn">Add Sarah Closing Still</button>
+        <button class="gapMenuBtn">Select One Frame</button>
+        <button class="gapMenuBtn">Select Multiple Frames</button>
+        <button class="gapMenuBtn">Paste One Frame</button>
+        <button class="gapMenuBtn">Paste Selected</button>
+        <button class="gapMenuBtn">Delete a Frame</button>
+        <button class="gapMenuBtn">Delete Selected</button>
+        <button class="gapMenuBtn">Duplicate One Frame</button>
+        <button class="gapMenuBtn">Duplicate Selected</button>
+      </div>
     </div>
   </div>
 

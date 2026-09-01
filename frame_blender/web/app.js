@@ -155,8 +155,10 @@
   function setView(showGapBuilder) {
     fbView.hidden = showGapBuilder;
     gapBuilderView.hidden = !showGapBuilder;
+    // Stacked (arrow / two-word label / "View") rather than one line — the
+    // single-line version overflowed this column's own width.
     viewToggleBtn.innerHTML = showGapBuilder
-      ? '&#8646; Frame Blender view' : '&#8646; Gap Builder view';
+      ? '&#8646;<br>Frame Blender<br>View' : '&#8646;<br>Gap Builder<br>View';
     viewToggleBtn.title = showGapBuilder
       ? 'Switch back to the frame-stepping / combine / build view'
       : 'Switch to the Frame Selector and Clip-Gap Builder view';
@@ -179,6 +181,47 @@
   const canvas = document.getElementById('resultCanvas');
   const ctx = canvas.getContext('2d');
   const status = document.getElementById('status');
+
+  // Which track(s) flow into the combiner canvas and, from there, into the
+  // frames collection (the filmstrip / scrub range) — both on by default,
+  // the same as every combine before this existed. Turning one off lets a
+  // review isolate just Sarah's motion, or just the background's, instead
+  // of always compositing the pair.
+  let includeBase = true, includeOverlay = true;
+  const overFlowBtn = document.getElementById('overFlowBtn');
+  const baseFlowBtn = document.getElementById('baseFlowBtn');
+
+  // The canvas border reads which track(s) are flowing, in the same
+  // colour language --seg/--over/--accent already use everywhere else on
+  // this page: blue for base alone, purple for overlay alone, green for
+  // both — and the neutral border colour if neither is on, since nothing
+  // is flowing at all.
+  function updateFlowUI() {
+    overFlowBtn.classList.toggle('on', includeOverlay);
+    baseFlowBtn.classList.toggle('on', includeBase);
+    overFlowBtn.title = includeOverlay
+      ? 'Overlay flows into the combiner — click to leave it out'
+      : 'Overlay is left out of the combiner — click to include it';
+    baseFlowBtn.title = includeBase
+      ? 'Base flows into the combiner — click to leave it out'
+      : 'Base is left out of the combiner — click to include it';
+    canvas.style.borderColor =
+      includeBase && includeOverlay ? 'var(--accent)'
+      : includeOverlay ? 'var(--over)'
+      : includeBase ? 'var(--seg)'
+      : 'var(--border)';
+    // By id, not the outer `plusBtn` const below — this runs once at load,
+    // before that declaration is reached, and a temporal-dead-zone
+    // reference here would throw before the page ever renders.
+    const btn = document.getElementById('plusBtn');
+    btn.classList.remove('flow-over', 'flow-base', 'flow-none');
+    if (!includeBase && !includeOverlay) btn.classList.add('flow-none');
+    else if (!includeBase) btn.classList.add('flow-over');
+    else if (!includeOverlay) btn.classList.add('flow-base');
+  }
+  overFlowBtn.onclick = () => { includeOverlay = !includeOverlay; updateFlowUI(); };
+  baseFlowBtn.onclick = () => { includeBase = !includeBase; updateFlowUI(); };
+  updateFlowUI();
 
   // Just the two viewer panels and the nav state — no opinion on the
   // canvas or the status line. Split out so the post-combine auto-advance
@@ -208,7 +251,8 @@
     status.textContent = combined.has(n) ? 'Already combined — click + again to redraw.' : '';
   }
 
-  // Returns once BOTH layers are actually painted, so a caller that wants
+  // Returns once every FLOWING layer is actually painted (base, overlay, or
+  // both — see includeBase/includeOverlay above), so a caller that wants
   // the finished picture (the filmstrip thumbnail, below) can wait for it
   // instead of reading the canvas mid-draw. Takes an explicit frame number
   // rather than always reading the global `n`, so the scrub slider (below)
@@ -216,18 +260,23 @@
   // whichever frame the nav buttons are currently sitting on.
   function drawCombinedAt(fn) {
     return new Promise(resolve => {
-      const b = new Image(), o = new Image();
+      const wantB = includeBase, wantO = includeOverlay;
+      if (!wantB && !wantO) { ctx.clearRect(0, 0, canvas.width, canvas.height); resolve(); return; }
+      const need = (wantB ? 1 : 0) + (wantO ? 1 : 0);
       let loaded = 0;
+      const b = wantB ? new Image() : null, o = wantO ? new Image() : null;
       const done = () => {
         loaded++;
-        if (loaded < 2) return;
+        if (loaded < need) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(b, 0, 0, canvas.width, canvas.height);
-        ctx.drawImage(o, 0, 0, canvas.width, canvas.height);
+        // Base first, overlay on top — the same stacking order a full
+        // combine has always drawn in, kept even when one side is off.
+        if (b) ctx.drawImage(b, 0, 0, canvas.width, canvas.height);
+        if (o) ctx.drawImage(o, 0, 0, canvas.width, canvas.height);
         resolve();
       };
-      b.onload = done; o.onload = done;
-      b.src = BASE(Math.min(fn, SCENE.base_n)); o.src = OVER(Math.min(fn, SCENE.over_n));
+      if (b) { b.onload = done; b.src = BASE(Math.min(fn, SCENE.base_n)); }
+      if (o) { o.onload = done; o.src = OVER(Math.min(fn, SCENE.over_n)); }
     });
   }
   const drawCombined = () => drawCombinedAt(n);
@@ -238,6 +287,10 @@
   // once it has just combined the LAST frame — the signal both the single
   // click handler and the auto-run loop use to know there is nothing left.
   async function combineCurrentFrame() {
+    if (!includeBase && !includeOverlay) {
+      status.textContent = 'Nothing flowing into the combiner — turn Base or Overlay back on.';
+      return false;   // same "nothing left to do" signal an auto-run stops on
+    }
     canvas.style.display = 'block';
     await drawCombined();
     if (!combined.has(n)) {
