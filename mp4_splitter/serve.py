@@ -2443,7 +2443,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 
 BROWSE_HTML = f"""<!doctype html>
-<html><head><meta charset="utf-8"><title>Browse Customers — MP4 Splitter</title>
+<html><head><meta charset="utf-8"><title>MP4 Splitter</title>
 <style>
   :root {{ color-scheme: dark; }}
   body {{ margin:0; background:#1a1a1a; color:#eee; font-family:-apple-system,sans-serif;
