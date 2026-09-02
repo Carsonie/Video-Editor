@@ -215,7 +215,6 @@ function rebuildLibFrames() {
   gmLibViewToggle.classList.remove('ready');
   for (const clip of PICKED)
     for (let i = 0; i < clip.n; i++) LIB_FRAMES.push({url: libFrameUrl(clip, i), clip, local: i});
-  libInspector.hidden = LIB_FRAMES.length === 0;
   renderLibFrameRow();
   applyLibViewMode();
 }
@@ -428,7 +427,6 @@ async function loadLibs() {
     if (!d.root) { libStatus.textContent = 'No sarah_clips/libs/ folder for this store yet.'; return; }
     const total = d.groups.reduce((s, g) => s + g.files.length, 0);
     libStatus.textContent = `${d.root} — ${total} file(s)`;
-    builderPanel.hidden = false;
     libGroups.innerHTML = '';
     // The one file every store's library carries under this exact name —
     // see Sarah/README.md's "rest pose" section. Found here, once per

@@ -22,11 +22,16 @@ WHAT THIS PROVES THAT test_editor.py CANNOT
     Not whether /api/save or /api/siblings work in isolation — that suite
     already covers them exhaustively. This proves the PROXY relays them
     correctly (status code, error body, and all) from a second process, and
-    exercises the two endpoints that exist ONLY here: /build_clip (the real
-    one-pass picture+voice build) and /api/save_mp4 (the versioned copy into
-    sandbox_mp4_scenes/ — which had a real, live bug: asking archive_name_v
-    for a name it never records with a matching extension made it hand out
-    "v1" forever. That bug is exactly what s_save_mp4_versions guards against.)
+    exercises the endpoints that exist ONLY here: /api/libs_list and
+    /api/lib_frames, the Gap Builder's own backend for browsing and
+    extracting sarah_clips/libs.
+
+    /build_clip and /api/save_mp4 — this tool's own frame-by-frame
+    overlay+base COMBINE and build-mp4 flow — were removed 2026-09-02
+    (Carson's call: that job stays in Frame Blender; this tool keeps only
+    what edits the avatar overlay itself). Their tests went with them; see
+    tests/test_frame_blender.py for the mirror-image change, where the
+    opposite half — the Gap Builder — was the one removed instead.
 """
 import argparse
 import json
@@ -53,7 +58,6 @@ AE_BASE = None
 RESULTS = []
 LOG = []
 STEPS = []
-SAVED_NAMES = []    # real files this run writes under a real store — cleaned up in main()
 
 
 def out(line=""):
@@ -194,75 +198,23 @@ def s_save_scene_proxy():
 
 
 
-# build_clip and save_mp4 need footage shaped like a real release — the
-# 1152x1152 canvas, and an avatar clip that actually carries a voice track.
-# The disposable fixture is deliberately lighter than that (it exists to
-# test frame-level editing, not full builds), so these two checks borrow one
-# scene from a real, already-committed store instead of asking the fixture
-# to be something it was never built to be. REAL_SCENE is never written to —
-# only read from — so this is safe to run against live customer data.
+# A real, already-committed store's own scene, used by s_load_picker and
+# s_stateless below — REAL_SEG/REAL_AV are never written to, only read from,
+# so this is safe to run against live customer data.
 REAL_STORE_REL = ("Rentify Demos Corp/bike-demo/help-videos/videos/"
                    "01-first-time-ordering")
 REAL_SEG = f"{REAL_STORE_REL}/sandbox/01-login/segment.mp4"
 REAL_AV = f"{REAL_STORE_REL}/sandbox/01-login/avatar.webm"
-SAVE_MP4_DIR = os.path.join(fixture.CUSTOMERS, REAL_STORE_REL, "video", "sandbox_mp4_scenes")
 
 # ski-demo is the one store with a real sarah_clips/libs/ — the Frame
-# Selector's own library — so these three tests borrow it the same way the
-# builds above borrow bike-demo. Read-only: /api/lib_frames only ever
+# Selector's own library — so these three tests borrow it the same way
+# s_load_picker borrows bike-demo. Read-only: /api/lib_frames only ever
 # EXTRACTS into cache/, it never writes into Customers/ itself.
 SKI_STORE_REL = "Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering"
 SKI_SEG = f"{SKI_STORE_REL}/sandbox/01-intro-and-login/segment.mp4"
 SKI_AV = f"{SKI_STORE_REL}/sandbox/01-intro-and-login/avatar.webm"
 SKI_LIB_CLIP = f"{SKI_STORE_REL}/sarah_clips/libs/gap-fillers/gap-filler-1.0s.webm"
 SKI_LIB_STILL = f"{SKI_STORE_REL}/sarah_clips/libs/stills/sarah-rest-pose-corner-300-alpha.png"
-
-
-def s_build_clip():
-    step("/build_clip — the real one-pass picture+voice build")
-    # Stateless as of 2026-08-30: the pair is named on the request itself,
-    # not remembered by the server from an earlier page load.
-    d, code = fb_get("/api/open_pair", base=REAL_SEG, overlay=REAL_AV)
-    eq("open_pair answers 200", code, 200)
-    check("and returns both cache slugs", bool(d.get("base_slug") and d.get("over_slug")), d)
-
-    d, code = fb_get("/build_clip", base=REAL_SEG, overlay=REAL_AV, n=10)
-    eq("200", code, 200)
-    eq("built exactly the frame count asked for", d.get("frames"), 10)
-    check("names a real file", bool(d.get("url")), d.get("url"))
-
-    # build_preview_clip's own docstring promises this is clamped rather than
-    # erroring — asking for more frames than the avatar has should still
-    # build the whole avatar's length, not fail or hang on a bad ffmpeg call.
-    d2, code2 = fb_get("/build_clip", base=REAL_SEG, overlay=REAL_AV, n=999999)
-    check("an over-large request is clamped, not a crash", code2 == 200 and not d2.get("error"),
-          (code2, d2))
-
-
-def s_save_mp4_versions():
-    """
-    The exact bug this locks in: naming the destination file WITH an
-    extension (.mp4) while asking a helper that only recognises names
-    WITHOUT one to find the last version. It found nothing, every call
-    answered v1, and a second save silently overwrote the first instead of
-    versioning past it. Three calls here have to produce three DIFFERENT
-    files, or this regresses back to that.
-    """
-    step("/api/save_mp4 — versioned copy into sandbox_mp4_scenes/, and it actually increments")
-    names = []
-    for i in range(3):
-        d, code = fb_get("/api/save_mp4", base=REAL_SEG, n=10)
-        eq(f"save {i + 1}: 200", code, 200)
-        names.append(d.get("saved"))
-    check("three saves, three different filenames", len(set(names)) == 3, names)
-    check("all three actually exist on disk", all(
-        os.path.isfile(os.path.join(fixture.CUSTOMERS, n)) for n in names if n), names)
-
-    d, code = fb_get("/api/save_mp4", base=REAL_SEG, n=99999)
-    eq("a frame count nothing was built for is refused, not silently wrong", code, 400)
-
-    global SAVED_NAMES
-    SAVED_NAMES = names
 
 
 def s_libs_list_paths():
@@ -342,7 +294,7 @@ def s_stateless():
     """
     step("stateless — a call that names no pair is refused, even right after opening one")
     fb_get("/api/open_pair", base=REAL_SEG, overlay=REAL_AV)   # open something first
-    for ep in ("/build_clip", "/api/libs_list", "/api/save_mp4"):
+    for ep in ("/api/libs_list",):
         d, code = fb_get(ep, n=10)
         eq(f"{ep} refuses without a pair", code, 400)
         check(f"{ep} says why", "base is required" in str(d.get("error", "")), d)
@@ -423,7 +375,7 @@ def s_app_js_parses():
 
 
 FUNCTIONS = [s_static_page, s_app_js_parses, s_stateless, s_load_picker, s_load_store,
-             s_save_scene_proxy, s_build_clip, s_save_mp4_versions,
+             s_save_scene_proxy,
              s_libs_list_paths, s_lib_frames_clip, s_lib_frames_still]
 
 
@@ -463,18 +415,6 @@ def main():
         for fn in FUNCTIONS:
             fn()
     finally:
-        # s_save_mp4_versions writes real files under bike-demo's real store
-        # (there's no disposable fixture shaped like a real release build —
-        # see the note above REAL_STORE_REL). Remove exactly what this run
-        # created; never rm -rf the folder, since a real save could land
-        # there between now and the next run.
-        for rel in SAVED_NAMES:
-            p = os.path.join(fixture.CUSTOMERS, rel)
-            if os.path.isfile(p):
-                os.remove(p)
-        if os.path.isdir(SAVE_MP4_DIR) and not os.listdir(SAVE_MP4_DIR):
-            os.rmdir(SAVE_MP4_DIR)
-
         if not a.keep:
             main_srv.terminate()
             fb_srv.terminate()

@@ -56,8 +56,6 @@ WHAT IT SERVES
     GET  /api/libs_list?base=                 JSON: the store's sarah_clips/libs
     GET  /api/lib_media?path=                 a library file's raw bytes, audio intact
     GET  /api/load_store?path=                JSON: standalone — see siblings()/load_store()
-    GET  /build_clip?base=&overlay=&n=        build a real mp4 of N frames
-    GET  /api/save_mp4?base=&n=               copy that build into the store
     POST /api/save_scene, /api/undo_scene     standalone — see save_scene()
     POST /api/gap_log                         appends a Gap Builder click to logs/avatar_editor_gap_builder_<date>.log
     GET  /<slug>/frames/frame_NNNNN.{jpg,png} the extracted frames
@@ -76,7 +74,6 @@ import urllib.parse
 HERE = os.path.dirname(os.path.abspath(__file__))       # <repo>/avatar_editor
 ROOT = os.path.dirname(HERE)                             # <repo>
 CACHE = os.path.join(ROOT, "cache")                       # SAME cache the editor uses
-PREVIEWS = os.path.join(CACHE, "_previews")               # this tool's own mp4 output
 GAP_LOG_DIR = os.path.join(ROOT, "logs")                  # same logs/ the editor's own daily log lives in
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "shared"))
@@ -100,82 +97,13 @@ def log(path, payload, result, status):
     main_serve.session_log(path, payload, result, status)
 
 
-def next_versioned_name(folder, ext):
-    """
-    Next `YY-M-D_v<N><ext>` name in `folder` — same Add-V scheme
-    shared/paths.py's archive_name_v already uses (two-digit year, unpadded
-    month/day, sequence resetting daily), reimplemented small here because
-    that one matches a bare folder name with no extension, and this always
-    has one (`.mp4`) — matching it verbatim would never find last save and
-    silently hand out v1 forever.
-    """
-    now = time.localtime()
-    yy, mm, dd = now.tm_year % 100, now.tm_mon, now.tm_mday
-    stem = f"{yy}-{mm}-{dd}"
-    pat = re.compile(rf"^{re.escape(stem)}_v(\d+){re.escape(ext)}$")
-    seen = 0
-    if os.path.isdir(folder):
-        for f in os.listdir(folder):
-            m = pat.match(f)
-            if m:
-                seen = max(seen, int(m.group(1)))
-    return f"{stem}_v{seen + 1}{ext}"
-
-
-def build_preview_clip(seg, av, n, out):
-    """
-    The SAME one-pass recipe build_scenes.py uses for a real release build —
-    picture and voice combined in a single ffmpeg call, never two passes —
-    just capped to the first `n` frames instead of the whole scene. Reuses
-    build_scenes' own probe()/run()/CANVAS/FPS rather than re-typing them,
-    so this can't quietly drift from the tool that makes the real thing.
-
-    `n` is clamped to the avatar's actual frame count — asking for more
-    frames than exist would either error deep in ffmpeg or silently hold
-    on nothing, neither of which says "you asked for too many" plainly.
-    """
-    B, P, R = build_scenes, build_scenes.probe, build_scenes.run
-    CANVAS, FPS = B.CANVAS, B.FPS
-
-    avail, _, aw, ah, _ = P(av, alpha=True)
-    n = max(1, min(n, avail))
-    if (aw, ah) != (CANVAS, CANVAS):
-        return None, f"avatar is {aw}x{ah}, expected {CANVAS}x{CANVAS}"
-
-    _, _, sw, sh, _ = P(seg)
-    vf = ["setpts=PTS-STARTPTS"]
-    if (sw, sh) != (CANVAS, CANVAS):
-        vf.append(f"scale={CANVAS}:-2")
-        vf.append(f"pad={CANVAS}:{CANVAS}:(ow-iw)/2:(oh-ih)/2:color=black")
-    vf.append("setsar=1")
-    vf.append("tpad=stop_mode=clone:stop_duration=60")   # hold if footage runs short
-
-    dur = n / FPS
-    R(["ffmpeg", "-v", "error",
-       "-i", seg,
-       "-c:v", "libvpx-vp9", "-i", av,          # the decoder MUST precede -i
-       "-filter_complex",
-       f"[0:v]{','.join(vf)}[bg];"
-       f"[1:v]setpts=PTS-STARTPTS,format=yuva420p[fg];"
-       f"[bg][fg]overlay=0:0:format=auto[v]",
-       "-map", "[v]",
-       "-map", "1:a",
-       "-af", f"apad=whole_dur={dur:.6f}",       # pad HER VOICE to the picture's exact length
-       "-frames:v", str(n),                      # -frames:v, never -t — see build_scenes.py
-       "-c:v", "libx264", "-preset", "medium", "-crf", "20",
-       "-pix_fmt", "yuv420p", "-r", str(FPS),
-       "-c:a", "aac", "-b:a", "128k",
-       "-movflags", "+faststart", "-y", out])
-    return n, None
-
 def video_root_of(seg_path):
     """
     <video folder> from a .../sandbox/<NN-label>/segment.mp4 path — up three
-    levels. Shared by save_mp4 (writes video/sandbox_mp4_scenes/ there) and
-    the libs list (reads sarah_clips/libs/ there), so the one assumption
-    about the folder shape lives once. Returns None rather than guessing
-    when the shape doesn't match, since a silently wrong folder here would
-    make an action land somewhere that just looks empty.
+    levels. Used by the libs list (reads sarah_clips/libs/ there). Returns
+    None rather than guessing when the shape doesn't match, since a
+    silently wrong folder here would make an action land somewhere that
+    just looks empty.
     """
     label_dir = os.path.dirname(seg_path)
     sandbox_root = os.path.dirname(label_dir)
@@ -193,16 +121,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.send_web(parsed.path[len("/web/"):])
         if parsed.path == "/api/open_pair":
             return self.open_pair(urllib.parse.parse_qs(parsed.query))
-        if parsed.path == "/build_clip":
-            return self.build_clip(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/stores":
             return self.stores()
         if parsed.path == "/api/load_video":
             return self.load_video(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/load_store":
             return self.load_store(urllib.parse.parse_qs(parsed.query))
-        if parsed.path == "/api/save_mp4":
-            return self.save_mp4(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/libs_list":
             return self.libs_list(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/lib_frames":
@@ -818,41 +742,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         log("/api/frames/restore", payload, result, 200)
         self._relay(200, result)
 
-    def save_mp4(self, qs):
-        """
-        GET /api/save_mp4?n=<N> -> copy this tool's own build_clip output
-        for N frames into <video folder>/video/sandbox_mp4_scenes/, named
-        with the SAME dated version scheme (YY-M-D_v#) already used
-        elsewhere in this repo for a kept, versioned copy of real work —
-        reused here via shared/paths.py rather than a second naming rule.
-        """
-        base_p, _, _, _ = self._pair_from(qs)
-        if base_p is None:
-            return
-        try:
-            n = int((qs.get("n") or [""])[0])
-        except ValueError:
-            return self.json_error(400, "n must be an integer frame count")
-        src = os.path.join(PREVIEWS, f"preview_{n}.mp4")
-        if not os.path.isfile(src):
-            return self.json_error(400, f"no built clip for {n} frames yet — "
-                                         f"use Build (real speed) or Build MP4 first")
-
-        video_root = video_root_of(base_p)
-        if video_root is None:
-            return self.json_error(500, f"expected .../sandbox/<label>/segment.mp4, "
-                                         f"got {base_p}")
-
-        dest_dir = os.path.join(video_root, "video", "sandbox_mp4_scenes")
-        os.makedirs(dest_dir, exist_ok=True)
-        name = next_versioned_name(dest_dir, ".mp4")
-        dest = os.path.join(dest_dir, name)
-        import shutil
-        shutil.copy2(src, dest)
-        result = {"saved": os.path.relpath(dest, CUSTOMERS_ROOT), "frames": n}
-        log("/api/save_mp4", {"n": n}, result, 200)
-        self._relay(200, result)
-
     def _pair_from(self, qs):
         """
         (base_path, overlay_path, base_rel, over_rel) from a request's own
@@ -919,61 +808,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             "over_ext": over_meta.get("ext", ".png"),
             "base_rel": base_rel, "over_rel": over_rel,
         })
-
-    def build_clip(self, qs):
-        """
-        GET /build_clip?n=<N> -> {"url": "/_previews/preview_N.mp4", "frames": N}
-
-        Builds a REAL mp4 of the first N frames of the pair currently open in
-        the browser — same one-pass picture+voice recipe as a production
-        build (see build_preview_clip's own docstring), just short. Exists so
-        "run 100 frames, then look at them as an actual video" doesn't need
-        the full scene finished first.
-        """
-        base_p, over_p, _, _ = self._pair_from(qs)
-        if base_p is None:
-            return
-        if over_p is None:
-            return self.json_error(400, "overlay is required")
-        try:
-            n = int((qs.get("n") or [""])[0])
-        except ValueError:
-            return self.json_error(400, "n must be an integer frame count")
-        if n < 1:
-            return self.json_error(400, "n must be at least 1")
-
-        os.makedirs(PREVIEWS, exist_ok=True)
-        # Named from the REQUESTED n until the build finishes, then renamed to
-        # the ACTUAL frame count build_preview_clip clamped to. Naming it from
-        # the request up front made "n=999999" on a 142-frame avatar produce
-        # a file called preview_999999.mp4 holding 142 real frames — a
-        # filename that lied about its own content the moment a request
-        # asked for more than existed.
-        tmp_out = os.path.join(PREVIEWS, f"_building_{os.getpid()}_{n}.mp4")
-        try:
-            got, err = build_preview_clip(base_p, over_p, n, tmp_out)
-        except SystemExit as e:
-            # build_scenes.run() exits the process on an ffmpeg failure — the
-            # right call in a one-shot CLI tool, the wrong one inside a
-            # request thread. Turn it back into an HTTP error instead of
-            # letting it kill this request's thread silently.
-            return self.json_error(500, str(e))
-        if err:
-            return self.json_error(400, err)
-
-        out = os.path.join(PREVIEWS, f"preview_{got}.mp4")
-        os.replace(tmp_out, out)
-
-        result = {"url": f"/_previews/{os.path.basename(out)}", "frames": got}
-        log("/build_clip", {"n": got}, result, 200)
-
-        import json
-        body = json.dumps(result).encode()
-        self.send_response(200)
-        self.send_header("Content-Type", "application/json")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
 
     def log_message(self, fmt, *args):
         # Frame requests alone would be one line per image, hundreds per

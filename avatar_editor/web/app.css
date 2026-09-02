@@ -18,6 +18,10 @@
     display: flex; align-items: flex-start; justify-content: center;
     gap: 24px; flex-wrap: wrap;
   }
+  /* sarah_clips/libs sits first here on purpose — Carson asked for it to
+     anchor the page's top-left corner, ahead of Timeline Scenes, rather
+     than sit centred with everything else. */
+  .row-top { justify-content: flex-start; }
   .panel {
     background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
     padding: 14px; width: 320px; text-align: center;
@@ -30,10 +34,8 @@
     border: 1px solid var(--seg);
   }
   /* Every checker-background viewer here shows a transparent, Sarah-overlay
-     render — the OVERLAY panel itself, and the Frame Selector / Clip-Gap
-     Builder viewers below, which browse the same kind of footage. All of
-     them get the overlay colour; Base is the one plain (non-checker) viewer
-     and keeps the segment colour above. */
+     render — the Frame Selector and Clip-Gap Builder viewers below, which
+     both browse footage from sarah_clips/libs. */
   .imgwrap.checker {
     border-color: var(--over);
     background-image:
@@ -51,102 +53,7 @@
     justify-content: center; gap: 8px;
   }
   .count b { color: var(--text); font-variant-numeric: tabular-nums; }
-
-  /* Whether this track flows into the combiner canvas and the frames
-     collection when +/auto-blend runs — filled with the track's own colour
-     when on, an empty ring when off. Off does not touch the viewer above it,
-     only what the NEXT combine draws and keeps. */
-  .flowToggle {
-    width: 16px; height: 16px; border-radius: 50%; flex: none; padding: 0;
-    cursor: pointer; background: transparent; border: 2px solid var(--border);
-  }
-  .flowToggle.over.on { background: var(--over); border-color: var(--over); }
-  .flowToggle.base.on { background: var(--seg); border-color: var(--seg); }
-  .flowToggle:hover { border-color: var(--accent2); }
-  .mid {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 14px; width: 100px; padding-top: 130px;
-  }
-  #speedSel {
-    width: 108px; background: #0f1214; color: var(--text); border: 1px solid var(--border);
-    border-radius: 6px; padding: 9px 6px; text-align: center; font: 13px/1 -apple-system, sans-serif;
-  }
-  #speedSel:disabled { opacity: .5; }
-  #playVideoBtn { width: 108px; padding: 8px 6px; font-size: 12px; }
-  #jumpLabel { font-size: 10px; text-transform: uppercase; letter-spacing: .08em;
-    color: var(--sub); text-align: center; }
-  .navrow { display: flex; justify-content: center; align-items: center; gap: 14px; margin: 22px 0 6px; }
-  button.nav {
-    background: #2c3236; color: var(--text); border: 1px solid var(--border);
-    border-radius: 6px; padding: 8px 16px; font-size: 13px; cursor: pointer;
-  }
-  button.nav:hover { border-color: var(--accent2); }
-  button.nav:disabled { opacity: .35; cursor: default; }
-  /* Default (both flowing) is green — the same colour the canvas border
-     falls back to for the same state, so the two never disagree. */
-  #plusBtn {
-    width: 56px; height: 56px; border-radius: 50%; font-size: 26px;
-    background: var(--accent); color: #06210a; border: none; cursor: pointer;
-    box-shadow: 0 4px 14px rgba(46,204,64,.35);
-  }
-  #plusBtn:active { transform: scale(.94); }
-  /* One flow toggle off — the button matches whichever track is still on,
-     same colour language as the canvas border and the toggle dots. */
-  #plusBtn.flow-over { background: var(--over); box-shadow: 0 4px 14px rgba(165,108,255,.4); }
-  #plusBtn.flow-base { background: var(--seg); box-shadow: 0 4px 14px rgba(79,195,247,.4); }
-  /* Both off — there is nothing this click would collect. */
-  #plusBtn.flow-none { background: #2a3138; color: var(--sub); box-shadow: none; }
-  /* Red while auto-blending — press again (same button) to stop early.
-     Declared LAST so it always wins over a flow-* colour when both classes
-     are on at once (same specificity; source order breaks the tie): what
-     the button DOES right now outranks what it would collect. */
-  #plusBtn.running {
-    background: #e0554f; box-shadow: 0 4px 14px rgba(224,85,79,.4);
-  }
-  /* Focus stays on this button after every combine (see the click handler),
-     so a visible ring here is what shows the run-of-frames workflow is
-     ready for the next Enter/Space press. */
-  #plusBtn:focus-visible, #plusBtn:focus {
-    outline: 3px solid var(--accent2); outline-offset: 3px;
-  }
-  .resultWrap { margin-top: 26px; display: flex; flex-direction: column; align-items: center; }
-  .resultWrap h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em;
-    color: var(--sub); margin: 0 0 10px; }
-  #resultCanvas {
-    /* Green is the third colour in the same language as --seg/--over above —
-       segment_avatar_editor/player.py's own --both, for when BOTH tracks are
-       shown together, which is exactly what this canvas is. */
-    width: 340px; height: 340px; border-radius: 8px; border: 1px solid var(--accent);
-    background:
-      linear-gradient(45deg, #232323 25%, transparent 25%),
-      linear-gradient(-45deg, #232323 25%, transparent 25%),
-      linear-gradient(45deg, transparent 75%, #232323 75%),
-      linear-gradient(-45deg, transparent 75%, #232323 75%);
-    background-size: 20px 20px;
-    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-    background-color: #1a1a1a;
-    display: none;
-  }
   .status { text-align: center; color: var(--sub); font-size: 12px; margin-top: 12px; min-height: 16px; }
-  .scrub {
-    margin-top: 16px; display: flex; flex-direction: column; align-items: center;
-    gap: 6px; width: 100%;
-  }
-  .scrub input[type=range] { width: 100%; accent-color: var(--accent2); }
-  .scrub input[type=range]:disabled { opacity: .35; }
-  #scrubLabel { font-size: 12px; color: var(--sub); }
-  #scrubLabel b { color: var(--text); font-variant-numeric: tabular-nums; }
-  #buildStatus { text-align: center; color: var(--sub); font-size: 12px; margin-top: 8px; min-height: 16px; }
-  #clipVideo {
-    display: none; margin: 16px auto 0; max-width: 100%; width: 500px;
-    border-radius: 8px; border: 1px solid var(--border);
-  }
-  .filmstrip { margin-top: 24px; display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; max-width: 100%; }
-  .filmstrip div {
-    width: 46px; height: 46px; border-radius: 4px; overflow: hidden;
-    border: 1px solid var(--border); background-size: cover; background-position: center;
-    opacity: .85;
-  }
   .tlscenes { width: 340px; text-align: left; display: flex; flex-direction: column; }
   .tlscenes h3 { text-align: center; }
   .libpanel { width: 260px; flex: none; text-align: left; display: flex; flex-direction: column; }
@@ -167,9 +74,8 @@
   .libfile .meta { color: var(--sub); flex: none; font-variant-numeric: tabular-nums; }
   .libempty { font-size: 11.5px; color: var(--sub); font-style: italic; }
   /* A sound bit's play button — small, round, sits at the end of its row
-     next to the file size/duration. Same idea as .flowToggle's small dots
-     elsewhere: an icon-only control that doesn't fight the row's text for
-     space. */
+     next to the file size/duration: an icon-only control that doesn't
+     fight the row's text for space. */
   .soundBitPlay {
     width: 20px; height: 20px; border-radius: 50%; flex: none; padding: 0;
     font-size: 10px; line-height: 1; cursor: pointer;
@@ -238,10 +144,11 @@
     color: var(--sub); text-align: center;
   }
 
-  /* Holds all three Gap Builder boxes side by side, sarah_clips/libs on the
-     left — its own full-width row, top-aligned by nothing more than being
+  /* Holds the Frame Selector, Clip-Gap Builder and Controller Menu side by
+     side — its own full-width row, top-aligned by nothing more than being
      flex siblings here (a flex row's cross-start already lines every child
      up the same way, whatever each one's own height turns out to be).
+     sarah_clips/libs itself moved up to the top-left row above (2026-09-02).
      Wraps rather than overflows on a narrower window, same as the main .row. */
   .libinspector-row {
     display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; margin: 24px auto 0;
@@ -254,9 +161,8 @@
     margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em;
     color: var(--sub); text-align: center;
   }
-  /* Square, same 1:1 as the Overlay/Base viewers up top — was a fixed
-     320px height (500:320, a non-square 25:16) until Carson asked for it
-     to match. */
+  /* Square — was a fixed 320px height (500:320, a non-square 25:16) until
+     Carson asked for it to match the panel's own 1:1 width. */
   .libinspector .imgwrap { width: 100%; height: auto; }
   .libinspector .count { text-align: center; font-size: 16px; }
   /* Two plain status boxes side by side, each its own border — the current
@@ -307,12 +213,6 @@
   }
   .pill:hover { border-color: var(--accent2); }
   .pill:disabled { opacity: .4; cursor: default; }
-  /* Three stacked lines (arrow / two-word label / "View") instead of one —
-     "Avatar Editor view" was overflowing this column's own width. */
-  #viewToggleBtn {
-    width: 100%; margin-top: 12px; white-space: normal; text-align: center;
-    line-height: 1.5;
-  }
   .tlstatus {
     font-size: 11.5px; color: var(--sub); border: 1px solid var(--border); border-radius: 6px;
     padding: 8px 10px; margin-bottom: 10px; min-height: 14px; line-height: 1.4;
@@ -337,9 +237,6 @@
   }
   .tlrow .ibtn:disabled { opacity: .3; cursor: default; }
   .tlrow .ibtn.save.dirty { border-color: #e0a93f; color: #ffdc9a; }
-  .totals { text-align: center; margin-top: 16px; font-size: 16px; color: var(--sub); }
-  .totals b { color: var(--accent); }
-  .brightness { margin-top: 6px; font-size: 11px; color: var(--sub); }
 
 /* ── the Load picker ──────────────────────────────────────────────────────
    A real modal rather than another panel on the page: picking a store and

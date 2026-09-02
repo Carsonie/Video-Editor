@@ -7,89 +7,10 @@
 </head>
 <body>
 <h1 id="pageTitle">Avatar Editor — nothing loaded</h1>
-  <div class="sub">Overlay (left) + base (right) &rarr; one combined frame of the finished video.</div>
+  <div class="sub">Sarah's own clip library &mdash; stills, idle loops, transitions, sound bits &mdash; for building and editing her overlay, scene by scene.</div>
+  <div class="status" id="status"></div>
 
-  <div class="row">
-    <div class="panel">
-      <h3>Overlay</h3>
-      <div class="imgwrap checker"><img id="overImg" alt="overlay frame"></div>
-      <div class="count">
-        <button class="flowToggle over" id="overFlowBtn"></button>
-        Frame <b id="overN">—</b> / <b id="overTotal">—</b>
-      </div>
-    </div>
-
-    <div class="mid">
-      <div id="jumpLabel">Speed</div>
-      <select id="speedSel" title="Single: + combines the current frame, then steps to the next. A speed: + auto-blends one frame after another at that rate until the last frame or until + (now red) is pressed again. Build: + skips the frame-by-frame animation entirely and asks the server to build the real mp4 directly — its own speed, not a chosen fps.">
-        <option value="single" selected>Single (1 click)</option>
-        <option value="4">4 fps</option>
-        <option value="8">8 fps</option>
-        <option value="12">12 fps</option>
-        <option value="25">25 fps</option>
-        <option value="build">Build (real speed)</option>
-      </select>
-      <button class="nav" id="playVideoBtn" disabled title="No built video yet">&#9654; Play video</button>
-      <!-- Lives here, not inside the checklist it switches, because that
-           checklist now sits INSIDE the very view this button switches
-           away from — a button that disappears exactly when you need it
-           to come back is no button at all. Always-visible ground instead. -->
-      <button class="pill" id="viewToggleBtn" title="Switch the area below between the Avatar Editor's combine/build view and the Gap Builder views">&#8646; Gap Builder view</button>
-    </div>
-
-    <div class="panel">
-      <h3>Base</h3>
-      <div class="imgwrap"><img id="baseImg" alt="base frame"></div>
-      <div class="count">
-        <button class="flowToggle base" id="baseFlowBtn"></button>
-        Frame <b id="baseN">—</b> / <b id="baseTotal">—</b>
-      </div>
-    </div>
-
-    <div class="panel tlscenes">
-      <h3>Timeline Scenes</h3>
-      <div class="pillrow">
-        <button class="pill" id="tlClearBtn" title="Empty this panel and forget the loaded store. Does not touch any file.">&#128465; Clear</button>
-        <button class="pill" id="tlLoadBtn" title="Load every scene in this pair's store from sandbox/ — the same list and pristine/dirty state the Segment and Avatar Editor shows.">&#128193; Load</button>
-        <button class="pill" id="tlSaveMp4Btn" disabled title="Build a clip first (the speed dropdown's Build option, or the Build MP4 flow) — this saves THAT file into video/sandbox_mp4_scenes/.">&#128190; Save MP4</button>
-      </div>
-      <div class="tlstatus" id="tlStatus">Nothing loaded — click Load.</div>
-      <div class="tlrows" id="tlRows"></div>
-    </div>
-  </div>
-
-  <!-- Two views sharing one area, only one visible at a time — toggled by
-       #viewToggleBtn under Play video, above (always visible, unlike
-       everything it switches between). Default is the Avatar Editor view
-       (fbView), because these two Gap Builder sections — sarah_clips/libs
-       included, it moved down to sit beside them — are only needed while
-       fine-tuning one scene, not every time. -->
-  <div id="fbView">
-    <div class="navrow">
-      <button class="nav" id="prevBtn">&#9664; prev frame</button>
-      <button id="plusBtn" title="Jump to the frame above and combine it">+</button>
-      <button class="nav" id="nextBtn">next frame &#9654;</button>
-    </div>
-    <div class="status" id="status"></div>
-
-    <div class="totals">Combined so far: <b id="combinedCount">0</b> / <b id="totalFrames">—</b> frames</div>
-
-    <div class="resultWrap">
-      <h3>Combined &mdash; this frame, as it lands in the finished mp4</h3>
-      <canvas id="resultCanvas" width="700" height="700"></canvas>
-      <div class="scrub">
-        <input type="range" id="scrubSlider" min="0" max="0" value="0" step="1" disabled>
-        <div id="scrubLabel">No frames combined yet</div>
-      </div>
-    </div>
-
-    <div class="filmstrip" id="filmstrip"></div>
-
-    <div class="status" id="buildStatus"></div>
-    <video id="clipVideo" controls></video>
-  </div>
-
-  <div class="libinspector-row" id="gapBuilderView" hidden>
+  <div class="row row-top">
     <div class="panel libpanel">
       <h3>sarah_clips/libs</h3>
       <div class="libstatus" id="libStatus">Loading…</div>
@@ -105,7 +26,19 @@
       </div>
     </div>
 
-    <div class="libinspector" id="libInspector" hidden>
+    <div class="panel tlscenes">
+      <h3>Timeline Scenes</h3>
+      <div class="pillrow">
+        <button class="pill" id="tlClearBtn" title="Empty this panel and forget the loaded store. Does not touch any file.">&#128465; Clear</button>
+        <button class="pill" id="tlLoadBtn" title="Load every scene in this pair's store from sandbox/ — the same list and pristine/dirty state the Segment and Avatar Editor shows.">&#128193; Load</button>
+      </div>
+      <div class="tlstatus" id="tlStatus">Nothing loaded — click Load.</div>
+      <div class="tlrows" id="tlRows"></div>
+    </div>
+  </div>
+
+  <div class="libinspector-row" id="gapBuilderView">
+    <div class="libinspector" id="libInspector">
       <h4>Frame Selector</h4>
       <div class="imgwrap checker"><img id="libViewerImg" alt="library frame"></div>
       <div class="framepickRow">
@@ -116,7 +49,7 @@
       <div class="libframerow" id="libFrameRow"></div>
     </div>
 
-    <div class="libinspector" id="builderPanel" hidden>
+    <div class="libinspector" id="builderPanel">
       <h4>Clip-Gap Builder</h4>
       <div class="imgwrap checker"><img id="builderViewerImg" alt="builder frame"></div>
       <div class="count">Frame <b id="builderN">—</b> / <b id="builderTotal">—</b></div>

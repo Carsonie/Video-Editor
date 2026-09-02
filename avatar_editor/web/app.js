@@ -73,12 +73,11 @@
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
   }
 
-  // The three things that are NOT tied to one scene: the Clip-Gap Builder's
-  // collection, the last Load result, and which view was showing. Called
-  // after every showEmpty()-driven reset (both a plain refresh and an
-  // in-session scene switch go through showEmpty() first, via openPair()) —
-  // NOT called by Clear, which empties storage first so there is nothing
-  // left for this to bring back.
+  // The one thing that is NOT tied to one scene: the Clip-Gap Builder's own
+  // collection. Called after every showEmpty()-driven reset (both a plain
+  // refresh and an in-session scene switch go through showEmpty() first,
+  // via openPair()) — NOT called by Clear, which empties storage first so
+  // there is nothing left for this to bring back.
   function restoreGlobals() {
     const s = loadStore();
     if (Array.isArray(s.builderFrames) && s.builderFrames.length) {
@@ -95,316 +94,10 @@
       tlRender();
       tlStatus.textContent += ' (restored)';
     }
-    if (s.gapBuilderView) setView(true);
   }
-
-  // Frame-stepping progress is tied to one scene — restored once that
-  // scene's own pair is open, keyed the same way a save for it is:
-  // base_rel + over_rel, so re-opening the SAME scene later in the same
-  // session (not just after a refresh) brings its own work back.
-  // (savePickedForCurrentPair, the other half of this pattern, lives in
-  // gap-builder.js — it saves PICKED, which belongs to that file now.)
-  function saveProgressForCurrentPair() {
-    if (!SCENE) return;
-    savePair(pairKey(SCENE.base_rel, SCENE.over_rel), {n, combined: [...combined]});
-  }
-  async function restorePairProgress() {
-    if (!SCENE) return;
-    const rec = loadStore().pairs?.[pairKey(SCENE.base_rel, SCENE.over_rel)];
-    if (!rec || !Array.isArray(rec.combined) || !rec.combined.length) return;
-    combined.clear();
-    for (const f of rec.combined) combined.add(f);
-    document.getElementById('combinedCount').textContent = combined.size;
-    n = Math.min(rec.n || 1, SCENE.max_n);
-    render();
-    // Redraw thumbnails only for a hand-stepped batch small enough that this
-    // is instant. A "Build (real speed)" run marks the WHOLE scene combined
-    // in one call without ever drawing a thumbnail per frame either (see
-    // runBuild()'s own comment) — restoring hundreds one at a time here
-    // would be the one place slower than just re-combining them.
-    const arr = combinedSorted();
-    if (arr.length && arr.length <= 60) {
-      const strip = document.getElementById('filmstrip');
-      strip.innerHTML = '';
-      for (const fn of arr) {
-        await drawCombinedAt(fn);
-        const tile = document.createElement('div');
-        tile.style.backgroundImage = `url(${canvas.toDataURL('image/jpeg', 0.85)})`;
-        tile.title = `frame ${fn}`;
-        strip.appendChild(tile);
-      }
-    }
-    updateScrub();
-  }
-
-  // ── view toggle ──────────────────────────────────────────────────────────
-  // Two views share one area: the Avatar Editor's own combine/build view
-  // (fbView) and the Gap Builder pair (gapBuilderView) added afterward.
-  // Only one is ever visible — the Gap Builder sections are only needed
-  // while fine-tuning one scene, not on every visit, so they stay out of
-  // the way until asked for. fbView is the default.
-  const fbView = document.getElementById('fbView');
-  const gapBuilderView = document.getElementById('gapBuilderView');
-  const viewToggleBtn = document.getElementById('viewToggleBtn');
-
-  // Deliberately does NOT save to storage — showEmpty() also calls this
-  // (setView(false), forcing the default) as part of the same reset that
-  // restoreGlobals() has to undo, and saving here would overwrite the real
-  // saved choice before restore ever gets to read it. Only the explicit
-  // click below saves.
-  function setView(showGapBuilder) {
-    fbView.hidden = showGapBuilder;
-    gapBuilderView.hidden = !showGapBuilder;
-    // Stacked (arrow / two-word label / "View") rather than one line — the
-    // single-line version overflowed this column's own width.
-    viewToggleBtn.innerHTML = showGapBuilder
-      ? '&#8646;<br>Avatar Editor<br>View' : '&#8646;<br>Gap Builder<br>View';
-    viewToggleBtn.title = showGapBuilder
-      ? 'Switch back to the frame-stepping / combine / build view'
-      : 'Switch to the Frame Selector and Clip-Gap Builder view';
-  }
-
-  viewToggleBtn.onclick = () => {
-    const showGapBuilder = gapBuilderView.hidden;
-    setView(showGapBuilder);
-    saveStore({gapBuilderView: showGapBuilder});
-  };
 
   const pad = n => String(n).padStart(5, '0');
-  const BASE = n => `/${SCENE.base_slug}/frames/frame_${pad(n)}${SCENE.base_ext}`;
-  const OVER = n => `/${SCENE.over_slug}/frames/frame_${pad(n)}${SCENE.over_ext}`;
-
-  let n = 1;
-  const combined = new Set();
-  const baseImg = document.getElementById('baseImg');
-  const overImg = document.getElementById('overImg');
-  const canvas = document.getElementById('resultCanvas');
-  const ctx = canvas.getContext('2d');
   const status = document.getElementById('status');
-
-  // Which track(s) flow into the combiner canvas and, from there, into the
-  // frames collection (the filmstrip / scrub range) — both on by default,
-  // the same as every combine before this existed. Turning one off lets a
-  // review isolate just Sarah's motion, or just the background's, instead
-  // of always compositing the pair.
-  let includeBase = true, includeOverlay = true;
-  const overFlowBtn = document.getElementById('overFlowBtn');
-  const baseFlowBtn = document.getElementById('baseFlowBtn');
-
-  // The canvas border reads which track(s) are flowing, in the same
-  // colour language --seg/--over/--accent already use everywhere else on
-  // this page: blue for base alone, purple for overlay alone, green for
-  // both — and the neutral border colour if neither is on, since nothing
-  // is flowing at all.
-  function updateFlowUI() {
-    overFlowBtn.classList.toggle('on', includeOverlay);
-    baseFlowBtn.classList.toggle('on', includeBase);
-    overFlowBtn.title = includeOverlay
-      ? 'Overlay flows into the combiner — click to leave it out'
-      : 'Overlay is left out of the combiner — click to include it';
-    baseFlowBtn.title = includeBase
-      ? 'Base flows into the combiner — click to leave it out'
-      : 'Base is left out of the combiner — click to include it';
-    canvas.style.borderColor =
-      includeBase && includeOverlay ? 'var(--accent)'
-      : includeOverlay ? 'var(--over)'
-      : includeBase ? 'var(--seg)'
-      : 'var(--border)';
-    // By id, not the outer `plusBtn` const below — this runs once at load,
-    // before that declaration is reached, and a temporal-dead-zone
-    // reference here would throw before the page ever renders.
-    const btn = document.getElementById('plusBtn');
-    btn.classList.remove('flow-over', 'flow-base', 'flow-none');
-    if (!includeBase && !includeOverlay) btn.classList.add('flow-none');
-    else if (!includeBase) btn.classList.add('flow-over');
-    else if (!includeOverlay) btn.classList.add('flow-base');
-  }
-  overFlowBtn.onclick = () => { includeOverlay = !includeOverlay; updateFlowUI(); };
-  baseFlowBtn.onclick = () => { includeBase = !includeBase; updateFlowUI(); };
-  updateFlowUI();
-
-  // Just the two viewer panels and the nav state — no opinion on the
-  // canvas or the status line. Split out so the post-combine auto-advance
-  // (below) can move the PICKER on to the next frame without also hiding
-  // the result it just drew: that used to call the combined render() below,
-  // which — seeing the NEW frame was not yet combined — hid the canvas the
-  // instant it appeared. Carson caught it: the big picture disappeared
-  // right after every combine.
-  function showFrame() {
-    if (!LOADED()) return;   // nothing to show, and nothing to repaint over a cleared page
-    baseImg.src = BASE(Math.min(n, SCENE.base_n));
-    overImg.src = OVER(Math.min(n, SCENE.over_n));
-    document.getElementById('baseN').textContent = Math.min(n, SCENE.base_n);
-    document.getElementById('overN').textContent = Math.min(n, SCENE.over_n);
-    document.getElementById('prevBtn').disabled = n <= 1;
-    document.getElementById('nextBtn').disabled = n >= SCENE.max_n;
-  }
-
-  // The full picture for NAVIGATING to a frame (prev/next, or landing on
-  // one by typing a number then +): also syncs the canvas and status to
-  // whether THIS frame has already been combined.
-  function render() {
-    if (!LOADED()) return;
-    showFrame();
-    canvas.style.display = combined.has(n) ? 'block' : 'none';
-    if (combined.has(n)) drawCombined();
-    status.textContent = combined.has(n) ? 'Already combined — click + again to redraw.' : '';
-  }
-
-  // Returns once every FLOWING layer is actually painted (base, overlay, or
-  // both — see includeBase/includeOverlay above), so a caller that wants
-  // the finished picture (the filmstrip thumbnail, below) can wait for it
-  // instead of reading the canvas mid-draw. Takes an explicit frame number
-  // rather than always reading the global `n`, so the scrub slider (below)
-  // can redraw an already-combined frame for review without disturbing
-  // whichever frame the nav buttons are currently sitting on.
-  function drawCombinedAt(fn) {
-    return new Promise(resolve => {
-      const wantB = includeBase, wantO = includeOverlay;
-      if (!wantB && !wantO) { ctx.clearRect(0, 0, canvas.width, canvas.height); resolve(); return; }
-      const need = (wantB ? 1 : 0) + (wantO ? 1 : 0);
-      let loaded = 0;
-      const b = wantB ? new Image() : null, o = wantO ? new Image() : null;
-      const done = () => {
-        loaded++;
-        if (loaded < need) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // Base first, overlay on top — the same stacking order a full
-        // combine has always drawn in, kept even when one side is off.
-        if (b) ctx.drawImage(b, 0, 0, canvas.width, canvas.height);
-        if (o) ctx.drawImage(o, 0, 0, canvas.width, canvas.height);
-        resolve();
-      };
-      if (b) { b.onload = done; b.src = BASE(Math.min(fn, SCENE.base_n)); }
-      if (o) { o.onload = done; o.src = OVER(Math.min(fn, SCENE.over_n)); }
-    });
-  }
-  const drawCombined = () => drawCombinedAt(n);
-
-  // Combine the CURRENT frame (n) and step to the next one, leaving the
-  // canvas/status showing what was just built (see showFrame()'s own
-  // comment for why that is a separate call from render()). Returns false
-  // once it has just combined the LAST frame — the signal both the single
-  // click handler and the auto-run loop use to know there is nothing left.
-  async function combineCurrentFrame() {
-    if (!includeBase && !includeOverlay) {
-      status.textContent = 'Nothing flowing into the combiner — turn Base or Overlay back on.';
-      return false;   // same "nothing left to do" signal an auto-run stops on
-    }
-    canvas.style.display = 'block';
-    await drawCombined();
-    if (!combined.has(n)) {
-      combined.add(n);
-      document.getElementById('combinedCount').textContent = combined.size;
-      const strip = document.getElementById('filmstrip');
-      const tile = document.createElement('div');
-      // The ACTUAL combined picture — Sarah composited onto the background,
-      // read straight off the canvas that was just painted — not the base
-      // frame alone. A thumbnail of only the background answers a different
-      // question than the one this tool exists to answer.
-      tile.style.backgroundImage = `url(${canvas.toDataURL('image/jpeg', 0.85)})`;
-      tile.title = `frame ${n}`;
-      strip.appendChild(tile);
-      updateScrub();
-    }
-    status.textContent = `Frame ${n} combined.`;
-    const hadNext = n < SCENE.max_n;
-    if (hadNext) { n++; showFrame(); }
-    saveProgressForCurrentPair();
-    return hadNext;
-  }
-
-  // The scrub slider walks the frames that have ACTUALLY been combined so
-  // far, in order — not the full 1..SCENE.max_n range, since most of that may not
-  // exist yet. Its position is an index into that sorted list, not a frame
-  // number itself, so it always spans exactly "first combined" to "last
-  // combined" with no dead space on either end.
-  const scrubSlider = document.getElementById('scrubSlider');
-  const scrubLabel = document.getElementById('scrubLabel');
-
-  function combinedSorted() {
-    return [...combined].sort((a, b) => a - b);
-  }
-
-  function scrubTo(idx) {
-    const arr = combinedSorted();
-    if (!arr.length) return;
-    idx = Math.max(0, Math.min(idx, arr.length - 1));
-    scrubSlider.value = idx;
-    const frameNum = arr[idx];
-    scrubLabel.innerHTML = `Frame <b>${frameNum}</b> &middot; ${idx + 1} / ${arr.length} combined`;
-    canvas.style.display = 'block';
-    drawCombinedAt(frameNum);
-  }
-
-  // Called every time a new frame joins `combined` — grows the slider's
-  // range and jumps it to the frame just built, so running a batch (the
-  // auto-blend speeds above) tracks live, and once it stops you can drag
-  // back through everything it made.
-  function updateScrub() {
-    const arr = combinedSorted();
-    scrubSlider.disabled = arr.length === 0;
-    scrubSlider.max = Math.max(0, arr.length - 1);
-    if (arr.length) scrubTo(arr.length - 1);
-  }
-
-  scrubSlider.oninput = () => scrubTo(+scrubSlider.value);
-
-  const buildStatus = document.getElementById('buildStatus');
-  const clipVideo = document.getElementById('clipVideo');
-  const playVideoBtn = document.getElementById('playVideoBtn');
-
-  // Enabled whenever a scene is loaded — it no longer waits for a build to
-  // exist first. Until 2026-08-30 this button stayed disabled until the "+"
-  // button (elsewhere on the page, with no visual link to Build/Play) ran
-  // the build, so choosing "Build (real speed)" and clicking THIS button —
-  // the obvious next step — silently did nothing. Now it builds first if
-  // there's nothing built yet, then plays, so Play is the one control that
-  // actually starts a build.
-  playVideoBtn.onclick = async () => {
-    if (!LOADED() || running) return;
-    if (lastBuiltFrames == null) {
-      playVideoBtn.disabled = true;
-      playVideoBtn.title = 'Building...';
-      try {
-        await buildClip(SCENE.max_n);
-      } catch (e) {
-        buildStatus.textContent = `Build failed: ${e.message}`;
-        playVideoBtn.disabled = false;
-        playVideoBtn.title = 'No built video yet';
-        return;
-      }
-    }
-    clipVideo.scrollIntoView({behavior: 'smooth', block: 'center'});
-    clipVideo.play();
-  };
-
-  // The one real request to the server behind the "Build" dropdown choice
-  // — picture + voice together in a single ffmpeg pass. Its running time
-  // is however long THAT takes, not a chosen fps: there is no per-frame
-  // delay to configure here, unlike the browser-side auto-blend.
-  let lastBuiltFrames = null;
-  const tlSaveMp4Btn = document.getElementById('tlSaveMp4Btn');
-
-  async function buildClip(want) {
-    playVideoBtn.disabled = true;
-    playVideoBtn.title = 'Building...';
-    tlSaveMp4Btn.disabled = true;
-    buildStatus.textContent = `Building ${want} frame(s) — picture and her voice, in one pass...`;
-    clipVideo.style.display = 'none';
-    const res = await fetch(`/build_clip?${pairQS()}&n=${want}`);
-    if (!res.ok) throw new Error(await res.text());
-    const data = await res.json();
-    clipVideo.src = data.url + `?t=${Date.now()}`;   // cache-bust a rebuild at the same N
-    clipVideo.style.display = 'block';
-    buildStatus.textContent = `Built ${data.frames} frame(s) — playable above.`;
-    playVideoBtn.disabled = false;
-    playVideoBtn.title = 'Play the built video';
-    lastBuiltFrames = data.frames;
-    tlSaveMp4Btn.disabled = false;
-    tlSaveMp4Btn.title = `Save the ${data.frames}-frame build into video/sandbox_mp4_scenes/`;
-    return data;
-  }
 
   // ── Timeline Scenes ──────────────────────────────────────────────────────
   // A read-mostly companion to the Segment and Avatar Editor's own panel of
@@ -539,7 +232,6 @@
   // two browser tabs silently fought over one slot. The API takes the pair
   // explicitly now, so there is no server-side copy left to clear.
   document.getElementById('tlClearBtn').onclick = () => {
-    if (running) running = false;
     clearStore();                // the ONE point that erases what's persisted —
                                   // otherwise the NEXT refresh or Load would
                                   // just bring the Builder and picks right back
@@ -550,104 +242,6 @@
     tlStatus.textContent = 'Nothing loaded — click Load.';
     history.replaceState(null, '', location.pathname);
   };
-
-  tlSaveMp4Btn.onclick = async () => {
-    if (lastBuiltFrames == null) return;
-    tlSaveMp4Btn.disabled = true;
-    try {
-      const r = await fetch(`/api/save_mp4?${pairQS()}&n=${lastBuiltFrames}`);
-      const d = await r.json();
-      tlStatus.textContent = d.error ? `Save MP4 failed: ${d.error}` : `Saved: ${d.saved}`;
-    } catch (e) {
-      tlStatus.textContent = `Save MP4 failed: ${e.message}`;
-    } finally {
-      tlSaveMp4Btn.disabled = false;
-    }
-  };
-
-  const plusBtn = document.getElementById('plusBtn');
-  const speedSel = document.getElementById('speedSel');
-  let running = false;
-
-  function setRunning(on) {
-    running = on;
-    plusBtn.classList.toggle('running', on);
-    plusBtn.textContent = on ? '■' : '+';
-    plusBtn.title = on ? 'Stop auto-blending' : '+';
-    speedSel.disabled = on;
-  }
-
-  // Auto-blend: combine, wait one frame-interval at the chosen fps, repeat
-  // — until the last frame combines itself (hadNext comes back false) or
-  // `running` goes false from the stop click below, whichever first.
-  async function runAuto(fps) {
-    setRunning(true);
-    const delayMs = 1000 / fps;
-    while (running) {
-      const hadNext = await combineCurrentFrame();
-      if (!hadNext || !running) break;
-      await new Promise(r => setTimeout(r, delayMs));
-    }
-    setRunning(false);
-  }
-
-  // Build the WHOLE scene (frame 1 through SCENE.max_n) via the server, and mark
-  // every one of those frames as combined here too — so the filmstrip count,
-  // the totals line and the scrub slider all agree with reality afterward,
-  // even though this path never drew them one at a time in the browser.
-  // Not stoppable like the fps loop below: it's one request, not a series of
-  // waits, so there's nothing meaningful for a second click to interrupt.
-  async function runBuild() {
-    plusBtn.disabled = true;
-    speedSel.disabled = true;
-    try {
-      await buildClip(SCENE.max_n);
-      for (let f = 1; f <= SCENE.max_n; f++) combined.add(f);
-      document.getElementById('combinedCount').textContent = combined.size;
-      updateScrub();
-      n = SCENE.max_n;
-      render();
-      saveProgressForCurrentPair();
-    } catch (e) {
-      buildStatus.textContent = `Build failed: ${e.message}`;
-    } finally {
-      plusBtn.disabled = false;
-      speedSel.disabled = false;
-    }
-  }
-
-  // Single mode: exactly the old one-click-one-frame behaviour, focus kept
-  // on + so a run of manual clicks (or repeated Enter/Space) still works.
-  // A speed selected instead turns + into a start/stop toggle for
-  // runAuto() — press once to start blending at that rate, press the same
-  // (now red) button again to stop early. Build skips that animation
-  // entirely: its pace is the ffmpeg process, not a chosen fps.
-  plusBtn.onclick = async () => {
-    if (running) { running = false; return; }   // this click is the STOP
-    if (!LOADED()) { status.textContent = 'Nothing loaded — open a pair, or click Load.'; return; }
-    const speed = speedSel.value;
-    if (speed === 'single') {
-      await combineCurrentFrame();
-      plusBtn.focus();
-    } else if (speed === 'build') {
-      runBuild();   // not awaited — button disables itself for its own duration
-    } else {
-      runAuto(+speed);   // not awaited — a stop click must reach the loop above
-    }
-  };
-
-  document.getElementById('prevBtn').onclick = () => { if (LOADED() && !running && n > 1) { n--; render(); saveProgressForCurrentPair(); } };
-  document.getElementById('nextBtn').onclick = () => { if (LOADED() && !running && n < SCENE.max_n) { n++; render(); saveProgressForCurrentPair(); } };
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft') document.getElementById('prevBtn').click();
-    if (e.key === 'ArrowRight') document.getElementById('nextBtn').click();
-  });
-
-  // sarah_clips/libs, the Frame Selector, and the Clip-Gap Builder (PICKED,
-  // LIB_FRAMES, BUILDER_FRAMES, rebuildLibFrames, rebuildBuilderFrames,
-  // toggleLibClip, loadLibs, savePickedForCurrentPair) all moved to
-  // gap-builder.js, loaded before this file — see that file's own header
-  // comment for why and how the two files still share scope.
 
   // ── the Load picker ──────────────────────────────────────────────────────
   // Two steps in one modal: a store, then one of that store's video folders.
@@ -745,41 +339,18 @@
 
   function showEmpty() {
     SCENE = null;
-    n = 1;
-    combined.clear();
     document.getElementById('pageTitle').textContent = 'Avatar Editor — nothing loaded';
     document.title = 'Avatar Editor';
-    document.getElementById('combinedCount').textContent = '0';
-    document.getElementById('filmstrip').innerHTML = '';
     status.textContent = '';
-    baseImg.removeAttribute('src');
-    overImg.removeAttribute('src');
-    for (const id of ['baseN', 'overN', 'baseTotal', 'overTotal', 'totalFrames'])
-      document.getElementById(id).textContent = '—';
-    document.getElementById('prevBtn').disabled = true;
-    document.getElementById('nextBtn').disabled = true;
-    canvas.style.display = 'none';
-    scrubSlider.value = 0; scrubSlider.max = 0; scrubSlider.disabled = true;
-    scrubLabel.textContent = 'No frames combined yet';
-    clipVideo.removeAttribute('src');
-    clipVideo.style.display = 'none';
-    buildStatus.textContent = '';
-    playVideoBtn.disabled = true;
-    playVideoBtn.title = 'No built video yet';
-    lastBuiltFrames = null;
-    tlSaveMp4Btn.disabled = true;
-    tlSaveMp4Btn.title = 'Build a clip first';
     libGroups.innerHTML = '';
     libStatus.textContent = 'Nothing loaded.';
     PICKED = [];
     rebuildLibFrames();
-    builderPanel.hidden = true;
     BUILDER_FRAMES = [];
     SELECTED = new Set();
     disarmSelectMode();
     rebuildBuilderFrames();
     CLIPBOARD = [];
-    setView(false);
   }
 
   async function openPair(baseRel, overRel) {
@@ -794,15 +365,8 @@
       SCENE = d;
       document.getElementById('pageTitle').textContent = `Avatar Editor — ${d.label}`;
       document.title = `Avatar Editor — ${d.label}`;
-      document.getElementById('baseTotal').textContent = d.base_n;
-      document.getElementById('overTotal').textContent = d.over_n;
-      document.getElementById('totalFrames').textContent = d.max_n;
       status.textContent = '';
-      playVideoBtn.disabled = false;
-      playVideoBtn.title = 'Build the whole scene, then play it';
-      render();
       loadLibs();
-      restorePairProgress();
       // Keep the URL honest, so a reload or a copied link reopens THIS pair
       // rather than whatever the server would have defaulted to.
       const u = new URL(location);
