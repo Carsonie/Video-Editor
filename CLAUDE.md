@@ -42,6 +42,27 @@ launch.json they all run from lives in
 
 ---
 
+## Editor changes stay inside the one editor in scope
+
+When a task is about one editor, code changes go in that editor's own
+files only. The other editors — of MP4 Splitter, Segment and Avatar
+Editor, Frame Blender, Avatar Editor — do not get touched, even if the
+same fix would technically apply to them too. Only Carson can widen the
+scope, and only by saying so directly in the chat, in that same
+conversation.
+
+**Why:** the four editors were deliberately split apart into separate,
+duplicated code (2026-09-02) so that a change in one could never break
+another. Quietly "fixing it everywhere while I'm in here" defeats that —
+it re-links tools that were split apart on purpose.
+
+**How to apply:** before editing any file outside the editor named in the
+current task, stop and ask Carson first, even if the change looks small,
+obviously correct, or identical to one already approved for another
+editor.
+
+---
+
 ## ⚠ Money: ask before every HeyGen render
 
 `build/render_narration.py` is the **only** thing here that spends real money —
