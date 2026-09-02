@@ -271,20 +271,41 @@ Every CSS and JS brace is doubled `{{ }}`. Two traps that have both shipped:
 
 ## Tests
 
+**Five suites now, one per server** — split 2026-09-02 alongside logging
+(below), so each editor's own dispatch table, cache and log get checked
+against the real standalone process people actually run, not only against
+the code they started as a copy of.
+
 ```bash
-python3 tests/test_editor.py
+python3 tests/test_editor.py                    # shared/serve.py, port 8842 (old combined) — 167 checks
+python3 tests/test_mp4_splitter.py               # mp4_splitter/serve.py, port 8845          — 82 checks
+python3 tests/test_segment_avatar_editor.py      # segment_avatar_editor/serve.py, port 8846  — 90 checks
+python3 tests/test_frame_blender.py              # frame_blender/serve.py, port 8843          — 49 checks
+python3 tests/test_avatar_editor.py              # avatar_editor/serve.py, port 8844           — 60 checks
 ```
 
-**30 steps, 106 checks**, about 90 seconds cold. One step per disk function,
-plus a `node --check` on all three generated pages. It builds a disposable
-store and deletes it — it never touches real data.
+`test_editor.py` is the deepest one — one step per disk function, plus a
+`node --check` on every generated page, about 90 seconds cold. The four
+per-editor suites don't re-derive that same depth (their target code
+started as a literal copy of shared/serve.py's own, already proven there);
+they exist to prove the STANDALONE process — its own trimmed routes, its
+own cache directory, its own session log — actually works, and that a
+route the split deliberately dropped is truly gone (404), not just
+unreachable by accident. Each builds its own disposable store and deletes
+it — none of the five ever touches real data.
 
-Every assertion is an exact **decoded frame count**. Every real bug this tool
-has had was an off-by-a-frame that still produced a playable file: Save wrote
-87 frames for an 89-frame edit for three weeks without erroring.
+Every assertion is an exact **decoded frame count**. Every real bug this
+tool has had was an off-by-a-frame that still produced a playable file:
+Save wrote 87 frames for an 89-frame edit for three weeks without
+erroring.
 
-A run writes `tests/log_reports/editor_<HH>_<MM>_<SS>.log`. Real editing writes
-`logs/editor_<YYYYMMDD>.log`. Both gitignored.
+A run writes `tests/log_reports/editor_<HH>_<MM>_<SS>.log`. Real editing
+writes to a log **dedicated to whichever editor did it** (also split
+2026-09-02, so one editor's actions are never interleaved with another's):
+`logs/editor_<date>.log` for the old combined server, and `logs/
+mp4_splitter_<date>.log` / `segment_avatar_editor_<date>.log` /
+`frame_blender_<date>.log` / `avatar_editor_<date>.log` for the standalone
+four. All gitignored.
 
 ### If a check fails
 
