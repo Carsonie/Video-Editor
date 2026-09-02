@@ -346,11 +346,18 @@
     libStatus.textContent = 'Nothing loaded.';
     PICKED = [];
     rebuildLibFrames();
+    refreshSceneSoundBit();
     BUILDER_FRAMES = [];
     SELECTED = new Set();
     disarmSelectMode();
     rebuildBuilderFrames();
     CLIPBOARD = [];
+    soundBitVideo.pause();
+    soundBitVideo.removeAttribute('src');
+    currentSoundBitPath = null;
+    soundBitPlayer.hidden = true;
+    soundBitName.textContent = 'No Sound Bit loaded';
+    syncPlayButtons();
   }
 
   async function openPair(baseRel, overRel) {

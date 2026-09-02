@@ -42,10 +42,23 @@ const soundBitRate = document.getElementById('soundBitRate');
 // video — one button, wherever the rest of the menu's buttons are, rather
 // than a second set of transport controls bolted onto the player itself.
 const gmSoundBitPlayPause = document.getElementById('gmSoundBitPlayPause');
+// The Frame Selector's and Clip-Gap Builder's own play buttons (added
+// 2026-09-02, so a picture can be checked against a voice without leaving
+// the row it's on) — same shared player as the Sound Bits rows above,
+// just two more doors into it. See playOrToggleSoundBit() below.
+const gmLibPlayPause = document.getElementById('gmLibPlayPause');
+const gmBuilderPlayPause = document.getElementById('gmBuilderPlayPause');
+
+// Which file is actually loaded right now — not just "is the player
+// playing," but WHICH clip, so playOrToggleSoundBit() below can tell "my
+// own clip is already playing, this click means pause" from "something
+// else is playing, this click means switch to mine."
+let currentSoundBitPath = null;
 
 function playSoundBit(f, label) {
   soundBitPlayer.hidden = false;
   soundBitName.textContent = label;
+  currentSoundBitPath = f.path;
   soundBitVideo.src = `/api/lib_media?path=${encodeURIComponent(f.path)}`;
   soundBitVideo.playbackRate = +soundBitRate.value;
   soundBitVideo.play();
@@ -53,17 +66,43 @@ function playSoundBit(f, label) {
   gmSoundBitPlayPause.disabled = false;
 }
 
+// The Frame Selector's and Clip-Gap Builder's buttons read as toggles, not
+// plain play buttons like a Sound Bits row's own ▶ — clicking one while
+// ITS OWN clip is already the thing playing pauses it; any other state
+// (paused, nothing loaded, a DIFFERENT clip playing) switches the shared
+// player onto this clip and plays it.
+function playOrToggleSoundBit(f, label) {
+  if (!f) return;
+  if (currentSoundBitPath === f.path && !soundBitVideo.paused) soundBitVideo.pause();
+  else playSoundBit(f, label);
+}
+
 soundBitRate.onchange = () => { soundBitVideo.playbackRate = +soundBitRate.value; };
 
-// Keeps its own label in sync with whatever's actually happening to the
-// video — including when a clip just runs out on its own, not only when
-// this button is what paused it.
-soundBitVideo.onplay = () => { gmSoundBitPlayPause.textContent = 'Pause'; };
-soundBitVideo.onpause = () => { gmSoundBitPlayPause.textContent = 'Play'; };
+// Keeps every play button's own label in sync with whatever's actually
+// happening to the video — including when a clip just runs out on its
+// own, not only when a button click is what paused it. The two toggle
+// buttons only claim "Pause" when the shared player is actually on THEIR
+// clip — a different clip playing still shows them as "Play", since
+// clicking either would switch the player onto that clip, not pause it.
+function syncPlayButtons() {
+  const playing = !soundBitVideo.paused;
+  gmSoundBitPlayPause.textContent = playing ? 'Pause' : 'Play';
+  gmLibPlayPause.textContent = (playing && currentSoundBitPath === libCurClip?.path)
+    ? "Pause This Clip's Audio" : "Play This Clip's Audio";
+  gmBuilderPlayPause.textContent = (playing && currentSoundBitPath === sceneSoundBit?.path)
+    ? 'Pause Original Sound Bit' : 'Play Original Sound Bit';
+}
+soundBitVideo.onplay = syncPlayButtons;
+soundBitVideo.onpause = syncPlayButtons;
 gmSoundBitPlayPause.onclick = withActiveFlash(gmSoundBitPlayPause, () => {
   if (soundBitVideo.paused) soundBitVideo.play();
   else soundBitVideo.pause();
 });
+gmLibPlayPause.onclick = withActiveFlash(gmLibPlayPause,
+  () => playOrToggleSoundBit(libCurClip, libCurClip?.name));
+gmBuilderPlayPause.onclick = withActiveFlash(gmBuilderPlayPause,
+  () => playOrToggleSoundBit(sceneSoundBit, sceneSoundBitLabel));
 
 const libInspector = document.getElementById('libInspector');
 const libViewerImg = document.getElementById('libViewerImg');
@@ -75,6 +114,10 @@ const libSelectedNEl = document.getElementById('libSelectedN');
 
 let PICKED = [];        // checked clips' metadata, in the order checked
 let LIB_FRAMES = [];    // every picked clip's frames, flattened into one list
+// Whichever clip the Frame Selector viewer is showing RIGHT NOW — read by
+// gmLibPlayPause (Play This Clip's Audio, above) so it always plays what's
+// actually on screen, not whatever was checked first or last.
+let libCurClip = null;
 
 // Which LIB_FRAMES indices are selected for Copy Selected — the Frame
 // Selector's own equivalent of the Clip-Gap Builder's SELECTED. Armed by
@@ -168,6 +211,9 @@ function showLibFrame(pos) {
   const i = indices[pos];
   const f = i != null ? LIB_FRAMES[i] : undefined;
   [...libFrameRow.children].forEach((d, j) => d.classList.toggle('cur', j === i));
+  libCurClip = f ? f.clip : null;
+  gmLibPlayPause.disabled = !libCurClip;
+  syncPlayButtons();
   if (!f) { libViewerImg.removeAttribute('src'); libNEl.textContent = '—'; return; }
   libViewerImg.src = f.url;
   libNEl.textContent = pos + 1;
@@ -398,6 +444,7 @@ async function toggleLibClip(f, checked) {
   if (!checked) {
     PICKED = PICKED.filter(c => c.path !== f.path);
     rebuildLibFrames();
+    refreshSceneSoundBit();
     savePickedForCurrentPair();
     return;
   }
@@ -407,15 +454,34 @@ async function toggleLibClip(f, checked) {
     if (d.error) { libStatus.textContent = `${f.name}: ${d.error}`; return; }
     PICKED.push({path: f.path, name: f.name, n: d.n, slug: d.slug, ext: d.ext});
     rebuildLibFrames();
+    refreshSceneSoundBit();
     savePickedForCurrentPair();
   } catch (e) {
     libStatus.textContent = `${f.name}: ${e.message}`;
   }
 }
 
+// Which checked sound_bits file (if any) plays through gmBuilderPlayPause
+// — Carson's own call (2026-09-02): rather than guessing which Sound Bit
+// belongs to this scene by matching its label, this plays whichever one is
+// actually checked in sarah_clips/libs above, same as every other group.
+// Re-run after every check/uncheck (toggleLibClip, above) and whenever a
+// scene loads (loadLibs, below — PICKED always starts empty there).
+function refreshSceneSoundBit() {
+  const hit = PICKED.find(c => c.path.includes('/sarah_clips/libs/sound_bits/'));
+  sceneSoundBit = hit || null;
+  sceneSoundBitLabel = hit ? hit.name.replace(/\.[^.]+$/, '').replace(/^\d+-/, '') : null;
+  gmBuilderPlayPause.disabled = !sceneSoundBit;
+  gmBuilderPlayPause.title = sceneSoundBit
+    ? `Plays the checked Sound Bit ("${sceneSoundBitLabel}"), straight off the shared player below — so you can listen to the original while scrubbing the Clip-Gap Builder's row above to compare. Click again to pause.`
+    : 'Check a file under sound_bits in sarah_clips/libs above first.';
+  syncPlayButtons();
+}
+
 async function loadLibs() {
   PICKED = [];
   rebuildLibFrames();
+  refreshSceneSoundBit();
   // A fresh pair may be a different STORE, so both are re-resolved below,
   // never carried over from whatever pair was open before.
   restPosePath = null;
@@ -554,6 +620,13 @@ let CLIPBOARD = [];
 const REST_POSE_NAME = 'sarah-rest-pose-corner-300-alpha.png';
 let restPosePath = null;
 let restPoseFrame = null;
+
+// This scene's own Sound Bit — the file object AND its stripped display
+// label, both found once per pair inside loadLibs() above, read by
+// gmBuilderPlayPause (Play Original Sound Bit) so it can compare the
+// Clip-Gap Builder's picture against the words it's meant to land on.
+let sceneSoundBit = null;
+let sceneSoundBitLabel = null;
 
 async function getRestPoseFrame() {
   if (restPoseFrame) return restPoseFrame;

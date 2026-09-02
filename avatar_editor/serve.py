@@ -85,14 +85,33 @@ import build_scenes                                       # noqa: E402  reuse it
 import paths as PTH                                       # noqa: E402  script()/sandbox_root() — see stores()
 
 
+# This tool's own action labels, set as main_serve.ACTIONS in main() (same
+# technique as the SESSION_LOG override there). shared/serve.py's own
+# ACTIONS carries these same two routes labelled "FB: Load video"/"FB:
+# Load store" — literally wrong here (this is Avatar Editor, not Frame
+# Blender), a leftover of both tools once sharing one combined log. Build
+# clip/Save MP4 aren't listed: this tool dropped those routes entirely
+# (2026-09-02, see this file's own module docstring) so log() is never
+# called with them.
+SESSION_ACTIONS = {
+    "/api/save":           ("Save scene", ()),
+    "/api/frames/restore": ("Undo",       ()),
+    "/api/load_video":     ("Load video", ("root",)),
+    "/api/load_store":     ("Load store", ("path",)),
+}
+
+
 def log(path, payload, result, status):
     """
-    Write one line into the SAME daily editing log shared/serve.py's own
-    process writes — same file, same format, same day, even though this is
-    a separate process. /api/save_scene and /api/undo_scene log themselves
-    already: they're real HTTP calls INTO that other process's /api/save and
-    /api/frames/restore, which log on the way through. Only this tool's own
-    three actions (never touching that process) need to be told to.
+    Write one line into this tool's own daily editing log — a dedicated
+    file (logs/avatar_editor_<date>.log, set in main()), not shared/
+    serve.py's logs/editor_<date>.log — separate from the Gap Builder's
+    own click log too (see GAP_LOG_DIR above). Reuses that module's
+    session_log() for the FORMATTING only (same shape every other editor's
+    log uses) — it's still a plain Python function call, not an HTTP
+    request, so nothing here proxies through the other process. Every real
+    action (Load, Save, Undo) calls this explicitly; none of them log
+    themselves for free.
     """
     main_serve.session_log(path, payload, result, status)
 
@@ -821,14 +840,24 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8844)
     ap.add_argument("--no-session-log", action="store_true",
-                     help="don't write Build/Save MP4/Load into logs/editor_<date>.log "
+                     help="don't write Save/Load into logs/avatar_editor_<date>.log "
                           "— for a test run, not normal use")
     a = ap.parse_args()
-    # A module attribute on the OTHER server's imported code, set from THIS
-    # process — safe because it's a plain Python global, not shared state
+    # Module attributes on the OTHER server's imported code, set from THIS
+    # process — safe because they're plain Python globals, not shared state
     # between the two actual server processes, and read back by the same
     # module's own session_log() every time this process calls it.
     main_serve.SESSION_OFF = a.no_session_log
+    # A dedicated file, not shared/serve.py's own logs/editor_<date>.log —
+    # every editor logs to its own file now (Carson's own call, 2026-09-02),
+    # so one editor's actions are never interleaved with another's in the
+    # same log. Reuses session_log()'s own FORMATTING code (still imported
+    # as a plain module) — only the destination file changes.
+    main_serve.SESSION_LOG = os.path.join(
+        main_serve.SESSION_DIR, f"avatar_editor_{time.strftime('%Y%m%d')}.log")
+    # Same idea, for the LABELS session_log() writes — see SESSION_ACTIONS'
+    # own comment above for why the "FB:" prefix is wrong here.
+    main_serve.ACTIONS = SESSION_ACTIONS
 
     os.makedirs(CACHE, exist_ok=True)
     import functools

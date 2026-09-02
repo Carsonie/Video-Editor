@@ -111,6 +111,11 @@
     color: var(--text); cursor: pointer;
   }
   .gapMenuBtn:hover { border-color: var(--accent2); }
+  /* gmLibPlayPause and gmBuilderPlayPause (added 2026-09-02) toggle this
+     live — no clip shown yet, or no matching Sound Bit found for the
+     scene — same dimmed language .pill:disabled already uses. */
+  .gapMenuBtn:disabled { opacity: .4; cursor: default; }
+  .gapMenuBtn:disabled:hover { border-color: var(--border); }
   /* Green while the click is actually being handled — added the instant
      onclick starts, held for a minimum visible time even for something
      synchronous (see withActiveFlash() in gap-builder.js), removed when
