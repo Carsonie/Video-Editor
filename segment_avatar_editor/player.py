@@ -7,12 +7,15 @@ over it, in two shapes:
   timeline  (SEQ_TEMPLATE)   several scenes joined, to judge how they JOIN
 
 They are one player because they edit the same two layers with the same tools;
-only the span differs. Frame extraction and the edit maths live in shared/.
+only the span differs. Frame extraction and the edit maths live in this
+same package's own frames.py — duplicated from shared/frames.py on
+2026-09-02 when this tool and MP4 Splitter split into fully independent
+tools, not imported from shared/ any more.
 """
 import json
 import os
 
-from shared import frames
+from segment_avatar_editor import frames
 
 probe = frames.probe
 get_frame_map = frames.get_frame_map
