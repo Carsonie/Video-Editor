@@ -1,7 +1,7 @@
 # Project rules
 
 This repo makes **help videos**: a HeyGen avatar narrating over a recording of
-the real Rentify UI. It holds the three editors, the build pipeline, and every
+the real Rentify UI. It holds the editors, the build pipeline, and every
 customer's `help-videos/` working files while a video is being made.
 
 `Basic_E2E_Testing` keeps the E2E testing, the BCP work, and the customer
@@ -27,12 +27,15 @@ the one place this is written down, and it can change.
 
 ## When Carson asks to open, launch, start, or run an editor
 
-Read **`.claude/skills/editor-launchers/SKILL.md`** first, every time. There
-are three separate editors now (Segment and Avatar Editor, the next-gen web
-editor, Frame Blender), each its own process, and the next-gen one is
-secretly two processes — skip the skill and it's easy to start the UI without
-its API and get a page full of 502s. The launch.json these all run from lives
-in `Basic_E2E_Testing`, not here.
+Read **`.claude/skills/editor-launchers/SKILL.md`** first, every time. Five
+separate tools now — Segment and Avatar Editor, MP4 Splitter (shares the
+SAE's own server), Frame Blender, Avatar Editor, and the next-gen web
+editor — each its own process except the first two, and the next-gen one
+is secretly two processes — skip the skill and it's easy to start its UI
+without its API and get a page full of 502s. "Run the editors"/"run all 4
+editors" is Carson's own standing phrase for four specific ones of these —
+the skill says which. The launch.json they all run from lives in
+`Basic_E2E_Testing`, not here.
 
 ---
 

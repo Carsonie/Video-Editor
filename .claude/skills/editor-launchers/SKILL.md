@@ -1,36 +1,41 @@
 ---
 name: editor-launchers
-description: Launch any of the three Video-Editor tools (Segment and Avatar Editor, the next-gen web editor, Frame Blender) in the browser, individually or all together. Use whenever Carson asks to open, launch, start, or run an editor by name.
+description: Launch any of the Video-Editor tools (Segment and Avatar Editor, MP4 Splitter, Frame Blender, Avatar Editor, the next-gen web editor) in the browser, individually or all together. Use whenever Carson asks to open, launch, start, or run an editor by name, or asks to "run the editors"/"run all 4 editors."
 user_invocable: true
 ---
 
 # Launching the editors
 
-There are **three** separate browser tools in this repo, each its own process.
-Each runs independently — starting one never requires the others, except where
-noted below.
+**"Run the editors" / "run all 4 editors" means these four**, Carson's own
+standing directive (2026-09-02) — always these four unless he names a
+different set:
 
 | Editor | What it is | Launch.json name(s) | Port(s) |
 |---|---|---|---|
-| **Segment and Avatar Editor** (+ MP4 Splitter) | The original editor pair — `shared/serve.py` | `video-editor` | 8842 |
-| **Next-gen web editor** | The React/Vite replacement, backed by a separate Go API | `video-editor-web-backend` (Go API), then `video-editor-web` (the UI) | 8870 (API), 5180 (UI) |
+| **Segment and Avatar Editor** | `shared/serve.py` | `video-editor` | 8842 |
+| **MP4 Splitter** | Shares the SAME server/port as the SAE above — one process, two tools on one page (`browse.html`). Starting `video-editor` starts both; there is no separate launch for this one. | `video-editor` | 8842 |
 | **Frame Blender** | Standalone frame-by-frame overlay/base combiner, `frame_blender/` | `frame-blender` | 8843 |
+| **Avatar Editor** | Frame Blender's own sibling — duplicated from it whole (2026-09-02) as a separate, independent starting point for different work, `avatar_editor/` | `avatar-editor` | 8844 |
 
-**All four configs live in `Basic_E2E_Testing/.claude/launch.json`** — not
-here. This repo has no `launch.json` of its own; the browser-preview tooling
-reads the one in whichever repo the session was started from, and that has
-always been `Basic_E2E_Testing` for this work. If a session is ever rooted
-here instead, these named configs need copying over before they'll resolve.
+**Each of these four is fully independent** — none of them need each other,
+or the main SAE server, running to work. Frame Blender and Avatar Editor
+used to proxy Load/Save/Undo/Build to the SAE's own server; that dependency
+was removed (2026-09-02) — see `frame_blender/serve.py`'s own module
+docstring, and `avatar_editor/serve.py`'s identical copy of it, for exactly
+what was duplicated and why. Starting any ONE of the four needs nothing
+else up first.
+
+**The next-gen web editor is a FIFTH, separate tool** — not part of "the
+four," not started by "run the editors." Launch it only when Carson names
+it specifically.
 
 ## Launching one, by name
 
 Use the Browser-pane preview tool with the exact `name` from the table:
 
-- **Segment and Avatar Editor**: `preview_start({name: "video-editor"})`
-- **Frame Blender**: needs the Segment and Avatar Editor's server (8842) up
-  first for Load/Save/Undo/Build — those routes proxy straight to it. Start
-  `video-editor` first if it isn't already running, then
-  `preview_start({name: "frame-blender"})`.
+- **Segment and Avatar Editor / MP4 Splitter**: `preview_start({name: "video-editor"})` — one call starts the one server both live on.
+- **Frame Blender**: `preview_start({name: "frame-blender"})` — standalone, nothing else needs to be running first.
+- **Avatar Editor**: `preview_start({name: "avatar-editor"})` — standalone, same as Frame Blender.
 - **Next-gen web editor**: it is TWO processes — a Go API with nothing to look
   at on its own, and the actual UI. Start the API first, THEN the UI:
   1. `preview_start({name: "video-editor-web-backend"})` — opens a tab at
@@ -48,16 +53,26 @@ Use the Browser-pane preview tool with the exact `name` from the table:
 `preview_start` reuses an already-running server on that port instead of
 double-starting it — safe to call again if unsure whether one is up.
 
-## Launching all three together
+## "Run the editors" — all four, in Chrome
 
-Start, in this order (each is independent once up, but the ORDER below avoids
-the 502s and proxy failures above):
+Carson's directive (2026-09-02): all four run **in his actual Chrome
+browser**, not the embedded Browser pane — each its own tab, each fully
+independent of the others. Order doesn't matter now (nothing here depends
+on anything else being up first), but starting the SERVER before opening
+the Chrome tab still does:
 
-1. `preview_start({name: "video-editor"})` — 8842
-2. `preview_start({name: "video-editor-web-backend"})` — 8870
-3. `preview_start({name: "video-editor-web"})` — 5180
-4. `preview_start({name: "frame-blender"})` — 8843 (after step 1, since it
-   depends on it)
+1. Start all four servers (order doesn't matter, none depend on each other):
+   - `preview_start({name: "video-editor"})` — 8842 (serves both SAE and Splitter)
+   - `preview_start({name: "frame-blender"})` — 8843
+   - `preview_start({name: "avatar-editor"})` — 8844
+2. Open each in a real Chrome tab (`open -a "Google Chrome" <url>` via Bash —
+   `preview_start` itself only opens the embedded pane, not real Chrome):
+   - `http://localhost:8842` — SAE / MP4 Splitter
+   - `http://localhost:8843` — Frame Blender
+   - `http://localhost:8844` — Avatar Editor
+
+That's three servers for four editor NAMES, because MP4 Splitter and the SAE
+still share one page — opening `:8842` once gives Carson both.
 
 ## If a server was started outside `preview_start`
 
@@ -73,15 +88,18 @@ by plain `Bash` earlier in a session; killing that process and re-running
 ## Raw commands, for reference or a manual fallback
 
 ```bash
-# Segment and Avatar Editor
+# Segment and Avatar Editor + MP4 Splitter (one server, both tools)
 python3 shared/serve.py --port 8842
+
+# Frame Blender
+python3 frame_blender/serve.py --port 8843
+
+# Avatar Editor
+python3 avatar_editor/serve.py --port 8844
 
 # Next-gen web editor — backend, from next-editor-version/server/
 go run ./cmd/editord --port 8870
 
 # Next-gen web editor — UI, from next-editor-version/web/
 npm run dev                      # http://localhost:5180
-
-# Frame Blender
-python3 frame_blender/serve.py --port 8843
 ```
