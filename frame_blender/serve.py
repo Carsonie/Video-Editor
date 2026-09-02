@@ -38,6 +38,7 @@ WHAT IT SERVES
     GET  /web/*                               its css and js
     GET  /api/open_pair?base=&overlay=        JSON: slugs, frame counts, label
     GET  /api/libs_list?base=                 JSON: the store's sarah_clips/libs
+    GET  /api/lib_media?path=                 a library file's raw bytes, audio intact
     GET  /api/load_store?path=                JSON: proxied /api/siblings
     GET  /build_clip?base=&overlay=&n=        build a real mp4 of N frames
     GET  /api/save_mp4?base=&n=               copy that build into the store
@@ -226,6 +227,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.libs_list(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/lib_frames":
             return self.lib_frames(urllib.parse.parse_qs(parsed.query))
+        if parsed.path == "/api/lib_media":
+            return self.lib_media(urllib.parse.parse_qs(parsed.query))
         return super().do_GET()   # frame images, served from CACHE (see main())
 
     def do_POST(self):
@@ -406,6 +409,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         log("/api/load_store", {"path": rel}, body, status)
         self._relay(status, body)
 
+    # Fixed display order for sarah_clips/libs/'s known subfolders — plain
+    # alphabetical would put "sound_bits" between "idle" and "stills",
+    # ahead of "transitions"; Carson asked for it to show LAST instead. Any
+    # future folder not in this list still shows up (libs_list() has always
+    # auto-discovered whatever subfolders exist, unchanged here) — it just
+    # sorts alphabetically after all of these.
+    LIBS_GROUP_ORDER = ["gap-fillers", "idle", "stills", "transitions", "sound_bits"]
+
     def libs_list(self, qs):
         """
         GET /api/libs_list -> every file under this pair's sarah_clips/libs/,
@@ -423,8 +434,29 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if not os.path.isdir(libs_dir):
             return self._relay(200, {"root": None, "groups": []})
 
+        # sound_bits files are named "<NN>-<scene label>.<ext>", matching a
+        # sandbox scene folder — so the SAME script.json that already holds
+        # every scene's spoken line can supply it here too, keyed by that
+        # label, rather than needing a second place to keep the words in
+        # sync. Best-effort: a sound bit with no matching label just has no
+        # "line" in its entry, and the client falls back to its filename.
+        label_lines = {}
+        script_path = os.path.join(video_root, "sandbox", "script.json")
+        if os.path.isfile(script_path):
+            try:
+                script = json.load(open(script_path))
+                label_lines = {s["label"]: s["line"] for s in script.get("scenes", []) if s.get("label")}
+            except Exception:
+                pass
+
+        def sort_key(folder):
+            try:
+                return (self.LIBS_GROUP_ORDER.index(folder), folder)
+            except ValueError:
+                return (len(self.LIBS_GROUP_ORDER), folder)
+
         groups = []
-        for folder in sorted(os.listdir(libs_dir)):
+        for folder in sorted(os.listdir(libs_dir), key=sort_key):
             fdir = os.path.join(libs_dir, folder)
             if not os.path.isdir(fdir):
                 continue
@@ -446,6 +478,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                             p, alpha=name.lower().endswith(".webm"))[1]), 2)
                     except Exception:
                         entry["dur"] = None
+                if folder == "sound_bits":
+                    label = re.sub(r"^\d+-", "", os.path.splitext(name)[0])
+                    if label in label_lines:
+                        entry["line"] = label_lines[label]
                 files.append(entry)
             groups.append({"folder": folder, "files": files})
 
@@ -490,6 +526,34 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         n = len([f for f in os.listdir(os.path.join(out, "frames")) if f.startswith("frame_")])
         self._relay(200, {"kind": "clip", "n": n,
                            "slug": os.path.relpath(out, CACHE), "ext": ".png"})
+
+    def lib_media(self, qs):
+        """
+        GET /api/lib_media?path=<rel to a file under sarah_clips/libs/>
+        -> the raw file, bytes as-is, WITH its audio track intact.
+
+        /api/lib_frames above only ever extracts silent picture frames —
+        every other Frame Selector feature works off those PNGs and never
+        needed the sound. A sound bit's whole point is being heard, so it
+        gets its own route straight to the source file, for a <video> tag
+        to play directly rather than going through frame extraction at all.
+        """
+        rel = (qs.get("path") or [""])[0]
+        if not rel:
+            return self.json_error(400, "path is required")
+        p = safe_join(rel)
+        if p is None or not os.path.isfile(p):
+            return self.json_error(400, f"not a file under Customers/: {rel}")
+        ctype = {".webm": "video/webm", ".mp4": "video/mp4",
+                 ".mov": "video/quicktime"}.get(os.path.splitext(p)[1].lower(),
+                                                 "application/octet-stream")
+        body = open(p, "rb").read()
+        self.send_response(200)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
 
     def save_scene(self, payload):
         """POST {slug, which, force} -> proxied straight to /api/save."""

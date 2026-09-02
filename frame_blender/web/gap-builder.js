@@ -27,6 +27,29 @@ const libStatus = document.getElementById('libStatus');
 const libGroups = document.getElementById('libGroups');
 const humanSize = b => b < 1024 ? `${b}B` : b < 1048576 ? `${(b / 1024).toFixed(0)}KB` : `${(b / 1048576).toFixed(1)}MB`;
 
+// ── Sound Bits ───────────────────────────────────────────────────────────
+// One shared player every Sound Bits row's own ▶ button loads into (see
+// renderLibGroups' sound_bits branch, below) — same "one viewer, many
+// things to pick" shape as the Frame Selector/Clip-Gap Builder already
+// use, rather than a <video> per row. Plays straight off /api/lib_media
+// (the raw file, audio intact — see that route's own comment in
+// serve.py for why /api/lib_frames can't be reused for this).
+const soundBitPlayer = document.getElementById('soundBitPlayer');
+const soundBitVideo = document.getElementById('soundBitVideo');
+const soundBitName = document.getElementById('soundBitName');
+const soundBitRate = document.getElementById('soundBitRate');
+
+function playSoundBit(f, label) {
+  soundBitPlayer.hidden = false;
+  soundBitName.textContent = label;
+  soundBitVideo.src = `/api/lib_media?path=${encodeURIComponent(f.path)}`;
+  soundBitVideo.playbackRate = +soundBitRate.value;
+  soundBitVideo.play();
+  soundBitPlayer.scrollIntoView({block: 'nearest'});
+}
+
+soundBitRate.onchange = () => { soundBitVideo.playbackRate = +soundBitRate.value; };
+
 const libInspector = document.getElementById('libInspector');
 const libViewerImg = document.getElementById('libViewerImg');
 const libSlider = document.getElementById('libSlider');
@@ -423,10 +446,32 @@ async function loadLibs() {
         cb.title = `Inspect ${f.name}'s frames below`;
         cb.onchange = () => toggleLibClip(f, cb.checked);
         const name = document.createElement('span');
-        name.className = 'name'; name.title = f.name; name.textContent = f.name;
+        name.className = 'name';
+        // Sound Bits: a short label (the scene name a "01-" prefix and the
+        // extension stripped off) with the FULL spoken line as its tooltip
+        // — f.line comes from that scene's own script.json (see
+        // libs_list()'s server-side comment), so the words shown here are
+        // never retyped from anywhere. Every other group keeps the plain
+        // filename it always has.
+        if (g.folder === 'sound_bits') {
+          const label = f.name.replace(/\.[^.]+$/, '').replace(/^\d+-/, '');
+          name.title = f.line || f.name;
+          name.textContent = label;
+        } else {
+          name.title = f.name; name.textContent = f.name;
+        }
         const metaEl = document.createElement('span');
         metaEl.className = 'meta'; metaEl.textContent = meta;
         row.appendChild(cb); row.appendChild(name); row.appendChild(metaEl);
+        if (g.folder === 'sound_bits') {
+          const playBtn = document.createElement('button');
+          playBtn.type = 'button';
+          playBtn.className = 'soundBitPlay';
+          playBtn.textContent = '▶';
+          playBtn.title = f.line ? `Play: "${f.line}"` : 'Play this clip';
+          playBtn.onclick = () => playSoundBit(f, name.textContent);
+          row.appendChild(playBtn);
+        }
         box.appendChild(row);
         if (savedPaths.has(f.path)) {
           cb.checked = true;

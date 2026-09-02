@@ -166,6 +166,32 @@
   .libfile .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 auto; }
   .libfile .meta { color: var(--sub); flex: none; font-variant-numeric: tabular-nums; }
   .libempty { font-size: 11.5px; color: var(--sub); font-style: italic; }
+  /* A sound bit's play button — small, round, sits at the end of its row
+     next to the file size/duration. Same idea as .flowToggle's small dots
+     elsewhere: an icon-only control that doesn't fight the row's text for
+     space. */
+  .soundBitPlay {
+    width: 20px; height: 20px; border-radius: 50%; flex: none; padding: 0;
+    font-size: 10px; line-height: 1; cursor: pointer;
+    background: #0f1214; color: var(--text); border: 1px solid var(--border);
+  }
+  .soundBitPlay:hover { border-color: var(--accent2); color: var(--accent2); }
+  /* The one shared player every Sound Bits row's play button loads into —
+     hidden until first used. */
+  .soundBitPlayer {
+    margin-top: 10px; padding: 10px; border: 1px solid var(--border); border-radius: 6px;
+    background: #1b2024;
+  }
+  .soundBitPlayer video { width: 100%; border-radius: 4px; background: #000; display: block; }
+  .soundBitControls {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    margin-top: 8px; font-size: 11.5px; color: var(--sub);
+  }
+  .soundBitName { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #soundBitRate {
+    background: #0f1214; color: var(--text); border: 1px solid var(--border);
+    border-radius: 4px; padding: 3px 4px; font-size: 11px;
+  }
 
   /* Same bordered-box, stacked-row language as sarah_clips/libs to its
      left — a list of actions rather than a list of files. Buttons only,
@@ -248,9 +274,13 @@
     margin-top: 12px; display: flex; gap: 6px; flex-wrap: wrap; max-height: 280px;
     overflow: auto;
   }
+  /* contain, not cover — cover was cropping Sarah's head off any frame
+     taller/narrower than the 64x64 box. background-color fills the
+     letterboxed edges `contain` leaves bare. */
   .libframe {
     width: 64px; height: 64px; border-radius: 5px; overflow: hidden; flex: none;
-    border: 1px solid var(--border); background-size: cover; background-position: center;
+    border: 1px solid var(--border); background-size: contain; background-position: center;
+    background-repeat: no-repeat; background-color: #0f1214;
     opacity: .8; cursor: pointer;
   }
   .libframe:hover { opacity: 1; }
