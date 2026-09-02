@@ -200,47 +200,28 @@ CUSTOMERS_ROOT = os.path.join(REPO_ROOT, "Customers")
 # calls that CHANGE something are logged; opening a clip is logged too, because
 # a line saying what you were working on is what makes the rest readable.
 SESSION_DIR = os.path.join(ROOT, "logs")
-SESSION_LOG = os.path.join(SESSION_DIR, f"editor_{time.strftime('%Y%m%d')}.log")
+SESSION_LOG = os.path.join(SESSION_DIR, f"mp4_splitter_{time.strftime('%Y%m%d')}.log")
 
-# endpoint -> (what to call it, which payload keys are worth showing)
+# endpoint -> (what to call it, which payload keys are worth showing).
+# Trimmed to just this tool's own routes (2026-09-02, alongside giving it
+# its own dedicated log file) — the full multi-tool table this was copied
+# from (shared/serve.py's ACTIONS) carried entries for routes this process
+# never serves (Join, Split, Frame Blender's Build/Save MP4, ...); every
+# entry left below is provably reachable — see this file's own do_POST/
+# do_GET dispatch for the exact route list.
 ACTIONS = {
     "/api/frames/dup":      ("+ Frame",      ("at", "count", "side")),
     "/api/frames/del":      ("- Frame",      ("at", "count", "side")),
-    "/api/frames/dup-span": ("+ Zone",       ("a", "b")),
-    "/api/frames/del-span": ("- Zone",       ("a", "b")),
     "/api/frames/restore":  ("Undo",         ()),
-    "/api/frames/paste":    ("Paste frame",  ("from", "at")),
     "/api/mark":            ("Mark",         ("frame", "on")),
     "/api/clear-marks":     ("Unmark all",   ()),
     "/api/save":            ("Save scene",   ()),
     "/api/cut":             ("Cut scene",    ()),
     "/api/clear-edits":     ("Discard edits", ()),
     "/api/reset-editor":    ("Reset editor", ()),
-    "/api/join":            ("Join",         ("ns", "label", "tracks")),
-    "/api/split":           ("Split",        ("n", "at", "labels", "tracks")),
-    "/api/line":            ("Edit line",    ("n",)),
-    "/api/renumber-clear":  ("Lift lock",    ()),
     "/api/handoff":         ("Hand off",     ("version", "names")),
     "/api/archive":         ("Archive",      ("folder",)),
-    "/api/save-archive":    ("Save All archive", ("root",)),
     "/api/open":            ("Open clip",    ("path",)),
-    "/api/open-pair":       ("Open layered", ("base",)),
-    "/api/open-seq":        ("Open timeline", ("root", "ns")),
-    "/api/open-pair-go":    ("Open layered", ("base",)),
-    "/api/open-seq-go":     ("Open timeline", ("root", "ns")),
-    "/api/load_video":      ("FB: Load video", ("root",)),
-    # Frame Blender's own actions. Save/Undo used to proxy here and log
-    # themselves on the way through; since 2026-09-02 Frame Blender's own
-    # save_scene()/undo_scene() run standalone and call this SAME
-    # session_log() directly with these SAME two keys ("/api/save",
-    # "/api/frames/restore") instead — no new entries needed, the existing
-    # "Save scene"/"Undo" labels above already cover it. Logged into this
-    # SAME file (same day, same repo, same path formula) even though
-    # frame_blender/serve.py is a separate process — one editing record
-    # regardless of which tool acted.
-    "/build_clip":          ("FB: Build clip", ("n",)),
-    "/api/save_mp4":        ("FB: Save MP4",   ("n",)),
-    "/api/load_store":      ("FB: Load store", ("path",)),
 }
 # result keys worth showing, in the order they read best
 RESULT_KEYS = ("nb_frames", "count", "version", "duration_s", "joined", "split",
