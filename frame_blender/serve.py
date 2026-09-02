@@ -13,10 +13,19 @@ WHY ITS OWN PROCESS, ON ITS OWN PORT
     for it to have "its own localhost address" — a standalone diagnostic,
     not a feature bolted onto the editor that happens to share its cache.
 
-    It has since grown Build, Save Scene, Undo and Save MP4. Save Scene and
-    Undo are PROXIED straight to shared/serve.py rather than reimplemented,
-    so staying separate never meant staying read-only — only that there is
-    still exactly one real save/undo path, and this is a client of it.
+    It has since grown Build, Save Scene, Undo and Save MP4, plus its own
+    store list (see stores()) — all standalone now, none of them need
+    shared/serve.py running on 8842 at all. Save Scene and Undo used to be
+    PROXIED there instead of reimplemented, so staying separate never meant
+    staying read-only, but only one real save/undo path existed; Carson
+    asked for genuine independence anyway (2026-09-02), accepting the
+    tradeoff that came with it — see save_scene()'s own docstring for the
+    cross-process dir_lock caveat that split brings back. Both still reuse
+    shared/serve.py's own pure helper functions directly (build_segment,
+    resolve_outdir, ...) rather than duplicating them, since that module is
+    already imported here as a plain Python module — sharing the CODE, not
+    the running PROCESS, so the ffmpeg recipe itself can't drift out of
+    step between the two tools.
 
     It also REUSES that cache (shared/frames.py's build_frames()), so
     opening a scene here that is already open in the editor is instant.
@@ -36,13 +45,14 @@ STATELESS, AS OF THE 2026-08-30 RESTRUCTURE
 WHAT IT SERVES
     GET  /                                    the (empty) page
     GET  /web/*                               its css and js
+    GET  /api/stores                          JSON: every business/store and its videos
     GET  /api/open_pair?base=&overlay=        JSON: slugs, frame counts, label
     GET  /api/libs_list?base=                 JSON: the store's sarah_clips/libs
     GET  /api/lib_media?path=                 a library file's raw bytes, audio intact
-    GET  /api/load_store?path=                JSON: proxied /api/siblings
+    GET  /api/load_store?path=                JSON: standalone — see siblings()/load_store()
     GET  /build_clip?base=&overlay=&n=        build a real mp4 of N frames
     GET  /api/save_mp4?base=&n=               copy that build into the store
-    POST /api/save_scene, /api/undo_scene     proxied to the main editor
+    POST /api/save_scene, /api/undo_scene     standalone — see save_scene()
     POST /api/gap_log                         appends a Gap Builder click to logs/gap_builder_<date>.log
     GET  /<slug>/frames/frame_NNNNN.{jpg,png} the extracted frames
 """
@@ -51,11 +61,11 @@ import http.server
 import json
 import os
 import re
+import shutil
 import sys
+import tempfile
 import time
-import urllib.error
 import urllib.parse
-import urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))       # <repo>/frame_blender
 ROOT = os.path.dirname(HERE)                             # <repo>
@@ -69,6 +79,7 @@ import frames as build_mod                               # noqa: E402
 import serve as main_serve                                # noqa: E402  for its session_log — see log()
 from serve import safe_join, CUSTOMERS_ROOT               # noqa: E402
 import build_scenes                                       # noqa: E402  reuse its real ffmpeg recipe
+import paths as PTH                                       # noqa: E402  script()/sandbox_root() — see stores()
 
 
 def log(path, payload, result, status):
@@ -81,43 +92,6 @@ def log(path, payload, result, status):
     three actions (never touching that process) need to be told to.
     """
     main_serve.session_log(path, payload, result, status)
-
-# The main editor, running separately on its own port. Save, Undo and Load
-# all proxy to IT rather than re-implementing any of the three — one save
-# path, one undo path, one source of the pristine/dirty flag, whichever tool
-# asks. This means that server has to actually be running for those three
-# buttons to work; Build MP4 and the frame-review tools underneath do not
-# need it, since they never touch anything outside this tool's own cache.
-MAIN_EDITOR = os.environ.get("MAIN_EDITOR_URL", "http://localhost:8842")
-
-
-def _proxy(method, path, payload=None, timeout=120):
-    """
-    Forward one request to the main editor and hand back (status, body_dict).
-
-    Never raises on the editor's OWN error responses (400/409/500) — those
-    are real, meaningful answers ("stale", "unknown slug", ...) that the
-    frame_blender frontend needs to see and act on, not failures of the
-    proxy itself. Only a genuine connection failure (editor not running)
-    is turned into a clear message instead of a raw stack trace.
-    """
-    url = MAIN_EDITOR + path
-    data = json.dumps(payload).encode() if payload is not None else None
-    req = urllib.request.Request(
-        url, data=data, method=method,
-        headers={"Content-Type": "application/json"} if data else {})
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            return r.status, json.loads(r.read())
-    except urllib.error.HTTPError as e:
-        try:
-            return e.code, json.loads(e.read())
-        except Exception:
-            return e.code, {"error": f"editor returned {e.code}"}
-    except urllib.error.URLError as e:
-        return 503, {"error": f"main editor not reachable at {MAIN_EDITOR} — "
-                               f"start it (python3 shared/serve.py) first. ({e.reason})"}
-
 
 
 def next_versioned_name(folder, ext):
@@ -325,11 +299,162 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         GET /api/stores -> every business/store, and the video folders each
         one has. Step one of Load: pick a store, then pick a video.
 
-        Proxied to the main editor, which already answers exactly this for
-        its own Load — one place decides what counts as a store.
+        Was proxied to the main editor's OWN /api/stores (shared/serve.py's
+        api_stores()) — Carson asked for Frame Blender to run standalone
+        instead, sharing CODE (paths.py, same as here) rather than sharing
+        a live PROCESS. This is that same walk, copied over rather than
+        called over HTTP; keep the two in step if either changes.
+
+        script.json is the check, not sandbox/ — a video can exist with a
+        script and no sandbox yet built, and Load should still find it.
+        Two levels down from Customers/ is assumed to be Business/store,
+        same as /api/list's own STORE-folder detection.
         """
-        status, body = _proxy("GET", "/api/stores")
-        self._relay(status, body)
+        out = []
+        if not os.path.isdir(CUSTOMERS_ROOT):
+            return self._relay(200, {"stores": out})
+        for biz in sorted(os.listdir(CUSTOMERS_ROOT), key=str.lower):
+            biz_dir = os.path.join(CUSTOMERS_ROOT, biz)
+            if biz.startswith(".") or not os.path.isdir(biz_dir):
+                continue
+            for store in sorted(os.listdir(biz_dir), key=str.lower):
+                store_dir = os.path.join(biz_dir, store)
+                videos_root = os.path.join(store_dir, "help-videos", "videos")
+                if store.startswith(".") or not os.path.isdir(videos_root):
+                    continue
+                videos = []
+                for vname in sorted(os.listdir(videos_root), key=str.lower):
+                    vdir = os.path.join(videos_root, vname)
+                    script_p = PTH.script(vdir)
+                    if vname.startswith(".") or not os.path.isfile(script_p):
+                        continue
+                    try:
+                        doc = json.load(open(script_p))
+                        ns = sorted(x["n"] for x in doc.get("scenes", []) if "n" in x)
+                    except (OSError, ValueError, KeyError):
+                        ns = []
+                    has_sandbox = os.path.isdir(PTH.sandbox_root(vdir))
+                    videos.append({"name": vname,
+                                   "root": f"{biz}/{store}/help-videos/videos/{vname}",
+                                   "scenes": ns, "has_sandbox": has_sandbox})
+                if videos:
+                    out.append({"business": biz, "store": store, "videos": videos})
+        self._relay(200, {"stores": out})
+
+    def siblings(self, rel):
+        """
+        Every scene of this store, resolved — not a directory listing.
+        Same recipe as the main editor's own api_siblings() (shared/
+        serve.py), called directly rather than proxied: PTH.script(),
+        .scenes_from_script(), .sandbox_only(), .source_of(),
+        .sandbox_root(), .versions() and .layout() are already imported
+        here as plain functions (paths.py never touched a live server to
+        begin with), and frame_count()/cache_state() are pure module-level
+        functions in shared/serve.py too — called off main_serve directly,
+        not copied, so a scene's frame count and pristine/dirty state stay
+        computed exactly one way no matter which tool asks. Only this
+        orchestration is actually duplicated (see save_scene()'s own
+        docstring for why that's the accepted tradeoff here).
+
+        Returns (status, body) — the same shape _proxy() used to hand
+        back, so load_video()/load_store() below barely had to change.
+        """
+        target = safe_join(rel)
+        if target is None or not os.path.isfile(target):
+            return 400, {"error": f"not a file under Customers/: {rel}"}
+
+        # Walk up to the store's `final/` — the folder holding script.json.
+        # NEVER stop ON `sandbox/` or `dev/` themselves, only above them —
+        # script.json can live INSIDE sandbox/, so PTH.script(sandbox_dir)
+        # would find that very file and stop one level too early.
+        final = os.path.dirname(target)
+        for _ in range(4):
+            if (os.path.basename(final) not in ("sandbox", "dev")
+                    and os.path.isfile(PTH.script(final))):
+                break
+            final = os.path.dirname(final)
+        if not os.path.isfile(PTH.script(final)):
+            return 400, {"error": f"no script.json above {rel}"}
+
+        # SANDBOX ONLY — the editor does not read dev/.
+        items = []
+        for n, label in PTH.scenes_from_script(final):
+            sb = PTH.sandbox_only(final, n, label)
+            seg, av = sb["segment"], sb["avatar"]
+            nfr, nex = (main_serve.frame_count(seg) if seg else (None, False))
+            ofr, oex = (main_serve.frame_count(av) if av else (None, False))
+            dur = None
+            if seg:
+                try:
+                    dur = round(float(build_mod.probe(seg, "duration")), 2)
+                except (ValueError, RuntimeError):
+                    dur = None
+            base_slug, base_edited = main_serve.cache_state(seg)
+            over_slug, over_edited = main_serve.cache_state(av)
+            items.append({
+                "n": n, "label": label,
+                "name": os.path.basename(seg) if seg else "—",
+                "dur": dur,
+                "path": os.path.relpath(seg, CUSTOMERS_ROOT) if seg else None,
+                "overlay": os.path.relpath(av, CUSTOMERS_ROOT) if av else None,
+                "src": PTH.source_of(final, seg),
+                "overlay_src": PTH.source_of(final, av),
+                "missing": seg is None,
+                "frames": nfr, "frames_exact": nex,
+                "overlay_frames": ofr, "overlay_frames_exact": oex,
+                "base_slug": base_slug, "base_edited": base_edited,
+                "over_slug": over_slug, "over_edited": over_edited,
+                "current": bool(seg) and os.path.abspath(seg) == os.path.abspath(target)})
+
+        # BOOKENDS and anything else in sandbox that is not a script scene —
+        # numbered 00/99 so they sit at the ends of the list.
+        known = {it["n"] for it in items}
+        sroot = PTH.sandbox_root(final)
+        if os.path.isdir(sroot):
+            for d in sorted(os.listdir(sroot)):
+                m = re.match(r"^(\d+)-(.+)$", d)
+                if not m or not os.path.isdir(os.path.join(sroot, d)):
+                    continue
+                n = int(m.group(1))
+                if n in known:
+                    continue
+                seg = os.path.join(sroot, d, "segment.mp4")
+                av = os.path.join(sroot, d, "avatar.webm")
+                if not os.path.isfile(seg):
+                    continue
+                dur = None
+                try:
+                    dur = round(float(build_mod.probe(seg, "duration")), 2)
+                except (ValueError, RuntimeError):
+                    pass
+                bfr, bex = main_serve.frame_count(seg)
+                afr, aex = (main_serve.frame_count(av) if os.path.isfile(av) else (None, False))
+                base_slug, base_edited = main_serve.cache_state(seg)
+                over_slug, over_edited = (main_serve.cache_state(av) if os.path.isfile(av)
+                                           else (None, False))
+                items.append({
+                    "n": n, "label": m.group(2), "name": "segment.mp4", "dur": dur,
+                    "frames": bfr, "frames_exact": bex,
+                    "overlay_frames": afr, "overlay_frames_exact": aex,
+                    "path": os.path.relpath(seg, CUSTOMERS_ROOT),
+                    "overlay": os.path.relpath(av, CUSTOMERS_ROOT) if os.path.isfile(av) else None,
+                    "src": "sandbox", "overlay_src": "sandbox" if os.path.isfile(av) else None,
+                    "missing": False, "extra": True,
+                    "base_slug": base_slug, "base_edited": base_edited,
+                    "over_slug": over_slug, "over_edited": over_edited,
+                    "current": os.path.abspath(seg) == os.path.abspath(target)})
+        items.sort(key=lambda it: it["n"])
+
+        v = PTH.versions(final)
+        return 200, {
+            "layout": PTH.layout(final),
+            "editor_scope": "sandbox",
+            "versions": v["segment"],
+            "current_version": v["segment"][0] if v["segment"] else None,
+            "overlay_version": v["avatar"][0] if v["avatar"] else None,
+            "script_version": v["script"][0] if v["script"] else None,
+            "by_version": {str(v["segment"][0] if v["segment"] else 0): items},
+            "folder": os.path.relpath(final, CUSTOMERS_ROOT)}
 
     def load_video(self, qs):
         """
@@ -347,10 +472,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             maintained.
 
         The per-scene rows (frame counts, cache slugs, pristine/dirty) come
-        from the main editor's /api/siblings, so Frame Blender and the
-        Segment and Avatar Editor cannot disagree about a scene's state.
-        script.json is read here and returned alongside, because siblings
-        answers about tracks and says nothing about the words.
+        from siblings() above — the same recipe the Segment and Avatar
+        Editor's own api_siblings() uses, called directly now rather than
+        proxied to it, so the two tools still cannot disagree about a
+        scene's state. script.json is read here and returned alongside,
+        because siblings() answers about tracks and says nothing about
+        the words.
         """
         rel = (qs.get("root") or [""])[0]
         if not rel:
@@ -375,8 +502,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.json_error(400, f"no scene folders with a segment.mp4 in {rel}/sandbox")
 
         seg_rel = os.path.relpath(first_seg, CUSTOMERS_ROOT)
-        status, body = _proxy(
-            "GET", f"/api/siblings?{urllib.parse.urlencode({'path': seg_rel})}")
+        status, body = self.siblings(seg_rel)
         if status != 200 or body.get("error"):
             return self._relay(status, body)
 
@@ -397,15 +523,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def load_store(self, qs):
         """
         GET /api/load_store?path=<rel to any scene file in the store>
-        -> the main editor's own /api/siblings response, unchanged — the
-        real per-scene list, frame counts, and pristine/dirty state, from
-        the same place the SAE reads it. Frame Blender never computes this
-        itself, so the two tools cannot disagree about what "dirty" means.
+        -> siblings() above — the real per-scene list, frame counts, and
+        pristine/dirty state, computed the same way the SAE's own
+        api_siblings() does (same shared helpers, called directly). Frame
+        Blender never computes this a second, different way, so the two
+        tools still cannot disagree about what "dirty" means.
         """
         rel = (qs.get("path") or [""])[0]
         if not rel:
             return self.json_error(400, "path is required")
-        status, body = _proxy("GET", f"/api/siblings?{urllib.parse.urlencode({'path': rel})}")
+        status, body = self.siblings(rel)
         log("/api/load_store", {"path": rel}, body, status)
         self._relay(status, body)
 
@@ -556,14 +683,131 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
     def save_scene(self, payload):
-        """POST {slug, which, force} -> proxied straight to /api/save."""
-        status, body = _proxy("POST", "/api/save", payload)
-        self._relay(status, body)
+        """
+        POST {slug, which, force} -> rebuilds this cache slug's whole
+        edited frame sequence and overwrites the file it came from.
+
+        Was proxied straight to the main editor's own /api/save — Carson
+        asked for Frame Blender to run standalone instead. This is that
+        same recipe (shared/serve.py's api_save()), with its own pure
+        helpers (resolve_outdir, is_alpha, build_segment, save_marks, ...)
+        called directly off main_serve rather than copied, since that
+        module is already imported here — same functions, same behavior,
+        no second copy of the ffmpeg recipe to drift out of step. Only
+        the orchestration below (archive-then-overwrite, the stale check,
+        the frame-count warning) is actually duplicated, because that part
+        is a Handler method bound to a different response convention
+        (send_json there, _relay here).
+
+        ⚠ dir_lock only guards THIS process's own concurrent requests —
+        it does NOT know about the main editor's own separate lock if
+        that's also running. Don't Save/Undo the same slug from both
+        Frame Blender and the main editor at the same moment; that race
+        is exactly what the single shared process used to prevent for
+        free, and splitting the process reopens it.
+        """
+        outdir = main_serve.resolve_outdir(payload.get("slug"), payload.get("which"))
+        if outdir is None:
+            return self.json_error(400, "unknown slug")
+        with build_mod.dir_lock(outdir):
+            meta = json.load(open(os.path.join(outdir, "meta.json")))
+            src, fps = meta["source"], meta["fps"]
+            if not os.path.isfile(src):
+                return self.json_error(500, f"source no longer exists: {src}")
+
+            st = os.stat(src)
+            stale = (st.st_size != meta.get("size") or st.st_mtime != meta.get("mtime"))
+            if stale and not payload.get("force"):
+                return self._relay(409, {
+                    "error": "stale",
+                    "message": f"{os.path.basename(src)} changed on disk since this was "
+                               f"loaded here — probably saved from another tab or tool. "
+                               f"Reload it to see the new version, or save again with "
+                               f"force to overwrite it anyway.",
+                })
+
+            frame_map = build_mod.get_frame_map(meta)
+            want_frames = len(frame_map)
+
+            tmp_dir = tempfile.mkdtemp(prefix="frame_blender_save_")
+            try:
+                runs = build_mod.group_frame_runs(frame_map)
+                built = os.path.join(tmp_dir, "built.webm" if main_serve.is_alpha(src) else "built.mp4")
+                r = main_serve.build_segment(src, fps, runs, built, tmp_dir)
+                if r.returncode != 0:
+                    return self.json_error(500, r.stderr[-500:])
+                got = float(build_mod.probe(built, "duration"))
+
+                hist_dir = os.path.join(os.path.dirname(src), "z_History", time.strftime("%Y%m%d-%H%M%S"))
+                os.makedirs(hist_dir, exist_ok=True)
+                archived = os.path.join(hist_dir, os.path.basename(src))
+                shutil.copy2(src, archived)
+
+                shutil.copy2(built, src)
+            finally:
+                shutil.rmtree(tmp_dir, ignore_errors=True)
+
+            nb_frames = wrote = None
+            warning = None
+            try:
+                build_mod.build_frames(src, out=outdir, box=meta.get("box", 750),
+                                        force=True,
+                                        alpha_png=(meta.get("ext") == ".png"),
+                                        log=lambda m: sys.stderr.write(m + "\n"))
+                main_serve.save_marks(outdir, [])
+                new_meta = json.load(open(os.path.join(outdir, "meta.json")))
+                nb_frames = new_meta["nb_frames"]
+
+                wrote = build_mod.decoded_frames(src, main_serve.dec_for(src))
+                if wrote is not None and wrote != want_frames:
+                    warning = (f"wrote {wrote} frames, expected {want_frames} — the rebuild "
+                               f"is time-based and loses a frame per cut")
+            except RuntimeError as e:
+                warning = (f"saved, but the live preview cache could not be refreshed "
+                           f"({e}). Reload this scene to see the new frames.")
+        result = {"path": src, "archived_to": archived, "duration_s": round(got, 3),
+                  "nb_frames": nb_frames,
+                  "frames_written": wrote, "frames_expected": want_frames,
+                  "warning": warning}
+        # Logged as "/api/save" (not "/api/save_scene") on purpose — that's
+        # the ACTIONS key shared/serve.py's own "Save scene" label is
+        # registered under, and a proxied save used to land in this same
+        # log automatically by making that literal HTTP call. Now that it
+        # doesn't, this call is what keeps Frame Blender's saves in the
+        # one editing record, same as before.
+        log("/api/save", payload, result, 200)
+        self._relay(200, result)
 
     def undo_scene(self, payload):
-        """POST {slug, which, frame_map} -> proxied straight to /api/frames/restore."""
-        status, body = _proxy("POST", "/api/frames/restore", payload)
-        self._relay(status, body)
+        """
+        POST {slug, which, frame_map} -> restore one clip's cache to the
+        given frame map — one step of the per-scene undo, same recipe as
+        the main editor's own api_restore(). There is no server-side undo
+        HISTORY on either side: frame_map is supplied by the page itself
+        (it snapshots the map before making the edit being undone), so
+        there is no in-memory state a separate process could fail to see.
+        See save_scene's own docstring for the dir_lock cross-process
+        caveat — it applies here too.
+        """
+        outdir = main_serve.resolve_outdir(payload.get("slug"), payload.get("which"))
+        if outdir is None:
+            return self.json_error(400, "unknown slug")
+        target = payload.get("frame_map")
+        if not isinstance(target, list) or not target:
+            return self.json_error(400, "frame_map must be a non-empty list")
+        with build_mod.dir_lock(outdir):
+            try:
+                n = build_mod.restore_map(outdir, target, log=lambda m: sys.stderr.write(m + "\n"))
+            except (RuntimeError, OSError) as e:
+                return self.json_error(400, str(e))
+            marks = [m for m in main_serve.load_marks(outdir) if 1 <= m <= n]
+            main_serve.save_marks(outdir, marks)
+            meta = json.load(open(os.path.join(outdir, "meta.json")))
+        result = {"nb_frames": n, "marks": sorted(marks), "edited": bool(meta.get("edited"))}
+        # "/api/frames/restore" — the ACTIONS key "Undo" is registered
+        # under; see save_scene()'s own comment on why this call exists now.
+        log("/api/frames/restore", payload, result, 200)
+        self._relay(200, result)
 
     def save_mp4(self, qs):
         """

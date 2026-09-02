@@ -8,12 +8,15 @@ against the same disposable store test_editor.py builds.
 
 WHY A SEPARATE FILE, NOT MORE STEPS IN test_editor.py
     Frame Blender is a second, independent server (frame_blender/serve.py, its
-    own port) that PROXIES three of its five endpoints to the main editor
-    (shared/serve.py) rather than reimplementing them — see frame_blender/
-    serve.py's MAIN_EDITOR / _proxy(). Testing it means two servers running at
-    once, which test_editor.py's single-server harness was never built for.
-    Keeping this separate means neither file has to bend its own shape to
-    accommodate the other.
+    own port), standalone since 2026-09-02 — it used to PROXY three of its
+    endpoints to the main editor (shared/serve.py) instead of reimplementing
+    them, but no longer does; its own save_scene()/undo_scene()/stores()/
+    siblings() now call the main editor's pure helper functions directly as
+    a plain Python module. This suite still runs both servers because the
+    fixture and some checks share test_editor.py's own conventions, not
+    because Frame Blender itself needs the main editor up. Keeping this
+    separate means neither file has to bend its own shape to accommodate
+    the other.
 
 WHAT THIS PROVES THAT test_editor.py CANNOT
     Not whether /api/save or /api/siblings work in isolation — that suite

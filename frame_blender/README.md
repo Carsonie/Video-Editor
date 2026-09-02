@@ -8,9 +8,13 @@ a real mp4 from what you see.
 python3 frame_blender/serve.py          # http://localhost:8843
 ```
 
-The main editor (`shared/serve.py`, port 8842) must also be running for Load,
-Save Scene and Undo — those are proxied to it rather than reimplemented here,
-so there is exactly one save path no matter which tool you use.
+Standalone — nothing else needs to be running. Load, Save Scene, Undo and the
+store list all used to proxy to the main editor (`shared/serve.py`, port
+8842); since 2026-09-02 they run here directly instead, reusing its own pure
+helper functions (module-level, no live HTTP call) so the two tools' saves
+and dirty-state tracking still can't drift apart — see `serve.py`'s own
+module docstring and `save_scene()`'s docstring for the one real tradeoff
+that came with the split (a cross-process lock gap).
 
 ## What's in here
 

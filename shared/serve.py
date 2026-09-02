@@ -223,11 +223,15 @@ ACTIONS = {
     "/api/open-pair-go":    ("Open layered", ("base",)),
     "/api/open-seq-go":     ("Open timeline", ("root", "ns")),
     "/api/load_video":      ("FB: Load video", ("root",)),
-    # Frame Blender's own actions — /api/save and /api/frames/restore already
-    # log themselves when it proxies to them, so only its three UN-proxied
-    # actions need an entry here. Logged into this SAME file (same day, same
-    # repo, same path formula) even though frame_blender/serve.py is a
-    # separate process — one editing record regardless of which tool acted.
+    # Frame Blender's own actions. Save/Undo used to proxy here and log
+    # themselves on the way through; since 2026-09-02 Frame Blender's own
+    # save_scene()/undo_scene() run standalone and call this SAME
+    # session_log() directly with these SAME two keys ("/api/save",
+    # "/api/frames/restore") instead — no new entries needed, the existing
+    # "Save scene"/"Undo" labels above already cover it. Logged into this
+    # SAME file (same day, same repo, same path formula) even though
+    # frame_blender/serve.py is a separate process — one editing record
+    # regardless of which tool acted.
     "/build_clip":          ("FB: Build clip", ("n",)),
     "/api/save_mp4":        ("FB: Save MP4",   ("n",)),
     "/api/load_store":      ("FB: Load store", ("path",)),
