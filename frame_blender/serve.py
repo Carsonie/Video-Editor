@@ -47,13 +47,10 @@ WHAT IT SERVES
     GET  /web/*                               its css and js
     GET  /api/stores                          JSON: every business/store and its videos
     GET  /api/open_pair?base=&overlay=        JSON: slugs, frame counts, label
-    GET  /api/libs_list?base=                 JSON: the store's sarah_clips/libs
-    GET  /api/lib_media?path=                 a library file's raw bytes, audio intact
     GET  /api/load_store?path=                JSON: standalone — see siblings()/load_store()
     GET  /build_clip?base=&overlay=&n=        build a real mp4 of N frames
     GET  /api/save_mp4?base=&n=               copy that build into the store
     POST /api/save_scene, /api/undo_scene     standalone — see save_scene()
-    POST /api/gap_log                         appends a Gap Builder click to logs/gap_builder_<date>.log
     GET  /<slug>/frames/frame_NNNNN.{jpg,png} the extracted frames
 """
 import argparse
@@ -71,7 +68,6 @@ HERE = os.path.dirname(os.path.abspath(__file__))       # <repo>/frame_blender
 ROOT = os.path.dirname(HERE)                             # <repo>
 CACHE = os.path.join(ROOT, "cache")                       # SAME cache the editor uses
 PREVIEWS = os.path.join(CACHE, "_previews")               # this tool's own mp4 output
-GAP_LOG_DIR = os.path.join(ROOT, "logs")                  # same logs/ the editor's own daily log lives in
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "shared"))
 sys.path.insert(0, os.path.join(ROOT, "build"))
@@ -165,11 +161,10 @@ def build_preview_clip(seg, av, n, out):
 def video_root_of(seg_path):
     """
     <video folder> from a .../sandbox/<NN-label>/segment.mp4 path — up three
-    levels. Shared by save_mp4 (writes video/sandbox_mp4_scenes/ there) and
-    the libs list (reads sarah_clips/libs/ there), so the one assumption
-    about the folder shape lives once. Returns None rather than guessing
-    when the shape doesn't match, since a silently wrong folder here would
-    make an action land somewhere that just looks empty.
+    levels. Used by save_mp4, which writes video/sandbox_mp4_scenes/ there.
+    Returns None rather than guessing when the shape doesn't match, since a
+    silently wrong folder here would make an action land somewhere that
+    just looks empty.
     """
     label_dir = os.path.dirname(seg_path)
     sandbox_root = os.path.dirname(label_dir)
@@ -197,12 +192,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.load_store(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/save_mp4":
             return self.save_mp4(urllib.parse.parse_qs(parsed.query))
-        if parsed.path == "/api/libs_list":
-            return self.libs_list(urllib.parse.parse_qs(parsed.query))
-        if parsed.path == "/api/lib_frames":
-            return self.lib_frames(urllib.parse.parse_qs(parsed.query))
-        if parsed.path == "/api/lib_media":
-            return self.lib_media(urllib.parse.parse_qs(parsed.query))
         return super().do_GET()   # frame images, served from CACHE (see main())
 
     def do_POST(self):
@@ -216,32 +205,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.save_scene(payload)
         if parsed.path == "/api/undo_scene":
             return self.undo_scene(payload)
-        if parsed.path == "/api/gap_log":
-            return self.client_log(payload)
         return self.json_error(404, f"no such route: {parsed.path}")
-
-    def client_log(self, payload):
-        """
-        POST {event, ...} -> appends one JSON line to logs/gap_builder_<date>.log.
-
-        A debugging aid for the Gap Builder Controller Menu specifically:
-        Carson tests through his own real browser tab, which this process
-        cannot see into — the only way to know what he actually clicked, in
-        order, and what state each click landed in, is if the page tells
-        this server itself (see gapLog() in gap-builder.js, wired into every
-        Controller Menu button plus both frame rows). Never raises: a log
-        that can break the page is worse than no log — same promise
-        shared/serve.py's own session_log() makes.
-        """
-        try:
-            os.makedirs(GAP_LOG_DIR, exist_ok=True)
-            path = os.path.join(GAP_LOG_DIR, f"gap_builder_{time.strftime('%Y%m%d')}.log")
-            line = {"t": time.strftime("%H:%M:%S"), **payload}
-            with open(path, "a") as fh:
-                fh.write(json.dumps(line, sort_keys=True) + "\n")
-        except Exception:
-            pass
-        self._relay(200, {"ok": True})
 
     def send_web(self, name, ctype=None):
         """
@@ -535,152 +499,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         status, body = self.siblings(rel)
         log("/api/load_store", {"path": rel}, body, status)
         self._relay(status, body)
-
-    # Fixed display order for sarah_clips/libs/'s known subfolders — plain
-    # alphabetical would put "sound_bits" between "idle" and "stills",
-    # ahead of "transitions"; Carson asked for it to show LAST instead. Any
-    # future folder not in this list still shows up (libs_list() has always
-    # auto-discovered whatever subfolders exist, unchanged here) — it just
-    # sorts alphabetically after all of these.
-    LIBS_GROUP_ORDER = ["gap-fillers", "idle", "stills", "transitions", "sound_bits"]
-
-    def libs_list(self, qs):
-        """
-        GET /api/libs_list -> every file under this pair's sarah_clips/libs/,
-        grouped by subfolder — the gap-filler library (see its own README).
-        Read-only: this only reports what's there, it never writes to it.
-        """
-        base_p, _, _, _ = self._pair_from(qs)
-        if base_p is None:
-            return
-        video_root = video_root_of(base_p)
-        if video_root is None:
-            return self.json_error(500, f"expected .../sandbox/<label>/segment.mp4, "
-                                         f"got {base_p}")
-        libs_dir = os.path.join(video_root, "sarah_clips", "libs")
-        if not os.path.isdir(libs_dir):
-            return self._relay(200, {"root": None, "groups": []})
-
-        # sound_bits files are named "<NN>-<scene label>.<ext>", matching a
-        # sandbox scene folder — so the SAME script.json that already holds
-        # every scene's spoken line can supply it here too, keyed by that
-        # label, rather than needing a second place to keep the words in
-        # sync. Best-effort: a sound bit with no matching label just has no
-        # "line" in its entry, and the client falls back to its filename.
-        label_lines = {}
-        script_path = os.path.join(video_root, "sandbox", "script.json")
-        if os.path.isfile(script_path):
-            try:
-                script = json.load(open(script_path))
-                label_lines = {s["label"]: s["line"] for s in script.get("scenes", []) if s.get("label")}
-            except Exception:
-                pass
-
-        def sort_key(folder):
-            try:
-                return (self.LIBS_GROUP_ORDER.index(folder), folder)
-            except ValueError:
-                return (len(self.LIBS_GROUP_ORDER), folder)
-
-        groups = []
-        for folder in sorted(os.listdir(libs_dir), key=sort_key):
-            fdir = os.path.join(libs_dir, folder)
-            if not os.path.isdir(fdir):
-                continue
-            files = []
-            for name in sorted(os.listdir(fdir)):
-                if name.startswith("."):
-                    continue
-                p = os.path.join(fdir, name)
-                if not os.path.isfile(p):
-                    continue
-                entry = {"name": name, "size": os.path.getsize(p),
-                         "path": os.path.relpath(p, CUSTOMERS_ROOT)}
-                if name.lower().endswith((".webm", ".mp4", ".mov")):
-                    # A .webm here is always a transparent HeyGen render —
-                    # same rule shared/serve.py's is_alpha() uses, inlined
-                    # rather than importing one more name for one check.
-                    try:
-                        entry["dur"] = round(float(build_scenes.probe(
-                            p, alpha=name.lower().endswith(".webm"))[1]), 2)
-                    except Exception:
-                        entry["dur"] = None
-                if folder == "sound_bits":
-                    label = re.sub(r"^\d+-", "", os.path.splitext(name)[0])
-                    if label in label_lines:
-                        entry["line"] = label_lines[label]
-                files.append(entry)
-            groups.append({"folder": folder, "files": files})
-
-        self._relay(200, {"root": os.path.relpath(libs_dir, CUSTOMERS_ROOT), "groups": groups})
-
-    def lib_frames(self, qs):
-        """
-        GET /api/lib_frames?path=<rel to a file under sarah_clips/libs/>
-        -> {"kind": "clip"|"still", "n": <frame count>, "slug": <cache dir>,
-            "ext": <frame file extension>}
-
-        A clip (.webm/.mp4) goes through the SAME extraction every pair
-        already uses -- alpha_png=True, because every file in this library
-        is a transparent Sarah overlay, exactly like the OVERLAY track. A
-        still (.png/.jpg) has no frames to extract, so it gets a one-frame
-        cache entry built by hand instead — that way the page can address a
-        still through the exact same slug+frame URL scheme as a real clip,
-        rather than needing a second code path just for stills.
-        """
-        rel = (qs.get("path") or [""])[0]
-        if not rel:
-            return self.json_error(400, "path is required")
-        p = safe_join(rel)
-        if p is None or not os.path.isfile(p):
-            return self.json_error(400, f"not a file under Customers/: {rel}")
-
-        ext = os.path.splitext(p)[1].lower()
-        if ext in (".png", ".jpg", ".jpeg"):
-            import shutil
-            outdir = os.path.join(CACHE, build_mod.slug_for(p))
-            frames_dir = os.path.join(outdir, "frames")
-            os.makedirs(frames_dir, exist_ok=True)
-            frame_ext = ".jpg" if ext in (".jpg", ".jpeg") else ".png"
-            dest = os.path.join(frames_dir, f"frame_00001{frame_ext}")
-            if not os.path.isfile(dest):
-                shutil.copyfile(p, dest)
-            return self._relay(200, {"kind": "still", "n": 1,
-                                      "slug": os.path.relpath(outdir, CACHE),
-                                      "ext": frame_ext})
-
-        out = build_mod.build_frames(p, box=750, alpha_png=True, log=lambda m: None)
-        n = len([f for f in os.listdir(os.path.join(out, "frames")) if f.startswith("frame_")])
-        self._relay(200, {"kind": "clip", "n": n,
-                           "slug": os.path.relpath(out, CACHE), "ext": ".png"})
-
-    def lib_media(self, qs):
-        """
-        GET /api/lib_media?path=<rel to a file under sarah_clips/libs/>
-        -> the raw file, bytes as-is, WITH its audio track intact.
-
-        /api/lib_frames above only ever extracts silent picture frames —
-        every other Frame Selector feature works off those PNGs and never
-        needed the sound. A sound bit's whole point is being heard, so it
-        gets its own route straight to the source file, for a <video> tag
-        to play directly rather than going through frame extraction at all.
-        """
-        rel = (qs.get("path") or [""])[0]
-        if not rel:
-            return self.json_error(400, "path is required")
-        p = safe_join(rel)
-        if p is None or not os.path.isfile(p):
-            return self.json_error(400, f"not a file under Customers/: {rel}")
-        ctype = {".webm": "video/webm", ".mp4": "video/mp4",
-                 ".mov": "video/quicktime"}.get(os.path.splitext(p)[1].lower(),
-                                                 "application/octet-stream")
-        body = open(p, "rb").read()
-        self.send_response(200)
-        self.send_header("Content-Type", ctype)
-        self.send_header("Content-Length", str(len(body)))
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(body)
 
     def save_scene(self, payload):
         """

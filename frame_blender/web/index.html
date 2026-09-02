@@ -30,11 +30,6 @@
         <option value="build">Build (real speed)</option>
       </select>
       <button class="nav" id="playVideoBtn" disabled title="No built video yet">&#9654; Play video</button>
-      <!-- Lives here, not inside the checklist it switches, because that
-           checklist now sits INSIDE the very view this button switches
-           away from — a button that disappears exactly when you need it
-           to come back is no button at all. Always-visible ground instead. -->
-      <button class="pill" id="viewToggleBtn" title="Switch the area below between the Frame Blender's combine/build view and the Gap Builder views">&#8646; Gap Builder view</button>
     </div>
 
     <div class="panel">
@@ -58,12 +53,6 @@
     </div>
   </div>
 
-  <!-- Two views sharing one area, only one visible at a time — toggled by
-       #viewToggleBtn under Play video, above (always visible, unlike
-       everything it switches between). Default is the Frame Blender view
-       (fbView), because these two Gap Builder sections — sarah_clips/libs
-       included, it moved down to sit beside them — are only needed while
-       fine-tuning one scene, not every time. -->
   <div id="fbView">
     <div class="navrow">
       <button class="nav" id="prevBtn">&#9664; prev frame</button>
@@ -89,81 +78,6 @@
     <video id="clipVideo" controls></video>
   </div>
 
-  <div class="libinspector-row" id="gapBuilderView" hidden>
-    <div class="panel libpanel">
-      <h3>sarah_clips/libs</h3>
-      <div class="libstatus" id="libStatus">Loading…</div>
-      <div class="libgroups" id="libGroups"></div>
-      <!-- Shared by every Sound Bits row's own play button below — one
-           player rather than one per clip, same reasoning as the Frame
-           Selector's own single shared viewer. Speed options match the
-           Segment and Avatar Editor's own rateSel exactly, same values,
-           same order, so "how fast Sarah talks" means the same thing in
-           both tools. -->
-      <div class="soundBitPlayer" id="soundBitPlayer" hidden>
-        <video id="soundBitVideo" playsinline></video>
-      </div>
-    </div>
-
-    <div class="libinspector" id="libInspector" hidden>
-      <h4>Frame Selector</h4>
-      <div class="imgwrap checker"><img id="libViewerImg" alt="library frame"></div>
-      <div class="framepickRow">
-        <div class="count framepick" id="libPickBtn">Frame <b id="libN">—</b> / <b id="libTotal">—</b></div>
-        <div class="count framepick" id="libSelectedCount">Selected <b id="libSelectedN">0</b></div>
-      </div>
-      <input type="range" id="libSlider" min="0" max="0" value="0" step="1">
-      <div class="libframerow" id="libFrameRow"></div>
-    </div>
-
-    <div class="libinspector" id="builderPanel" hidden>
-      <h4>Clip-Gap Builder</h4>
-      <div class="imgwrap checker"><img id="builderViewerImg" alt="builder frame"></div>
-      <div class="count">Frame <b id="builderN">—</b> / <b id="builderTotal">—</b></div>
-      <input type="range" id="builderSlider" min="0" max="0" value="0" step="1" disabled>
-      <div class="libframerow" id="builderFrameRow"></div>
-    </div>
-
-    <!-- List only, for now — no click handlers wired yet. Buttons come
-         before the actions behind them so the shape can be looked at and
-         reordered cheaply, before any of it does something real. Each one
-         has its own id already, so wiring it later is filling in an
-         .onclick, not hunting for a way to address it. -->
-    <div class="panel libpanel gapMenu">
-      <h3>Gap Builder Controller Menu</h3>
-      <div class="gapMenuList">
-        <button class="gapMenuBtn" id="gmAddOpeningStill">Add Sarah Opening Still</button>
-        <button class="gapMenuBtn" id="gmAddClosingStill">Add Sarah Closing Still</button>
-        <button class="gapMenuBtn" id="gmBuilderSelectFrames" title="Arms selecting in the Clip-Gap Builder row below. Click 1: start frame. Click 2: end frame (or the same frame again for a one-frame selection). Click 3: reset, start over.">Select Frames</button>
-        <button class="gapMenuBtn" id="gmBuilderCopySelected" title="Copies whatever's selected in the Clip-Gap Builder's own row below (Select Frames), onto the clipboard — Paste Selected adds it back in, so this also duplicates a range in place.">Copy Selected</button>
-        <button class="gapMenuBtn" id="gmPasteSelected" title="Turns green once Copy Selected has filled the clipboard. Click a frame below first to pick where, then click this — the clipboard's contents land right after it.">Paste Selected</button>
-        <button class="gapMenuBtn" id="gmDeleteSelected">Delete Selected</button>
-        <button class="gapMenuBtn" id="gmClearAll" title="Empty the Clip-Gap Builder collection. Does not touch the Frame Selector, the loaded scene, or Timeline Scenes — only this list.">Clear All</button>
-        <hr class="gapMenuDivider">
-        <div class="gapMenuSectionTitle">Frame Selector Menu</div>
-        <hr class="gapMenuDivider">
-        <button class="gapMenuBtn" id="gmSelectFrames" title="Arms selecting in the Frame Selector row above. Click 1: start frame. Click 2: end frame (or the same frame again for a one-frame selection). Click 3: reset, start over.">Select Frames</button>
-        <button class="gapMenuBtn" id="gmCopySelected" title="Copies whatever's selected in the Frame Selector's own row above (Select Frames), onto a clipboard — Paste (above) adds it to the Clip-Gap Builder.">Copy Selected</button>
-        <button class="gapMenuBtn" id="gmLibViewToggle" title="Turns green along with Copy Selected once a selection is complete. Filters the row and slider above to just your selection, so you can scrub through it before deciding — click again to go back to the full collection.">Show Selected on Timeline</button>
-        <button class="gapMenuBtn" id="gmFrameSelectorClearAll" title="Unchecks every clip in sarah_clips/libs and empties the Frame Selector's row above. Does not touch the Clip-Gap Builder, the clipboard, the loaded scene, or Timeline Scenes — only this list.">Clear All</button>
-        <hr class="gapMenuDivider">
-        <div class="gapMenuSectionTitle">Audio Menu</div>
-        <hr class="gapMenuDivider">
-        <button class="gapMenuBtn" id="gmSoundBitPlayPause" disabled title="Play or pause whichever Sound Bit was last clicked ▶ in sarah_clips/libs above.">Play / Pause</button>
-        <div class="audioMenuRow">
-          <span class="soundBitName" id="soundBitName">No Sound Bit loaded</span>
-          <select id="soundBitRate" title="Playback speed — same options as the Segment and Avatar Editor.">
-            <option value="2">2x</option>
-            <option value="1" selected>1x</option>
-            <option value="0.5">0.5x</option>
-            <option value="0.25">0.25x</option>
-            <option value="0.125">0.125x</option>
-          </select>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="modalback" id="pickBack" hidden>
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pickTitle">
       <header>
@@ -178,10 +92,6 @@
     </div>
   </div>
 
-<!-- gap-builder.js first: app.js's bootstrap, at the bottom of the second
-     file, calls straight into functions this one defines (loadLibs,
-     rebuildLibFrames, rebuildBuilderFrames) — they have to exist already. -->
-<script src="/web/gap-builder.js"></script>
 <script src="/web/app.js"></script>
 </body>
 </html>

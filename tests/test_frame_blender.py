@@ -207,16 +207,6 @@ REAL_SEG = f"{REAL_STORE_REL}/sandbox/01-login/segment.mp4"
 REAL_AV = f"{REAL_STORE_REL}/sandbox/01-login/avatar.webm"
 SAVE_MP4_DIR = os.path.join(fixture.CUSTOMERS, REAL_STORE_REL, "video", "sandbox_mp4_scenes")
 
-# ski-demo is the one store with a real sarah_clips/libs/ — the Frame
-# Selector's own library — so these three tests borrow it the same way the
-# builds above borrow bike-demo. Read-only: /api/lib_frames only ever
-# EXTRACTS into cache/, it never writes into Customers/ itself.
-SKI_STORE_REL = "Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering"
-SKI_SEG = f"{SKI_STORE_REL}/sandbox/01-intro-and-login/segment.mp4"
-SKI_AV = f"{SKI_STORE_REL}/sandbox/01-intro-and-login/avatar.webm"
-SKI_LIB_CLIP = f"{SKI_STORE_REL}/sarah_clips/libs/gap-fillers/gap-filler-1.0s.webm"
-SKI_LIB_STILL = f"{SKI_STORE_REL}/sarah_clips/libs/stills/sarah-rest-pose-corner-300-alpha.png"
-
 
 def s_build_clip():
     step("/build_clip — the real one-pass picture+voice build")
@@ -265,74 +255,6 @@ def s_save_mp4_versions():
     SAVED_NAMES = names
 
 
-def s_libs_list_paths():
-    """
-    Each file /api/libs_list returns now carries its own `path` (relative
-    to Customers/), added specifically so the Frame Selector can hand it
-    straight to /api/lib_frames. A name alone can't do that — two different
-    library folders can hold a file with the same name.
-    """
-    step("/api/libs_list — every file carries a real, resolvable path")
-    d, code = fb_get("/api/libs_list", base=SKI_SEG, overlay=SKI_AV)
-    eq("200", code, 200)
-    files = [f for g in d.get("groups", []) for f in g.get("files", [])]
-    check("finds real library files", len(files) > 0, len(files))
-    check("every file has a path", all("path" in f for f in files), files[:1])
-    sample = files[0]
-    check("that path is a real file under Customers/",
-          os.path.isfile(os.path.join(fixture.CUSTOMERS, sample["path"])),
-          sample["path"])
-
-
-def s_lib_frames_clip():
-    """
-    /api/lib_frames on a real clip — the Frame Selector's own backend.
-    Goes through the SAME extraction every OVERLAY track already uses
-    (alpha_png=True, since every file in this library is a transparent
-    Sarah render), so its frames must be servable the identical way.
-    """
-    step("/api/lib_frames — a real .webm clip")
-    d, code = fb_get("/api/lib_frames", path=SKI_LIB_CLIP)
-    eq("200", code, 200)
-    eq("kind is clip", d.get("kind"), "clip")
-    check("has a real, multi-frame count", isinstance(d.get("n"), int) and d["n"] > 1, d.get("n"))
-    check("names a real cache slug", bool(d.get("slug")), d.get("slug"))
-    eq("frames are alpha PNGs, like any overlay track", d.get("ext"), ".png")
-
-    url = f"{FB_BASE}/{d['slug']}/frames/frame_00001{d['ext']}"
-    r = urllib.request.urlopen(url, timeout=10)
-    eq("frame 1 is really servable at that URL", r.status, 200)
-
-    _, code2 = fb_get("/api/lib_frames")
-    eq("a missing path is refused", code2, 400)
-    _, code3 = fb_get("/api/lib_frames", path="not/a/real/file.webm")
-    eq("a path that isn't a real file is refused, not a crash", code3, 400)
-
-
-def s_lib_frames_still():
-    """
-    A still has no frames to extract — it gets a hand-built ONE-frame cache
-    entry instead (see lib_frames()'s own docstring), so the page can
-    address it through the exact same slug+frame URL scheme as a real
-    clip, with no second code path in app.js just for stills.
-    """
-    step("/api/lib_frames — a still image gets a one-frame cache entry")
-    d, code = fb_get("/api/lib_frames", path=SKI_LIB_STILL)
-    eq("200", code, 200)
-    eq("kind is still", d.get("kind"), "still")
-    eq("exactly one frame", d.get("n"), 1)
-    eq("keeps its own PNG extension", d.get("ext"), ".png")
-
-    url = f"{FB_BASE}/{d['slug']}/frames/frame_00001{d['ext']}"
-    r = urllib.request.urlopen(url, timeout=10)
-    eq("that one frame is really servable", r.status, 200)
-
-    # Asking again must reuse the same cache entry, not duplicate or rebuild it.
-    d2, code2 = fb_get("/api/lib_frames", path=SKI_LIB_STILL)
-    eq("asking again still answers 200", code2, 200)
-    eq("same slug both times", d2.get("slug"), d.get("slug"))
-
-
 def s_stateless():
     """
     The restructure's actual promise: this server remembers no scene. A
@@ -342,7 +264,7 @@ def s_stateless():
     """
     step("stateless — a call that names no pair is refused, even right after opening one")
     fb_get("/api/open_pair", base=REAL_SEG, overlay=REAL_AV)   # open something first
-    for ep in ("/build_clip", "/api/libs_list", "/api/save_mp4"):
+    for ep in ("/build_clip", "/api/save_mp4"):
         d, code = fb_get(ep, n=10)
         eq(f"{ep} refuses without a pair", code, 400)
         check(f"{ep} says why", "base is required" in str(d.get("error", "")), d)
@@ -354,15 +276,7 @@ def s_static_page():
     check("says nothing is loaded", "nothing loaded" in html, html[:0] or "ok")
     for gone in ("base_slug", "over_slug", "01-opening-with-login"):
         check(f"no {gone} baked in", gone not in html)
-    # gap-builder.js must be named BEFORE app.js — app.js's own bootstrap
-    # calls straight into functions gap-builder.js defines, so if load
-    # order here ever regressed, the page would fail at the very last line
-    # of app.js with everything above it having worked perfectly.
-    gb_pos = html.find("gap-builder.js")
-    app_pos = html.find('src="/web/app.js"')
-    check("gap-builder.js is named before app.js", -1 < gb_pos < app_pos, (gb_pos, app_pos))
-    for asset, ctype in (("/web/app.js", "javascript"), ("/web/gap-builder.js", "javascript"),
-                         ("/web/app.css", "css")):
+    for asset, ctype in (("/web/app.js", "javascript"), ("/web/app.css", "css")):
         r = urllib.request.urlopen(FB_BASE + asset, timeout=10)
         eq(f"{asset} served", r.status, 200)
         check(f"{asset} content-type", ctype in r.headers.get("Content-Type", ""),
@@ -385,25 +299,18 @@ def s_app_js_parses():
     2026-08-30 extraction out of player.py's template, and later a modal's
     markup sitting after its own <script> tag.
 
-    Checks each file's OWN syntax first, then both CONCATENATED in the same
-    order the page loads them — gap-builder.js then app.js, exactly as
-    index.html names them, and deliberately neither file wrapped in its own
-    IIFE (see app.js's own header comment on why) specifically so each can
-    call the other's top-level declarations directly. That same flat shared
-    scope is also the one place a NEW kind of bug can now hide: two files
-    that each parse perfectly alone can still declare the same `let` or
-    `const` name and throw the moment they share a scope for real — a class
-    of bug neither file's own syntax check would ever catch alone. Fetches
-    the REAL served files, not the ones on disk, so a serving bug is
-    caught too.
+    Was briefly two files checked separately and concatenated (2026-09-01,
+    while the Clip-Gap Builder lived in its own gap-builder.js) — that
+    file is gone (2026-09-02, moved to the Avatar Editor's own scope), so
+    this now just checks app.js's own syntax. Fetches the REAL served
+    file, not the one on disk, so a serving bug is caught too.
     """
-    step("web/*.js — does the JavaScript actually parse, alone and together?")
+    step("web/app.js — does the JavaScript actually parse?")
     node = shutil.which("node")
     if node is None:
         check("node is available to parse it", False,
               "install node, or this can never catch a broken page again")
         return
-    gb = urllib.request.urlopen(FB_BASE + "/web/gap-builder.js", timeout=10).read().decode()
     js = urllib.request.urlopen(FB_BASE + "/web/app.js", timeout=10).read().decode()
 
     def parses(name, text):
@@ -417,14 +324,11 @@ def s_app_js_parses():
               f"{len(text)} bytes" if r.returncode == 0
               else next((l for l in first if "Error" in l), first[0] if first else ""))
 
-    parses("gap-builder.js", gb)
     parses("app.js", js)
-    parses("gap-builder.js + app.js together (load order)", gb + "\n" + js)
 
 
 FUNCTIONS = [s_static_page, s_app_js_parses, s_stateless, s_load_picker, s_load_store,
-             s_save_scene_proxy, s_build_clip, s_save_mp4_versions,
-             s_libs_list_paths, s_lib_frames_clip, s_lib_frames_still]
+             s_save_scene_proxy, s_build_clip, s_save_mp4_versions]
 
 
 def main():

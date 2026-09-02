@@ -6,14 +6,11 @@
 // It is served as a static file now: no build step, no escaping, and the
 // browser's own debugger lines up with the file.
 //
-// NOT wrapped in an IIFE, as of the 2026-09-01 split into two files (this
-// one and gap-builder.js, loaded before it — see that file's own header).
-// Both need one flat top-level scope to share SCENE, pairQS(), pad(), and
-// the localStorage helpers without a formal interface between them; an
-// IIFE around either file would hide its top-level bindings from the
-// other. Safe here specifically because this is a single-purpose internal
-// tool page, not a library — there is nothing else on the page for a
-// leaked global to collide with.
+// Was briefly split into this file plus a second, gap-builder.js (added
+// 2026-09-01, removed 2026-09-02 when the Clip-Gap Builder moved to the
+// Avatar Editor's own scope). Not wrapped in an IIFE, a leftover of that
+// split kept on purpose: nothing else on this single-purpose page needs
+// its own scope, and there is no leaked-global risk to guard against.
 'use strict';
 
 // THE one piece of state that says what this page is looking at.
@@ -38,10 +35,10 @@
   // ── persistence (the browser's own storage, not the server) ────────────────
   // The server is deliberately stateless (2026-08-30 restructure, so two tabs
   // can't fight over one remembered pair) — which also means it never had
-  // anywhere to remember Frame Selector picks, Clip-Gap Builder frames, or a
-  // Load result. Before this, a refresh silently threw all of that away; the
-  // only thing that ever survived was the open pair itself, and only by
-  // accident, because it happens to sit in the page's own URL.
+  // anywhere to remember a Load result. Before this, a refresh silently
+  // threw that away; the only thing that ever survived was the open pair
+  // itself, and only by accident, because it happens to sit in the page's
+  // own URL.
   //
   // localStorage survives a refresh AND closing the tab, until something
   // clears it — which here is only ever the Clear button (see showEmpty()).
@@ -73,18 +70,13 @@
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
   }
 
-  // The three things that are NOT tied to one scene: the Clip-Gap Builder's
-  // collection, the last Load result, and which view was showing. Called
-  // after every showEmpty()-driven reset (both a plain refresh and an
+  // The one thing that is NOT tied to one scene: the last Load result.
+  // Called after every showEmpty()-driven reset (both a plain refresh and an
   // in-session scene switch go through showEmpty() first, via openPair()) —
   // NOT called by Clear, which empties storage first so there is nothing
   // left for this to bring back.
   function restoreGlobals() {
     const s = loadStore();
-    if (Array.isArray(s.builderFrames) && s.builderFrames.length) {
-      BUILDER_FRAMES = s.builderFrames;
-      rebuildBuilderFrames(BUILDER_FRAMES.length - 1);
-    }
     // Guarded on STORE_SCENES already being empty — showEmpty() does NOT
     // reset it (see showEmpty()'s own comment on what it deliberately
     // leaves alone), so loadVideo() calling this right after setting it
@@ -95,15 +87,12 @@
       tlRender();
       tlStatus.textContent += ' (restored)';
     }
-    if (s.gapBuilderView) setView(true);
   }
 
   // Frame-stepping progress is tied to one scene — restored once that
   // scene's own pair is open, keyed the same way a save for it is:
   // base_rel + over_rel, so re-opening the SAME scene later in the same
   // session (not just after a refresh) brings its own work back.
-  // (savePickedForCurrentPair, the other half of this pattern, lives in
-  // gap-builder.js — it saves PICKED, which belongs to that file now.)
   function saveProgressForCurrentPair() {
     if (!SCENE) return;
     savePair(pairKey(SCENE.base_rel, SCENE.over_rel), {n, combined: [...combined]});
@@ -136,39 +125,6 @@
     }
     updateScrub();
   }
-
-  // ── view toggle ──────────────────────────────────────────────────────────
-  // Two views share one area: the Frame Blender's own combine/build view
-  // (fbView) and the Gap Builder pair (gapBuilderView) added afterward.
-  // Only one is ever visible — the Gap Builder sections are only needed
-  // while fine-tuning one scene, not on every visit, so they stay out of
-  // the way until asked for. fbView is the default.
-  const fbView = document.getElementById('fbView');
-  const gapBuilderView = document.getElementById('gapBuilderView');
-  const viewToggleBtn = document.getElementById('viewToggleBtn');
-
-  // Deliberately does NOT save to storage — showEmpty() also calls this
-  // (setView(false), forcing the default) as part of the same reset that
-  // restoreGlobals() has to undo, and saving here would overwrite the real
-  // saved choice before restore ever gets to read it. Only the explicit
-  // click below saves.
-  function setView(showGapBuilder) {
-    fbView.hidden = showGapBuilder;
-    gapBuilderView.hidden = !showGapBuilder;
-    // Stacked (arrow / two-word label / "View") rather than one line — the
-    // single-line version overflowed this column's own width.
-    viewToggleBtn.innerHTML = showGapBuilder
-      ? '&#8646;<br>Frame Blender<br>View' : '&#8646;<br>Gap Builder<br>View';
-    viewToggleBtn.title = showGapBuilder
-      ? 'Switch back to the frame-stepping / combine / build view'
-      : 'Switch to the Frame Selector and Clip-Gap Builder view';
-  }
-
-  viewToggleBtn.onclick = () => {
-    const showGapBuilder = gapBuilderView.hidden;
-    setView(showGapBuilder);
-    saveStore({gapBuilderView: showGapBuilder});
-  };
 
   const pad = n => String(n).padStart(5, '0');
   const BASE = n => `/${SCENE.base_slug}/frames/frame_${pad(n)}${SCENE.base_ext}`;
@@ -643,12 +599,6 @@
     if (e.key === 'ArrowRight') document.getElementById('nextBtn').click();
   });
 
-  // sarah_clips/libs, the Frame Selector, and the Clip-Gap Builder (PICKED,
-  // LIB_FRAMES, BUILDER_FRAMES, rebuildLibFrames, rebuildBuilderFrames,
-  // toggleLibClip, loadLibs, savePickedForCurrentPair) all moved to
-  // gap-builder.js, loaded before this file — see that file's own header
-  // comment for why and how the two files still share scope.
-
   // ── the Load picker ──────────────────────────────────────────────────────
   // Two steps in one modal: a store, then one of that store's video folders.
   // Before this, "Load" needed the scene's own path to already be known —
@@ -769,17 +719,6 @@
     lastBuiltFrames = null;
     tlSaveMp4Btn.disabled = true;
     tlSaveMp4Btn.title = 'Build a clip first';
-    libGroups.innerHTML = '';
-    libStatus.textContent = 'Nothing loaded.';
-    PICKED = [];
-    rebuildLibFrames();
-    builderPanel.hidden = true;
-    BUILDER_FRAMES = [];
-    SELECTED = new Set();
-    disarmSelectMode();
-    rebuildBuilderFrames();
-    CLIPBOARD = [];
-    setView(false);
   }
 
   async function openPair(baseRel, overRel) {
@@ -801,7 +740,6 @@
       playVideoBtn.disabled = false;
       playVideoBtn.title = 'Build the whole scene, then play it';
       render();
-      loadLibs();
       restorePairProgress();
       // Keep the URL honest, so a reload or a copied link reopens THIS pair
       // rather than whatever the server would have defaulted to.
