@@ -2477,136 +2477,93 @@ BROWSE_HTML = f"""<!doctype html>
          display:flex; flex-direction:column; align-items:center; padding:16px 0; }}
   #panel {{ width:750px; }}
   h1 {{ font-size:15px; font-weight:600; margin:0 0 10px; color:#ccc; }}
-  #crumb {{ font-size:12px; color:#888; margin-bottom:10px; word-break:break-all; }}
+  #crumb {{ font-size:12px; color:#888; margin-bottom:10px; cursor:pointer; }}
+  #crumb:hover {{ color:#ccc; }}
+  #crumb:empty {{ display:none; }}
   #status {{ font-size:13px; color:#e0c060; min-height:18px; margin-bottom:8px; }}
   #list {{ border:1px solid #333; border-radius:8px; overflow:hidden; }}
   .row {{ padding:9px 14px; cursor:pointer; border-bottom:1px solid #2a2a2a;
-         display:flex; justify-content:space-between; font-size:13px; }}
+         display:flex; justify-content:space-between; align-items:center; font-size:13px; }}
   .row:last-child {{ border-bottom:none; }}
   .row:hover {{ background:#2a2a2a; }}
-  .row.file {{ color:#9fd0ff; }}
-  .row .size {{ color:#777; font-variant-numeric:tabular-nums; }}
-  .badges {{ display:flex; gap:8px; }}
-  .chip {{ color:#9aa; padding:2px 8px; border:1px solid #444; border-radius:10px;
-          font-size:11px; white-space:nowrap; }}
-  .chip:hover {{ color:#fff; border-color:#6a6; background:#1f3320; }}
+  .row.disabled {{ cursor:default; color:#666; }}
+  .row.disabled:hover {{ background:none; }}
+  .sub {{ display:block; font-size:11px; color:#888; margin-top:2px; }}
   .empty {{ padding:14px; color:#666; font-size:13px; }}
-  .slotbtn {{ margin-left:8px; background:#2c3236; color:#eee; border:1px solid #4a5259;
-              border-radius:5px; padding:2px 8px; font-size:13px; cursor:pointer; }}
-  .slotbtn.base:hover {{ border-color:#2ecc40; color:#2ecc40; }}
-  .slotbtn.overlay:hover {{ border-color:#a56cff; color:#a56cff; }}
 </style></head>
 <body>
   <div id="panel">
-    <h1>Browse Customers/ for a raw recording</h1>
-    <div id="crumb">Customers/</div>
-    <div id="pairbar" style="display:none;gap:10px;align-items:center;flex-wrap:wrap;
-       margin:8px 0;padding:8px 10px;border:1px solid #3a4248;border-radius:8px;background:#1b1f22">
-    <span style="color:#2ecc40;font-weight:600">▩ background</span>
-    <span id="pbBase" style="color:#ccc">—</span>
-    <span style="color:#a56cff;font-weight:600">◈ overlay</span>
-    <span id="pbOver" style="color:#ccc">—</span>
-    <button id="pbGo" onclick="openPair()" disabled
-      style="background:#2c3236;color:#eee;border:1px solid #4a5259;border-radius:6px;
-             padding:6px 12px;cursor:pointer">Layer these ▶</button>
-    <button onclick="PAIR.base=PAIR.overlay=null;paintPair()"
-      style="background:none;color:#889;border:0;cursor:pointer">clear</button>
-  </div>
-  <div id="status"></div>
+    <h1 id="h1">Load a video — choose a store</h1>
+    <div id="crumb"></div>
+    <div id="status"></div>
     <div id="list"></div>
   </div>
 <script>
-  function fmtSize(b) {{
-    if (b > 1e6) return (b / 1e6).toFixed(1) + ' MB';
-    if (b > 1e3) return (b / 1e3).toFixed(0) + ' KB';
-    return b + ' B';
-  }}
-  function row(icon, label, sizeText, onclick, isFile) {{
+  // Split off 2026-09-02: this page used to be a raw Customers/ file browser
+  // (open a store, land in help-videos/raw_mp4/, hand-pick a base+overlay
+  // pair). Every video needs cutting into scenes before it can be layered,
+  // so hand-pairing raw footage here was always a dead end that just looked
+  // like a working path. This page now shows the SAME store -> video ->
+  // sandbox scenes picker the in-editor Load button already used — just as
+  // the first thing you see, not something buried inside an open session.
+  function row(label, sub, onclick, disabled) {{
     const d = document.createElement('div');
-    d.className = 'row' + (isFile ? ' file' : '');
-    const l = document.createElement('span'); l.textContent = `${{icon}}  ${{label}}`;
+    d.className = 'row' + (disabled ? ' disabled' : '');
+    const l = document.createElement('span');
+    l.innerHTML = label + (sub ? `<span class="sub">${{sub}}</span>` : '');
     d.appendChild(l);
-    if (sizeText) {{ const s = document.createElement('span'); s.className = 'size'; s.textContent = sizeText; d.appendChild(s); }}
-    d.onclick = onclick;
+    if (!disabled) d.onclick = onclick;
     return d;
   }}
-  // A store row: clicking the name still jumps to raw_mp4 (unchanged default),
-  // and a "segments" chip sits right beside it when that folder exists too —
-  // added so the cut segments this tool itself produces are as reachable as
-  // the raw recording they came from, not three folders deeper.
-  function storeRow(d) {{
-    const div = document.createElement('div');
-    div.className = 'row';
-    const label = document.createElement('span');
-    label.textContent = `🎬  ${{d.name}}`;
-    div.appendChild(label);
-    const badges = document.createElement('span');
-    badges.className = 'badges';
-    const chip = (text, target) => {{
-      const c = document.createElement('span');
-      c.className = 'chip';
-      c.textContent = text;
-      c.onclick = (e) => {{ e.stopPropagation(); list(target); }};
-      return c;
-    }};
-    badges.appendChild(chip('raw_mp4 →', d.jump));
-    if (d.segments_jump) badges.appendChild(chip('segments →', d.segments_jump));
-    div.appendChild(badges);
-    div.onclick = () => list(d.jump);
-    return div;
-  }}
-  async function list(path) {{
-    setStatus('');
-    const r = await fetch(`/api/list?path=${{encodeURIComponent(path)}}`);
-    const data = await r.json();
-    if (data.error) {{ setStatus('Error: ' + data.error); return; }}
-    document.getElementById('crumb').textContent = 'Customers/' + data.path;
-    const el = document.getElementById('list');
-    el.innerHTML = '';
-    if (data.parent !== null) el.appendChild(row('⬆️', '.. (up)', '', () => list(data.parent)));
-    for (const d of data.dirs) {{
-      el.appendChild(d.jump ? storeRow(d) : row('📁', d.name, '', () => list(d.path)));
-    }}
-    for (const f of data.files) {{
-      // No single-file open here any more — MP4 Splitter's own tool does
-      // that now (this tool split off 2026-09-02). A row exists only to
-      // carry the two pair slots.
-      const r = row('🎬', f.name, fmtSize(f.size), null, true);
-      for (const [slot, glyph, tip] of [['base','▩','use as BACKGROUND (mp4)'],
-                                        ['overlay','◈','use as OVERLAY (webm)']]) {{
-        const b = document.createElement('button');
-        b.className = 'slotbtn ' + slot;
-        b.textContent = glyph; b.title = tip;
-        b.onclick = ev => {{ ev.stopPropagation(); PAIR[slot] = f.path; paintPair(); }};
-        r.appendChild(b);
-      }}
-      el.appendChild(r);
-    }}
-    if (data.parent === null && data.dirs.length === 0 && data.files.length === 0)
-      el.appendChild(Object.assign(document.createElement('div'), {{ className: 'empty', textContent: 'Customers/ is empty.' }}));
-  }}
-  const PAIR = {{ base: null, overlay: null }};
-  function paintPair() {{
-    const bar = document.getElementById('pairbar');
-    const nm = p => p ? p.split('/').pop() : '—';
-    document.getElementById('pbBase').textContent = nm(PAIR.base);
-    document.getElementById('pbOver').textContent = nm(PAIR.overlay);
-    document.getElementById('pbGo').disabled = !(PAIR.base && PAIR.overlay);
-    bar.style.display = (PAIR.base || PAIR.overlay) ? 'flex' : 'none';
-  }}
-  async function openPair() {{
-    setStatus('Extracting BOTH clips — the overlay keeps its alpha, so this takes a moment…');
-    try {{
-      const r = await fetch(`/api/open-pair?base=${{encodeURIComponent(PAIR.base)}}`
-                            + `&overlay=${{encodeURIComponent(PAIR.overlay)}}`);
-      const d = await r.json();
-      if (d.error) {{ setStatus('Error: ' + d.error); return; }}
-      location.href = d.url;
-    }} catch (e) {{ setStatus('Error: ' + e); }}
-  }}
   function setStatus(msg) {{ document.getElementById('status').textContent = msg; }}
-  paintPair();
-  list('');
+
+  async function showStores() {{
+    document.getElementById('h1').textContent = 'Load a video — choose a store';
+    document.getElementById('crumb').innerHTML = '';
+    setStatus('Loading stores…');
+    const list = document.getElementById('list');
+    list.innerHTML = '';
+    let stores;
+    try {{
+      const r = await fetch('/api/stores');
+      const d = await r.json();
+      stores = d.stores || [];
+    }} catch (e) {{ setStatus(`Could not list stores: ${{e}}`); return; }}
+    setStatus('');
+    if (!stores.length) {{
+      list.appendChild(Object.assign(document.createElement('div'),
+        {{ className: 'empty', textContent: 'No store with a ready video was found under Customers/.' }}));
+      return;
+    }}
+    for (const s of stores) {{
+      list.appendChild(row(`🎬  ${{s.store}}`,
+        `${{s.business}} — ${{s.videos.length}} video${{s.videos.length === 1 ? '' : 's'}}`,
+        () => showVideos(s)));
+    }}
+  }}
+  function showVideos(s) {{
+    document.getElementById('h1').textContent = `Load a video — ${{s.store}}`;
+    const crumb = document.getElementById('crumb');
+    crumb.textContent = '← back to stores';
+    crumb.onclick = showStores;
+    setStatus('');
+    const list = document.getElementById('list');
+    list.innerHTML = '';
+    for (const v of s.videos) {{
+      const reason = !v.scenes.length ? 'its script has no scenes'
+        : !v.has_sandbox ? 'no sandbox/ built yet — cut it in MP4 Splitter first'
+        : null;
+      list.appendChild(row(`📼  ${{v.name}}`,
+        `${{v.scenes.length}} scene${{v.scenes.length === 1 ? '' : 's'}}` + (reason ? ` — ${{reason}}` : ''),
+        () => confirmLoad(s, v), !!reason));
+    }}
+  }}
+  function confirmLoad(s, v) {{
+    if (!confirm(`Load ${{s.store}} — ${{v.name}}?\\n\\n${{v.scenes.length}} scene(s).`)) return;
+    setStatus(`Loading ${{s.store}} — ${{v.name}}…`);
+    location.href = `/api/open-seq-go?root=${{encodeURIComponent(v.root)}}&ns=${{v.scenes.join(',')}}`;
+  }}
+  showStores();
 </script>
 </body></html>
 """
