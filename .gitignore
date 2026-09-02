@@ -48,6 +48,13 @@ cache/
 # extraction's mtime independently — sharing one would have each of them decide
 # the other's work was stale and redo it.
 cache-go/
+# MP4 Splitter's and the Segment and Avatar Editor's OWN caches, since they
+# split into fully independent tools on 2026-09-02 and stopped sharing
+# cache/ above on purpose (Carson's own call — see editor-launchers/
+# SKILL.md). Frame Blender and Avatar Editor still share cache/ itself;
+# only these two got a genuinely separate folder each.
+cache_mp4_splitter/
+cache_segment_avatar_editor/
 
 # Run logs: the record of one machine's work, not source.
 logs/*.log

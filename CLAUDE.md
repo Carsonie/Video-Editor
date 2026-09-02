@@ -27,14 +27,17 @@ the one place this is written down, and it can change.
 
 ## When Carson asks to open, launch, start, or run an editor
 
-Read **`.claude/skills/editor-launchers/SKILL.md`** first, every time. Five
-separate tools now — Segment and Avatar Editor, MP4 Splitter (shares the
-SAE's own server), Frame Blender, Avatar Editor, and the next-gen web
-editor — each its own process except the first two, and the next-gen one
-is secretly two processes — skip the skill and it's easy to start its UI
-without its API and get a page full of 502s. "Run the editors"/"run all 4
-editors" is Carson's own standing phrase for four specific ones of these —
-the skill says which. The launch.json they all run from lives in
+Read **`.claude/skills/editor-launchers/SKILL.md`** first, every time. Six
+separate tools now — MP4 Splitter, Segment and Avatar Editor, Frame
+Blender, Avatar Editor, the still-existing old combined server
+(shared/serve.py, port 8842 — cannot be removed, Frame Blender/Avatar
+Editor both import plain functions out of it), and the next-gen web
+editor — each its own process, and the next-gen one is secretly two
+processes — skip the skill and it's easy to start its UI without its API
+and get a page full of 502s. "Run the editors"/"run all 4 editors" is
+Carson's own standing phrase for four specific ones of these (not the old
+combined server, not the next-gen editor) — the skill says which. The
+launch.json they all run from lives in
 `Basic_E2E_Testing`, not here.
 
 ---
