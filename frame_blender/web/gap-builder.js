@@ -38,6 +38,10 @@ const soundBitPlayer = document.getElementById('soundBitPlayer');
 const soundBitVideo = document.getElementById('soundBitVideo');
 const soundBitName = document.getElementById('soundBitName');
 const soundBitRate = document.getElementById('soundBitRate');
+// Lives in the Controller Menu's own "Audio Menu" section, not next to the
+// video — one button, wherever the rest of the menu's buttons are, rather
+// than a second set of transport controls bolted onto the player itself.
+const gmSoundBitPlayPause = document.getElementById('gmSoundBitPlayPause');
 
 function playSoundBit(f, label) {
   soundBitPlayer.hidden = false;
@@ -46,9 +50,20 @@ function playSoundBit(f, label) {
   soundBitVideo.playbackRate = +soundBitRate.value;
   soundBitVideo.play();
   soundBitPlayer.scrollIntoView({block: 'nearest'});
+  gmSoundBitPlayPause.disabled = false;
 }
 
 soundBitRate.onchange = () => { soundBitVideo.playbackRate = +soundBitRate.value; };
+
+// Keeps its own label in sync with whatever's actually happening to the
+// video — including when a clip just runs out on its own, not only when
+// this button is what paused it.
+soundBitVideo.onplay = () => { gmSoundBitPlayPause.textContent = 'Pause'; };
+soundBitVideo.onpause = () => { gmSoundBitPlayPause.textContent = 'Play'; };
+gmSoundBitPlayPause.onclick = withActiveFlash(gmSoundBitPlayPause, () => {
+  if (soundBitVideo.paused) soundBitVideo.play();
+  else soundBitVideo.pause();
+});
 
 const libInspector = document.getElementById('libInspector');
 const libViewerImg = document.getElementById('libViewerImg');

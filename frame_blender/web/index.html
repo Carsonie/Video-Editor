@@ -102,16 +102,6 @@
            both tools. -->
       <div class="soundBitPlayer" id="soundBitPlayer" hidden>
         <video id="soundBitVideo" playsinline></video>
-        <div class="soundBitControls">
-          <span class="soundBitName" id="soundBitName"></span>
-          <select id="soundBitRate" title="Playback speed — same options as the Segment and Avatar Editor.">
-            <option value="2">2x</option>
-            <option value="1" selected>1x</option>
-            <option value="0.5">0.5x</option>
-            <option value="0.25">0.25x</option>
-            <option value="0.125">0.125x</option>
-          </select>
-        </div>
       </div>
     </div>
 
@@ -156,6 +146,20 @@
         <button class="gapMenuBtn" id="gmCopySelected" title="Copies whatever's selected in the Frame Selector's own row above (Select Frames), onto a clipboard — Paste (above) adds it to the Clip-Gap Builder.">Copy Selected</button>
         <button class="gapMenuBtn" id="gmLibViewToggle" title="Turns green along with Copy Selected once a selection is complete. Filters the row and slider above to just your selection, so you can scrub through it before deciding — click again to go back to the full collection.">Show Selected on Timeline</button>
         <button class="gapMenuBtn" id="gmFrameSelectorClearAll" title="Unchecks every clip in sarah_clips/libs and empties the Frame Selector's row above. Does not touch the Clip-Gap Builder, the clipboard, the loaded scene, or Timeline Scenes — only this list.">Clear All</button>
+        <hr class="gapMenuDivider">
+        <div class="gapMenuSectionTitle">Audio Menu</div>
+        <hr class="gapMenuDivider">
+        <button class="gapMenuBtn" id="gmSoundBitPlayPause" disabled title="Play or pause whichever Sound Bit was last clicked ▶ in sarah_clips/libs above.">Play / Pause</button>
+        <div class="audioMenuRow">
+          <span class="soundBitName" id="soundBitName">No Sound Bit loaded</span>
+          <select id="soundBitRate" title="Playback speed — same options as the Segment and Avatar Editor.">
+            <option value="2">2x</option>
+            <option value="1" selected>1x</option>
+            <option value="0.5">0.5x</option>
+            <option value="0.25">0.25x</option>
+            <option value="0.125">0.125x</option>
+          </select>
+        </div>
       </div>
     </div>
   </div>

@@ -183,9 +183,11 @@
     background: #1b2024;
   }
   .soundBitPlayer video { width: 100%; border-radius: 4px; background: #000; display: block; }
-  .soundBitControls {
+  /* Audio Menu's own row, under its Play/Pause button — which Sound Bit
+     is loaded, and the speed it plays at. */
+  .audioMenuRow {
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
-    margin-top: 8px; font-size: 11.5px; color: var(--sub);
+    padding: 2px 2px 0; font-size: 11.5px; color: var(--sub);
   }
   .soundBitName { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   #soundBitRate {
