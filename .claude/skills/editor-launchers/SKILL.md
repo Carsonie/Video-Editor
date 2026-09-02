@@ -1,6 +1,6 @@
 ---
 name: editor-launchers
-description: Launch any of the Video-Editor tools (Segment and Avatar Editor, MP4 Splitter, Frame Blender, Avatar Editor, the next-gen web editor) in the browser, individually or all together. Use whenever Carson asks to open, launch, start, or run an editor by name, or asks to "run the editors"/"run all 4 editors."
+description: Launch any of the Video-Editor tools (Segment and Avatar Editor, MP4 Splitter, Frame Blender, Avatar Editor, the next-gen web editor) in the browser, individually or all together. Use whenever Carson asks to open, launch, start, run, or reload an editor by name, or asks to "run the editors"/"run all 4 editors"/"reload."
 user_invocable: true
 ---
 
@@ -14,8 +14,26 @@ into two) — always these four unless he names a different set:
 |---|---|---|---|---|
 | **MP4 Splitter** | Cuts a raw recording into numbered segments. `mp4_splitter/serve.py` | `mp4-splitter` | 8845 | `cache_mp4_splitter/` |
 | **Segment and Avatar Editor** | Layers a segment + avatar overlay, timelines, Join/Split. `segment_avatar_editor/serve.py` | `segment-avatar-editor` | 8846 | `cache_segment_avatar_editor/` |
-| **Frame Blender** | Standalone frame-by-frame overlay/base combiner, `frame_blender/` | `frame-blender` | 8843 | `cache/` (repo-root) |
-| **Avatar Editor** | Frame Blender's own sibling — duplicated from it whole (2026-09-02) as a separate, independent starting point for different work, `avatar_editor/` | `avatar-editor` | 8844 | `cache/` — SAME folder as Frame Blender's, unlike the two below. That split (2026-08-xx) never asked for separate caches; this one (Splitter/SAE, 2026-09-02) explicitly did. Worth knowing if that ever needs fixing to match. |
+| **Frame Blender** | Monitors how the base and overlay tracks flow together, frame by frame, to form the current scene — and (planned) drives a visual frame-by-frame mp4 build, showing the build as it happens. `frame_blender/` | `frame-blender` | 8843 | `cache/` (repo-root) |
+| **Avatar Editor** | Edits Sarah's own overlay — her clip library (stills, idle loops, transitions, sound bits) via the Gap Builder, for building and adjusting her overlay scene by scene. `avatar_editor/` | `avatar-editor` | 8844 | `cache/` — SAME folder as Frame Blender's, unlike the two below. That split (2026-08-xx) never asked for separate caches; this one (Splitter/SAE, 2026-09-02) explicitly did. Worth knowing if that ever needs fixing to match. |
+
+**Frame Blender's purpose (2026-09-02):** it exists to watch the two
+tracks — base and overlay — and how they line up, scene by scene, frame
+by frame. The build step (`build_scenes.py`, `build/`) currently runs
+blind, with nothing to look at while it works. Frame Blender is meant to
+grow into the tool that shows that mp4 build happening, frame by frame,
+as it runs — not just editing individual frames after the fact. That
+build-visualizer piece is not built yet.
+
+**Avatar Editor's purpose (2026-09-02, narrowed same day):** started as a
+whole duplicate of Frame Blender, but Carson split the work between the
+two — Frame Blender keeps the two-track combine/build job above; Avatar
+Editor keeps only the Gap Builder, the tool for editing Sarah's overlay
+itself (sarah_clips/libs — stills, idle loops, transitions, sound bits —
+plus the Frame Selector and Clip-Gap Builder that assemble them). The
+overlay+base combine view, Build, Play video and Save MP4 were removed
+from `avatar_editor/` entirely — that job belongs to Frame Blender now,
+not duplicated here.
 
 **Every one of these four is now genuinely its own process, own port, own
 cache, no shared code** — MP4 Splitter and the SAE used to share ONE
@@ -85,6 +103,46 @@ combined 8842 server) running first.
    - `http://localhost:8846` — Segment and Avatar Editor
    - `http://localhost:8843` — Frame Blender
    - `http://localhost:8844` — Avatar Editor
+
+## "Reload" — restart all four servers, then their real Chrome tabs
+
+Carson's own standing phrase (2026-09-02, after a session's preview servers
+had quietly all stopped, so a plain browser refresh on a dead server just
+sat on a blank/error page): "reload" means restart the SERVERS, not just
+refresh the tabs. A browser refresh alone proves nothing — it cannot tell
+you whether the process behind it is even still running.
+
+1. `preview_start` all four, same as launching them (safe to call even if
+   they're already up — it reuses a running one instead of double-starting):
+   - `preview_start({name: "frame-blender"})` — 8843
+   - `preview_start({name: "avatar-editor"})` — 8844
+   - `preview_start({name: "mp4-splitter"})` — 8845
+   - `preview_start({name: "segment-avatar-editor"})` — 8846
+2. Reload each real Chrome tab whose URL contains one of those four ports,
+   via `osascript`:
+   ```applescript
+   tell application "Google Chrome"
+     repeat with w in windows
+       repeat with t in tabs of w
+         set u to URL of t
+         if u contains "localhost:8843" or u contains "localhost:8844" or u contains "localhost:8845" or u contains "localhost:8846" then
+           reload t
+         end if
+       end repeat
+     end repeat
+   end tell
+   ```
+3. Confirm it worked by reading back each tab's title (a dead server shows
+   the tab titled plain `localhost`, not the editor's own name) — the same
+   `osascript` shape as step 2, but returning `URL of t & " | " & title of t`
+   instead of `reload`ing.
+
+Whichever tab was mid-session on a specific page (a viewer, a loaded pair)
+reloads to THAT same URL, same as any browser refresh — this does not send
+anyone back to the landing page unless the server restart itself lost that
+state (it doesn't; only the in-page JS session state, kept in
+`localStorage`, can survive a dead process, and frame/scene caches on disk
+survive regardless).
 
 ## If a server was started outside `preview_start`
 
