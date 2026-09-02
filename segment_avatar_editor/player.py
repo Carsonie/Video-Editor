@@ -37,7 +37,7 @@ def label():
 
 
 PAIR_TEMPLATE = """<!doctype html>
-<html><head><meta charset="utf-8"><title>{title}</title>
+<html><head><meta charset="utf-8"><title>Segment and Avatar Editor</title>
 <style>
   :root {{
     --box: {box}px;
@@ -816,7 +816,7 @@ def write_pair(outdir, base_meta, over_meta, box=750, base_rel="", overlay_rel="
 # opening it in a timeline share one extraction instead of doubling it.
 
 SEQ_TEMPLATE = """<!doctype html>
-<html><head><meta charset="utf-8"><title>{title}</title>
+<html><head><meta charset="utf-8"><title>Segment and Avatar Editor</title>
 <style>
   /* The viewer's border reports WHICH LAYERS ARE TICKED, so it answers "what
      will + and - touch here" without reading down the list:

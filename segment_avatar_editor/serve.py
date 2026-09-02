@@ -2470,7 +2470,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 
 BROWSE_HTML = f"""<!doctype html>
-<html><head><meta charset="utf-8"><title>Browse Customers — Segment and Avatar Editor</title>
+<html><head><meta charset="utf-8"><title>Segment and Avatar Editor</title>
 <style>
   :root {{ color-scheme: dark; }}
   body {{ margin:0; background:#1a1a1a; color:#eee; font-family:-apple-system,sans-serif;

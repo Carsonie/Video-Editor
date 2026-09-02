@@ -73,7 +73,7 @@ def write(outdir, meta):
 
 
 TEMPLATE = """<!doctype html>
-<html><head><meta charset="utf-8"><title>{title} — video editor</title>
+<html><head><meta charset="utf-8"><title>Segment and Avatar Editor</title>
 <style>
   :root {{
     color-scheme: dark;
