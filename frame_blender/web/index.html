@@ -99,7 +99,10 @@
     <div class="libinspector" id="libInspector" hidden>
       <h4>Frame Selector</h4>
       <div class="imgwrap checker"><img id="libViewerImg" alt="library frame"></div>
-      <button class="count framepick" id="libPickBtn" title="Copy this frame into the Clip-Gap Builder below">Frame <b id="libN">—</b> / <b id="libTotal">—</b></button>
+      <div class="framepickRow">
+        <div class="count framepick" id="libPickBtn">Frame <b id="libN">—</b> / <b id="libTotal">—</b></div>
+        <div class="count framepick" id="libSelectedCount">Selected <b id="libSelectedN">0</b></div>
+      </div>
       <input type="range" id="libSlider" min="0" max="0" value="0" step="1">
       <div class="libframerow" id="libFrameRow"></div>
     </div>
@@ -128,10 +131,12 @@
         <button class="gapMenuBtn" id="gmDeleteSelected">Delete Selected</button>
         <button class="gapMenuBtn" id="gmClearAll" title="Empty the Clip-Gap Builder collection. Does not touch the Frame Selector, the loaded scene, or Timeline Scenes — only this list.">Clear All</button>
         <hr class="gapMenuDivider">
-        <div class="gapMenuSectionTitle">Frame Selector</div>
+        <div class="gapMenuSectionTitle">Frame Selector Menu</div>
         <hr class="gapMenuDivider">
         <button class="gapMenuBtn" id="gmSelectFrames" title="Arms selecting in the Frame Selector row above. Click 1: start frame. Click 2: end frame (or the same frame again for a one-frame selection). Click 3: reset, start over.">Select Frames</button>
         <button class="gapMenuBtn" id="gmCopySelected" title="Copies whatever's selected in the Frame Selector's own row above (Select Frames), onto a clipboard — Paste (above) adds it to the Clip-Gap Builder.">Copy Selected</button>
+        <button class="gapMenuBtn" id="gmLibViewToggle" title="Turns green along with Copy Selected once a selection is complete. Filters the row and slider above to just your selection, so you can scrub through it before deciding — click again to go back to the full collection.">Show Selected on Timeline</button>
+        <button class="gapMenuBtn" id="gmFrameSelectorClearAll" title="Unchecks every clip in sarah_clips/libs and empties the Frame Selector's row above. Does not touch the Clip-Gap Builder, the clipboard, the loaded scene, or Timeline Scenes — only this list.">Clear All</button>
       </div>
     </div>
   </div>

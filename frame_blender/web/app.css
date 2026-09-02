@@ -226,15 +226,22 @@
     margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em;
     color: var(--sub); text-align: center;
   }
-  .libinspector .imgwrap { width: 100%; height: 320px; }
+  /* Square, same 1:1 as the Overlay/Base viewers up top — was a fixed
+     320px height (500:320, a non-square 25:16) until Carson asked for it
+     to match. */
+  .libinspector .imgwrap { width: 100%; height: auto; }
   .libinspector .count { text-align: center; font-size: 16px; }
-  button.count.framepick {
-    width: 100%; display: block; text-align: center; font-size: 16px; margin-top: 14px;
+  /* Two plain status boxes side by side, each its own border — the current
+     frame on the left, how many are selected (for Copy Selected) on the
+     right, so that count is visible before committing to the clipboard. */
+  .framepickRow { display: flex; gap: 8px; margin-top: 14px; }
+  .count.framepick {
+    flex: 1 1 0; display: block; text-align: center; font-size: 16px;
     background: #1b2024; color: var(--text); border: 1px solid var(--border);
-    border-radius: 6px; padding: 10px 0; cursor: pointer;
+    border-radius: 6px; padding: 10px 0;
   }
-  button.count.framepick:hover { border-color: var(--accent2); }
-  button.count.framepick b { color: var(--text); font-variant-numeric: tabular-nums; }
+  #libSelectedCount { flex: 0 1 auto; padding-left: 14px; padding-right: 14px; white-space: nowrap; }
+  .count.framepick b { color: var(--text); font-variant-numeric: tabular-nums; }
   #libSlider, #builderSlider { width: 100%; accent-color: var(--accent2); margin-top: 12px; }
   #builderSlider:disabled { opacity: .35; }
   .libframerow {
@@ -257,6 +264,10 @@
     border-color: #ff8a80; opacity: 1;
     box-shadow: 0 0 0 2px rgba(255, 138, 128, .25);
   }
+  /* "Show Selected on Timeline" mode — everything not selected is pulled
+     out of the row entirely, not just dimmed, so the strip actually reads
+     as just the selection. */
+  .libframe.hiddenByView { display: none; }
   .pillrow { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
   .pill {
     flex: 1 1 auto; background: #1b2024; color: var(--text); border: 1px solid var(--border);

@@ -33,6 +33,7 @@ const libSlider = document.getElementById('libSlider');
 const libFrameRow = document.getElementById('libFrameRow');
 const libNEl = document.getElementById('libN');
 const libTotalEl = document.getElementById('libTotal');
+const libSelectedNEl = document.getElementById('libSelectedN');
 
 let PICKED = [];        // checked clips' metadata, in the order checked
 let LIB_FRAMES = [];    // every picked clip's frames, flattened into one list
@@ -52,10 +53,18 @@ let libRangeStart = null;
 // that clears it rather than picking anything.
 let libPhase = 0;
 
+// Whether the row and slider above are filtered down to JUST LIB_SELECTED
+// (gmLibViewToggle, below) — a review mode, not a second selection
+// mechanism. Toggling it OFF (back to the full collection) un-stages
+// whatever was selected, same as click 3 does, since backing out of the
+// review means starting over rather than leaving a stale pick armed.
+let libShowSelectedOnly = false;
+
 const libFrameUrl = (clip, local) => `/${clip.slug}/frames/frame_${pad(local + 1)}${clip.ext}`;
 
 function setLibSelected(indices) {
   LIB_SELECTED = new Set(indices);
+  libSelectedNEl.textContent = LIB_SELECTED.size;
   [...libFrameRow.children].forEach((d, j) => d.classList.toggle('selected', LIB_SELECTED.has(j)));
 }
 
@@ -84,30 +93,66 @@ function renderLibFrameRow() {
           libRangeStart = null;
           libPhase = 2;
           gmCopySelected.classList.add('ready');
+          gmLibViewToggle.classList.add('ready');
         } else {
           // Click 3 — reset, and this click picks nothing on its own.
           setLibSelected([]);
           libRangeStart = null;
           libPhase = 0;
           gmCopySelected.classList.remove('ready');
+          gmLibViewToggle.classList.remove('ready');
         }
       }
       gapLog('lib_frame_click', {i, libArmed, after: gapSnapshot()});
-      // Still moves the viewer here too, armed or not, same as before.
-      libSlider.value = i; showLibFrame(i);
+      // Still moves the viewer here too, armed or not, same as before — as
+      // a POSITION in the current view, not necessarily this thumbnail's
+      // raw index (the two differ once "Show Selected on Timeline" has
+      // filtered the view down).
+      const pos = libViewIndices().indexOf(i);
+      libSlider.value = pos; showLibFrame(pos);
     };
     libFrameRow.appendChild(d);
   });
 }
 
-function showLibFrame(i) {
-  const f = LIB_FRAMES[i];
+// The indices INTO LIB_FRAMES that the slider/viewer currently scrub
+// through — every frame normally, or just LIB_SELECTED, sorted, while
+// "Show Selected on Timeline" is on. showLibFrame's own argument is a
+// POSITION into whichever of these is current, not a raw LIB_FRAMES index.
+function libViewIndices() {
+  return libShowSelectedOnly
+    ? [...LIB_SELECTED].sort((a, b) => a - b)
+    : LIB_FRAMES.map((_, i) => i);
+}
+
+function showLibFrame(pos) {
+  const indices = libViewIndices();
+  const i = indices[pos];
+  const f = i != null ? LIB_FRAMES[i] : undefined;
   [...libFrameRow.children].forEach((d, j) => d.classList.toggle('cur', j === i));
   if (!f) { libViewerImg.removeAttribute('src'); libNEl.textContent = '—'; return; }
   libViewerImg.src = f.url;
-  libNEl.textContent = i + 1;
+  libNEl.textContent = pos + 1;
   const cur = libFrameRow.children[i];
   if (cur) cur.scrollIntoView({block: 'nearest', inline: 'center'});
+}
+
+// Applies libShowSelectedOnly to what's actually on screen: hides every
+// thumbnail not in the current view, resizes the slider to match, and
+// relabels gmLibViewToggle to say what clicking it will do NEXT (the
+// label names the action, not the current mode).
+function applyLibViewMode() {
+  const indices = libViewIndices();
+  const indexSet = new Set(indices);
+  [...libFrameRow.children].forEach((d, j) => {
+    d.classList.toggle('hiddenByView', libShowSelectedOnly && !indexSet.has(j));
+  });
+  libSlider.max = Math.max(0, indices.length - 1);
+  libSlider.disabled = indices.length === 0;
+  libTotalEl.textContent = indices.length || '—';
+  libSlider.value = 0;
+  showLibFrame(0);
+  gmLibViewToggle.textContent = libShowSelectedOnly ? 'Show the Collection' : 'Show Selected on Timeline';
 }
 
 // Rebuilds the flattened frame list from PICKED, in checked order —
@@ -119,17 +164,22 @@ function rebuildLibFrames() {
   // carrying a selection over onto whatever now happens to sit at the
   // same index.
   LIB_SELECTED = new Set();
+  libSelectedNEl.textContent = 0;
   libRangeStart = null;
   libPhase = 0;
+  libShowSelectedOnly = false;
+  // Full reset of the whole selection mechanism, not just its data — a
+  // Clear All that leaves Select Frames still armed (red) is only half
+  // cleared.
+  libArmed = false;
+  gmSelectFrames.classList.remove('armed');
   gmCopySelected.classList.remove('ready');
+  gmLibViewToggle.classList.remove('ready');
   for (const clip of PICKED)
     for (let i = 0; i < clip.n; i++) LIB_FRAMES.push({url: libFrameUrl(clip, i), clip, local: i});
   libInspector.hidden = LIB_FRAMES.length === 0;
-  libSlider.max = Math.max(0, LIB_FRAMES.length - 1);
-  libSlider.disabled = LIB_FRAMES.length === 0;
-  libTotalEl.textContent = LIB_FRAMES.length || '—';
   renderLibFrameRow();
-  showLibFrame(0);
+  applyLibViewMode();
 }
 
 libSlider.oninput = () => showLibFrame(+libSlider.value);
@@ -166,7 +216,6 @@ const builderSlider = document.getElementById('builderSlider');
 const builderFrameRow = document.getElementById('builderFrameRow');
 const builderNEl = document.getElementById('builderN');
 const builderTotalEl = document.getElementById('builderTotal');
-const libPickBtn = document.getElementById('libPickBtn');
 
 // Which BUILDER_FRAMES indices are selected FOR AN ACTION (Delete,
 // Duplicate, Copy Selected, ...) — separate from which one is merely being
@@ -266,8 +315,8 @@ function showBuilderFrame(i) {
 // at the start of showEmpty() (BUILDER_FRAMES = [] before restoreGlobals()
 // gets a chance to read what was saved), and saving there would overwrite
 // the very collection a refresh is about to bring back before it can.
-// Only the actual mutation site (libPickBtn.onclick, below — and, soon,
-// the Gap Builder Controller Menu actions) saves.
+// Only the actual mutation sites (doPaste, and the Gap Builder Controller
+// Menu actions) save.
 function rebuildBuilderFrames(landOn) {
   builderSlider.max = Math.max(0, BUILDER_FRAMES.length - 1);
   builderSlider.disabled = BUILDER_FRAMES.length === 0;
@@ -307,16 +356,6 @@ function doPaste(insertAt) {
     ? `Pasted ${n} frame(s) after frame ${insertAt}.`
     : `Pasted ${n} frame(s).`;
 }
-
-// The Frame N/Total button IS the copy action — clicking it takes
-// whatever the Selector's slider is currently sitting on.
-libPickBtn.onclick = () => {
-  const f = LIB_FRAMES[+libSlider.value];
-  if (!f) return;
-  BUILDER_FRAMES.push(f);
-  rebuildBuilderFrames(BUILDER_FRAMES.length - 1);
-  saveStore({builderFrames: BUILDER_FRAMES});
-};
 
 async function toggleLibClip(f, checked) {
   if (!checked) {
@@ -428,6 +467,8 @@ const gmDeleteSelected = document.getElementById('gmDeleteSelected');
 const gmClearAll = document.getElementById('gmClearAll');
 const gmSelectFrames = document.getElementById('gmSelectFrames');
 const gmCopySelected = document.getElementById('gmCopySelected');
+const gmLibViewToggle = document.getElementById('gmLibViewToggle');
+const gmFrameSelectorClearAll = document.getElementById('gmFrameSelectorClearAll');
 const gmPasteSelected = document.getElementById('gmPasteSelected');
 
 // Whether gmSelectFrames is armed — while true, a plain click on a Frame
@@ -679,7 +720,7 @@ gmSelectFrames.onclick = withActiveFlash(gmSelectFrames, () => {
 // either end can be clicked first. Turns its own 'ready' green back off
 // and resets the cycle to click 1, so the very next click on a frame
 // starts a fresh pick rather than landing on click 3 by surprise.
-gmCopySelected.onclick = withActiveFlash(gmCopySelected, () => {
+function copySelectedLibFrames() {
   if (!LIB_SELECTED.size) {
     libStatus.textContent = 'Select Frames, then click a frame above to start a selection '
       + '(click again to finish it) — then Copy Selected.';
@@ -689,12 +730,54 @@ gmCopySelected.onclick = withActiveFlash(gmCopySelected, () => {
   CLIPBOARD = indices.map(i => LIB_FRAMES[i]);
   libStatus.textContent = `Copied ${CLIPBOARD.length} frame(s) — Paste Selected is ready.`;
   gmCopySelected.classList.remove('ready');
+  gmLibViewToggle.classList.remove('ready');
   // The clipboard now has something in it — Paste Selected is the next
   // step, same "ready" green Copy Selected itself just had.
   gmPasteSelected.classList.add('ready');
   setLibSelected([]);
   libRangeStart = null;
   libPhase = 0;
+  // Copied — the review is over either way, so land back on the full
+  // collection rather than leaving the view filtered to a selection that
+  // no longer exists.
+  if (libShowSelectedOnly) { libShowSelectedOnly = false; applyLibViewMode(); }
+}
+
+gmCopySelected.onclick = withActiveFlash(gmCopySelected, copySelectedLibFrames);
+
+// Switches the row/slider above between the full collection and just
+// LIB_SELECTED, so a selection can be scrubbed through before deciding —
+// Copy Selected if it looks right, or click this again to back out.
+// Backing out UN-STAGES the pick (same as click 3 of the select cycle):
+// this is a review step, not a second way to hold a selection.
+gmLibViewToggle.onclick = withActiveFlash(gmLibViewToggle, () => {
+  if (!libShowSelectedOnly) {
+    if (!LIB_SELECTED.size) {
+      libStatus.textContent = 'Select Frames, then click a frame above to start a selection '
+        + '(click again to finish it) — then Show Selected on Timeline.';
+      return;
+    }
+    libShowSelectedOnly = true;
+  } else {
+    libShowSelectedOnly = false;
+    setLibSelected([]);
+    libRangeStart = null;
+    libPhase = 0;
+    gmCopySelected.classList.remove('ready');
+    gmLibViewToggle.classList.remove('ready');
+  }
+  applyLibViewMode();
+});
+
+// Empties the Frame Selector's OWN collection — unchecks every clip in
+// sarah_clips/libs and clears PICKED, same idea as gmClearAll above but
+// for this row instead. Does not touch the Clip-Gap Builder, CLIPBOARD,
+// the loaded scene, or Timeline Scenes.
+gmFrameSelectorClearAll.onclick = withActiveFlash(gmFrameSelectorClearAll, () => {
+  PICKED = [];
+  [...libGroups.querySelectorAll('input[type=checkbox]')].forEach(cb => { cb.checked = false; });
+  rebuildLibFrames();
+  savePickedForCurrentPair();
 });
 
 // Pastes right away — no arming step. The destination is wherever a plain
