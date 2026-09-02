@@ -6,12 +6,15 @@ segments at the break points you mark.
 Its page is also every clip's own page: a layered or timeline view is built
 from individual clips, and this is what each of them opens on its own.
 
-Frame extraction, the frame map and the edit maths all live in shared/.
+Frame extraction, the frame map and the edit maths all live in this same
+package's own frames.py — duplicated from shared/frames.py on 2026-09-02
+when MP4 Splitter and the Segment and Avatar Editor split into fully
+independent tools, not imported from shared/ any more.
 """
 import json
 import os
 
-from shared import frames
+from mp4_splitter import frames
 
 probe = frames.probe
 
