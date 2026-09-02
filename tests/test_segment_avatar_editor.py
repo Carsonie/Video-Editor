@@ -1,0 +1,618 @@
+#!/usr/bin/env python3
+"""
+Exercise the Segment and Avatar Editor's own endpoints — the standalone
+server (segment_avatar_editor/serve.py, port 8846) — against the same
+disposable store test_editor.py builds.
+
+    python3 tests/test_segment_avatar_editor.py            # build, run, tear down
+    python3 tests/test_segment_avatar_editor.py --keep      # leave the store to poke at
+
+WHY THIS FILE DIDN'T EXIST UNTIL NOW
+    MP4 Splitter and the Segment and Avatar Editor split off shared/serve.py
+    into fully independent processes on 2026-09-02 (own port, own cache,
+    duplicated code — see segment_avatar_editor/serve.py's own module
+    docstring). That work was verified by hand at the time — curl and a
+    real browser — but never got a permanent, automated suite of its own,
+    so a regression in this tool's OWN dispatch table, cache, or log could
+    ship unnoticed. This is that suite, added the same day logging was
+    split apart per editor too (Carson's own call — see this file's own
+    log-file check), and the same day the landing page was reworked to
+    load sandbox scenes only (see s_stores below).
+
+WHY NOT JUST REUSE test_editor.py
+    test_editor.py drives shared/serve.py on port 8842 — the OLD combined
+    process. Every route this file exercises is the SAME code (segment_
+    avatar_editor/serve.py started as a literal copy, trimmed to this
+    tool's own routes), so this suite is not re-proving that code is
+    correct; it is proving the STANDALONE server — its own trimmed
+    dispatch table, its own cache dir, its own session log, its own
+    private duplicate of MP4 Splitter's viewer (_splitter_player.py) —
+    actually wires together and serves the real thing. Routes the split
+    deliberately dropped (the single-clip Open, Handoff, Clear edits,
+    Reset editor, Frame Blender's/Avatar Editor's Build/Save MP4/Load) are
+    checked as gone, not skipped.
+"""
+import argparse
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import fixture  # noqa: E402
+
+PLAYERS = os.path.dirname(HERE)
+SAE_SERVE = os.path.join(PLAYERS, "segment_avatar_editor", "serve.py")
+
+SAE_BASE = None    # set by main()
+RESULTS = []
+LOG = []
+STEPS = []
+PAIR = None          # the layered-view slug, set by s_open_pair
+SEQ = None           # the timeline slug, set by s_open_seq
+
+
+def out(line=""):
+    print(line)
+    LOG.append(line)
+
+
+def step(title):
+    STEPS.append([len(STEPS) + 1, title, []])
+    out(f"\n  Step {len(STEPS)}: {title}")
+
+
+def check(name, ok, detail=""):
+    RESULTS.append((name, bool(ok), detail))
+    if STEPS:
+        STEPS[-1][2].append(len(RESULTS) - 1)
+    out(f"     {'✓' if ok else '✗'} {name}" + (f"   {detail}" if detail else ""))
+    return bool(ok)
+
+
+def eq(name, got, want, extra=""):
+    return check(name, got == want,
+                 f"got {got}, want {want}" if got != want else (extra or str(got)))
+
+
+def get(ep, **params):
+    url = f"{SAE_BASE}{ep}?" + urllib.parse.urlencode(params)
+    try:
+        with urllib.request.urlopen(url, timeout=120) as r:
+            return json.load(r), r.status
+    except urllib.error.HTTPError as e:
+        try:
+            return json.load(e), e.code
+        except Exception:
+            return {"error": e.read().decode(errors="replace")}, e.code
+
+
+def post(ep, **body):
+    req = urllib.request.Request(
+        SAE_BASE + ep, data=json.dumps(body).encode(),
+        headers={"Content-Type": "application/json"}, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=120) as r:
+            return json.load(r), r.status
+    except urllib.error.HTTPError as e:
+        try:
+            return json.load(e), e.code
+        except Exception:
+            return {"error": e.read().decode(errors="replace")}, e.code
+
+
+def raw_status(ep, **params):
+    """For the two *-go endpoints, which redirect rather than answer."""
+    url = f"{SAE_BASE}{ep}?" + urllib.parse.urlencode(params)
+    class NoRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self, *a, **k):
+            return None
+    op = urllib.request.build_opener(NoRedirect)
+    try:
+        with op.open(url, timeout=120) as r:
+            return r.status
+    except urllib.error.HTTPError as e:
+        return e.code
+
+
+def must(ep, **body):
+    d, code = post(ep, **body)
+    if code != 200 or d.get("error"):
+        check(f"{ep} should have worked", False, f"{code}: {d.get('error', d)}")
+    return d
+
+
+def wait_up(url, tries=40):
+    for _ in range(tries):
+        time.sleep(0.25)
+        try:
+            urllib.request.urlopen(url, timeout=2)
+            return True
+        except Exception:
+            continue
+    return False
+
+
+def frames_of(rel, alpha=False):
+    return fixture.frames(os.path.join(fixture.STORE, rel), alpha)
+
+
+def scenes_now():
+    p = os.path.join(fixture.STORE, "sandbox", "script.json")
+    return [(s["n"], s["label"]) for s in json.load(open(p))["scenes"]]
+
+
+def line_of(n):
+    p = os.path.join(fixture.STORE, "sandbox", "script.json")
+    node = next((s for s in json.load(open(p))["scenes"] if s["n"] == n), None)
+    return node.get("line") if node else None
+
+
+def archives(kind):
+    d = os.path.join(fixture.STORE, "z_History")
+    if not os.path.isdir(d):
+        return []
+    return sorted(x for x in os.listdir(d) if x.startswith(kind))
+
+
+def s_static_page():
+    """
+    "raw_mp4" is deliberately NOT checked absent here — the page's own JS
+    still carries one explanatory comment naming it, describing the OLD
+    raw-file browser this landing page replaced (2026-09-02). That is
+    documentation, not a live reference; asserting the literal string
+    never appears would just be testing a code comment.
+    """
+    step("the landing page — clean title, sandbox scenes only")
+    html = urllib.request.urlopen(SAE_BASE + "/", timeout=10).read().decode()
+    check("titled just \"Segment and Avatar Editor\", no \"Browse Customers —\" prefix",
+          "<title>Segment and Avatar Editor</title>" in html)
+    for gone in ("gap-builder.js", "sarah_clips"):
+        check(f"nothing about {gone!r} on this page", gone not in html)
+
+
+def s_list():
+    step("/api/list — browse the store's folders")
+    d, _ = get("/api/list", path=fixture.ROOT_REL + "/sandbox")
+    eq("lists the three scene folders", len(d.get("dirs", [])), 3)
+    d, code = get("/api/list", path="../outside")
+    eq("refuses a path outside Customers/", code, 400)
+
+
+def s_siblings():
+    step("/api/siblings — find a scene's other tracks")
+    seg = f"{fixture.ROOT_REL}/sandbox/01-alpha-scene/segment.mp4"
+    d, _ = get("/api/siblings", path=seg)
+    rows = [r for v in d.get("by_version", {}).values() for r in v]
+    eq("finds all three scenes", len(rows), 3)
+    check("pairs the segment with its avatar",
+          any(r.get("overlay", "").endswith("avatar.webm") for r in rows),
+          f"scope={d.get('editor_scope')}")
+    row1 = next(r for r in rows if r["n"] == 1)
+    check("reports a real base_slug", bool(row1.get("base_slug")), row1.get("base_slug"))
+    eq("scene 1 has not been edited yet", row1.get("base_edited"), False)
+
+
+def s_stores():
+    """
+    Reworked 2026-08-13/2026-09-02: the landing page — and this endpoint
+    that feeds it — must show only videos with sandbox/ already built, not
+    a raw recording to hand-pick clips from. has_sandbox is the field the
+    page's own picker disables an entry on; a video missing this field
+    would silently show as pickable when it has nothing to load.
+    """
+    step("/api/stores — every store with a video ready to load, sandbox only")
+    d, code = get("/api/stores")
+    eq("answers 200", code, 200)
+    stores = d.get("stores")
+    check("a list of stores comes back", isinstance(stores, list), str(stores)[:60])
+    businesses = [s.get("business") for s in (stores or [])]
+    check("the fixture's folder is not mistaken for a business — wrong depth, correctly excluded",
+          fixture.ROOT_REL not in businesses, businesses)
+    ski = next((s for s in (stores or []) if s.get("store") == "ski-demo"), None)
+    check("finds a real store (ski-demo)", ski is not None, businesses)
+    if ski:
+        v = ski["videos"][0]
+        check("every video names has_sandbox", "has_sandbox" in v, v)
+        check("its scenes list is real", isinstance(v.get("scenes"), list) and v["scenes"], v)
+
+
+def s_open_pair():
+    step("/api/open-pair — the layered view")
+    global PAIR
+    seg = f"{fixture.ROOT_REL}/sandbox/01-alpha-scene/segment.mp4"
+    av = f"{fixture.ROOT_REL}/sandbox/01-alpha-scene/avatar.webm"
+    d, _ = get("/api/open-pair", base=seg, overlay=av)
+    PAIR = d.get("slug")
+    check("segment under avatar, both extracted", bool(PAIR), PAIR or json.dumps(d)[:90])
+
+
+def s_open_pair_go():
+    step("/api/open-pair-go — and its redirect")
+    seg = f"{fixture.ROOT_REL}/sandbox/01-alpha-scene/segment.mp4"
+    av = f"{fixture.ROOT_REL}/sandbox/01-alpha-scene/avatar.webm"
+    eq("redirects to the page it built",
+       raw_status("/api/open-pair-go", base=seg, overlay=av), 302)
+
+
+def s_open_seq():
+    step("/api/open-seq — the timeline")
+    global SEQ
+    d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns="1,2,3")
+    SEQ = d.get("slug")
+    eq("three scenes on one timeline", d.get("scenes"), [1, 2, 3])
+    eq("none missing", d.get("missing"), [])
+
+
+def s_open_seq_go():
+    step("/api/open-seq-go — and its redirect")
+    eq("redirects to the page it built",
+       raw_status("/api/open-seq-go", root=fixture.ROOT_REL, ns="1,2,3"), 302)
+
+
+def s_own_cache():
+    """
+    Not a check that cache/<slug> is ABSENT — content-hash slugging means
+    another tool extracting this exact fixture on some earlier, unrelated
+    run can legitimately leave a same-named folder in the shared cache/ it
+    uses, and that is not a collision: it is a different directory. What
+    matters, and what this checks, is that THIS pair landed in this
+    tool's own cache_segment_avatar_editor/.
+    """
+    step("its own cache — cache_segment_avatar_editor/, not the shared cache/")
+    own = os.path.join(PLAYERS, "cache_segment_avatar_editor", PAIR)
+    check("the pair just opened landed in cache_segment_avatar_editor/",
+          os.path.isdir(own), own)
+
+
+def s_map():
+    step("/api/frames/map — read the frame map (base half of the pair)")
+    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    eq("40 entries, one per source frame", d.get("nb_frames"), 40)
+    check("starts as an identity map", d["frame_map"] == list(range(1, 41)), "1..40")
+
+
+def s_dup():
+    step("/api/frames/dup — ＋ Frame")
+    must("/api/frames/dup", slug=PAIR, which="base", at=10, count=1, side="right")
+    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    m = d["frame_map"]
+    eq("one more frame", len(m), 41)
+    eq("the new frame repeats frame 10", m[10], 10)
+    _, code = post("/api/frames/dup", slug=PAIR, which="base", at=10, count=1, side="sideways")
+    eq("refuses a side that is neither left nor right", code, 400)
+
+
+def s_del():
+    step("/api/frames/del — − Frame")
+    before, _ = get("/api/frames/map", slug=PAIR, which="base")
+    d = must("/api/frames/del", slug=PAIR, which="base", at=10, count=1, side="left")
+    after, _ = get("/api/frames/map", slug=PAIR, which="base")
+    eq("one frame gone", after["nb_frames"], before["nb_frames"] - 1)
+    eq("and reports how many it actually took", d.get("actual", 1), 1)
+
+
+def s_dup_span():
+    step("/api/frames/dup-span — ＋ Zone, and Update Frame Imbalance")
+    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    before = d["nb_frames"]
+    must("/api/frames/dup-span", slug=PAIR, which="base", a=5, b=9)
+    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    eq("a 5-frame zone repeated", d.get("nb_frames"), before + 5)
+
+
+def s_del_span():
+    step("/api/frames/del-span — − Zone")
+    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    before = d["nb_frames"]
+    must("/api/frames/del-span", slug=PAIR, which="base", a=5, b=9)
+    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    eq("the zone removed again", d.get("nb_frames"), before - 5)
+
+
+def s_restore():
+    step("/api/frames/restore — Undo")
+    original = list(range(1, 41))
+    must("/api/frames/restore", slug=PAIR, which="base", frame_map=original)
+    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    check("restore puts the exact map back", d["frame_map"] == original,
+          f"{d.get('nb_frames')} frames")
+
+
+def s_paste():
+    step("/api/frames/paste — copy a frame, put it somewhere else")
+    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    before, m0 = d["nb_frames"], d["frame_map"]
+    must("/api/frames/paste", slug=PAIR, which="base", **{"from": 5, "at": 20})
+    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    m1 = d["frame_map"]
+    eq("one more frame", d["nb_frames"], before + 1)
+    eq("the pasted frame carries frame 5's SOURCE number", m1[20], m0[4])
+    eq("everything after it shifted right by one", m1[21], m0[20])
+    must("/api/frames/restore", slug=PAIR, which="base", frame_map=list(range(1, 41)))
+
+
+def s_mark():
+    step("/api/mark, /api/marks, /api/clear-marks — Mark / Unmark / Unmark all")
+    slug, which = PAIR, "base"
+    must("/api/clear-marks", slug=slug, which=which)
+    must("/api/mark", slug=slug, which=which, frame=5, on=True)
+    must("/api/mark", slug=slug, which=which, frame=20, on=True)
+    d, _ = get("/api/marks", slug=slug, which=which)
+    eq("two marks set", sorted(d.get("marks", [])), [5, 20])
+    must("/api/mark", slug=slug, which=which, frame=5, on=False)
+    d, _ = get("/api/marks", slug=slug, which=which)
+    eq("unmarking removes just that one", sorted(d.get("marks", [])), [20])
+    must("/api/clear-marks", slug=slug, which=which)
+    d, _ = get("/api/marks", slug=slug, which=which)
+    eq("Clear All leaves none", d.get("marks", []), [])
+
+
+def s_save():
+    step("/api/save — 💾 Save scene")
+    eq("the file starts at 40 frames",
+       frames_of("sandbox/01-alpha-scene/segment.mp4"), 40)
+    must("/api/frames/dup-span", slug=PAIR, which="base", a=5, b=9)   # 40 -> 45
+    d = must("/api/save", slug=PAIR, which="base")
+    check("no frame-count warning", not d.get("warning"), d.get("warning", "none"))
+    eq("the FILE now has exactly 45 frames",
+       frames_of("sandbox/01-alpha-scene/segment.mp4"), 45)
+    check("archived the previous file", bool(d.get("archived_to")),
+          os.path.basename(str(d.get("archived_to"))))
+
+
+def s_save_stale():
+    step("/api/save — refuses when the file changed elsewhere first")
+    seg_path = os.path.join(fixture.STORE, "sandbox", "01-alpha-scene", "segment.mp4")
+    os.utime(seg_path, None)
+    d, code = post("/api/save", slug=PAIR, which="base")
+    eq("refused with 409", code, 409)
+    eq("named as a stale conflict", d.get("error"), "stale")
+    d2 = must("/api/save", slug=PAIR, which="base", force=True)
+    check("force overrides the refusal", not d2.get("error"), d2)
+
+
+def s_cut():
+    step("/api/cut — ✂ Cut scene")
+    slug, which = PAIR, "base"
+    must("/api/clear-marks", slug=slug, which=which)
+    must("/api/mark", slug=slug, which=which, frame=15, on=True)
+    must("/api/mark", slug=slug, which=which, frame=30, on=True)
+    d = must("/api/cut", slug=slug, which=which)
+    eq("two break points make three segments", d.get("count"), 3)
+    must("/api/clear-marks", slug=slug, which=which)
+
+
+def s_vtt():
+    step("/api/vtt — the timing table")
+    d, _ = get("/api/vtt", root=fixture.ROOT_REL)
+    eq("one row per script scene", len(d.get("scenes", [])), 3)
+    d, code = get("/api/vtt", root="../outside")
+    eq("refuses a path outside Customers/", code, 400)
+
+
+def s_line():
+    step("/api/line — edit a line in the VTT")
+    new = "A replacement line for the first scene."
+    d, _ = post("/api/line", root=fixture.ROOT_REL, n=1, line=new)
+    eq("the new text comes back", d.get("line"), new)
+    eq("written to script.json", line_of(1), new)
+    d, _ = post("/api/line", root=fixture.ROOT_REL, n=1, line=new)
+    check("writing the same text is a no-op", d.get("unchanged") is True, "")
+    d, code = post("/api/line", root=fixture.ROOT_REL, n=99, line="x")
+    eq("refuses a scene that is not in the script", code, 400)
+
+
+def s_join():
+    step("/api/join — Join, every track")
+    _, code = post("/api/join", root=fixture.ROOT_REL, ns=[1], label="solo")
+    eq("refuses fewer than two scenes", code, 400)
+
+    seg0 = frames_of("sandbox/01-alpha-scene/segment.mp4")   # 45 after the save
+    d, _ = post("/api/join", root=fixture.ROOT_REL, ns=[1, 2], label="joined",
+                tracks=["segment", "avatar"])
+    check("succeeded", "error" not in d, d.get("error", ""))
+    eq("segment is the two lengths added",
+       frames_of("sandbox/01-joined/segment.mp4"), seg0 + 32)
+    eq("two scenes left", len(scenes_now()), 2)
+    eq("the third scene was renumbered to 2", scenes_now()[1], (2, "charlie-scene"))
+    check("archived what it consumed", bool(archives("join-")), archives("join-"))
+
+
+def s_renumber_state():
+    step("/api/renumber-state — the save-as-a-set lock")
+    d, _ = get("/api/renumber-state", root=fixture.ROOT_REL)
+    check("set by the join, and survives a reload", d.get("renumbered") is True, "")
+    eq("and says which scene moved where", d.get("moved"), [{"from": 3, "to": 2}])
+
+
+def s_renumber_clear():
+    step("/api/renumber-clear — lift the lock")
+    must("/api/renumber-clear", root=fixture.ROOT_REL)
+    d, _ = get("/api/renumber-state", root=fixture.ROOT_REL)
+    check("cleared once the set is written", d.get("renumbered") is False, "")
+
+
+def s_split():
+    step("/api/split — Split, every track")
+    _, code = post("/api/split", root=fixture.ROOT_REL, n=1, at=10,
+                   labels=["same", "same"])
+    eq("refuses two halves with the same name", code, 400)
+
+    seg = frames_of("sandbox/01-joined/segment.mp4")
+    at = 21
+    d, _ = post("/api/split", root=fixture.ROOT_REL, n=1, at=at, labels=["head", "tail"])
+    check("succeeded", "error" not in d, d.get("error", ""))
+    eq("segment head", frames_of("sandbox/01-head/segment.mp4"), at - 1)
+    eq("segment tail", frames_of("sandbox/02-tail/segment.mp4"), seg - at + 1)
+    eq("three scenes again", len(scenes_now()), 3)
+    check("archived what it cut", bool(archives("split-")), archives("split-"))
+
+
+def s_archive():
+    step("/api/archive — a folder's generation archive")
+    d = must("/api/archive", root=fixture.ROOT_REL, folder="sandbox")
+    check("sandbox is COPIED, not moved — the scenes stay put",
+          d.get("moved") is False, f"moved={d.get('moved')}")
+    d, code = post("/api/archive", root=fixture.ROOT_REL, folder="elsewhere")
+    eq("refuses a folder that is not dev or sandbox", code, 400)
+
+
+def s_save_archive():
+    step("/api/save-archive — Backup Scenes' whole-generation snapshot")
+    d = must("/api/save-archive", root=fixture.ROOT_REL)
+    dest = d.get("archived_to")
+    check("archived somewhere real", bool(dest) and os.path.isdir(str(dest)), dest)
+    check("PLUS the narrative script, copied in beside them",
+          os.path.isfile(os.path.join(dest, "script.json")), dest)
+    d, code = post("/api/save-archive", root="../outside")
+    eq("refuses a path outside Customers/", code, 400)
+
+
+def s_dropped_routes_are_gone():
+    """
+    /api/open (single-clip) belongs to MP4 Splitter now; Handoff, Clear
+    edits and Reset editor were never this tool's own job even before the
+    split; Build clip/Save MP4/Load video/Load store belong to Frame
+    Blender and Avatar Editor. A route left reachable here by accident
+    would mean the split's own trim silently regressed.
+    """
+    step("routes this split deliberately dropped — confirmed gone, not just unused")
+    for ep in ("/api/open", "/api/handoff", "/api/clear-edits", "/api/reset-editor",
+               "/build_clip", "/api/save_mp4", "/api/load_video", "/api/load_store",
+               "/api/libs_list", "/api/lib_frames", "/api/lib_media"):
+        _, code = get(ep)
+        eq(f"{ep} is not served here", code, 404)
+
+
+def s_session_log():
+    """
+    A dedicated file (logs/segment_avatar_editor_<date>.log), not shared/
+    serve.py's combined logs/editor_<date>.log — split apart per editor
+    2026-09-02, at the same time this suite was added.
+    """
+    step("its own dedicated session log")
+    log_path = os.path.join(PLAYERS, "logs",
+                             f"segment_avatar_editor_{time.strftime('%Y%m%d')}.log")
+    check("the file exists", os.path.isfile(log_path), log_path)
+    text = open(log_path).read() if os.path.isfile(log_path) else ""
+    check("carries this run's own actions (Save scene)", "Save scene" in text, text[-200:])
+
+
+def s_app_js_parses():
+    """
+    Three pages, not two — the pair viewer, the timeline viewer, AND
+    _splitter_player.py's own private duplicate of MP4 Splitter's page
+    (the "open this scene on its own" link Carson asked to keep working
+    without importing the real mp4_splitter package). All three are
+    Python .format() templates, and a stray brace or apostrophe kills the
+    whole page silently — the exact gap test_editor.py's own
+    s_pages_parse() exists to close, checked here for this tool's own
+    three pages specifically.
+    """
+    step("all three of its own pages — does the JavaScript actually run?")
+    node = shutil.which("node")
+    if node is None:
+        check("node is available to parse them", False,
+              "install node, or this can never catch a broken page again")
+        return
+    doc = json.load(open(os.path.join(fixture.STORE, "sandbox", "script.json")))
+    sc = doc["scenes"][-1]
+    folder = f"{sc['n']:02d}-{sc['label']}"
+    seg = f"{fixture.ROOT_REL}/sandbox/{folder}/segment.mp4"
+    av = f"{fixture.ROOT_REL}/sandbox/{folder}/avatar.webm"
+    pages = {}
+    d, _ = get("/api/open-pair", base=seg, overlay=av)
+    pages["pair viewer"] = f"{d.get('slug')}/viewer.html"
+    ns = ",".join(str(x["n"]) for x in doc["scenes"])
+    d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns=ns)
+    pages["timeline viewer"] = f"{d.get('slug')}/viewer.html"
+    # The single-clip page _splitter_player.py builds — reached by opening
+    # the base half of a pair on its own, the same private-duplicate path
+    # the pair viewer's own "open in splitter" link uses.
+    d, _ = get("/api/open-pair", base=seg, overlay=av)
+    pages["single-clip (private splitter duplicate)"] = f"{d.get('slug')}/base/viewer.html"
+
+    for name, url in pages.items():
+        if not url or url.startswith("None"):
+            check(f"{name}: page built", False, str(url))
+            continue
+        try:
+            with urllib.request.urlopen(f"{SAE_BASE}/{url}", timeout=60) as r:
+                html = r.read().decode()
+        except Exception as e:
+            check(f"{name}: page served", False, str(e)[:60])
+            continue
+        js = "\n".join(re.findall(r"<script>(.*?)</script>", html, re.S))
+        tmp = os.path.join(tempfile.gettempdir(), "sae_check.js")
+        with open(tmp, "w") as fh:
+            fh.write(js)
+        r = subprocess.run([node, "--check", tmp], capture_output=True, text=True)
+        os.remove(tmp)
+        first = (r.stderr or "").strip().split("\n")
+        check(f"{name}: its JavaScript parses", r.returncode == 0,
+              f"{len(js)} bytes" if r.returncode == 0
+              else next((l for l in first if "Error" in l), first[0] if first else ""))
+
+
+FUNCTIONS = [s_static_page, s_list, s_siblings, s_stores, s_open_pair,
+             s_open_pair_go, s_open_seq, s_open_seq_go, s_own_cache, s_map,
+             s_dup, s_del, s_dup_span, s_del_span, s_restore, s_paste,
+             s_mark, s_save, s_save_stale, s_cut, s_vtt, s_line, s_join,
+             s_renumber_state, s_renumber_clear, s_split, s_archive,
+             s_save_archive, s_dropped_routes_are_gone, s_session_log,
+             s_app_js_parses]
+
+
+def main():
+    global SAE_BASE
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--port", type=int, default=8856)
+    ap.add_argument("--keep", action="store_true")
+    a = ap.parse_args()
+    SAE_BASE = f"http://localhost:{a.port}"
+
+    out(f"Segment and Avatar Editor Test:  {time.strftime('%Y-%m-%dT%H:%M:%S')}")
+    out(f"Store:                            {fixture.ROOT_REL}  (built, used, deleted)")
+    out(f"Segment and Avatar Editor:        {SAE_BASE}")
+
+    step("Build the test store")
+    for n, label, ns, na, nn, _ in fixture.SCENES:
+        check(f"{n:02d}-{label}", True, f"segment={ns} avatar={na} narration={nn}")
+    fixture.build(quiet=True)
+
+    # No --no-session-log: s_session_log() needs a real file to read.
+    srv = subprocess.Popen(
+        [sys.executable, SAE_SERVE, "--port", str(a.port)],
+        cwd=os.path.dirname(SAE_SERVE), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        if not wait_up(SAE_BASE + "/"):
+            sys.exit("  segment_avatar_editor never came up")
+
+        for fn in FUNCTIONS:
+            fn()
+    finally:
+        if not a.keep:
+            srv.terminate()
+            fixture.destroy()
+        else:
+            out(f"\n  --keep: store at {fixture.STORE}")
+            out(f"  --keep: server still on {SAE_BASE} (kill it yourself)")
+
+    passed = sum(1 for _, ok, _ in RESULTS if ok)
+    out(f"\n  Checks:  {passed}/{len(RESULTS)} passed")
+    out(f"  Result:  {'PASS' if passed == len(RESULTS) else 'FAIL'}")
+    if passed != len(RESULTS):
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
