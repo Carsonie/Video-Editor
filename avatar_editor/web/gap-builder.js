@@ -916,11 +916,17 @@ gmPasteSelected.onclick = withActiveFlash(gmPasteSelected, () => {
 
 // ── Working Clips: saving out, and dropping back in ──────────────────────
 // Save: the whole Clip-Gap Builder collection, in its own order, filed
-// under the section the dropdown names, with a name typed into a popup.
-// The popup is the page's own modal, not window.prompt — see modalPrompt()
-// in app.js for why.
-gmSaveToWorking.onclick = withActiveFlash(gmSaveToWorking, async () => {
+// under the section PICKING one names — the dropdown is the button, there
+// is no second click. The popup that asks for the name is the page's own
+// modal, not window.prompt; see modalPrompt() in app.js for why.
+//
+// The dropdown falls back to its own blank option afterwards, whether the
+// save happened or was cancelled, so it never sits showing a destination
+// as though it were a setting. It is an action.
+gmSaveTarget.onchange = withActiveFlash(gmSaveToWorking, async () => {
   const section = gmSaveTarget.value;
+  gmSaveTarget.value = '';
+  if (!section) return;
   const label = (WorkingClips.sections().find(s => s.key === section) || {}).label || section;
   const r = await WorkingClips.saveBuilder(section, () => modalPrompt({
     title: 'Save to Working Clips',

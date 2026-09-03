@@ -317,10 +317,26 @@ def s_working_clips():
           "cb.checked ? {section: sec.key, id: entry.id} : null" in wc)
 
     # ── saving
-    check("Save to: dropdown", 'id="gmSaveTarget"' in html)
+    # ONE control: picking a section IS the save, so there is no separate
+    # button to press afterwards. The row wears a menu button's own box.
+    check("Save to: is itself the button",
+          'class="gapMenuBtn gapMenuRow" id="gmSaveToWorking"' in html)
+    check("...with the dropdown inside it", 'id="gmSaveTarget"' in html)
+    check("no second Save button",
+          html.count('id="gmSaveToWorking"') == 1
+          and "Save to Working Clips</button>" not in html)
     for value in ("idle", "sound_bits", "transitions"):
         check(f"...offers {value}", f'value="{value}"' in html)
-    check("Save button", 'id="gmSaveToWorking"' in html)
+    check("picking a section fires the save", "gmSaveTarget.onchange" in gb)
+    # It is an action, not a setting, so it must never sit showing a
+    # destination afterwards — saved or cancelled.
+    check("...and the dropdown falls back to blank", "gmSaveTarget.value = '';" in gb)
+    check("green when the Builder has frames",
+          "save.classList.toggle('ready', n > 0);" in wc)
+    # A <select> cannot live inside a <button>, so the row is a <div> and
+    # cannot be :disabled — this class stands in for it.
+    check("dimmed when it does not", "save.classList.toggle('isDisabled', !n);" in wc)
+    check("...and the dropdown itself is disabled then", "target.disabled = !n;" in wc)
     check("it asks for a name in the page's own modal, not window.prompt",
           "modalPrompt({" in gb
           and "window.prompt(" not in gb and "= prompt(" not in gb)
@@ -359,6 +375,55 @@ def s_working_clips():
         check(f"every click logs {field}", f"{field}:" in gb)
 
 
+def s_tooltips():
+    """
+    Every control on the page explains itself after a 3-second hover.
+
+    The two things worth asserting from here: that no control is MISSING a
+    description (the whole point — one silent button is the one you have to
+    guess at), and that the description is read from the element's own
+    `title` at hover time rather than copied at load, because several of
+    them are rewritten as the page works.
+    """
+    step("tooltips — every control says what it does, after 3 seconds")
+    html = urllib.request.urlopen(AE_BASE + "/", timeout=10).read().decode()
+    tt = urllib.request.urlopen(AE_BASE + "/web/tooltips.js", timeout=10).read().decode()
+
+    check("three seconds, exactly", "const DELAY = 3000;" in tt)
+    # Read at hover time, never cached: a Play button's title says how many
+    # clips it would play, and Save to:'s how many frames it would save.
+    check("the text comes from the live title", 'src.getAttribute(\'title\')' in tt)
+    # Both tooltips showing at once would be worse than either alone.
+    check("the browser's own tooltip is suppressed while hovering",
+          "c.removeAttribute('title');" in tt)
+    check("...and put back on the way out",
+          "holding.setAttribute('title', heldTitle)" in tt)
+    # The library's rows, Timeline Scenes' rows and Working Clips' rows are
+    # all built at runtime, and more will be.
+    check("delegated, so runtime-built controls are covered too",
+          "document.addEventListener('mouseover'" in tt)
+    check("a click cancels a pending tooltip", "'mousedown', 'wheel', 'keydown'" in tt)
+    # Carson's own call: a tick box says what it does by being ticked.
+    check("checkboxes are excluded",
+          "if (c.matches('input[type=checkbox]')) return null;" in tt)
+    # Long sentences on buttons that sit against the right edge.
+    check("it is kept inside the window", "window.innerWidth" in tt and "window.innerHeight" in tt)
+    check("it never steals the hover it describes", "pointer-events: none" in
+          urllib.request.urlopen(AE_BASE + "/web/app.css", timeout=10).read().decode())
+
+    # ── nothing silent
+    # Every <button> and <select> written into index.html carries its own
+    # title, EXCEPT the one that deliberately points at the row around it.
+    import re as _re
+    tags = _re.findall(r"<(?:button|select)\b[^>]*>", html)
+    silent = [t for t in tags if "title=" not in t and "data-tip-from" not in t]
+    check("every control in the page has a description", not silent, silent[:3])
+    check("...and the count is what it should be", len(tags) >= 20, len(tags))
+    # The Save to: dropdown borrows the row's, because the row is the button.
+    check("the dropdown borrows its row's description",
+          'data-tip-from="gmSaveToWorking"' in html)
+
+
 def s_stateless():
     """
     The restructure's actual promise: this server remembers no scene. A
@@ -387,6 +452,7 @@ def s_static_page():
     # Match the <script src> attributes, never a bare filename — the
     # comments above these tags name all three files too, in a different
     # order, and matching those measures nothing.
+    tt_pos = html.find('src="/web/tooltips.js"')
     wc_pos = html.find('src="/web/working-clips.js"')
     fp_pos = html.find('src="/web/frame-player.js"')
     gb_pos = html.find('src="/web/gap-builder.js"')
@@ -400,9 +466,11 @@ def s_static_page():
     # gap-builder.js, and app.js's restoreGlobals() calls into it.
     check("working-clips.js sits between gap-builder.js and app.js",
           gb_pos < wc_pos < app_pos, (gb_pos, wc_pos, app_pos))
+    check("tooltips.js is on the page", tt_pos > -1, tt_pos)
     for asset, ctype in (("/web/app.js", "javascript"), ("/web/gap-builder.js", "javascript"),
                          ("/web/frame-player.js", "javascript"),
                          ("/web/working-clips.js", "javascript"),
+                         ("/web/tooltips.js", "javascript"),
                          ("/web/app.css", "css")):
         r = urllib.request.urlopen(AE_BASE + asset, timeout=10)
         eq(f"{asset} served", r.status, 200)
@@ -447,6 +515,7 @@ def s_app_js_parses():
     fp = urllib.request.urlopen(AE_BASE + "/web/frame-player.js", timeout=10).read().decode()
     gb = urllib.request.urlopen(AE_BASE + "/web/gap-builder.js", timeout=10).read().decode()
     wc = urllib.request.urlopen(AE_BASE + "/web/working-clips.js", timeout=10).read().decode()
+    tt = urllib.request.urlopen(AE_BASE + "/web/tooltips.js", timeout=10).read().decode()
     js = urllib.request.urlopen(AE_BASE + "/web/app.js", timeout=10).read().decode()
 
     def parses(name, text):
@@ -463,9 +532,10 @@ def s_app_js_parses():
     parses("frame-player.js", fp)
     parses("gap-builder.js", gb)
     parses("working-clips.js", wc)
+    parses("tooltips.js", tt)
     parses("app.js", js)
-    parses("all four together (load order)",
-           fp + "\n" + gb + "\n" + wc + "\n" + js)
+    parses("all five together (load order)",
+           fp + "\n" + gb + "\n" + wc + "\n" + tt + "\n" + js)
 
 
 def s_original_audio_stack():
@@ -567,7 +637,7 @@ def s_original_audio_stack():
               f'<video id="{vid}" playsinline hidden>' in html)
 
 
-FUNCTIONS = [s_static_page, s_app_js_parses, s_original_audio_stack, s_working_clips, s_stateless, s_load_picker, s_load_store,
+FUNCTIONS = [s_static_page, s_app_js_parses, s_original_audio_stack, s_working_clips, s_tooltips, s_stateless, s_load_picker, s_load_store,
              s_save_scene_proxy,
              s_libs_list_paths, s_lib_frames_clip, s_lib_frames_still]
 

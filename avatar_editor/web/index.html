@@ -110,25 +110,28 @@
     <div class="panel libpanel gapMenu">
       <h3>Gap Builder Menu</h3>
       <div class="gapMenuList">
-        <button class="gapMenuBtn" id="gmAddOpeningStill">Add Sarah Opening Still</button>
-        <button class="gapMenuBtn" id="gmAddClosingStill">Add Sarah Closing Still</button>
+        <button class="gapMenuBtn" id="gmAddOpeningStill" title="Adds 4 identical frames of Sarah's standard rest pose to the START of the Clip-Gap Builder, with no transition into them — scene 1 has nothing before it to move from, and every other scene should already be closing on this exact pose.">Add Sarah Opening Still</button>
+        <button class="gapMenuBtn" id="gmAddClosingStill" title="Adds a fade from the Clip-Gap Builder's last frame into Sarah's standard rest pose, then holds that pose — so the scene ends where the next one is expected to begin.">Add Sarah Closing Still</button>
         <button class="gapMenuBtn" id="gmBuilderSelectFrames" title="Arms selecting in the Clip-Gap Builder row below. Click 1: start frame. Click 2: end frame (or the same frame again for a one-frame selection). Click 3: reset, start over.">Select Frames</button>
         <button class="gapMenuBtn" id="gmBuilderCopySelected" title="Copies whatever's selected in the Clip-Gap Builder's own row below (Select Frames), onto the clipboard — Paste Selected adds it back in, so this also duplicates a range in place.">Copy Selected</button>
         <button class="gapMenuBtn" id="gmPasteSelected" title="Turns green once Copy Selected has filled the clipboard. Click a frame below first to pick where, then click this — the clipboard's contents land right after it.">Paste Selected</button>
-        <button class="gapMenuBtn" id="gmDeleteSelected">Delete Selected</button>
+        <button class="gapMenuBtn" id="gmDeleteSelected" title="Removes the frames selected in the Clip-Gap Builder's own row below. Select Frames arms the picking; this deletes what it picked. Nothing else is touched, and there is no undo.">Delete Selected</button>
         <button class="gapMenuBtn" id="gmClearAll" title="Empty the Clip-Gap Builder collection. Does not touch the Frame Selector, the loaded scene, or Timeline Scenes — only this list.">Clear All</button>
         <button class="gapMenuBtn" id="gmBuilderPlayPause" disabled title="Build the collection above first.">Play Clip-Gap Builder's Audio</button>
-        <!-- Which Working Clips section this collection gets filed under.
-             The three options are the three sections that panel has. -->
-        <div class="gapMenuRow">
+        <!-- ONE control, not a dropdown plus a button: picking a section IS
+             the save. Carson's own call — the two always went together, so
+             the second click was only ever confirming the first. It wears
+             the same box and the same green as every button beside it,
+             because that is what it now is. -->
+        <div class="gapMenuBtn gapMenuRow" id="gmSaveToWorking" title="Build the collection above first.">
           <label class="gapMenuLabel" for="gmSaveTarget">Save to:</label>
-          <select id="gmSaveTarget" title="Which Working Clips section the saved collection is filed under. Clip goes to IDLE, Bit to SOUND_BITS, Transition to TRANSITIONS.">
+          <select id="gmSaveTarget" disabled data-tip-from="gmSaveToWorking">
+            <option value="" selected>&mdash;</option>
             <option value="idle">Clip &rarr; IDLE</option>
             <option value="sound_bits">Bit &rarr; SOUND_BITS</option>
             <option value="transitions">Transition &rarr; TRANSITIONS</option>
           </select>
         </div>
-        <button class="gapMenuBtn" id="gmSaveToWorking" disabled title="Build the collection above first.">Save to Working Clips</button>
         <hr class="gapMenuDivider">
         <div class="gapMenuSectionTitle">Frame Selector Menu</div>
         <hr class="gapMenuDivider">
@@ -165,8 +168,8 @@
       </header>
       <div class="body" id="pickBody"></div>
       <footer>
-        <button class="pill" id="pickBackBtn" style="flex:0 0 auto" hidden>&#8592; Back</button>
-        <button class="pill" id="pickCancel" style="flex:0 0 auto;margin-left:auto">Cancel</button>
+        <button class="pill" id="pickBackBtn" title="Goes back one step in this popup — from a store's videos to the list of stores." style="flex:0 0 auto" hidden>&#8592; Back</button>
+        <button class="pill" id="pickCancel" title="Closes this popup and does nothing. Escape and clicking the dark background do the same." style="flex:0 0 auto;margin-left:auto">Cancel</button>
       </footer>
     </div>
   </div>
@@ -178,10 +181,13 @@
         last file, calls straight into functions gap-builder.js defines
         (loadLibs, rebuildLibFrames, rebuildBuilderFrames).
      3. working-clips.js next  — it reads BUILDER_FRAMES and libFrameUrl
-        from gap-builder.js, and app.js's restoreGlobals() calls into it. -->
+        from gap-builder.js, and app.js's restoreGlobals() calls into it.
+     4. tooltips.js           — order does not matter to it: it listens on
+        the document and reads each control's own title at hover time. -->
 <script src="/web/frame-player.js"></script>
 <script src="/web/gap-builder.js"></script>
 <script src="/web/working-clips.js"></script>
+<script src="/web/tooltips.js"></script>
 <script src="/web/app.js"></script>
 </body>
 </html>

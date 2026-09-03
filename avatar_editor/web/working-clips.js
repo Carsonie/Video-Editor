@@ -170,14 +170,20 @@ const WorkingClips = (function () {
 
   // ── the two buttons that depend on this panel's state ───────────────────
   function refreshButtons() {
+    // "Save to:" is a BUTTON that happens to be a dropdown — picking a
+    // section is the save. It is a <div>, so there is no disabled state to
+    // set on it; the <select> inside carries that, and the row carries the
+    // green and the tooltip the way every other button here does.
     const save = document.getElementById('gmSaveToWorking');
-    if (save) {
+    const target = document.getElementById('gmSaveTarget');
+    if (save && target) {
       const n = typeof BUILDER_FRAMES === 'undefined' ? 0 : BUILDER_FRAMES.length;
-      save.disabled = !n;
+      target.disabled = !n;
       save.classList.toggle('ready', n > 0);
+      save.classList.toggle('isDisabled', !n);
       save.title = n
-        ? `Saves all ${n} frame(s) in the Clip-Gap Builder, in order, into the `
-          + `Working Clips section chosen above, under a name you type next.`
+        ? `Pick a section to save all ${n} frame(s) in the Clip-Gap Builder, in `
+          + `order, into Working Clips under a name you type next.`
         : 'Build the collection above first.';
     }
     const rep = document.getElementById('gmReplaceSelected');

@@ -34,6 +34,7 @@ the same scene at once).
 | `web/frame-player.js` | the three Play buttons, one player each — loaded FIRST |
 | `web/gap-builder.js` | sarah_clips/libs, the Frame Selector, the Clip-Gap Builder, the menus — loaded SECOND |
 | `web/working-clips.js` | the Working Clips panel: Carson's own saved clips — loaded THIRD |
+| `web/tooltips.js` | the 3-second hover tooltip on every control |
 | `web/app.js` | everything else: the combine engine, persistence, Timeline Scenes, the Load popup |
 | `VERSION` | bumped on every commit that touches this tool — starts at 1, its OWN history, not Frame Blender's |
 
@@ -104,3 +105,30 @@ chance of breaking the other. Duplicated code costs a second place to fix
 the same bug if one ever turns up in code that's still identical between
 the two; the alternative — a shared module both import — costs exactly the
 coupling this split was meant to remove. Accept the first cost on purpose.
+
+## Tooltips
+
+Every button, dropdown and icon control carries a `title` saying what it
+does, and `tooltips.js` shows it as a styled box after a **3-second**
+hover — Carson's own number: long enough that passing over a stack of
+buttons never triggers it, short enough that stopping on one because you
+are unsure gets you an answer. The browser's own tooltip is suppressed
+while hovering and restored on the way out, so the two never show at once.
+
+Two rules to keep:
+
+- **`title` stays the source.** The text is read at hover time, never
+  copied at load, because several titles are rewritten as the page works
+  — each Play button's says how many clips it would play, and Save to:'s
+  says how many frames it would save.
+- **Checkboxes are excluded**, deliberately. A tick box says what it does
+  by being ticked.
+
+The listener is delegated on the document, so controls built at runtime
+(the library's rows, Timeline Scenes' rows, Working Clips' rows) are
+covered with nothing to wire up. A control can borrow another element's
+description with `data-tip-from="<id>"` — the Save to: dropdown does,
+because the row around it is the button.
+
+The suite fails if any `<button>` or `<select>` in `index.html` has
+neither a `title` nor a `data-tip-from`.

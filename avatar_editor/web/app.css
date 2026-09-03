@@ -187,18 +187,23 @@
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
     margin-top: 8px; padding: 4px 2px 0; font-size: 11.5px; color: var(--sub);
   }
-  /* "Save to:" and its dropdown, sitting in the button stack — the same
-     row language the Audio Menu's own name+speed row uses. */
+  /* "Save to:" IS the button — picking a section is the save, so it wears
+     a .gapMenuBtn's own box and green and only overrides the layout. A
+     <div>, not a <button>, because a <select> cannot live inside one; the
+     .isDisabled class stands in for the :disabled it therefore cannot
+     have. */
   .gapMenuRow {
-    display: flex; align-items: center; gap: 8px; padding: 2px 2px;
-    font-size: 11.5px; color: var(--sub);
+    display: flex; align-items: center; gap: 8px; text-align: left;
   }
   .gapMenuLabel { flex: none; }
+  .gapMenuBtn.isDisabled { opacity: .4; }
+  .gapMenuBtn.isDisabled:hover { border-color: var(--border); }
   #gmSaveTarget {
     flex: 1 1 auto; min-width: 0;
-    background: #0f1214; color: var(--text); border: 1px solid var(--border);
-    border-radius: 4px; padding: 4px; font-size: 11px;
+    background: #0f1214; color: inherit; border: 1px solid var(--border);
+    border-radius: 4px; padding: 4px; font-size: 12px;
   }
+  #gmSaveTarget:disabled { cursor: default; }
   #fsRate {
     background: #0f1214; color: var(--text); border: 1px solid var(--border);
     border-radius: 4px; padding: 3px 4px; font-size: 11px;
@@ -328,3 +333,18 @@
 .modalbtns { display: flex; gap: 8px; margin-top: 14px; }
 .modalbtns .pill { flex: 1 1 0; justify-content: center; }
 
+
+/* The 3-second tooltip (tooltips.js). Positioned by script in viewport
+   coordinates, so `fixed`. Wide enough for a real sentence and no wider —
+   these explain a button, and a single long line is harder to read than
+   three short ones. */
+.tip3 {
+  position: fixed; z-index: 100; max-width: 320px;
+  background: #0b0e10; color: var(--text);
+  border: 1px solid var(--accent2); border-radius: 6px;
+  padding: 8px 10px; font-size: 12px; line-height: 1.45;
+  box-shadow: 0 10px 28px rgba(0,0,0,.55);
+  pointer-events: none;          /* never steals the hover it describes */
+  white-space: pre-wrap;
+}
+.tip3[hidden] { display: none; }
