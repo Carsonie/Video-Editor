@@ -168,6 +168,18 @@
   }
   /* Square — was a fixed 320px height (500:320, a non-square 25:16) until
      Carson asked for it to match the panel's own 1:1 width. */
+  /* The Frame Selector's own transport, right under its slider: which
+     clip is being heard, and how fast. The <video> that carries the voice
+     is hidden — the PICTURE is the panel's own viewer above, stepping
+     through the row's real frames. */
+  .fsBar {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    margin-top: 8px; padding: 4px 2px 0; font-size: 11.5px; color: var(--sub);
+  }
+  #fsRate {
+    background: #0f1214; color: var(--text); border: 1px solid var(--border);
+    border-radius: 4px; padding: 3px 4px; font-size: 11px;
+  }
   .libinspector .imgwrap { width: 100%; height: auto; }
   .libinspector .count { text-align: center; font-size: 16px; }
   /* Two plain status boxes side by side, each its own border — the current

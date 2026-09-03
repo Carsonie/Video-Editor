@@ -39,7 +39,7 @@ const humanSize = b => b < 1024 ? `${b}B` : b < 1048576 ? `${(b / 1024).toFixed(
 // this one and keeps its own scope, so the only way in is FramePlayer's
 // own small API. What is left here is what this file actually owns: the
 // library, the two frame rows, and handing those over at the bottom of
-// this file (see the FramePlayer.configure() call there).
+// this file (see the Players.configure() call there).
 
 const libInspector = document.getElementById('libInspector');
 const libViewerImg = document.getElementById('libViewerImg');
@@ -148,6 +148,12 @@ function libViewIndices() {
     : LIB_FRAMES.map((_, i) => i);
 }
 
+// Set while the Frame Selector's own stepper is driving the viewer. The
+// buttons cannot change from one frame to the next, and Players.refresh()
+// rescans the whole collection, so doing it 25 times a second was pure
+// waste. The stepper redraws once when it starts and once when it stops.
+let libStepping = false;
+
 function showLibFrame(pos) {
   const indices = libViewIndices();
   const i = indices[pos];
@@ -157,9 +163,8 @@ function showLibFrame(pos) {
   // it no longer does is gate the Frame Selector's Play button: that plays
   // the whole collection now, not the one frame under the playhead.
   libCurClip = f ? f.clip : null;
-  // Labels only, never the full refresh: this also runs once per frame
-  // while a run animates the row, so it has to stay cheap.
-  FramePlayer.syncLabels();
+  // Skipped while the stepper is running — see libStepping above.
+  if (!libStepping) Players.refresh();
   if (!f) { libViewerImg.removeAttribute('src'); libNEl.textContent = '—'; return; }
   libViewerImg.src = f.url;
   libNEl.textContent = pos + 1;
@@ -186,7 +191,7 @@ function applyLibViewMode() {
   // "Show Selected on Timeline" narrows what the Frame Selector's own run
   // would play, so its button's count/green state is recomputed here too,
   // not only on a check/uncheck.
-  FramePlayer.refresh();
+  Players.refresh();
 }
 
 // Rebuilds the flattened frame list from PICKED, in checked order —
@@ -202,7 +207,7 @@ function rebuildLibFrames() {
   // Only the Frame Selector's run: its frame row is rebuilt underneath it,
   // so every index that run held is meaningless. The Audio Menu's stack is
   // re-pointed instead, and keeps playing — see OriginalAudio.rebuild().
-  FramePlayer.endRun('selector');
+  FrameSelector.endRun();
   // Whatever was selected pointed at indices in the OLD list — meaningless
   // the moment the list is rebuilt, so this starts clean rather than
   // carrying a selection over onto whatever now happens to sit at the
@@ -225,7 +230,7 @@ function rebuildLibFrames() {
   applyLibViewMode();
   // Runs on every check/uncheck and on every reset, which is exactly when
   // "is there anything for these buttons to play" changes.
-  FramePlayer.refresh();
+  Players.refresh();
 }
 
 libSlider.oninput = () => showLibFrame(+libSlider.value);
@@ -351,11 +356,17 @@ function renderBuilderFrameRow() {
   });
 }
 
+// Set while the Clip-Gap Builder's own stepper is driving its viewer —
+// same reasoning as libStepping above: the buttons cannot change from one
+// animation frame to the next, and Players.refresh() rescans both
+// collections.
+let builderStepping = false;
+
 function showBuilderFrame(i) {
   const f = BUILDER_FRAMES[i];
   [...builderFrameRow.children].forEach((d, j) => d.classList.toggle('cur', j === i));
   builderCurClip = f ? f.clip : null;
-  FramePlayer.refresh();
+  if (!builderStepping) Players.refresh();
   if (!f) { builderViewerImg.removeAttribute('src'); builderNEl.textContent = '—'; return; }
   builderViewerImg.src = f.url;
   builderNEl.textContent = i + 1;
@@ -370,6 +381,10 @@ function showBuilderFrame(i) {
 // Only the actual mutation sites (doPaste, and the Gap Builder Controller
 // Menu actions) save.
 function rebuildBuilderFrames(landOn) {
+  // The collection this run was walking has been rebuilt, so every
+  // position it held is meaningless — same rule the Frame Selector's row
+  // follows in rebuildLibFrames().
+  GapBuilder.endRun();
   builderSlider.max = Math.max(0, BUILDER_FRAMES.length - 1);
   builderSlider.disabled = BUILDER_FRAMES.length === 0;
   builderTotalEl.textContent = BUILDER_FRAMES.length || '—';
@@ -505,7 +520,7 @@ async function loadLibs() {
           playBtn.className = 'soundBitPlay';
           playBtn.textContent = '▶';
           playBtn.title = f.line ? `Play: "${f.line}"` : 'Play this clip';
-          playBtn.onclick = () => FramePlayer.playClip(f, name.textContent);
+          playBtn.onclick = () => OriginalAudio.playClip(f, name.textContent);
           row.appendChild(playBtn);
         }
         box.appendChild(row);
@@ -912,10 +927,17 @@ gmBuilderPlayPause.onclick = withActiveFlash(gmBuilderPlayPause, () => {
 //
 // Last thing in this file on purpose — everything named below has to
 // exist before it runs.
-FramePlayer.configure({
+Players.configure({
+  // showFrame and slider are the Frame Selector's OWN viewer, and only its
+  // OWN Play button reaches them — see the stepper in frame-player.js.
+  showFrame: pos => { libStepping = true; showLibFrame(pos); libStepping = false; },
+  slider: () => libSlider,
+  // ...and the Clip-Gap Builder's own, reached only by ITS own button.
+  builderFrames: () => BUILDER_FRAMES,
+  builderShow: i => { builderStepping = true; showBuilderFrame(i); builderStepping = false; },
+  builderSlider: () => builderSlider,
   picked: () => PICKED,
   frames: () => LIB_FRAMES,
   viewIndices: () => libViewIndices(),
-  builderClip: () => builderCurClip,
   order: () => LIB_ORDER,
 });

@@ -397,16 +397,15 @@ def s_original_audio_stack():
     step("Audio Menu — the OriginalAudio stack is wired to the checkboxes")
     fp = urllib.request.urlopen(AE_BASE + "/web/frame-player.js", timeout=10).read().decode()
     gb = urllib.request.urlopen(AE_BASE + "/web/gap-builder.js", timeout=10).read().decode()
+    html = urllib.request.urlopen(AE_BASE + "/", timeout=10).read().decode()
 
     check("OriginalAudio owns a stack", "let STACK = []" in fp)
     check("built in library display order, not tick order",
-          "FramePlayer.checkedInOrder()" in fp)
+          "LibSources.checkedInOrder()" in fp)
     check("silent clips are kept out of it", "filter(c => c.has_audio)" in fp)
-    check("Play walks the stack, not a fresh list",
-          "FramePlayer.run('libs', STACK)" in fp)
+    check("Play walks the stack, not a fresh list", "P.run(STACK)" in fp)
     # A tick mid-run must EXTEND the run, not stop the voice.
-    check("a live run is re-pointed rather than killed",
-          "FramePlayer.resync('libs', STACK)" in fp)
+    check("a live run is re-pointed rather than killed", "P.resync(STACK)" in fp)
     # Both branches of toggleLibClip — tick AND untick — must rebuild it.
     # The trailing ";" is what separates the two real call sites from the
     # comment that just points at them.
@@ -416,17 +415,73 @@ def s_original_audio_stack():
     # has to end — but ending the Audio Menu's run there was a real bug:
     # ticking a second box killed the voice that was already playing.
     check("rebuildLibFrames ends only the SELECTOR's run",
-          "FramePlayer.endRun('selector')" in gb)
-    check("...and never the Audio Menu's", "FramePlayer.endRun()" not in gb)
-    # Playing audio must move NOTHING but the shared <video>. An earlier
-    # build stepped the Frame Selector's viewer along with the voice and
-    # left it parked mid-clip on a panel nobody had touched.
-    for gone in ("requestAnimationFrame", "startSync", "clipBase"):
-        check(f"the frame stepper is gone: no {gone}", gone not in fp)
-    check("the player is not handed the Frame Selector's slider",
-          "slider:" not in gb.split("FramePlayer.configure(")[-1])
-    check("...nor its showFrame",
-          "showFrame:" not in gb.split("FramePlayer.configure(")[-1])
+          "FrameSelector.endRun()" in gb)
+
+    step("each panel's Play button drives its OWN player, not a shared one")
+    # One <video> for every button meant the Frame Selector's Play took over
+    # a previewer on the other side of the page. FramePlayer is a factory
+    # now: one engine per panel, each with its own elements.
+    check("FramePlayer is a factory, not a single instance",
+          "function create(dom)" in fp and "return {create," in fp)
+    for el in ("fsPlayer", "fsVideo", "fsName", "fsRate"):
+        check(f"the Frame Selector has its own {el}", f'id="{el}"' in html)
+    check("the Frame Selector's engine is built on those",
+          "player: 'fsPlayer'" in fp and "video: 'fsVideo'" in fp)
+    check("the Audio Menu keeps its own", "video: 'soundBitVideo'" in fp)
+    # Two voices at once is never wanted, and this is the ONLY thing the
+    # engines are allowed to say to each other.
+    check("starting one player quiets the others", "function stopOthers(me)" in fp)
+    # The Frame Selector's viewer DOES step with its own voice — that is
+    # the whole point of its button. What must never happen again is the
+    # AUDIO MENU moving it: that left the panel parked mid-clip, on frames
+    # nobody had asked to see. So the stepper has to live inside the
+    # FrameSelector scenario and nowhere else.
+    fs_block = fp.split("const FrameSelector = ")[-1].split("const GapBuilder = ")[0]
+    gb_block = fp.split("const GapBuilder = ")[-1].split("const Players = ")[0]
+    check("the Frame Selector steps its own frames", "P.tick((t, dur, clip)" in fs_block)
+    check("the Clip-Gap Builder steps its own frames", "P.tick((t, dur, clip)" in gb_block)
+    # Each panel reaches ONLY its own viewer. Crossing over is the exact
+    # fault that left a panel parked mid-clip with nobody driving it.
+    check("only the Frame Selector touches the Frame Selector's viewer",
+          fp.count("LibSources.showFrame(") == 1
+          and "LibSources.showFrame(" in fs_block)
+    check("only the Clip-Gap Builder touches the Clip-Gap Builder's viewer",
+          fp.count("LibSources.builderShow(") == 1
+          and "LibSources.builderShow(" in gb_block)
+    check("the Audio Menu touches neither",
+          "showFrame" not in fp.split("const OriginalAudio = ")[-1]
+                               .split("const FrameSelector = ")[0])
+    check("the engine itself knows nothing about frames",
+          "showFrame" not in fp.split("const FramePlayer = ")[-1]
+                              .split("const OriginalAudio = ")[0])
+    # A row built by pasting can hold a clip in pieces, out of order, or
+    # twice — so "the clip starts at P, frame k is at P+k" is wrong there.
+    check("frames are located by their own index within the clip",
+          "f.local === k" in fp)
+    # Once a run ended, the loaded clip could be replayed with the picture
+    # frozen, because the stepper was handed queue[0] and the queue was gone.
+    check("stepping follows the LOADED clip, not just a live run",
+          "fn(video.currentTime, video.duration, currentClip)" in fp)
+    # 25 frames a second through a full collection rescan was pure waste.
+    check("Frame Selector stepping skips the full button refresh", "libStepping" in gb)
+    check("Clip-Gap Builder stepping skips it too", "builderStepping" in gb)
+    # A rebuilt row makes every position a run held meaningless.
+    check("rebuilding the Builder's row ends its run", "GapBuilder.endRun();" in gb)
+    # The Clip-Gap Builder is a TIMELINE, not an audio picker: its run is
+    # every clip in the collection, silent ones included, and its button is
+    # green whenever there are FRAMES to run. Asking the other two panels'
+    # question here left a full 482-frame collection reading as silent.
+    check("the Builder's run keeps silent clips", "seen.has(c.path)" in fp
+          and "distinctAudible(src.builderFrames" not in fp)
+    check("the Builder's button goes green on FRAMES, not voices",
+          "btn.classList.toggle('ready', rowHas > 0);" in gb_block)
+    check("the other two still go green only on a voice",
+          "btn.classList.toggle('ready', STACK.length > 0);" in fp
+          and "btn.classList.toggle('ready', n > 0);" in fs_block)
+    # No second viewer in either panel: both already have one.
+    for vid in ("fsVideo", "gbVideo"):
+        check(f"{vid} is the voice only, never a second viewer",
+              f'<video id="{vid}" playsinline hidden>' in html)
 
 
 FUNCTIONS = [s_static_page, s_app_js_parses, s_original_audio_stack, s_stateless, s_load_picker, s_load_store,

@@ -353,7 +353,7 @@
     CLIPBOARD = [];
     // The player is frame-player.js's business, not this file's — one
     // call, rather than nine lines reaching into its internals.
-    FramePlayer.reset();
+    Players.reset();
   }
 
   async function openPair(baseRel, overRel) {

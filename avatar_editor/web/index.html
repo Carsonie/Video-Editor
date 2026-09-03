@@ -46,6 +46,24 @@
         <div class="count framepick" id="libSelectedCount">Selected <b id="libSelectedN">0</b></div>
       </div>
       <input type="range" id="libSlider" min="0" max="0" value="0" step="1">
+      <!-- The Frame Selector's OWN transport. No second viewer: the panel
+           already HAS one, and the frames it plays are the ones in its own
+           row, stepped in time with the voice — so the viewer, the Frame
+           counter and the slider above all move together. The <video> here
+           is never seen; it is the voice, and nothing else. It is this
+           panel's own, deliberately NOT the Audio Menu's, so pressing Play
+           here cannot reach across the page. -->
+      <div class="fsBar" id="fsPlayer">
+        <video id="fsVideo" playsinline hidden></video>
+        <span class="soundBitName" id="fsName">Nothing loaded</span>
+        <select id="fsRate" title="Playback speed for the Frame Selector's own playback.">
+          <option value="2">2x</option>
+          <option value="1" selected>1x</option>
+          <option value="0.5">0.5x</option>
+          <option value="0.25">0.25x</option>
+          <option value="0.125">0.125x</option>
+        </select>
+      </div>
       <div class="libframerow" id="libFrameRow"></div>
     </div>
 
@@ -54,6 +72,21 @@
       <div class="imgwrap checker"><img id="builderViewerImg" alt="builder frame"></div>
       <div class="count">Frame <b id="builderN">—</b> / <b id="builderTotal">—</b></div>
       <input type="range" id="builderSlider" min="0" max="0" value="0" step="1" disabled>
+      <!-- The Clip-Gap Builder's OWN transport, the same shape as the Frame
+           Selector's above it. The <video> is never seen: it carries the
+           voice, and the PICTURE is this panel's own viewer, stepping
+           through the frames actually in this collection. -->
+      <div class="fsBar" id="gbPlayer">
+        <video id="gbVideo" playsinline hidden></video>
+        <span class="soundBitName" id="gbName">Nothing loaded</span>
+        <select id="gbRate" title="Playback speed for the Clip-Gap Builder's own playback.">
+          <option value="2">2x</option>
+          <option value="1" selected>1x</option>
+          <option value="0.5">0.5x</option>
+          <option value="0.25">0.25x</option>
+          <option value="0.125">0.125x</option>
+        </select>
+      </div>
       <div class="libframerow" id="builderFrameRow"></div>
     </div>
 
@@ -72,7 +105,7 @@
         <button class="gapMenuBtn" id="gmPasteSelected" title="Turns green once Copy Selected has filled the clipboard. Click a frame below first to pick where, then click this — the clipboard's contents land right after it.">Paste Selected</button>
         <button class="gapMenuBtn" id="gmDeleteSelected">Delete Selected</button>
         <button class="gapMenuBtn" id="gmClearAll" title="Empty the Clip-Gap Builder collection. Does not touch the Frame Selector, the loaded scene, or Timeline Scenes — only this list.">Clear All</button>
-        <button class="gapMenuBtn" id="gmBuilderPlayPause" disabled title="Plays whichever clip the Clip-Gap Builder above is currently showing, off the shared player below — only has real sound if that clip actually carries a voice track. Click again to pause.">Play This Clip's Audio</button>
+        <button class="gapMenuBtn" id="gmBuilderPlayPause" disabled title="Build the collection above first.">Play Clip-Gap Builder's Audio</button>
         <hr class="gapMenuDivider">
         <div class="gapMenuSectionTitle">Frame Selector Menu</div>
         <hr class="gapMenuDivider">
