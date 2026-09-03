@@ -23,7 +23,6 @@ that came with the split (a cross-process lock gap).
 | `serve.py` | the server. Stateless: every request that acts on a scene names that scene. |
 | `web/index.html` | the page, with no scene in it |
 | `web/app.css` | its styling |
-| `web/gap-builder.js` | sarah_clips/libs, the Frame Selector, the Clip-Gap Builder — loaded FIRST |
 | `web/app.js` | everything else: the combine engine, persistence, Timeline Scenes, the Load popup |
 | `VERSION` | bumped on every commit that touches this tool |
 

@@ -25,6 +25,21 @@ the one place this is written down, and it can change.
 
 ---
 
+## Working with the Avatar Editor, or anything about Sarah
+
+Read **`.claude/skills/sarah-library/SKILL.md`** first, every time —
+before editing anything in `avatar_editor/`, before touching `Sarah/` or
+any store's own `sarah_clips/`, and before answering a question about
+Sarah's clips, her standard poses, or idle footage. It is the single
+source of truth for what's common vs. per-store, what the Avatar Editor's
+two panels each do, and the traps already paid for once (a stale path in
+`build/assemble_video.py` that silently resolved to nothing; a folder one
+level too deep that a flat listing never saw). Don't reconstruct any of
+this from memory of a past answer — the skill is the one place it's
+written down, and it changes as the library does.
+
+---
+
 ## When Carson asks to open, launch, start, or run an editor
 
 Read **`.claude/skills/editor-launchers/SKILL.md`** first, every time. Six

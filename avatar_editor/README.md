@@ -32,7 +32,7 @@ the same scene at once).
 | `web/index.html` | the page, with no scene in it |
 | `web/app.css` | its styling |
 | `web/frame-player.js` | the three Play buttons, one player each — loaded FIRST |
-| `web/gap-builder.js` | sarah_clips/libs, the Frame Selector, the Clip-Gap Builder, the menus — loaded SECOND |
+| `web/gap-builder.js` | both library panels, the Frame Selector, the Clip-Gap Builder, the menus — loaded SECOND |
 | `web/working-clips.js` | the Working Clips panel: Carson's own saved clips — loaded THIRD |
 | `web/tooltips.js` | the 3-second hover tooltip on every control |
 | `web/app.js` | everything else: the combine engine, persistence, Timeline Scenes, the Load popup |
@@ -60,27 +60,15 @@ pauses the rest, because two voices at once is never wanted. The test
 suite guards all of this; read the file's own header before adding
 anything that moves a panel.
 
-The Clip-Gap Builder is a TIMELINE, not an audio picker — hence the
-silent clips, and hence its button going green on FRAMES while the other
-two go green only on a voice.
-
-`working-clips.js` keeps its own scope too, and hands out `WorkingClips`.
-It is the panel right of Timeline Scenes: three sections (IDLE,
-TRANSITIONS, SOUND_BITS) holding clips Carson built here, as opposed to
-`sarah_clips/libs`, which holds what HeyGen and the transition tools
-produced. Two controls read and write it — **Save to Working Clips** in
-the Gap Builder Menu (the whole Clip-Gap Builder collection, in order,
-under a typed name) and **Replace Selected** in the Frame Selector Menu
-(the active saved clip goes in over the selection, with a Yes/No warning
-when the frame counts differ). At most ONE entry is active at a time,
-because Replace Selected needs one answer.
-
-Saved clips live in the same `localStorage` record as the Clip-Gap
-Builder's own collection, and are NOT tied to one scene. Frames are
-stored compactly — a short list of source clips plus (clip index, frame
-index) pairs — because written out in full a single 482-frame clip is
-about 100KB of JSON against a ~5MB budget for the whole page. URLs are
-rebuilt on the way out rather than stored.
+`working-clips.js` keeps its own scope too, and hands out `WorkingClips`
+— its own third panel, saved from the Clip-Gap Builder and dropped back
+in over a Frame Selector selection. **What each button plays, why the
+Clip-Gap Builder is a timeline rather than an audio picker, how audibility
+is measured, and how this tool's two library panels (Sarah's common one
+plus a store's own) relate to each other and to the build pipeline is all
+in `.claude/skills/sarah-library/SKILL.md`** — read that, not this file,
+for anything about what Sarah's clips ARE or where they belong; this file
+is about how the CODE is put together.
 
 `gap-builder.js` and `app.js` share one flat scope on purpose — neither is
 wrapped in an IIFE, so each can call straight into the other's top-level

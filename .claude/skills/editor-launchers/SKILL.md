@@ -29,8 +29,11 @@ build-visualizer piece is not built yet.
 whole duplicate of Frame Blender, but Carson split the work between the
 two — Frame Blender keeps the two-track combine/build job above; Avatar
 Editor keeps only the Gap Builder, the tool for editing Sarah's overlay
-itself (sarah_clips/libs — stills, idle loops, transitions, sound bits —
-plus the Frame Selector and Clip-Gap Builder that assemble them). The
+itself — her common library (`Sarah/`) alongside a store's own
+`sarah_clips/`, browsed side by side, plus the Frame Selector and
+Clip-Gap Builder that assemble them (see `.claude/skills/sarah-library/
+SKILL.md` for what Sarah's clips are and how the two libraries relate).
+The
 overlay+base combine view, Build, Play video and Save MP4 were removed
 from `avatar_editor/` entirely — that job belongs to Frame Blender now,
 not duplicated here.

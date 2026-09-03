@@ -1,5 +1,7 @@
 # The closing — taken out of ski-demo's first video, kept for reuse
 
+See `.claude/skills/sarah-library/SKILL.md` for how this folder fits into Sarah's common library, and how a piece from here has to be copied by hand into a store's own `sarah_clips/` before a build will pick it up.
+
 Removed from `01-first-time-ordering` on **2026-08-27**, at the user's
 direction. Nothing was deleted: every file that made the closing is here, and
 putting it back is four `mv` commands.
@@ -33,10 +35,10 @@ closing in the finished video, looking done. Both had to go.
 
 ```bash
 V="Customers/Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering"
-mv Sarah/closing/sarah-idle-transition-to-centre.webm "$V/sarah_clips/"
-mv Sarah/closing/sarah-closeout-alpha.webm            "$V/sarah_clips/"
-mv Sarah/closing/PREVIEW-morph-then-closeout.mp4      "$V/sarah_clips/"
-mv Sarah/closing/99-closing                           "$V/sandbox/"
+mv Sarah/closings/sarah-idle-transition-to-centre.webm "$V/sarah_clips/"
+mv Sarah/closings/sarah-closeout-alpha.webm            "$V/sarah_clips/"
+mv Sarah/closings/PREVIEW-morph-then-closeout.mp4      "$V/sarah_clips/"
+mv Sarah/closings/99-closing                           "$V/sandbox/"
 ```
 
 The build picks it up again on the next run — the glob is the only switch.
