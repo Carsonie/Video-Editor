@@ -310,10 +310,19 @@ def s_static_page():
     # calls straight into functions gap-builder.js defines, so if load
     # order here ever regressed, the page would fail at the very last line
     # of app.js with everything above it having worked perfectly.
-    gb_pos = html.find("gap-builder.js")
+    # Match the <script src> attributes, never a bare filename — the
+    # comments above these tags name all three files too, in a different
+    # order, and matching those measures nothing.
+    fp_pos = html.find('src="/web/frame-player.js"')
+    gb_pos = html.find('src="/web/gap-builder.js"')
     app_pos = html.find('src="/web/app.js"')
     check("gap-builder.js is named before app.js", -1 < gb_pos < app_pos, (gb_pos, app_pos))
+    # frame-player.js has to be FIRST: gap-builder.js's very last statement
+    # is FramePlayer.configure({...}), so the component must already exist.
+    check("frame-player.js is named before gap-builder.js", -1 < fp_pos < gb_pos,
+          (fp_pos, gb_pos))
     for asset, ctype in (("/web/app.js", "javascript"), ("/web/gap-builder.js", "javascript"),
+                         ("/web/frame-player.js", "javascript"),
                          ("/web/app.css", "css")):
         r = urllib.request.urlopen(AE_BASE + asset, timeout=10)
         eq(f"{asset} served", r.status, 200)
@@ -355,6 +364,7 @@ def s_app_js_parses():
         check("node is available to parse it", False,
               "install node, or this can never catch a broken page again")
         return
+    fp = urllib.request.urlopen(AE_BASE + "/web/frame-player.js", timeout=10).read().decode()
     gb = urllib.request.urlopen(AE_BASE + "/web/gap-builder.js", timeout=10).read().decode()
     js = urllib.request.urlopen(AE_BASE + "/web/app.js", timeout=10).read().decode()
 
@@ -369,12 +379,57 @@ def s_app_js_parses():
               f"{len(text)} bytes" if r.returncode == 0
               else next((l for l in first if "Error" in l), first[0] if first else ""))
 
+    parses("frame-player.js", fp)
     parses("gap-builder.js", gb)
     parses("app.js", js)
-    parses("gap-builder.js + app.js together (load order)", gb + "\n" + js)
+    parses("all three together (load order)", fp + "\n" + gb + "\n" + js)
 
 
-FUNCTIONS = [s_static_page, s_app_js_parses, s_stateless, s_load_picker, s_load_store,
+def s_original_audio_stack():
+    """
+    The Audio Menu's Play walks a STACK, and the stack is maintained by the
+    checkbox events rather than worked out when Play is pressed. None of
+    that is reachable over HTTP, so what is asserted here is the WIRING —
+    the four joins that, if any one of them were dropped, would leave the
+    button silently playing the wrong thing or nothing at all. Each one has
+    already been the actual bug once.
+    """
+    step("Audio Menu — the OriginalAudio stack is wired to the checkboxes")
+    fp = urllib.request.urlopen(AE_BASE + "/web/frame-player.js", timeout=10).read().decode()
+    gb = urllib.request.urlopen(AE_BASE + "/web/gap-builder.js", timeout=10).read().decode()
+
+    check("OriginalAudio owns a stack", "let STACK = []" in fp)
+    check("built in library display order, not tick order",
+          "FramePlayer.checkedInOrder()" in fp)
+    check("silent clips are kept out of it", "filter(c => c.has_audio)" in fp)
+    check("Play walks the stack, not a fresh list",
+          "FramePlayer.run('libs', STACK)" in fp)
+    # A tick mid-run must EXTEND the run, not stop the voice.
+    check("a live run is re-pointed rather than killed",
+          "FramePlayer.resync('libs', STACK)" in fp)
+    # Both branches of toggleLibClip — tick AND untick — must rebuild it.
+    # The trailing ";" is what separates the two real call sites from the
+    # comment that just points at them.
+    eq("every checkbox event rebuilds the stack",
+       gb.count("OriginalAudio.rebuild();"), 2)
+    # rebuildLibFrames tears the Frame Selector's own row apart, so its run
+    # has to end — but ending the Audio Menu's run there was a real bug:
+    # ticking a second box killed the voice that was already playing.
+    check("rebuildLibFrames ends only the SELECTOR's run",
+          "FramePlayer.endRun('selector')" in gb)
+    check("...and never the Audio Menu's", "FramePlayer.endRun()" not in gb)
+    # Playing audio must move NOTHING but the shared <video>. An earlier
+    # build stepped the Frame Selector's viewer along with the voice and
+    # left it parked mid-clip on a panel nobody had touched.
+    for gone in ("requestAnimationFrame", "startSync", "clipBase"):
+        check(f"the frame stepper is gone: no {gone}", gone not in fp)
+    check("the player is not handed the Frame Selector's slider",
+          "slider:" not in gb.split("FramePlayer.configure(")[-1])
+    check("...nor its showFrame",
+          "showFrame:" not in gb.split("FramePlayer.configure(")[-1])
+
+
+FUNCTIONS = [s_static_page, s_app_js_parses, s_original_audio_stack, s_stateless, s_load_picker, s_load_store,
              s_save_scene_proxy,
              s_libs_list_paths, s_lib_frames_clip, s_lib_frames_still]
 

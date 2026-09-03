@@ -346,18 +346,14 @@
     libStatus.textContent = 'Nothing loaded.';
     PICKED = [];
     rebuildLibFrames();
-    refreshSceneSoundBit();
     BUILDER_FRAMES = [];
     SELECTED = new Set();
     disarmSelectMode();
     rebuildBuilderFrames();
     CLIPBOARD = [];
-    soundBitVideo.pause();
-    soundBitVideo.removeAttribute('src');
-    currentSoundBitPath = null;
-    soundBitPlayer.hidden = true;
-    soundBitName.textContent = 'No Sound Bit loaded';
-    syncPlayButtons();
+    // The player is frame-player.js's business, not this file's — one
+    // call, rather than nine lines reaching into its internals.
+    FramePlayer.reset();
   }
 
   async function openPair(baseRel, overRel) {

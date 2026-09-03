@@ -31,9 +31,20 @@ the same scene at once).
 | `serve.py` | the server. Stateless: every request that acts on a scene names that scene. |
 | `web/index.html` | the page, with no scene in it |
 | `web/app.css` | its styling |
-| `web/gap-builder.js` | sarah_clips/libs, the Frame Selector, the Clip-Gap Builder — loaded FIRST |
+| `web/frame-player.js` | the three Play buttons and the one shared <video> they share — loaded FIRST |
+| `web/gap-builder.js` | sarah_clips/libs, the Frame Selector, the Clip-Gap Builder — loaded SECOND |
 | `web/app.js` | everything else: the combine engine, persistence, Timeline Scenes, the Load popup |
 | `VERSION` | bumped on every commit that touches this tool — starts at 1, its OWN history, not Frame Blender's |
+
+`frame-player.js` is the one exception to the flat scope below: it wraps
+itself in an IIFE and exposes `FramePlayer` plus three named scenarios —
+`OriginalAudio` (the Audio Menu: walks a stack of the checked, audible
+Sound Bits, in library order), `FrameSelector` and `GapBuilder`. Each
+logs `Inside: <name>` so a click can be traced from the button, through
+`gap-builder.js`, into the player. Playing audio moves the shared
+`<video>` and NOTHING else — not the Frame Selector, not the Clip-Gap
+Builder; see the "the picture does NOT follow the voice" note in that
+file before adding anything that moves a panel.
 
 `gap-builder.js` and `app.js` share one flat scope on purpose — neither is
 wrapped in an IIFE, so each can call straight into the other's top-level

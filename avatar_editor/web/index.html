@@ -72,7 +72,7 @@
         <button class="gapMenuBtn" id="gmPasteSelected" title="Turns green once Copy Selected has filled the clipboard. Click a frame below first to pick where, then click this — the clipboard's contents land right after it.">Paste Selected</button>
         <button class="gapMenuBtn" id="gmDeleteSelected">Delete Selected</button>
         <button class="gapMenuBtn" id="gmClearAll" title="Empty the Clip-Gap Builder collection. Does not touch the Frame Selector, the loaded scene, or Timeline Scenes — only this list.">Clear All</button>
-        <button class="gapMenuBtn" id="gmBuilderPlayPause" disabled title="Plays whichever Sound Bit is checked in sarah_clips/libs above, straight off the shared player below — so you can listen to the original while scrubbing the Clip-Gap Builder's row above to compare. Click again to pause.">Play Original Sound Bit</button>
+        <button class="gapMenuBtn" id="gmBuilderPlayPause" disabled title="Plays whichever clip the Clip-Gap Builder above is currently showing, off the shared player below — only has real sound if that clip actually carries a voice track. Click again to pause.">Play This Clip's Audio</button>
         <hr class="gapMenuDivider">
         <div class="gapMenuSectionTitle">Frame Selector Menu</div>
         <hr class="gapMenuDivider">
@@ -80,11 +80,11 @@
         <button class="gapMenuBtn" id="gmCopySelected" title="Copies whatever's selected in the Frame Selector's own row above (Select Frames), onto a clipboard — Paste (above) adds it to the Clip-Gap Builder.">Copy Selected</button>
         <button class="gapMenuBtn" id="gmLibViewToggle" title="Turns green along with Copy Selected once a selection is complete. Filters the row and slider above to just your selection, so you can scrub through it before deciding — click again to go back to the full collection.">Show Selected on Timeline</button>
         <button class="gapMenuBtn" id="gmFrameSelectorClearAll" title="Unchecks every clip in sarah_clips/libs and empties the Frame Selector's row above. Does not touch the Clip-Gap Builder, the clipboard, the loaded scene, or Timeline Scenes — only this list.">Clear All</button>
-        <button class="gapMenuBtn" id="gmLibPlayPause" disabled title="Plays whichever clip the Frame Selector above is currently showing, off the shared player below — only has real sound if that clip actually carries a voice track (an idle loop or a sound bit; a still or gap-filler plays silent). Click again to pause.">Play This Clip's Audio</button>
+        <button class="gapMenuBtn" id="gmLibPlayPause" disabled title="Check a clip in sarah_clips/libs above to fill the Frame Selector first.">Play Frame Selector's Audio</button>
         <hr class="gapMenuDivider">
         <div class="gapMenuSectionTitle">Audio Menu</div>
         <hr class="gapMenuDivider">
-        <button class="gapMenuBtn" id="gmSoundBitPlayPause" disabled title="Play or pause whichever Sound Bit was last clicked ▶ in sarah_clips/libs above.">Play / Pause</button>
+        <button class="gapMenuBtn" id="gmSoundBitPlayPause" disabled title="Check one or more clips in sarah_clips/libs above first.">Play</button>
         <div class="audioMenuRow">
           <span class="soundBitName" id="soundBitName">No Sound Bit loaded</span>
           <select id="soundBitRate" title="Playback speed — same options as the Segment and Avatar Editor.">
@@ -113,9 +113,13 @@
     </div>
   </div>
 
-<!-- gap-builder.js first: app.js's bootstrap, at the bottom of the second
-     file, calls straight into functions this one defines (loadLibs,
-     rebuildLibFrames, rebuildBuilderFrames) — they have to exist already. -->
+<!-- Load order is forced, in this order, for two separate reasons:
+     1. frame-player.js first  — gap-builder.js's last statement is
+        FramePlayer.configure({...}), so FramePlayer must already exist.
+     2. gap-builder.js next    — app.js's bootstrap, at the bottom of the
+        last file, calls straight into functions gap-builder.js defines
+        (loadLibs, rebuildLibFrames, rebuildBuilderFrames). -->
+<script src="/web/frame-player.js"></script>
 <script src="/web/gap-builder.js"></script>
 <script src="/web/app.js"></script>
 </body>

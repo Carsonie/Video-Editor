@@ -66,6 +66,7 @@ import json
 import os
 import re
 import shutil
+import subprocess                                          # ffprobe/ffmpeg — see has_audible()
 import sys
 import tempfile
 import time
@@ -114,6 +115,72 @@ def log(path, payload, result, status):
     themselves for free.
     """
     main_serve.session_log(path, payload, result, status)
+
+
+# Measured audibility, cached per (path, mtime, size) — see has_audible().
+_AUDIBLE = {}
+
+# Anything peaking above this is a real voice; anything under it is one of
+# this library's silent tracks. Measured directly on ski-demo's own files
+# (2026-09-02), and the gap between the two groups is enormous, so the
+# threshold is nowhere near a real edge:
+#
+#   sound bits            max -4.8 dB / -7.1 dB   ← Sarah actually speaking
+#   idle 10s / 20s        max -60.8 dB / -60.2 dB ← a silent track, not silence
+#   gap-filler 1.0s       max -91.0 dB            ← digital silence
+#   transitions, stills   no audio stream at all
+AUDIBLE_DB = -50.0
+
+
+def has_audible(path):
+    """
+    Does this file carry audio a person would actually HEAR?
+
+    NOT the same question as "does it have an audio stream" — and that
+    difference is the whole reason this exists. Every .webm the gap-filler
+    library holds carries an Opus stream, including the idle loops and the
+    gap-fillers, whose tracks are silent. Answering the stream question
+    made the Frame Selector's Play run sit through ten seconds of nothing
+    before reaching a clip with a voice in it, which reads as "it played
+    the wrong clip".
+
+    ffprobe's per-stream `duration` is no help either: WebM does not
+    record it, so every file here reports N/A. So this measures the real
+    peak with ffmpeg's volumedetect.
+
+    `-vn` is required, not tidiness: these are VP9-with-alpha renders, and
+    decoding the picture is what made the measurement fail outright when
+    it was left in.
+
+    Never raises — an unreadable file is reported as "no audio" rather
+    than breaking the whole library listing.
+    """
+    try:
+        key = (path, os.path.getmtime(path), os.path.getsize(path))
+    except OSError:
+        return False
+    if key in _AUDIBLE:
+        return _AUDIBLE[key]
+
+    audible = False
+    try:
+        # Cheap first pass: no audio stream at all means no decode needed.
+        r = subprocess.run(
+            ["ffprobe", "-v", "error", "-select_streams", "a",
+             "-show_entries", "stream=codec_name", "-of", "csv=p=0", path],
+            capture_output=True, text=True, timeout=30)
+        if r.stdout.strip():
+            m = subprocess.run(
+                ["ffmpeg", "-hide_banner", "-i", path, "-vn",
+                 "-af", "volumedetect", "-f", "null", "-"],
+                capture_output=True, text=True, timeout=120)
+            hit = re.search(r"max_volume:\s*(-?\d+(?:\.\d+)?) dB", m.stderr or "")
+            audible = bool(hit) and float(hit.group(1)) > AUDIBLE_DB
+    except Exception:
+        audible = False
+
+    _AUDIBLE[key] = audible
+    return audible
 
 
 def video_root_of(seg_path):
@@ -546,8 +613,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 p = os.path.join(fdir, name)
                 if not os.path.isfile(p):
                     continue
+                # has_audio is answered for EVERY file, stills included — a
+                # missing key reads as "unknown", and the page's Play runs
+                # need a plain yes/no to filter on.
                 entry = {"name": name, "size": os.path.getsize(p),
-                         "path": os.path.relpath(p, CUSTOMERS_ROOT)}
+                         "path": os.path.relpath(p, CUSTOMERS_ROOT),
+                         "has_audio": False}
                 if name.lower().endswith((".webm", ".mp4", ".mov")):
                     # A .webm here is always a transparent HeyGen render —
                     # same rule shared/serve.py's is_alpha() uses, inlined
@@ -557,6 +628,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                             p, alpha=name.lower().endswith(".webm"))[1]), 2)
                     except Exception:
                         entry["dur"] = None
+                    # Whether there is a voice in it, MEASURED — the Play
+                    # runs skip silent clips, and the buttons only go green
+                    # when something audible is actually there to play.
+                    entry["has_audio"] = has_audible(p)
                 if folder == "sound_bits":
                     label = re.sub(r"^\d+-", "", os.path.splitext(name)[0])
                     if label in label_lines:
