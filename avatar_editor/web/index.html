@@ -11,6 +11,21 @@
   <div class="status" id="status"></div>
 
   <div class="row row-top">
+    <!-- Sarah's COMMON library — Sarah/ at the repo root, the same across
+         every store (Carson's own split, 2026-09-03; see Sarah/README.md).
+         A plain duplicate of the store panel beside it: same markup, same
+         classes, same row shape — the eye should not have to learn a
+         second layout for a second source. Checking a clip here feeds the
+         SAME Frame Selector / Clip-Gap Builder / Audio Menu the store
+         panel does, so the two can be mixed in one build; only which
+         server root a clip's frames and audio come from differs, via each
+         clip's own `source` field. -->
+    <div class="panel libpanel">
+      <h3>Sarah/ (common)</h3>
+      <div class="libstatus" id="libStatusCommon">Loading…</div>
+      <div class="libgroups" id="libGroupsCommon"></div>
+    </div>
+
     <div class="panel libpanel">
       <h3>sarah_clips/libs</h3>
       <div class="libstatus" id="libStatus">Loading…</div>

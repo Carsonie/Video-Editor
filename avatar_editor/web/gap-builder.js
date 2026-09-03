@@ -30,6 +30,11 @@
 // where you are in the scene's own combined-frame review.
 const libStatus = document.getElementById('libStatus');
 const libGroups = document.getElementById('libGroups');
+// The second, duplicated panel — Sarah's COMMON library (Sarah/ at the
+// repo root), beside this one. Same rendering function, a different
+// source and a different pair of DOM elements — see renderLibSource().
+const libStatusCommon = document.getElementById('libStatusCommon');
+const libGroupsCommon = document.getElementById('libGroupsCommon');
 const humanSize = b => b < 1024 ? `${b}B` : b < 1048576 ? `${(b / 1024).toFixed(0)}KB` : `${(b / 1048576).toFixed(1)}MB`;
 
 // ── the player ───────────────────────────────────────────────────────────
@@ -431,6 +436,15 @@ function doPaste(insertAt) {
     : `Pasted ${n} frame(s).`;
 }
 
+// `f.source` ('store' | 'common') says which library the clip came from,
+// and travels on every PICKED/LIB_FRAMES entry from here on — the server
+// needs it on every later /api/lib_frames or /api/lib_media call, since
+// Sarah/ and a store's own sarah_clips/libs/ are siblings, not one nested
+// in the other, so a bare path is ambiguous between them. `path` itself
+// stays the identity key for lookups (PICKED.filter(c => c.path !== ...)
+// below): the two sources' paths can never collide, because a store path
+// always carries that store's own long Customers/-relative prefix and a
+// common path never does.
 async function toggleLibClip(f, checked) {
   if (!checked) {
     PICKED = PICKED.filter(c => c.path !== f.path);
@@ -440,19 +454,95 @@ async function toggleLibClip(f, checked) {
     return;
   }
   try {
-    const r = await fetch(`/api/lib_frames?path=${encodeURIComponent(f.path)}`);
+    const r = await fetch(`/api/lib_frames?source=${f.source}&path=${encodeURIComponent(f.path)}`);
     const d = await r.json();
     if (d.error) { libStatus.textContent = `${f.name}: ${d.error}`; return; }
     // has_audio is MEASURED server-side (see has_audible() in serve.py) —
     // every .webm in this library carries an Opus stream, including the
     // silent idle loops, so "has a stream" was never the right question.
     PICKED.push({path: f.path, name: f.name, n: d.n, slug: d.slug, ext: d.ext,
-                 has_audio: !!f.has_audio});
+                 has_audio: !!f.has_audio, source: f.source});
     rebuildLibFrames();
     OriginalAudio.rebuild();   // the stack follows every checkbox
     savePickedForCurrentPair();
   } catch (e) {
     libStatus.textContent = `${f.name}: ${e.message}`;
+  }
+}
+
+// Renders one library's groups into its own panel — the exact same DOM
+// shape whichever of the two panels this is. `source` ('store'|'common')
+// is what makes it possible to tell the two apart afterwards: it rides on
+// every clip object this builds, and every later fetch (toggleLibClip,
+// the Play buttons, Working Clips) reads it straight off the clip rather
+// than asking which panel it came from.
+//
+// LIB_ORDER — the FLAT, combined display order both panels' checked
+// clips share, for OriginalAudio's stack (Carson's rule: it plays down
+// the list the way you read it) — is appended to, not reset, so calling
+// this once per panel in the same pass builds one continuous order:
+// whatever the COMMON panel shows, top to bottom, then the STORE panel's,
+// top to bottom — left to right, the same order the two panels sit in on
+// screen.
+function renderLibSource(d, groupsEl, statusEl, source, savedPaths) {
+  const total = d.groups.reduce((s, g) => s + g.files.length, 0);
+  statusEl.textContent = `${d.root} — ${total} file(s)`;
+  groupsEl.innerHTML = '';
+  for (const g of d.groups) {
+    const box = document.createElement('div');
+    box.className = 'libgroup';
+    const head = document.createElement('h4');
+    head.textContent = `${g.folder} (${g.files.length})`;
+    box.appendChild(head);
+    if (!g.files.length) {
+      const e = document.createElement('div');
+      e.className = 'libempty';
+      e.textContent = 'empty';
+      box.appendChild(e);
+    }
+    for (const f of g.files) {
+      LIB_ORDER.push(f.path);   // display order, for OriginalAudio's stack
+      const row = document.createElement('div');
+      row.className = 'libfile';
+      const meta = f.dur != null ? `${f.dur}s` : humanSize(f.size);
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.title = `Inspect ${f.name}'s frames below`;
+      cb.onchange = () => toggleLibClip(f, cb.checked);
+      const name = document.createElement('span');
+      name.className = 'name';
+      // Sound Bits: a short label (the scene name a "01-" prefix and the
+      // extension stripped off) with the FULL spoken line as its tooltip
+      // — f.line comes from that scene's own script.json (see
+      // libs_list()'s server-side comment), so the words shown here are
+      // never retyped from anywhere. Every other group keeps the plain
+      // filename it always has.
+      if (g.folder === 'sound_bits') {
+        const label = f.name.replace(/\.[^.]+$/, '').replace(/^\d+-/, '');
+        name.title = f.line || f.name;
+        name.textContent = label;
+      } else {
+        name.title = f.name; name.textContent = f.name;
+      }
+      const metaEl = document.createElement('span');
+      metaEl.className = 'meta'; metaEl.textContent = meta;
+      row.appendChild(cb); row.appendChild(name); row.appendChild(metaEl);
+      if (g.folder === 'sound_bits') {
+        const playBtn = document.createElement('button');
+        playBtn.type = 'button';
+        playBtn.className = 'soundBitPlay';
+        playBtn.textContent = '▶';
+        playBtn.title = f.line ? `Play: "${f.line}"` : 'Play this clip';
+        playBtn.onclick = () => OriginalAudio.playClip(f, name.textContent);
+        row.appendChild(playBtn);
+      }
+      box.appendChild(row);
+      if (savedPaths.has(f.path)) {
+        cb.checked = true;
+        toggleLibClip(f, true);
+      }
+    }
+    groupsEl.appendChild(box);
   }
 }
 
@@ -462,82 +552,55 @@ async function loadLibs() {
   // A fresh pair may be a different STORE, so both are re-resolved below,
   // never carried over from whatever pair was open before.
   restPosePath = null;
+  restPoseSource = null;
   restPoseFrame = null;
+  LIB_ORDER = [];
+
+  // What was checked for THIS pair last time — a refresh, or coming back
+  // to a scene already visited this session, both restore it. Shared by
+  // both panels: PICKED can hold entries from either source, and their
+  // paths never collide (a store path always carries that store's own
+  // long Customers/-relative prefix; a common path never does), so one
+  // Set correctly re-ticks the right box in whichever panel it belongs to.
+  const rec = SCENE && loadStore().pairs?.[pairKey(SCENE.base_rel, SCENE.over_rel)];
+  const savedPaths = new Set((rec?.picked || []).map(c => c.path));
+
+  // COMMON first, so its clips sort ahead of the store's own in LIB_ORDER
+  // — matching the two panels' left-to-right order on screen. Independent
+  // try/catch: a broken store fetch should not also blank the common
+  // panel, and Sarah/ not existing yet on a fresh checkout shouldn't block
+  // the store's own library from loading.
+  try {
+    const r = await fetch('/api/libs_list?source=common');
+    const d = await r.json();
+    if (d.error) { libStatusCommon.textContent = d.error; }
+    else if (!d.root) { libStatusCommon.textContent = 'No Sarah/ folder found.'; }
+    else {
+      // The one file every library carries under this exact name — see
+      // Sarah/README.md's "rest pose" section. Checked here FIRST: Sarah/
+      // is the canonical, single source for it now (Carson's own split,
+      // 2026-09-03) — a store's own copy under the store branch below is
+      // only used as a fallback for a pair whose common library hasn't
+      // been checked yet.
+      for (const g of d.groups)
+        for (const f of g.files)
+          if (f.name === REST_POSE_NAME) { restPosePath = f.path; restPoseSource = 'common'; }
+      renderLibSource(d, libGroupsCommon, libStatusCommon, 'common', savedPaths);
+    }
+  } catch (e) {
+    libStatusCommon.textContent = `Couldn't load: ${e.message}`;
+  }
+
   try {
     const r = await fetch(`/api/libs_list?${pairQS()}`);
     const d = await r.json();
     if (d.error) { libStatus.textContent = d.error; return; }
     if (!d.root) { libStatus.textContent = 'No sarah_clips/libs/ folder for this store yet.'; return; }
-    const total = d.groups.reduce((s, g) => s + g.files.length, 0);
-    libStatus.textContent = `${d.root} — ${total} file(s)`;
-    libGroups.innerHTML = '';
-    // The one file every store's library carries under this exact name —
-    // see Sarah/README.md's "rest pose" section. Found here, once per
-    // pair, rather than re-searched on every Controller Menu click.
-    for (const g of d.groups)
-      for (const f of g.files)
-        if (f.name === REST_POSE_NAME) restPosePath = f.path;
-    // What was checked for THIS pair last time — a refresh, or coming
-    // back to a scene already visited this session, both restore it.
-    const rec = SCENE && loadStore().pairs?.[pairKey(SCENE.base_rel, SCENE.over_rel)];
-    const savedPaths = new Set((rec?.picked || []).map(c => c.path));
-    LIB_ORDER = [];
-    for (const g of d.groups) {
-      const box = document.createElement('div');
-      box.className = 'libgroup';
-      const head = document.createElement('h4');
-      head.textContent = `${g.folder} (${g.files.length})`;
-      box.appendChild(head);
-      if (!g.files.length) {
-        const e = document.createElement('div');
-        e.className = 'libempty';
-        e.textContent = 'empty';
-        box.appendChild(e);
-      }
-      for (const f of g.files) {
-        LIB_ORDER.push(f.path);   // display order, for OriginalAudio's stack
-        const row = document.createElement('div');
-        row.className = 'libfile';
-        const meta = f.dur != null ? `${f.dur}s` : humanSize(f.size);
-        const cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.title = `Inspect ${f.name}'s frames below`;
-        cb.onchange = () => toggleLibClip(f, cb.checked);
-        const name = document.createElement('span');
-        name.className = 'name';
-        // Sound Bits: a short label (the scene name a "01-" prefix and the
-        // extension stripped off) with the FULL spoken line as its tooltip
-        // — f.line comes from that scene's own script.json (see
-        // libs_list()'s server-side comment), so the words shown here are
-        // never retyped from anywhere. Every other group keeps the plain
-        // filename it always has.
-        if (g.folder === 'sound_bits') {
-          const label = f.name.replace(/\.[^.]+$/, '').replace(/^\d+-/, '');
-          name.title = f.line || f.name;
-          name.textContent = label;
-        } else {
-          name.title = f.name; name.textContent = f.name;
-        }
-        const metaEl = document.createElement('span');
-        metaEl.className = 'meta'; metaEl.textContent = meta;
-        row.appendChild(cb); row.appendChild(name); row.appendChild(metaEl);
-        if (g.folder === 'sound_bits') {
-          const playBtn = document.createElement('button');
-          playBtn.type = 'button';
-          playBtn.className = 'soundBitPlay';
-          playBtn.textContent = '▶';
-          playBtn.title = f.line ? `Play: "${f.line}"` : 'Play this clip';
-          playBtn.onclick = () => OriginalAudio.playClip(f, name.textContent);
-          row.appendChild(playBtn);
-        }
-        box.appendChild(row);
-        if (savedPaths.has(f.path)) {
-          cb.checked = true;
-          toggleLibClip(f, true);
-        }
-      }
-      libGroups.appendChild(box);
-    }
+    if (restPosePath === null)
+      for (const g of d.groups)
+        for (const f of g.files)
+          if (f.name === REST_POSE_NAME) { restPosePath = f.path; restPoseSource = 'store'; }
+    renderLibSource(d, libGroups, libStatus, 'store', savedPaths);
   } catch (e) {
     libStatus.textContent = `Couldn't load: ${e.message}`;
   }
@@ -600,23 +663,27 @@ let libArmed = false;
 // not something a refresh should be expected to bring back.
 let CLIPBOARD = [];
 
-// The standardized "rest pose" — Sarah, settled, not speaking. Every
-// store's sarah_clips/libs/stills/ carries it under this exact name (see
-// Sarah/README.md). restPosePath is found once per pair inside loadLibs()
-// above; restPoseFrame is the actual {url, clip, local} for it, fetched
-// lazily on first use and kept — it never changes mid-pair, so there is
-// no reason to ask the server for it twice.
+// The standardized "rest pose" — Sarah, settled, not speaking. Sarah/'s
+// own stills/ is now the canonical source for it (Carson's own split,
+// 2026-09-03; see Sarah/README.md), with a store's own sarah_clips/libs/
+// stills/ copy as a fallback — see loadLibs() above, which checks common
+// first. restPosePath+restPoseSource are found once per pair there;
+// restPoseFrame is the actual {url, clip, local} for it, fetched lazily on
+// first use and kept — it never changes mid-pair, so there is no reason to
+// ask the server for it twice.
 const REST_POSE_NAME = 'sarah-rest-pose-corner-300-alpha.png';
 let restPosePath = null;
+let restPoseSource = null;
 let restPoseFrame = null;
 
 async function getRestPoseFrame() {
   if (restPoseFrame) return restPoseFrame;
   if (!restPosePath) return null;
-  const r = await fetch(`/api/lib_frames?path=${encodeURIComponent(restPosePath)}`);
+  const r = await fetch(`/api/lib_frames?source=${restPoseSource}&path=${encodeURIComponent(restPosePath)}`);
   const d = await r.json();
   if (d.error) return null;
-  const clip = {path: restPosePath, name: REST_POSE_NAME, n: d.n, slug: d.slug, ext: d.ext};
+  const clip = {path: restPosePath, name: REST_POSE_NAME, n: d.n, slug: d.slug, ext: d.ext,
+                source: restPoseSource};
   restPoseFrame = {url: libFrameUrl(clip, 0), clip, local: 0};
   return restPoseFrame;
 }

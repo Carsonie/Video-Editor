@@ -217,7 +217,11 @@ const FramePlayer = (function () {
       nameEl.textContent = text;
       currentPath = f.path;
       currentClip = f;
-      video.src = `/api/lib_media?path=${encodeURIComponent(f.path)}`;
+      // f.source ('store'|'common') says which library this clip's file
+      // lives under — Sarah/ and a store's own sarah_clips/libs/ are
+      // siblings, not one nested in the other, so the server needs it to
+      // know which root to resolve `path` against.
+      video.src = `/api/lib_media?source=${f.source}&path=${encodeURIComponent(f.path)}`;
       video.playbackRate = +rateEl.value;
       video.play();
       player.scrollIntoView({block: 'nearest'});

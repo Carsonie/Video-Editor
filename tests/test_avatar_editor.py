@@ -34,8 +34,10 @@ WHAT THIS PROVES THAT test_editor.py CANNOT
     opposite half — the Gap Builder — was the one removed instead.
 """
 import argparse
+import ast
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -235,6 +237,117 @@ def s_libs_list_paths():
           os.path.isfile(os.path.join(fixture.CUSTOMERS, sample["path"])),
           sample["path"])
 
+    # Every one of the 7 KNOWN folders shows up, EVEN a store that has
+    # nothing filed in one yet — Carson's own call (2026-09-03): the panel
+    # always shows the full taxonomy at a glance, "(0)" included, rather
+    # than a folder only appearing once something is put in it. ski-demo's
+    # own sarah_clips/libs/ has no openings/ or closings/ on disk, so this
+    # is exactly the case that would otherwise go missing.
+    present = {g["folder"]: len(g["files"]) for g in d.get("groups", [])}
+    check("openings shows even though nothing is filed there yet",
+          present.get("openings") == 0, present.get("openings"))
+    check("closings shows even though nothing is filed there yet",
+          present.get("closings") == 0, present.get("closings"))
+    check("all 5 folders that DO have files still show their real counts",
+          present.get("gap-fillers", 0) > 0 and present.get("idle", 0) > 0
+          and present.get("stills", 0) > 0 and present.get("transitions", 0) > 0
+          and present.get("sound_bits", 0) > 0, present)
+    check("every entry is tagged source='store'",
+          all(f.get("source") == "store" for f in files), files[:1])
+
+
+def s_common_library():
+    """
+    Sarah's COMMON library — Sarah/ at the repo root, the same across every
+    store (Carson's own split, 2026-09-03; see Sarah/README.md). A second,
+    independent /api/libs_list?source=common, alongside the per-store one
+    above rather than replacing it — a store's own sarah_clips/libs/ still
+    holds the clips DEVELOPED for that one video.
+
+    Also proves the one real security boundary this split needed: Sarah/
+    sits BESIDE Customers/, not inside it, so /api/lib_frames and
+    /api/lib_media have to resolve `path` against a DIFFERENT root
+    depending on `source` — get that wrong in either direction and a
+    request either 400s on a real file or, worse, reads outside the root
+    it was supposed to be confined to.
+    """
+    step("Sarah's common library — /api/libs_list?source=common")
+    d, code = fb_get("/api/libs_list", source="common")
+    eq("200", code, 200)
+    eq("root is Sarah", d.get("root"), "Sarah")
+    files = [f for g in d.get("groups", []) for f in g.get("files", [])]
+    check("finds real files", len(files) > 0, len(files))
+    check("every entry is tagged source='common'",
+          all(f.get("source") == "common" for f in files), files[:1])
+    sample = next(f for f in files if f["name"] == "sarah-rest-pose-corner-300-alpha.png")
+    check("its path is real, resolved against Sarah/ — not Customers/",
+          os.path.isfile(os.path.join(fixture.REPO, "Sarah", sample["path"])),
+          sample["path"])
+    present = {g["folder"]: len(g["files"]) for g in d.get("groups", [])}
+    check("same 7-folder taxonomy as the store's own library",
+          set(present) >= {"openings", "gap-fillers", "idle", "stills",
+                            "transitions", "sound_bits", "closings"}, present)
+    # The 11 sound bits copied in from ski-demo — a real bug, caught live:
+    # they first landed one level deeper (sound_bits/HeyGen-originals/),
+    # invisible to a listing that only walks ONE level down. Flattened to
+    # match every other folder; this guards it staying that way.
+    check("sound_bits are flat, not nested — the folder walk is one level deep",
+          present.get("sound_bits", 0) >= 11, present.get("sound_bits"))
+
+    step("source=common resolves against Sarah/, never against Customers/")
+    d2, code2 = fb_get("/api/lib_frames", source="common", path=sample["path"])
+    eq("200", code2, 200)
+    eq("kind is still", d2.get("kind"), "still")
+    # The exact escape a naive "just reuse safe_join" would have allowed:
+    # a relative climb OUT of Sarah/ and back into Customers/.
+    d3, code3 = fb_get("/api/lib_frames", source="common",
+                        path=f"../Customers/{fixture.ROOT_REL}")
+    eq("...a path escaping Sarah/ is refused, not resolved", code3, 400)
+    # And the reverse: the STORE endpoint must never accept a Sarah/-only
+    # path just because source was left off (defaults to 'store').
+    d4, code4 = fb_get("/api/lib_frames", path=sample["path"])
+    eq("...and Sarah/'s own paths are foreign to the store root", code4, 400)
+
+    step("source=common media — the real bytes, not just metadata")
+    url = f"{AE_BASE}/api/lib_media?source=common&path=" + urllib.parse.quote(
+        next(f["path"] for f in files if f["name"].endswith(".webm") and f.get("has_audio")))
+    with urllib.request.urlopen(url, timeout=30) as r:
+        eq("200", r.status, 200)
+        check("real bytes came back", len(r.read(1024)) > 0)
+
+
+def s_libs_group_order():
+    """
+    LIBS_GROUP_ORDER in avatar_editor/serve.py names the fixed display
+    order for sarah_clips/libs/'s subfolders — and, per Carson's own
+    direction (2026-09-03), those 7 names are also the top-level Sarah/
+    folder's own 7 subfolders (Sarah/README.md's reference stash), so a
+    store's own library and Sarah's reference library agree on what a
+    "kind" of clip is called. Checked against Sarah/ ON DISK rather than a
+    second hardcoded list, so this fails the moment the two drift apart in
+    either direction — a folder added to one and not the other.
+    """
+    step("sarah_clips/libs/'s 7 folder names line up with Sarah/'s own")
+    serve_src = open(os.path.join(fixture.REPO, "avatar_editor", "serve.py")).read()
+    m = re.search(r'LIBS_GROUP_ORDER = (\[[^\]]+\])', serve_src)
+    check("LIBS_GROUP_ORDER is defined", m is not None)
+    order = ast.literal_eval(m.group(1)) if m else []
+
+    sarah_dir = os.path.join(fixture.REPO, "Sarah")
+    on_disk = sorted(n for n in os.listdir(sarah_dir)
+                      if os.path.isdir(os.path.join(sarah_dir, n)) and not n.startswith("."))
+    check("exactly 7 folders", len(order) == 7, order)
+    eq("the same 7 names as Sarah/ itself", sorted(order), on_disk)
+
+    # And the real endpoint honours that order for whichever of the 6
+    # ski-demo actually has files in — closings/ has none there today, so
+    # this checks the ORDER of what's present, not that all 6 show up.
+    d, code = fb_get("/api/libs_list", base=SKI_SEG, overlay=SKI_AV)
+    eq("200", code, 200)
+    present = [g["folder"] for g in d.get("groups", [])]
+    ranked = sorted(present, key=lambda f: order.index(f) if f in order else len(order))
+    eq("groups come back in LIBS_GROUP_ORDER's order", present, ranked)
+
 
 def s_lib_frames_clip():
     """
@@ -373,6 +486,53 @@ def s_working_clips():
     # ── logging
     for field in ("wcIdle", "wcTransitions", "wcSoundBits", "wcActive", "wcActiveN"):
         check(f"every click logs {field}", f"{field}:" in gb)
+
+
+def s_common_library_wiring():
+    """
+    The client half of the common-library split (2026-09-03): a second
+    library panel beside the store's own, feeding the SAME Frame Selector /
+    Clip-Gap Builder / Audio Menu — Carson's own call, so a build can mix
+    clips from both. HTTP cannot tick a checkbox, so what's asserted here
+    is the WIRING: the second panel exists with its own elements, and every
+    later request a checked clip triggers carries the `source` that says
+    which root to resolve it against.
+    """
+    step("the common library panel exists and is wired through, not bolted on")
+    html = urllib.request.urlopen(AE_BASE + "/", timeout=10).read().decode()
+    gb = urllib.request.urlopen(AE_BASE + "/web/gap-builder.js", timeout=10).read().decode()
+    fp = urllib.request.urlopen(AE_BASE + "/web/frame-player.js", timeout=10).read().decode()
+
+    for el in ("libGroupsCommon", "libStatusCommon"):
+        check(f"the common panel has its own {el}", f'id="{el}"' in html)
+    check("it is a real second panel, not a rename of the store's own",
+          html.count('id="libGroups"') == 1 and html.count('id="libGroupsCommon"') == 1)
+
+    check("one render function serves both panels",
+          "function renderLibSource(d, groupsEl, statusEl, source, savedPaths)" in gb)
+    check("loadLibs fetches the common library", "source=common" in gb)
+    check("...and the store's own, unchanged", "fetch(`/api/libs_list?${pairQS()}`)" in gb)
+    # Common renders FIRST, so its clips sort ahead of the store's own in
+    # LIB_ORDER — the same left-to-right order the two panels sit in.
+    common_at = gb.find("renderLibSource(d, libGroupsCommon")
+    store_at = gb.find("renderLibSource(d, libGroups, libStatus, 'store'")
+    check("common is rendered before the store panel, matching their on-screen order",
+          -1 < common_at < store_at, (common_at, store_at))
+
+    # Every request a checked clip triggers has to carry `source` — Sarah/
+    # and a store's own sarah_clips/libs/ are siblings, not one inside the
+    # other, so a bare path is ambiguous between them.
+    check("checking a clip asks for ITS OWN source's frames",
+          "/api/lib_frames?source=${f.source}&path=" in gb)
+    check("PICKED remembers which library each clip came from",
+          "source: f.source" in gb)
+    check("playing a clip's audio carries its source too",
+          "/api/lib_media?source=${f.source}&path=" in fp)
+    # The rest pose is looked up in the common library FIRST, a store's own
+    # copy only as a fallback — Sarah/ is the canonical source for it now.
+    check("the rest pose prefers the common library",
+          "restPosePath = f.path; restPoseSource = 'common';" in gb)
+    check("...falling back to the store's own copy", "restPoseSource = 'store';" in gb)
 
 
 def s_tooltips():
@@ -637,9 +797,10 @@ def s_original_audio_stack():
               f'<video id="{vid}" playsinline hidden>' in html)
 
 
-FUNCTIONS = [s_static_page, s_app_js_parses, s_original_audio_stack, s_working_clips, s_tooltips, s_stateless, s_load_picker, s_load_store,
+FUNCTIONS = [s_static_page, s_app_js_parses, s_original_audio_stack, s_working_clips, s_common_library_wiring, s_tooltips, s_stateless, s_load_picker, s_load_store,
              s_save_scene_proxy,
-             s_libs_list_paths, s_lib_frames_clip, s_lib_frames_still]
+             s_libs_list_paths, s_common_library, s_libs_group_order,
+             s_lib_frames_clip, s_lib_frames_still]
 
 
 def main():

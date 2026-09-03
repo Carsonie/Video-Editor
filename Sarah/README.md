@@ -5,9 +5,9 @@ Anything held on screen for more than a frame or two should match these.
 
 ## The rest pose — how she must look whenever she is NOT speaking
 
-`sarah-rest-pose-full-alpha.png` — 608×1080, RGBA, real alpha
-`sarah-rest-pose-corner-300-alpha.png` — the 300×300 corner crop the video uses
-`sarah-rest-pose-corner-300-preview.png` — the same over the app's `#212121`, to look at
+`stills/sarah-rest-pose-full-alpha.png` — 608×1080, RGBA, real alpha
+`stills/sarah-rest-pose-corner-300-alpha.png` — the 300×300 corner crop the video uses
+`stills/sarah-rest-pose-corner-300-preview.png` — the same over the app's `#212121`, to look at
 
 **Eyes open, looking at camera, mouth closed, faint neutral smile, head level.**
 
@@ -27,9 +27,9 @@ almost all mid-word.
 
 ## "Uncertainty" — the softer, asymmetric look
 
-`sarah-uncertainty-full-alpha.png` — 608×1080, RGBA
-`sarah-uncertainty-corner-300-alpha.png` — the 300×300 corner crop
-`sarah-uncertainty-corner-300-preview.png` — over `#212121`, to look at
+`stills/sarah-uncertainty-full-alpha.png` — 608×1080, RGBA
+`stills/sarah-uncertainty-corner-300-alpha.png` — the 300×300 corner crop
+`stills/sarah-uncertainty-corner-300-preview.png` — over `#212121`, to look at
 
 Eyes open and mouth closed like the rest pose, but the head sits very slightly
 turned and the expression reads softer — hesitant rather than composed.

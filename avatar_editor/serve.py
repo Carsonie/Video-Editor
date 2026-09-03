@@ -54,7 +54,8 @@ WHAT IT SERVES
     GET  /api/stores                          JSON: every business/store and its videos
     GET  /api/open_pair?base=&overlay=        JSON: slugs, frame counts, label
     GET  /api/libs_list?base=                 JSON: the store's sarah_clips/libs
-    GET  /api/lib_media?path=                 a library file's raw bytes, audio intact
+    GET  /api/libs_list?source=common         JSON: Sarah's own COMMON library (Sarah/)
+    GET  /api/lib_media?path=&source=         a library file's raw bytes, audio intact
     GET  /api/load_store?path=                JSON: standalone — see siblings()/load_store()
     POST /api/save_scene, /api/undo_scene     standalone — see save_scene()
     POST /api/gap_log                         appends a Gap Builder click to logs/avatar_editor_gap_builder_<date>.log
@@ -84,6 +85,20 @@ import serve as main_serve                                # noqa: E402  for its 
 from serve import safe_join, CUSTOMERS_ROOT               # noqa: E402
 import build_scenes                                       # noqa: E402  reuse its real ffmpeg recipe
 import paths as PTH                                       # noqa: E402  script()/sandbox_root() — see stores()
+
+SARAH_ROOT = os.path.join(ROOT, "Sarah")                 # her common library — see Sarah/README.md
+
+
+def safe_join_sarah(rel):
+    """Resolve `rel` under SARAH_ROOT; return None if it would escape. Same
+    shape as shared/serve.py's own safe_join(), scoped to Sarah/ instead of
+    Customers/ — the common library lives OUTSIDE Customers/, so the
+    existing safe_join refuses every path into it, correctly."""
+    rel = (rel or "").strip("/")
+    target = os.path.normpath(os.path.join(SARAH_ROOT, rel))
+    if target != SARAH_ROOT and not target.startswith(SARAH_ROOT + os.sep):
+        return None
+    return target
 
 
 # This tool's own action labels, set as main_serve.ACTIONS in main() (same
@@ -564,14 +579,113 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     # future folder not in this list still shows up (libs_list() has always
     # auto-discovered whatever subfolders exist, unchanged here) — it just
     # sorts alphabetically after all of these.
-    LIBS_GROUP_ORDER = ["gap-fillers", "idle", "stills", "transitions", "sound_bits"]
+    #
+    # These 7 are also the top-level Sarah/ folder's own 7 subfolders (its
+    # reference stash — see Sarah/README.md), so the two line up: a store's
+    # sarah_clips/libs/ and Sarah/ agree on what a "kind" of clip is called,
+    # even though today only Sarah/ has anything IN openings/ or closings/.
+    # "closings"/"openings" (not the singular) match Sarah/'s own names.
+    #
+    # openings first, closings last — the two bookend the other 5, the same
+    # order they'd actually play in a finished video.
+    LIBS_GROUP_ORDER = ["openings", "gap-fillers", "idle", "stills", "transitions",
+                         "sound_bits", "closings"]
+
+    def _group_key(self, folder):
+        try:
+            return (self.LIBS_GROUP_ORDER.index(folder), folder)
+        except ValueError:
+            return (len(self.LIBS_GROUP_ORDER), folder)
+
+    def _list_groups(self, libs_dir, path_root, source, label_lines):
+        """
+        Shared by both halves of libs_list() below — everything from here
+        down is identical whichever library is being read; only WHERE
+        libs_dir/path_root point differs. `source` ('store'|'common')
+        travels on every file entry, because the client needs it on every
+        later /api/lib_frames or /api/lib_media call to know which root to
+        resolve `path` against — Sarah/ and Customers/ are siblings, not
+        one inside the other, so a bare path alone is ambiguous between
+        them.
+
+        Every one of the 7 KNOWN folders shows up, even one with nothing
+        filed in it yet — Carson's own call, so the panel always shows the
+        full taxonomy at a glance ("(0)"), rather than a folder only
+        appearing once something is filed in it. Union with whatever ELSE
+        actually exists on disk: an unknown folder someone drops in still
+        shows too, sorted after these 7.
+        """
+        found = {n for n in os.listdir(libs_dir)
+                 if os.path.isdir(os.path.join(libs_dir, n))}
+        all_folders = set(self.LIBS_GROUP_ORDER) | found
+
+        groups = []
+        for folder in sorted(all_folders, key=self._group_key):
+            fdir = os.path.join(libs_dir, folder)
+            files = []
+            if not os.path.isdir(fdir):
+                groups.append({"folder": folder, "files": files})
+                continue
+            for name in sorted(os.listdir(fdir)):
+                if name.startswith("."):
+                    continue
+                p = os.path.join(fdir, name)
+                if not os.path.isfile(p):
+                    continue
+                # has_audio is answered for EVERY file, stills included — a
+                # missing key reads as "unknown", and the page's Play runs
+                # need a plain yes/no to filter on.
+                entry = {"name": name, "size": os.path.getsize(p),
+                         "path": os.path.relpath(p, path_root),
+                         "source": source, "has_audio": False}
+                if name.lower().endswith((".webm", ".mp4", ".mov")):
+                    # A .webm here is always a transparent HeyGen render —
+                    # same rule shared/serve.py's is_alpha() uses, inlined
+                    # rather than importing one more name for one check.
+                    try:
+                        entry["dur"] = round(float(build_scenes.probe(
+                            p, alpha=name.lower().endswith(".webm"))[1]), 2)
+                    except Exception:
+                        entry["dur"] = None
+                    # Whether there is a voice in it, MEASURED — the Play
+                    # runs skip silent clips, and the buttons only go green
+                    # when something audible is actually there to play.
+                    entry["has_audio"] = has_audible(p)
+                if folder == "sound_bits":
+                    label = re.sub(r"^\d+-", "", os.path.splitext(name)[0])
+                    if label in label_lines:
+                        entry["line"] = label_lines[label]
+                files.append(entry)
+            groups.append({"folder": folder, "files": files})
+        return groups
 
     def libs_list(self, qs):
         """
-        GET /api/libs_list -> every file under this pair's sarah_clips/libs/,
-        grouped by subfolder — the gap-filler library (see its own README).
-        Read-only: this only reports what's there, it never writes to it.
+        GET /api/libs_list?base=&overlay=       every file under that pair's
+                                                 sarah_clips/libs/ — the clips
+                                                 DEVELOPED for that one store's
+                                                 video, never shared elsewhere.
+        GET /api/libs_list?source=common        every file under the top-level
+                                                 Sarah/ folder instead — her
+                                                 COMMON library, the same
+                                                 across every store (Carson's
+                                                 own split, 2026-09-03; see
+                                                 Sarah/README.md). No base/
+                                                 overlay needed: this one
+                                                 isn't tied to any open pair.
+
+        Read-only either way: this only reports what's there, it never
+        writes to it.
         """
+        if (qs.get("source") or [""])[0] == "common":
+            if not os.path.isdir(SARAH_ROOT):
+                return self._relay(200, {"root": None, "groups": []})
+            # Not tied to any one store's script, so sound_bits here always
+            # fall back to their filename — there is no single script.json
+            # to read a spoken line from.
+            groups = self._list_groups(SARAH_ROOT, SARAH_ROOT, "common", {})
+            return self._relay(200, {"root": "Sarah", "groups": groups})
+
         base_p, _, _, _ = self._pair_from(qs)
         if base_p is None:
             return
@@ -598,55 +712,38 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             except Exception:
                 pass
 
-        def sort_key(folder):
-            try:
-                return (self.LIBS_GROUP_ORDER.index(folder), folder)
-            except ValueError:
-                return (len(self.LIBS_GROUP_ORDER), folder)
-
-        groups = []
-        for folder in sorted(os.listdir(libs_dir), key=sort_key):
-            fdir = os.path.join(libs_dir, folder)
-            if not os.path.isdir(fdir):
-                continue
-            files = []
-            for name in sorted(os.listdir(fdir)):
-                if name.startswith("."):
-                    continue
-                p = os.path.join(fdir, name)
-                if not os.path.isfile(p):
-                    continue
-                # has_audio is answered for EVERY file, stills included — a
-                # missing key reads as "unknown", and the page's Play runs
-                # need a plain yes/no to filter on.
-                entry = {"name": name, "size": os.path.getsize(p),
-                         "path": os.path.relpath(p, CUSTOMERS_ROOT),
-                         "has_audio": False}
-                if name.lower().endswith((".webm", ".mp4", ".mov")):
-                    # A .webm here is always a transparent HeyGen render —
-                    # same rule shared/serve.py's is_alpha() uses, inlined
-                    # rather than importing one more name for one check.
-                    try:
-                        entry["dur"] = round(float(build_scenes.probe(
-                            p, alpha=name.lower().endswith(".webm"))[1]), 2)
-                    except Exception:
-                        entry["dur"] = None
-                    # Whether there is a voice in it, MEASURED — the Play
-                    # runs skip silent clips, and the buttons only go green
-                    # when something audible is actually there to play.
-                    entry["has_audio"] = has_audible(p)
-                if folder == "sound_bits":
-                    label = re.sub(r"^\d+-", "", os.path.splitext(name)[0])
-                    if label in label_lines:
-                        entry["line"] = label_lines[label]
-                files.append(entry)
-            groups.append({"folder": folder, "files": files})
-
+        groups = self._list_groups(libs_dir, CUSTOMERS_ROOT, "store", label_lines)
         self._relay(200, {"root": os.path.relpath(libs_dir, CUSTOMERS_ROOT), "groups": groups})
+
+    def _lib_path(self, qs):
+        """
+        Resolve `path` against the right root for `source` ('store', the
+        default -> CUSTOMERS_ROOT; 'common' -> SARAH_ROOT). Shared by
+        lib_frames and lib_media, which differ only in what they DO with
+        the resolved file. Sarah/ sits BESIDE Customers/, not inside it,
+        so which root applies can never be guessed from the path alone —
+        the client carries `source` on every clip it got from libs_list()
+        and passes it straight back here.
+
+        Returns (path, None) on success, or (None, <error message string>)
+        on failure — a plain string, not a written response: json_error()
+        itself writes the response and returns nothing, so returning ITS
+        result here would silently swap the error for a None that reads as
+        success.
+        """
+        rel = (qs.get("path") or [""])[0]
+        if not rel:
+            return None, "path is required"
+        common = (qs.get("source") or [""])[0] == "common"
+        p = safe_join_sarah(rel) if common else safe_join(rel)
+        root = "Sarah/" if common else "Customers/"
+        if p is None or not os.path.isfile(p):
+            return None, f"not a file under {root}: {rel}"
+        return p, None
 
     def lib_frames(self, qs):
         """
-        GET /api/lib_frames?path=<rel to a file under sarah_clips/libs/>
+        GET /api/lib_frames?path=<rel to a file under a library>&source=<store|common>
         -> {"kind": "clip"|"still", "n": <frame count>, "slug": <cache dir>,
             "ext": <frame file extension>}
 
@@ -658,12 +755,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         still through the exact same slug+frame URL scheme as a real clip,
         rather than needing a second code path just for stills.
         """
-        rel = (qs.get("path") or [""])[0]
-        if not rel:
-            return self.json_error(400, "path is required")
-        p = safe_join(rel)
-        if p is None or not os.path.isfile(p):
-            return self.json_error(400, f"not a file under Customers/: {rel}")
+        p, err = self._lib_path(qs)
+        if err is not None:
+            return self.json_error(400, err)
 
         ext = os.path.splitext(p)[1].lower()
         if ext in (".png", ".jpg", ".jpeg"):
@@ -686,7 +780,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def lib_media(self, qs):
         """
-        GET /api/lib_media?path=<rel to a file under sarah_clips/libs/>
+        GET /api/lib_media?path=<rel to a file under a library>&source=<store|common>
         -> the raw file, bytes as-is, WITH its audio track intact.
 
         /api/lib_frames above only ever extracts silent picture frames —
@@ -695,12 +789,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         gets its own route straight to the source file, for a <video> tag
         to play directly rather than going through frame extraction at all.
         """
-        rel = (qs.get("path") or [""])[0]
-        if not rel:
-            return self.json_error(400, "path is required")
-        p = safe_join(rel)
-        if p is None or not os.path.isfile(p):
-            return self.json_error(400, f"not a file under Customers/: {rel}")
+        p, err = self._lib_path(qs)
+        if err is not None:
+            return self.json_error(400, err)
         ctype = {".webm": "video/webm", ".mp4": "video/mp4",
                  ".mov": "video/quicktime"}.get(os.path.splitext(p)[1].lower(),
                                                  "application/octet-stream")
