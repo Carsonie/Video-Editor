@@ -166,3 +166,144 @@ next-session steps are in `HANDOFF.md`.
 A crossfade feature has been mid-development in `build/assemble_video.py`
 by someone else this whole time — visible in `git status` throughout, never
 touched, never committed over.
+
+## Four editors, four processes, no shared code (2026-09-02)
+
+By 2026-08-30 Frame Blender had grown real teeth — Save, Undo, Load, a
+real Build — by reaching into the main editor's process (`shared/
+serve.py`, port 8842) for its save/undo/dirty-state machinery, and MP4
+Splitter and the Segment and Avatar Editor still lived together in that
+SAME process, one combined page on one port. Carson's own call, stated
+directly: he was about to develop different functionality in each tool
+and did not want a small change in one to be able to break another —
+code duplication was an accepted, explicit tradeoff for that isolation,
+not an oversight to clean up later.
+
+So, in order: Frame Blender was made to run standalone (own port, own
+save/undo — genuinely reimplemented, not proxied through the other
+process, though it still imports `shared/serve.py`'s PURE helper
+functions as a plain Python module, since that's sharing code, not a
+running process). Then Avatar Editor was created as a full duplicate of
+Frame Blender, to split Carson's own upcoming work between the two
+rather than have one tool do everything. Then MP4 Splitter and the
+Segment and Avatar Editor split apart from each other the same way —
+own port, own cache directory, own duplicated `frames.py`/`paths.py` —
+with one deliberate exception: SAE's "open this scene on its own" link
+still works, via a PRIVATE duplicate of MP4 Splitter's player
+(`_splitter_player.py`), not an import of the real package. Four
+standalone processes, one shared philosophy: **share components, never
+the running process.**
+
+## Splitting the work between Frame Blender and Avatar Editor (2026-09-02)
+
+Avatar Editor started life as a byte-for-byte duplicate of Frame
+Blender — same combine/build UI, same Gap Builder, everything. That
+was a starting POSITION, not the end state: Carson was about to divide
+real work between the two and needed them to already be independent
+processes before the split of WHAT EACH ONE DOES could happen cleanly.
+
+That division landed the same day: Frame Blender kept the two-track
+combine/build job (Overlay/Base panels, Speed dropdown, Build, Save
+MP4) and lost the Gap Builder entirely. Avatar Editor kept only the Gap
+Builder — Sarah's own clip library, the Frame Selector, the Clip-Gap
+Builder that assembles a gap-filler sequence from picked clips — and
+lost the combine/build UI entirely, including its backend routes.
+Neither tool duplicates the other's job anymore; each is a full
+implementation of exactly one half of what "Avatar Editor" used to mean
+as a single duplicate.
+
+Two small corrections happened on top of that split, both from real use
+rather than being planned up front: a "play the original audio to
+compare against my edit" feature was first built around "whichever
+Sound Bit is checked in the library," then corrected — Carson wanted
+each panel's OWN Play button to play whichever clip THAT PANEL is
+actually showing (the Frame Selector's own current frame, the Clip-Gap
+Builder's own current frame), not a third, separately-tracked
+selection. The simpler design was also the one that mirrored existing
+code exactly — `libCurClip`/`showLibFrame` already tracked "what's on
+screen right now" for the Frame Selector; `builderCurClip`/
+`showBuilderFrame` is the same pattern applied to the Clip-Gap Builder,
+not a new mechanism.
+
+## Logging stopped being one shared file (2026-09-02)
+
+Once four editors were genuinely separate processes, sharing ONE
+session log (`logs/editor_<date>.log`) quietly undid part of that
+independence — every tool's actions interleaved in one file, and Frame
+Blender's and Avatar Editor's own entries were labelled `"FB: ..."`
+regardless of which of the two actually did the thing, a leftover from
+when both shared a single `ACTIONS` table built for the old combined
+process. Each of the four now writes to its own dedicated file, with a
+label table trimmed to just the routes that process actually serves —
+the same "own process, own everything" principle the port/cache split
+already established, applied to the one place it had been missed.
+
+## Two editors had never been tested standalone (2026-09-02)
+
+MP4 Splitter and the Segment and Avatar Editor had been running as
+independent processes since 2026-09-01/02, verified by hand at the
+time — curl and a real browser — but neither ever got a permanent,
+automated suite of its own. `test_editor.py` still proved the
+underlying code correct (both started as literal copies of it), but
+nothing proved the STANDALONE server — its own trimmed dispatch table,
+its own cache directory, its own session log — actually held together.
+`tests/test_mp4_splitter.py` and `tests/test_segment_avatar_editor.py`
+closed that gap: 82 and 90 checks, built the same way `test_frame_
+blender.py`/`test_avatar_editor.py` already were, plus a check that
+every route each split deliberately dropped is confirmed truly gone
+rather than just never called.
+
+## Sarah stopped being one folder per store, and became one shared library (2026-09-03)
+
+`sarah_clips/libs` and the top-level `Sarah/` folder had always looked
+related and never actually were: every store's own video kept a private
+copy of stills/idle/transitions/sound-bits, and `Sarah/` sat beside all
+of it as a hand-kept reference stash nothing in the code ever read. The
+question of whether that was intentional had never actually been asked.
+Carson's answer, once it was: no — `Sarah/` should be the real, common
+library, the same across every store, and a store's own `sarah_clips/`
+should hold only what was made specifically for that one video.
+
+That answer reshaped more than the folder: the Avatar Editor gained a
+whole second library panel (`Sarah`, beside the existing per-store one),
+both feeding the same Frame Selector/Clip-Gap Builder/Audio Menu rather
+than being two separate tools bolted together — checking a common clip
+and a store-specific one in the same session had to just work, which
+meant every clip now carries which library it came from (`source`), and
+the server gained a second, separately-scoped path guard, because
+`Sarah/` sits beside `Customers/`, not inside it. ski-demo's own
+organized `sarah_clips/libs/` — now redundant — was archived rather
+than deleted, following the project's own existing `z_History`
+convention (spelled lowercase here, at Carson's own instruction, the
+one deliberate deviation from that convention).
+
+Two real bugs were caught DURING this work, both worth remembering as
+patterns, not just fixes: files copied one folder deeper than a flat
+listing walks are invisible, not an error (`sound_bits/HeyGen-
+originals/` the first time); and a hardcoded path that quietly stops
+resolving does not fail loudly, it just makes the build wrong
+(`build/assemble_video.py`'s own `REST_POSE` constant had already done
+this once, which is exactly why the risk was checked for explicitly
+before the stills PNGs were moved this time, rather than after).
+
+Every doc that had grown up around this — `Sarah/README.md`,
+`Sarah/closings/README.md`, `avatar_editor/README.md`'s own Sarah
+sections, a stale line in `editor-launchers/SKILL.md` — was written at
+a different moment in that history and none of them agreed anymore.
+Consolidated into one file, `.claude/skills/sarah-library/SKILL.md`,
+with `CLAUDE.md` pointing there — the same shape the project had
+already settled on for `vtt` and `editor-launchers`, just not yet
+applied to the thing that had actually drifted the most.
+
+## Test output followed the same "own everything" principle logging did (2026-09-03)
+
+The 2026-09-02 entry above split each editor's session LOG apart, for
+one process to never write into another's file. The same gap existed
+one level over: none of the four newer test suites wrote a log file at
+all — only the old combined `test_editor.py` did, because it was the
+only one anyone had gone back and added that to. Rather than copy the
+same log-plus-report logic into four files, it went into `fixture.py`
+once, since all four already import it — a change to what the report
+looks like only has to happen in one place now, and the four outputs
+can't drift out of shape with each other the way the four editors'
+own `ACTIONS` label tables once had.

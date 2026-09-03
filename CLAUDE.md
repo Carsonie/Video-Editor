@@ -296,7 +296,7 @@ python3 tests/test_editor.py                    # shared/serve.py, port 8842 (ol
 python3 tests/test_mp4_splitter.py               # mp4_splitter/serve.py, port 8845          — 82 checks
 python3 tests/test_segment_avatar_editor.py      # segment_avatar_editor/serve.py, port 8846  — 90 checks
 python3 tests/test_frame_blender.py              # frame_blender/serve.py, port 8843          — 49 checks
-python3 tests/test_avatar_editor.py              # avatar_editor/serve.py, port 8844           — 60 checks
+python3 tests/test_avatar_editor.py              # avatar_editor/serve.py, port 8844           — 210 checks
 ```
 
 `test_editor.py` is the deepest one — one step per disk function, plus a

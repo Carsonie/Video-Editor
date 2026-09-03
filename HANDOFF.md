@@ -4,6 +4,311 @@ Newest work first. One file so there is one place to check for open work.
 
 ---
 
+## 2026-09-03 — Sarah's clips got a real home, and the Avatar Editor now has two library panels
+
+Branch **`next_gen_editors`**. Everything below is **committed AND
+pushed** — `git log` matches `origin/next_gen_editors` exactly, working
+tree clean except `build/assemble_video.py` (not ours, never touch —
+see the standing note further down) and this file. Avatar Editor is at
+**`VERSION` 9**.
+
+### Quick point-form refresher, for picking this back up cold
+
+- Avatar Editor now has TWO side-by-side library panels: **`Sarah`**
+  (her common library, `Sarah/` at the repo root) on the left,
+  **`<store name>` / `<video name>`** (that store's own leftover files
+  in `sarah_clips/`) on the right. Checking a clip in EITHER feeds the
+  SAME Frame Selector / Clip-Gap Builder / Audio Menu below.
+- **Read `.claude/skills/sarah-library/SKILL.md` before touching any of
+  this again.** It is now the one place that explains what Sarah's
+  clips are, where they live, and how the Avatar Editor and the build
+  scripts each use them — CLAUDE.md points here for a reason.
+- ski-demo's own `sarah_clips/libs/` — the old per-store organized
+  library — is **archived**, not deleted: it's at
+  `sarah_clips/z_history/20260903-112319/libs/`. The Avatar Editor's
+  store panel deliberately never looks inside `z_history/`.
+- `Sarah/sarah-scene-12-CORNER-preview-alpha.webm` still sits unsorted
+  at `Sarah/`'s own root — **still unresolved**. Nobody has said what
+  "scene 12" is (this video only has scenes 1–11). Don't guess a folder
+  for it; ask Carson.
+- Test suites now write their own log + report per editor, under
+  `tests/<editor>/` — see "Testing output split apart per editor,
+  too" below before running any of the four.
+- A full **code review of all 4 editors** was done and handed to Carson
+  as a downloadable `.txt` (scorecard + suggestions, not yet acted on).
+  The one finding worth knowing before touching MP4 Splitter or Segment
+  and Avatar Editor: both still build their whole page as one giant
+  Python string (`player.py`, 1,568 and 3,966 lines) — the exact pattern
+  Avatar Editor and Frame Blender already moved off of on 2026-08-30.
+  Neither has a README either. See "Code review of all 4 editors" below
+  for the full scorecard and ranked suggestions — nothing here has been
+  started.
+
+### Sarah's common library — built out, and wired into the Avatar Editor
+
+Started from a plain question: where does `sarah_clips/libs` loading
+actually come from, and does it match the top-level `Sarah/` folder?
+Answer: they were two unrelated things — every store kept its own
+private copy, and `Sarah/` was a hand-kept reference stash nothing read.
+Carson's direction, arrived at over several turns: **`Sarah/` becomes
+the real, common, shared library; a store's own `sarah_clips/` keeps
+only what was developed specifically for that video.**
+
+What that turned into, in order:
+
+1. **The 7-folder taxonomy** — `openings`, `gap-fillers`, `idle`,
+   `stills`, `transitions`, `sound_bits`, `closings` — added to
+   `avatar_editor/serve.py`'s `LIBS_GROUP_ORDER`, and to `Sarah/` itself
+   as real folders (`openings/` was the one that didn't exist yet,
+   confirming Carson's original "7 nested folders" count).
+2. **The 6 loose PNGs at `Sarah/`'s own root** (rest-pose, uncertainty)
+   moved into `stills/`, where they belonged.
+3. **Every real Sarah clip found under ski-demo's `01-first-time-
+   ordering`** (the one finished video — all others are still in
+   progress) that `Sarah/` didn't already have was copied in — never
+   moved, so nothing a build script depends on broke. Files that fit no
+   folder went to `Sarah/`'s own root, Carson's own rule for anything
+   ambiguous. One exception, at his explicit instruction: the old
+   `TRACK_rear_background.mp4` was genuinely MOVED and renamed to
+   `Sarah/login_segment.mp4` — its original really is gone from
+   ski-demo's `sarah_clips/`.
+4. **A second library panel** added to the Avatar Editor — `Sarah`
+   (common) beside the existing per-store one. Backend: `libs_list()`,
+   `lib_frames()` and `lib_media()` all gained a `source` param
+   (`store`|`common`), each clip now carries which library it came
+   from, and a second, separately-scoped path guard (`safe_join_sarah`)
+   keeps `Sarah/` and `Customers/` from ever being confused — tested
+   with a deliberate path-escape attempt, refused correctly. Checking a
+   clip in either panel feeds the SAME toolset (Carson's own call, so a
+   build can mix a common clip with a store-specific one).
+5. **ski-demo's own `sarah_clips/libs/` archived** to
+   `sarah_clips/z_history/<timestamp>/libs/` — worked off the common
+   library from here on. Confirmed the dependency was actually broken
+   (the store panel answers cleanly empty for that pair, not an error),
+   and confirmed no BUILD SCRIPT depends on that per-store `libs/`
+   path — only the Avatar Editor's own browsing UI did.
+6. **The store panel reworked** to browse a store's own `sarah_clips/`
+   ITSELF (not `sarah_clips/libs/`, which is usually empty/archived
+   now) — shows whatever loose files are actually still there, one
+   plain group, `z_history/` deliberately excluded from the browse.
+   Its header now reads the STORE name then the VIDEO name, not the
+   folder path.
+7. **A one-off orphan found and removed**: `sarah_clips/scene_overlays/
+   v1/manifest.json` — leftover metadata from a since-superseded
+   per-scene review tool (`make_scene_overlays.py`); the `.webm` files
+   it described were migrated into today's `sandbox/` layout back on
+   2026-08-26 and the manifest never went with them. Confirmed nothing
+   else in the repo reads it before deleting.
+8. **Two small polish items**: the common panel's title is now just
+   `SARAH` (was `Sarah/ (common)`); both panels show a real spinning
+   loading indicator while their own fetch is in flight, each hidden in
+   a `finally` block so it can never get stuck spinning.
+
+`tests/test_avatar_editor.py` grew from 60 checks (its state at the
+last handoff) to **210**, entirely from this arc — including two checks
+that specifically try to escape either library's root and confirm
+they're refused.
+
+### Sarah's documentation consolidated into one skill
+
+Everything about what Sarah's clips ARE, why the standards exist
+(rest pose, "uncertainty", why idle footage is rendered rather than
+mined), and how the Avatar Editor works with either library was
+scattered across `Sarah/README.md`, `Sarah/closings/README.md`,
+`avatar_editor/README.md`, and a stale line in `editor-launchers/
+SKILL.md` — some of it already wrong after the split above. Moved into
+one file: **`.claude/skills/sarah-library/SKILL.md`**. `CLAUDE.md` now
+says to read it first, every time, before touching `avatar_editor/`,
+`Sarah/`, or any store's `sarah_clips/` — same pattern as the existing
+`vtt`/`editor-launchers` rules.
+
+The older docs were trimmed to point at the skill rather than staying
+duplicated — `Sarah/README.md` is now a short landing note,
+`avatar_editor/README.md` kept only its own code-architecture content,
+`frame_blender/README.md` had a flatly wrong row deleted (described a
+file — `gap-builder.js` — that tool hasn't had since the 2026-09-02
+split). A real staleness bug was fixed along the way:
+`Sarah/closings/README.md`'s own `mv` commands still said
+`Sarah/closing` (singular) — the folder was renamed to `closings/` this
+session and the doc never caught up.
+
+Deliberately left alone: `docs/avatar_launch.md`, `heygen_api.md`,
+`HEYGEN_RULES.md`, `avatar_compositing.md` — Sarah's locked HeyGen
+identity and how a brand-new clip of her gets rendered is a different
+concern from working with clips that already exist; the skill points to
+them rather than absorbing them.
+
+### Testing output split apart per editor, too
+
+Before today, none of the four newer per-editor suites
+(`test_avatar_editor.py`, `test_frame_blender.py`,
+`test_mp4_splitter.py`, `test_segment_avatar_editor.py`) wrote a log
+file at all — only the old combined `test_editor.py` did. Each of the
+four now writes into its own folder:
+
+```
+tests/avatar_editor/avatar_editor_<HH>_<MM>_<SS>.log   the full transcript
+tests/avatar_editor/avatar_editor_<HH>_<MM>_<SS>.txt   the pass/fail report
+tests/frame_blender/frame_blender_<HH>_<MM>_<SS>.{log,txt}
+tests/mp4_splitter/mp4_splitter_<HH>_<MM>_<SS>.{log,txt}
+tests/segment_avatar_editor/segment_avatar_editor_<HH>_<MM>_<SS>.{log,txt}
+```
+
+The `.txt` report: total run, total passed, every step's own PASS/FAIL,
+and — only when something failed — a `Failures:` section naming exactly
+which check and what it found. One shared function,
+`fixture.write_report()`, writes both for all four, so the shape can't
+drift between them. Verified the failure-description path with a
+synthetic failing result before trusting it for real. Before writing
+this, confirmed the four editors' actual CODE is genuinely
+independent — no editor imports another's Python, no editor's page
+loads another's JS/CSS.
+
+**One asterisk, flagged, not fixed:** Avatar Editor and Frame Blender
+still share one `cache/` directory at the repo root — a leftover from
+before they split apart. Data-directory sharing, not code sharing.
+
+### Code review of all 4 editors
+
+Full scorecard (1–10, five axes each — architecture, best practices,
+separation of concerns, cross-editor use, readability) delivered to
+Carson as a downloadable `.txt`. Nothing from it has been acted on yet.
+Short version, ranked by what would help most:
+
+1. Give MP4 Splitter and Segment and Avatar Editor a README each —
+   Avatar Editor's and Frame Blender's are right there as a template.
+2. Move both off the Python-string page-building style, the way Avatar
+   Editor and Frame Blender already did (2026-08-30) — this is the
+   single biggest structural fix available.
+3. Split `segment_avatar_editor/player.py` (3,966 lines, the biggest
+   file in the whole codebase) into its two page types.
+4. Decide on `_splitter_player.py` — a documented, deliberate duplicate
+   of MP4 Splitter's own player, copied rather than imported.
+5. Smaller: split `gap-builder.js` (1,155 lines, 8 different jobs in
+   one file) and Frame Blender's `app.js` (765 lines, no split at all)
+   a bit further.
+
+### Still standing, unchanged
+
+- **`build/assemble_video.py` is modified and NOT ours** — someone
+  else's uncommitted crossfade work-in-progress. Never touch it, never
+  stage it, never commit over it.
+
+---
+
+## 2026-09-02 — the four editors split apart, logging split apart, two of them got their first tests
+
+Branch **`next_gen_editors`**. 5 commits made today sit **ahead of `origin/
+next_gen_editors`, not yet pushed** (oldest first):
+`d58e1ba` Frame Blender v14, `4bfced5` Avatar Editor v3, `3abace8` MP4
+Splitter v11, `6099590` Segment and Avatar Editor v60, `38337cf` the
+CLAUDE.md Tests-section doc update. Push only if Carson says to.
+
+**On top of those, working-tree changes not yet committed** (in
+`avatar_editor/web/app.js`, `web/gap-builder.js`, `web/index.html`):
+the Frame Selector's and Clip-Gap Builder's own Play buttons were
+corrected to each play whichever clip THEIR OWN panel is currently
+showing (an earlier version of this session played a "checked Sound
+Bit" instead — Carson corrected that), and the Audio Menu's "Play" text
+now turns green (`.ready` class, same language `gmCopySelected`/
+`gmLibViewToggle` already use) once a Sound Bit is actually loaded.
+Tested live both ways, 60/60 automated checks pass. **Not committed —
+wait for Carson to say so**, then bump `avatar_editor/VERSION` to `4`
+and commit as its own `Avatar Editor vN ADDED:` commit, per this repo's
+own player-commit rule.
+
+**`build/assemble_video.py` is modified and NOT ours** — someone else's
+uncommitted crossfade work-in-progress, sitting there the whole
+session as it has for weeks. Never touch it, never stage it, never
+commit over it.
+
+### What we succeeded on
+
+1. **The 4 editors' purpose split settled, and code now matches it.**
+   Frame Blender watches the two tracks (base + overlay) frame by frame
+   and drives the combine/build — Overlay/Base panels, Speed dropdown,
+   Build, Save MP4. Avatar Editor keeps only the Gap Builder — Sarah's
+   own overlay library (`sarah_clips/libs`), the Frame Selector, and the
+   Clip-Gap Builder that assembles gap-filler sequences from it. Avatar
+   Editor started the session as a WHOLE duplicate of Frame Blender
+   (including the combine/build UI); that half was removed outright
+   (Overlay/Base panels, Build, Save MP4, and their backend routes)
+   once the split was made explicit. Frame Blender's own Gap Builder
+   (it had one too, from before the split) was removed the same way,
+   moving the other direction.
+2. **MP4 Splitter and the Segment and Avatar Editor's landing/viewer
+   pages cleaned up**: no more `Browse Customers —` prefix, the tab
+   title stays on the clean tool name even with a clip/scene open
+   (was drifting to the source filename before). SAE's landing page
+   was reworked from a raw `Customers/` file browser into the same
+   store → video → sandbox-scenes-only picker the in-editor Load
+   button already used — no more hand-pairing raw, uncut footage.
+3. **Session logging split apart per editor** — was one shared
+   `logs/editor_<date>.log` for all four standalone tools (plus the old
+   combined server), with Frame Blender's and Avatar Editor's own
+   actions mislabeled `"FB: Load video"` even when it was Avatar Editor
+   that acted. Now each of the four writes to its own dedicated file
+   (`frame_blender_<date>.log`, `avatar_editor_<date>.log`,
+   `mp4_splitter_<date>.log`, `segment_avatar_editor_<date>.log`),
+   correctly labeled, verified live by triggering a real action on each
+   running server and reading the right line out of the right file.
+   MP4 Splitter's and SAE's own `ACTIONS` label tables were also
+   trimmed to just the routes each process actually serves — both
+   still carried entries for routes that belong to OTHER tools,
+   inherited from the shared table they were copied out of.
+4. **MP4 Splitter and Segment and Avatar Editor each got their first
+   real automated test suite** — `tests/test_mp4_splitter.py` (82
+   checks) and `tests/test_segment_avatar_editor.py` (90 checks).
+   Neither existed before today; both tools had been standalone
+   processes since 2026-09-01/02 but were only ever checked by hand.
+   Every kept route gets a real check, every route the split dropped is
+   confirmed truly gone (404, not just untested), each tool's own cache
+   directory and session log are verified directly, and every page's
+   generated JavaScript is checked with `node --check` — SAE's suite
+   checks all THREE of its pages, including `_splitter_player.py`'s own
+   private duplicate of MP4 Splitter's viewer.
+5. **Avatar Editor UI work**: `sarah_clips/libs` moved to the top-left
+   of the page (was centered below Timeline Scenes); the Frame Selector
+   and Clip-Gap Builder previewers now stay open all the time, including
+   on first load, instead of staying hidden until something is picked.
+6. **New standing rule, added to this repo's own `CLAUDE.md`**: code
+   changes for one editor stay inside that editor's own files. The
+   other three don't get touched in the same pass, even for an
+   identical, obviously-correct fix, unless Carson explicitly widens
+   scope in chat. (Also saved to Claude's cross-session memory, outside
+   this repo.)
+7. **Confirmed by direct ffprobe, not assumed**: `sarah_clips/libs/
+   sound_bits/*.webm` carry a REAL video track (VP9, 1152×1152, Sarah's
+   own avatar footage) plus the Opus audio — not audio-only files. So
+   checking one in the Frame Selector should show her picture moving,
+   not a blank/black viewer.
+
+### What's still open
+
+1. **The 3 uncommitted Avatar Editor files above** — waiting on
+   Carson's go-ahead to commit (see the top of this section for exactly
+   what's in them).
+2. **The 5 commits above are unpushed.** Push only on explicit
+   instruction.
+3. **Frame Blender's and Avatar Editor's own tab titles still drift**
+   once a scene is open (`Frame Blender — 01-intro-and-login`, same for
+   Avatar Editor) — the exact thing that was fixed for MP4 Splitter and
+   SAE earlier this session (item 2 above), just never asked for on
+   these two. Spotted, not fixed — flag it if Carson wants it matched.
+4. Carson reported the Frame Selector/Gap Builder Play buttons "not
+   working" more than once this session; every attempt to reproduce it
+   with real clicks succeeded. The audio-source correction and the
+   green-ready fix (both in the uncommitted work above) may be what he
+   was actually asking for each time — worth confirming on his return
+   rather than assuming closed.
+5. Everything under "What's still open" in the 2026-08-30 sections
+   below is unchanged and still real: **scene 1's frozen tail (frames
+   442–482) is still frozen**, the transition tools are still
+   command-line only, and only one gap-filler size exists in the
+   library.
+
+---
+
 ## 2026-08-30 (later) — Frame Blender restructured, and Load actually loads
 
 ### What we succeeded on
