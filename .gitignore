@@ -60,6 +60,20 @@ cache_segment_avatar_editor/
 logs/*.log
 tests/log_reports/*.log
 
+# Per-editor test output (2026-09-03 split) — one folder per editor, a
+# .log (the full transcript) and a .txt (the pass/fail report) per run,
+# same base filename. .gitkeep keeps the 4 folders themselves in git even
+# with nothing run yet.
+tests/avatar_editor/*.log
+tests/avatar_editor/*.txt
+tests/frame_blender/*.log
+tests/frame_blender/*.txt
+tests/mp4_splitter/*.log
+tests/mp4_splitter/*.txt
+tests/segment_avatar_editor/*.log
+tests/segment_avatar_editor/*.txt
+!tests/*/.gitkeep
+
 # Generation archives — dev/, sandbox/ and video/ each keep their previous
 # batch. Under Customers/ and so already ignored, but named here because the
 # rule is about what they ARE, not where they sit.

@@ -451,6 +451,13 @@ def main():
     passed = sum(1 for _, ok, _ in RESULTS if ok)
     out(f"\n  Checks:  {passed}/{len(RESULTS)} passed")
     out(f"  Result:  {'PASS' if passed == len(RESULTS) else 'FAIL'}")
+
+    # Own folder, own log + report — tests/mp4_splitter/, never another
+    # editor's (see fixture.write_report()'s own docstring for why this
+    # is shared code rather than copied four times).
+    base = fixture.write_report("mp4_splitter", LOG, RESULTS, STEPS)
+    out(f"  Report:  tests/mp4_splitter/{base}.txt")
+
     if passed != len(RESULTS):
         sys.exit(1)
 

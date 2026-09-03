@@ -22,6 +22,30 @@ tests/log_reports/editor_<HH>_<MM>_<SS>.log
 Same shape as the E2E run logs — a header, the steps with a tick per check, then
 a recap and a `Result: PASS` / `FAIL` verdict. Gitignored, like those are.
 
+## The four standalone editors have their own folders, own logs, own reports
+
+`test_avatar_editor.py`, `test_frame_blender.py`, `test_mp4_splitter.py` and
+`test_segment_avatar_editor.py` are separate suites for the four genuinely
+independent editor processes (each its own port, cache and code — see each
+editor's own README for why). Since 2026-09-03 each writes its own run's
+output into its own folder, never a shared one:
+
+```
+tests/avatar_editor/avatar_editor_<HH>_<MM>_<SS>.log            # the full transcript
+tests/avatar_editor/avatar_editor_<HH>_<MM>_<SS>.txt            # the pass/fail report
+tests/frame_blender/frame_blender_<HH>_<MM>_<SS>.{log,txt}
+tests/mp4_splitter/mp4_splitter_<HH>_<MM>_<SS>.{log,txt}
+tests/segment_avatar_editor/segment_avatar_editor_<HH>_<MM>_<SS>.{log,txt}
+```
+
+Same base filename for both — only the extension differs. The `.log` is the
+same text the terminal showed, step by step. The `.txt` report is the short
+version: total run, total passed, every step's own PASS/FAIL, and — only
+when something failed — a `Failures:` section naming exactly which check
+and what it found. Both are written by `fixture.write_report()`, shared
+across all four so the shape can't drift between them. Gitignored, like
+`test_editor.py`'s own `tests/log_reports/`.
+
 ## The other log — real editing
 
 The test's log is one run of a fixture. The editor keeps its own log of what you

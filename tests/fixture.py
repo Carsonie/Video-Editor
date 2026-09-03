@@ -141,6 +141,65 @@ def destroy():
     shutil.rmtree(STORE, ignore_errors=True)
 
 
+def write_report(editor, log_lines, results, steps):
+    """
+    Write one run's output to tests/<editor>/ — a .log (the full printed
+    transcript, same text the terminal showed) and a .txt (a short,
+    structured pass/fail report), same base filename, `.log`/`.txt` the
+    only difference. One per editor (Carson's own split, 2026-09-03,
+    alongside each of the four now having its own standalone process,
+    cache and session log) — so a run's output can never land in, or be
+    confused with, another editor's.
+
+    `steps` is the (number, title, [result-indexes]) list `step()`/`check()`
+    build as a run goes; a step's own state is PASS only if every check
+    inside it passed. `results` is the flat (name, ok, detail) list
+    `check()`/`eq()` append to.
+
+    Shared here rather than copied into each of the four test files: the
+    shape is identical for all of them, and a change to what the report
+    looks like should not mean editing it four times.
+    """
+    import time
+    stamp = time.strftime("%H_%M_%S")
+    out_dir = os.path.join(HERE, editor)
+    os.makedirs(out_dir, exist_ok=True)
+    base = f"{editor}_{stamp}"
+
+    with open(os.path.join(out_dir, base + ".log"), "w") as fh:
+        fh.write("\n".join(log_lines) + "\n")
+
+    passed = sum(1 for _, ok, _ in results if ok)
+    failed = [(name, detail) for name, ok, detail in results if not ok]
+
+    lines = [
+        f"{editor} Test Report",
+        f"Run:         {time.strftime('%Y-%m-%dT%H:%M:%S')}",
+        f"Log:         {base}.log",
+        "",
+        f"Tests run:   {len(results)}",
+        f"Passed:      {passed}",
+        f"Failed:      {len(failed)}",
+        f"Result:      {'PASS' if not failed else 'FAIL'}",
+        "",
+        "Steps:",
+    ]
+    for num, title, idxs in steps:
+        ok = all(results[i][1] for i in idxs) if idxs else True
+        lines.append(f"  {'PASS' if ok else 'FAIL'}  Step {num}: {title}")
+
+    if failed:
+        lines.append("")
+        lines.append("Failures:")
+        for name, detail in failed:
+            lines.append(f"  - {name}" + (f"   {detail}" if detail else ""))
+
+    with open(os.path.join(out_dir, base + ".txt"), "w") as fh:
+        fh.write("\n".join(lines) + "\n")
+
+    return base
+
+
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "destroy":
         destroy()
