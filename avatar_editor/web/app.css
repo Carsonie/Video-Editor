@@ -73,6 +73,17 @@
   .libfile .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 auto; }
   .libfile .meta { color: var(--sub); flex: none; font-variant-numeric: tabular-nums; }
   .libempty { font-size: 11.5px; color: var(--sub); font-style: italic; }
+  /* Working Clips: the same panel, the same rows and the same overall size
+     as sarah_clips/libs — Carson's own call, and the reason the min-height
+     is here: an empty panel would otherwise be a 200px stub beside a 737px
+     one, and the pair is meant to read as two of the same thing. A long
+     typed name ellipsises like a long filename already does, with the full
+     name in the row's tooltip. */
+  .wcpanel { width: 260px; }
+  .wcpanel .libgroups { min-height: 640px; }
+  .wcDelete { color: var(--sub); font-size: 12px; }
+  .wcDelete:hover { color: #ff8080; border-color: #ff8080; }
+
   /* A sound bit's play button — small, round, sits at the end of its row
      next to the file size/duration: an icon-only control that doesn't
      fight the row's text for space. */
@@ -175,6 +186,18 @@
   .fsBar {
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
     margin-top: 8px; padding: 4px 2px 0; font-size: 11.5px; color: var(--sub);
+  }
+  /* "Save to:" and its dropdown, sitting in the button stack — the same
+     row language the Audio Menu's own name+speed row uses. */
+  .gapMenuRow {
+    display: flex; align-items: center; gap: 8px; padding: 2px 2px;
+    font-size: 11.5px; color: var(--sub);
+  }
+  .gapMenuLabel { flex: none; }
+  #gmSaveTarget {
+    flex: 1 1 auto; min-width: 0;
+    background: #0f1214; color: var(--text); border: 1px solid var(--border);
+    border-radius: 4px; padding: 4px; font-size: 11px;
   }
   #fsRate {
     background: #0f1214; color: var(--text); border: 1px solid var(--border);
@@ -294,3 +317,14 @@
 .pickitem .meta { margin-left: auto; color: var(--sub); font-size: 11.5px; flex: none; }
 .pickitem:disabled { opacity: .4; cursor: default; }
 .modalmsg { color: var(--sub); font-size: 12px; padding: 6px 2px; }
+/* The Load picker's modal, borrowed by modalPrompt/modalConfirm — one
+   text field and one or two buttons, nothing else. */
+.modalinput {
+  width: 100%; box-sizing: border-box; margin-top: 8px; padding: 8px 10px;
+  background: #0f1214; color: var(--text); border: 1px solid var(--border);
+  border-radius: 6px; font-size: 13px;
+}
+.modalinput:focus { outline: none; border-color: var(--accent2); }
+.modalbtns { display: flex; gap: 8px; margin-top: 14px; }
+.modalbtns .pill { flex: 1 1 0; justify-content: center; }
+

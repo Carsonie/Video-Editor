@@ -243,14 +243,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         Frame Blender's own logs/gap_builder_<date>.log so the two tools'
         debug logs never collide if both run at once.
 
-        A debugging aid for the Gap Builder Controller Menu specifically:
+        A debugging aid for the Gap Builder Menu specifically:
         Carson tests through his own real browser tab, which this process
         cannot see into — the only way to know what he actually clicked, in
         order, and what state each click landed in, is if the page tells
         this server itself (see gapLog() in gap-builder.js, wired into every
-        Controller Menu button plus both frame rows). Never raises: a log
-        that can break the page is worse than no log — same promise
-        shared/serve.py's own session_log() makes.
+        Gap Builder Menu button plus both frame rows). Every line carries
+        the page's whole state before and after the click — both frame
+        rows, the clipboard, and Working Clips' own counts and active
+        item — because a click's MEANING is that state, not its id. Never
+        raises: a log that can break the page is worse than no log — same
+        promise shared/serve.py's own session_log() makes.
         """
         try:
             os.makedirs(GAP_LOG_DIR, exist_ok=True)

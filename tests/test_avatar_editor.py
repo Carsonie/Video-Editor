@@ -285,6 +285,80 @@ def s_lib_frames_still():
     eq("same slug both times", d2.get("slug"), d.get("slug"))
 
 
+def s_working_clips():
+    """
+    Working Clips, and the two things that read and write it: Save to
+    Working Clips in the Gap Builder Menu, and Replace Selected in the
+    Frame Selector Menu. Plus the Audio Menu's own Clear All.
+
+    HTTP cannot press a button, so what is asserted here is the WIRING and
+    the SHAPE — every control present with the id its handler looks up, the
+    three sections named, and the handful of rules that are easy to lose in
+    a later edit and expensive to notice by hand.
+    """
+    step("Working Clips — the panel, saving into it, and replacing from it")
+    html = urllib.request.urlopen(AE_BASE + "/", timeout=10).read().decode()
+    wc = urllib.request.urlopen(AE_BASE + "/web/working-clips.js", timeout=10).read().decode()
+    gb = urllib.request.urlopen(AE_BASE + "/web/gap-builder.js", timeout=10).read().decode()
+    js = urllib.request.urlopen(AE_BASE + "/web/app.js", timeout=10).read().decode()
+
+    # ── the panel
+    check("the panel is on the page", 'id="wcGroups"' in html)
+    check("it has its own status line", 'id="wcStatus"' in html)
+    check("it reuses the library panel's own classes, not a second layout",
+          'class="panel libpanel wcpanel"' in html)
+    for label in ("IDLE", "TRANSITIONS", "SOUND_BITS"):
+        check(f"section {label}", f"label: '{label}'" in wc)
+    check("exactly three sections", wc.count("{key: '") == 3)
+    check("each row shows its frame count", "${entry.n}f" in wc)
+    check("each row has its own checkbox", "cb.type = 'checkbox'" in wc)
+    # One active item, not a list: Replace Selected needs ONE answer.
+    check("ticking one unticks the rest",
+          "cb.checked ? {section: sec.key, id: entry.id} : null" in wc)
+
+    # ── saving
+    check("Save to: dropdown", 'id="gmSaveTarget"' in html)
+    for value in ("idle", "sound_bits", "transitions"):
+        check(f"...offers {value}", f'value="{value}"' in html)
+    check("Save button", 'id="gmSaveToWorking"' in html)
+    check("it asks for a name in the page's own modal, not window.prompt",
+          "modalPrompt({" in gb
+          and "window.prompt(" not in gb and "= prompt(" not in gb)
+    check("the modal's button says Continue", "okText = 'Continue'" in js)
+    check("the whole Builder collection is saved, in order",
+          "WorkingClips.saveBuilder(section" in gb and "BUILDER_FRAMES.slice()" in wc)
+    # A stored URL would be a second copy of something derivable, and would
+    # go stale if the frame cache were ever re-slugged.
+    check("frames are stored compactly and their URLs rebuilt",
+          "libFrameUrl(clip, p.local)" in wc and "packed.push({c: ci" in wc)
+    check("saved clips survive a refresh",
+          "saveStore({workingClips: DATA})" in wc and "WorkingClips.restore();" in js)
+
+    # ── replacing
+    check("Replace Selected button", 'id="gmReplaceSelected"' in html)
+    check("it needs BOTH an active clip and a selection",
+          "rep.disabled = !entry || !sel;" in wc)
+    check("a different frame count warns first",
+          "title: 'Mismatch frame count'" in gb)
+    check("...with Yes and No", "yes: 'Yes', no: 'No'" in gb)
+    check("No cancels and changes nothing",
+          "if (!go) { libStatus.textContent = 'Replace cancelled.'; return; }" in gb)
+    check("the replacement keeps the row's order",
+          "LIB_FRAMES.splice(at, span, ...frames);" in gb)
+
+    # ── the Audio Menu's Clear All
+    check("Audio Menu Clear All", 'id="gmAudioClearAll"' in html)
+    check("it resets every player", "gmAudioClearAll" in gb and "Players.reset();" in gb)
+    # Unticking the library empties the Frame Selector too — a different
+    # button's job, and destroying that collection here would be a surprise.
+    clear_block = gb.split("gmAudioClearAll.onclick")[-1].split("// ── the three Play")[0]
+    check("...and unticks nothing", "PICKED" not in clear_block)
+
+    # ── logging
+    for field in ("wcIdle", "wcTransitions", "wcSoundBits", "wcActive", "wcActiveN"):
+        check(f"every click logs {field}", f"{field}:" in gb)
+
+
 def s_stateless():
     """
     The restructure's actual promise: this server remembers no scene. A
@@ -313,6 +387,7 @@ def s_static_page():
     # Match the <script src> attributes, never a bare filename — the
     # comments above these tags name all three files too, in a different
     # order, and matching those measures nothing.
+    wc_pos = html.find('src="/web/working-clips.js"')
     fp_pos = html.find('src="/web/frame-player.js"')
     gb_pos = html.find('src="/web/gap-builder.js"')
     app_pos = html.find('src="/web/app.js"')
@@ -321,8 +396,13 @@ def s_static_page():
     # is FramePlayer.configure({...}), so the component must already exist.
     check("frame-player.js is named before gap-builder.js", -1 < fp_pos < gb_pos,
           (fp_pos, gb_pos))
+    # working-clips.js reads BUILDER_FRAMES and libFrameUrl from
+    # gap-builder.js, and app.js's restoreGlobals() calls into it.
+    check("working-clips.js sits between gap-builder.js and app.js",
+          gb_pos < wc_pos < app_pos, (gb_pos, wc_pos, app_pos))
     for asset, ctype in (("/web/app.js", "javascript"), ("/web/gap-builder.js", "javascript"),
                          ("/web/frame-player.js", "javascript"),
+                         ("/web/working-clips.js", "javascript"),
                          ("/web/app.css", "css")):
         r = urllib.request.urlopen(AE_BASE + asset, timeout=10)
         eq(f"{asset} served", r.status, 200)
@@ -366,6 +446,7 @@ def s_app_js_parses():
         return
     fp = urllib.request.urlopen(AE_BASE + "/web/frame-player.js", timeout=10).read().decode()
     gb = urllib.request.urlopen(AE_BASE + "/web/gap-builder.js", timeout=10).read().decode()
+    wc = urllib.request.urlopen(AE_BASE + "/web/working-clips.js", timeout=10).read().decode()
     js = urllib.request.urlopen(AE_BASE + "/web/app.js", timeout=10).read().decode()
 
     def parses(name, text):
@@ -381,8 +462,10 @@ def s_app_js_parses():
 
     parses("frame-player.js", fp)
     parses("gap-builder.js", gb)
+    parses("working-clips.js", wc)
     parses("app.js", js)
-    parses("all three together (load order)", fp + "\n" + gb + "\n" + js)
+    parses("all four together (load order)",
+           fp + "\n" + gb + "\n" + wc + "\n" + js)
 
 
 def s_original_audio_stack():
@@ -484,7 +567,7 @@ def s_original_audio_stack():
               f'<video id="{vid}" playsinline hidden>' in html)
 
 
-FUNCTIONS = [s_static_page, s_app_js_parses, s_original_audio_stack, s_stateless, s_load_picker, s_load_store,
+FUNCTIONS = [s_static_page, s_app_js_parses, s_original_audio_stack, s_working_clips, s_stateless, s_load_picker, s_load_store,
              s_save_scene_proxy,
              s_libs_list_paths, s_lib_frames_clip, s_lib_frames_still]
 

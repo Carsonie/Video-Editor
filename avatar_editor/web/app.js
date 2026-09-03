@@ -88,6 +88,7 @@
     // reset it (see showEmpty()'s own comment on what it deliberately
     // leaves alone), so loadVideo() calling this right after setting it
     // fresh must not stomp that with the same data relabeled "restored".
+    WorkingClips.restore();
     if (s.storeScenes && !STORE_SCENES) {
       STORE_SCENES = s.storeScenes;
       SCRIPT = s.script || null;
@@ -252,9 +253,11 @@
   const pickBody = document.getElementById('pickBody');
   const pickCrumb = document.getElementById('pickCrumb');
   const pickBackBtn = document.getElementById('pickBackBtn');
+  const pickCancel = document.getElementById('pickCancel');
+  const pickTitleEl = document.getElementById('pickTitle');
 
   function pickClose() { pickBack.hidden = true; pickBody.innerHTML = ''; }
-  document.getElementById('pickCancel').onclick = pickClose;
+  pickCancel.onclick = pickClose;
   pickBack.onclick = e => { if (e.target === pickBack) pickClose(); };
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && !pickBack.hidden) pickClose();
@@ -263,6 +266,94 @@
   function pickShow(msg) {
     pickBack.hidden = false;
     pickBody.innerHTML = `<div class="modalmsg">${msg}</div>`;
+  }
+
+  // ── the same modal, borrowed for asking a question ──────────────────────
+  // Two small dialogs, both built on the Load picker's own furniture rather
+  // than a second one: window.prompt/confirm are blocked in some contexts,
+  // look nothing like the page, and cannot be styled or tested. Each hands
+  // back a Promise, so a caller reads top to bottom instead of splitting
+  // itself across callbacks.
+  //
+  // Both restore whatever the modal's footer looked like before, because
+  // the Load picker owns those two buttons and expects to find them as it
+  // left them.
+  function modalAsk(build) {
+    const crumb = pickCrumb.textContent;
+    const title = pickTitleEl.textContent;
+    return new Promise(resolve => {
+      let done = false;
+      const finish = v => {
+        if (done) return;
+        done = true;
+        pickClose();
+        pickCancel.onclick = pickClose;
+        pickCancel.textContent = 'Cancel';
+        pickBackBtn.hidden = true;
+        pickCrumb.textContent = crumb;
+        pickTitleEl.textContent = title;
+        resolve(v);
+      };
+      pickBack.hidden = false;
+      pickBackBtn.hidden = true;
+      pickBody.innerHTML = '';
+      build(pickBody, finish);
+      // Cancel, the backdrop and Escape all mean the same thing here.
+      pickCancel.onclick = () => finish(null);
+      const esc = e => {
+        if (e.key === 'Escape') { document.removeEventListener('keydown', esc); finish(null); }
+      };
+      document.addEventListener('keydown', esc);
+    });
+  }
+
+  // Ask for one line of text. Resolves to the trimmed string, or null if
+  // the user backed out. Enter is the same as clicking Continue.
+  function modalPrompt({title = 'Name', label = '', value = '', okText = 'Continue'} = {}) {
+    return modalAsk((body, finish) => {
+      pickTitleEl.textContent = title;
+      pickCrumb.textContent = '';
+      const lab = document.createElement('div');
+      lab.className = 'modalmsg';
+      lab.textContent = label;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'modalinput';
+      input.id = 'modalPromptInput';
+      input.value = value;
+      const ok = document.createElement('button');
+      ok.className = 'pill';
+      ok.id = 'modalPromptOk';
+      ok.textContent = okText;
+      ok.style.marginTop = '12px';
+      const submit = () => { const v = input.value.trim(); if (v) finish(v); };
+      ok.onclick = submit;
+      input.onkeydown = e => { if (e.key === 'Enter') submit(); };
+      body.appendChild(lab); body.appendChild(input); body.appendChild(ok);
+      setTimeout(() => { input.focus(); input.select(); }, 0);
+    });
+  }
+
+  // Ask a yes/no question. Resolves true only on the yes button.
+  function modalConfirm({title = 'Confirm', msg = '', yes = 'Yes', no = 'No'} = {}) {
+    return modalAsk((body, finish) => {
+      pickTitleEl.textContent = title;
+      pickCrumb.textContent = '';
+      const m = document.createElement('div');
+      m.className = 'modalmsg';
+      m.textContent = msg;
+      const rowEl = document.createElement('div');
+      rowEl.className = 'modalbtns';
+      const y = document.createElement('button');
+      y.className = 'pill'; y.id = 'modalConfirmYes'; y.textContent = yes;
+      y.onclick = () => finish(true);
+      const n = document.createElement('button');
+      n.className = 'pill'; n.id = 'modalConfirmNo'; n.textContent = no;
+      n.onclick = () => finish(false);
+      rowEl.appendChild(y); rowEl.appendChild(n);
+      body.appendChild(m); body.appendChild(rowEl);
+      setTimeout(() => n.focus(), 0);
+    });
   }
 
   async function pickStores() {

@@ -499,7 +499,7 @@ const FrameSelector = (function () {
   return {play, clips, endRun, engine: () => P};
 })();
 
-// ── 3. the Gap Builder Controller Menu's "Play This Clip's Audio" ────────
+// ── 3. the Gap Builder Menu's "Play Clip-Gap Builder's Audio" ───────────
 // THE CLIP-GAP BUILDER'S OWN: whichever clip that panel is showing right
 // now. Still ONE clip rather than a run, and still borrowing the Audio
 // Menu's player — this is the button that has not been reworked yet.

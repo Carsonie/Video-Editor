@@ -1,7 +1,7 @@
 // Avatar Editor — sarah_clips/libs, the Frame Selector, and the Clip-Gap
 // Builder. Split out of app.js on 2026-09-01, specifically because this is
-// the one area about to grow a lot (the ten Gap Builder Controller Menu
-// actions all act on BUILDER_FRAMES, defined here) — everything else on the
+// the one area about to grow a lot (the ten Gap Builder Menu actions all
+// act on BUILDER_FRAMES, defined here) — everything else on the
 // page (the combine engine, Timeline Scenes, the Load popup, persistence)
 // was staying roughly the size it already was.
 //
@@ -39,7 +39,8 @@ const humanSize = b => b < 1024 ? `${b}B` : b < 1048576 ? `${(b / 1024).toFixed(
 // this one and keeps its own scope, so the only way in is FramePlayer's
 // own small API. What is left here is what this file actually owns: the
 // library, the two frame rows, and handing those over at the bottom of
-// this file (see the Players.configure() call there).
+// this file (see the Players.configure() call there). working-clips.js
+// loads between the two and keeps its own scope, handing out WorkingClips.
 
 const libInspector = document.getElementById('libInspector');
 const libViewerImg = document.getElementById('libViewerImg');
@@ -89,6 +90,9 @@ function setLibSelected(indices) {
   LIB_SELECTED = new Set(indices);
   libSelectedNEl.textContent = LIB_SELECTED.size;
   [...libFrameRow.children].forEach((d, j) => d.classList.toggle('selected', LIB_SELECTED.has(j)));
+  // Replace Selected needs BOTH a selection here and an active Working
+  // Clip, so it has to be re-judged whenever either half moves.
+  WorkingClips.refreshButtons();
 }
 
 function renderLibFrameRow() {
@@ -231,6 +235,7 @@ function rebuildLibFrames() {
   // Runs on every check/uncheck and on every reset, which is exactly when
   // "is there anything for these buttons to play" changes.
   Players.refresh();
+  WorkingClips.refreshButtons();
 }
 
 libSlider.oninput = () => showLibFrame(+libSlider.value);
@@ -378,9 +383,11 @@ function showBuilderFrame(i) {
 // at the start of showEmpty() (BUILDER_FRAMES = [] before restoreGlobals()
 // gets a chance to read what was saved), and saving there would overwrite
 // the very collection a refresh is about to bring back before it can.
-// Only the actual mutation sites (doPaste, and the Gap Builder Controller
-// Menu actions) save.
+// Only the actual mutation sites (doPaste, and the Gap Builder Menu
+// actions) save.
 function rebuildBuilderFrames(landOn) {
+  // Save to Working Clips is only offered when there is something to save.
+  WorkingClips.refreshButtons();
   // The collection this run was walking has been rebuilt, so every
   // position it held is meaningless — same rule the Frame Selector's row
   // follows in rebuildLibFrames().
@@ -536,7 +543,7 @@ async function loadLibs() {
   }
 }
 
-// ── Gap Builder Controller Menu ──────────────────────────────────────────
+// ── Gap Builder Menu ─────────────────────────────────────────────────────
 // All ten of the original placeholder buttons are gone or folded in now.
 // Select One Frame / Select Multiple Frames combined into
 // gmBuilderSelectFrames + gmBuilderCopySelected — the SAME 3-click cycle
@@ -566,6 +573,10 @@ const gmCopySelected = document.getElementById('gmCopySelected');
 const gmLibViewToggle = document.getElementById('gmLibViewToggle');
 const gmFrameSelectorClearAll = document.getElementById('gmFrameSelectorClearAll');
 const gmPasteSelected = document.getElementById('gmPasteSelected');
+const gmSaveTarget = document.getElementById('gmSaveTarget');
+const gmSaveToWorking = document.getElementById('gmSaveToWorking');
+const gmReplaceSelected = document.getElementById('gmReplaceSelected');
+const gmAudioClearAll = document.getElementById('gmAudioClearAll');
 // The three Play buttons. Their BEHAVIOUR lives in frame-player.js; what
 // they are wired to here is only the route in — see the three onclicks at
 // the bottom of this file.
@@ -661,6 +672,14 @@ function gapSnapshot() {
     builderArmed, builderPhase, builderRangeStart, selected: SELECTED.size,
     clipboard: CLIPBOARD.length, builderCur: +builderSlider.value,
     builderFrames: BUILDER_FRAMES.length, libFrames: LIB_FRAMES.length,
+    // Working Clips: how many are saved in each section, and which one is
+    // active. Both change what Save to Working Clips and Replace Selected
+    // will DO, so a click log without them cannot explain either.
+    wcIdle: WorkingClips.count('idle'),
+    wcTransitions: WorkingClips.count('transitions'),
+    wcSoundBits: WorkingClips.count('sound_bits'),
+    wcActive: WorkingClips.active()?.name ?? null,
+    wcActiveN: WorkingClips.active()?.n ?? 0,
   };
 }
 
@@ -893,6 +912,91 @@ gmPasteSelected.onclick = withActiveFlash(gmPasteSelected, () => {
     return;
   }
   doPaste(BUILDER_FRAMES.length ? +builderSlider.value + 1 : 0);
+});
+
+// ── Working Clips: saving out, and dropping back in ──────────────────────
+// Save: the whole Clip-Gap Builder collection, in its own order, filed
+// under the section the dropdown names, with a name typed into a popup.
+// The popup is the page's own modal, not window.prompt — see modalPrompt()
+// in app.js for why.
+gmSaveToWorking.onclick = withActiveFlash(gmSaveToWorking, async () => {
+  const section = gmSaveTarget.value;
+  const label = (WorkingClips.sections().find(s => s.key === section) || {}).label || section;
+  const r = await WorkingClips.saveBuilder(section, () => modalPrompt({
+    title: 'Save to Working Clips',
+    label: `${BUILDER_FRAMES.length} frame(s) → ${label}. Name this clip:`,
+    value: '',
+  }));
+  libStatus.textContent = r.ok
+    ? `Saved "${r.entry.name}" (${r.entry.n} frames) to ${label}.`
+    : r.why === 'cancelled' ? 'Save cancelled.' : r.why;
+});
+
+// Replace: the active Working Clip goes in where the Frame Selector's own
+// selection is. A different frame count is allowed — the two collections
+// are Carson's to line up — but never silently, because a replacement that
+// changes the length changes the timing of everything after it.
+gmReplaceSelected.onclick = withActiveFlash(gmReplaceSelected, async () => {
+  const entry = WorkingClips.active();
+  if (!entry) {
+    libStatus.textContent = 'Tick a clip in Working Clips to make it active first.';
+    return;
+  }
+  if (!LIB_SELECTED.size) {
+    libStatus.textContent = 'Select Frames above, then click a frame to start a selection '
+      + '(click again to finish it) — then Replace Selected.';
+    return;
+  }
+  const indices = [...LIB_SELECTED].sort((a, b) => a - b);
+  if (entry.n !== indices.length) {
+    const go = await modalConfirm({
+      title: 'Mismatch frame count',
+      msg: `The selection is ${indices.length} frame(s) and "${entry.name}" is `
+         + `${entry.n}. Use it anyway?`,
+      yes: 'Yes', no: 'No',
+    });
+    if (!go) { libStatus.textContent = 'Replace cancelled.'; return; }
+  }
+  replaceLibSelection(indices, WorkingClips.activeFrames());
+  libStatus.textContent = `Replaced ${indices.length} frame(s) with "${entry.name}" `
+    + `(${entry.n} frames).`;
+});
+
+// The selection is a set of positions in the row, and Copy/Paste already
+// only ever produce a CONTIGUOUS one (the 3-click cycle picks a start and
+// an end). Splicing the whole span out and the new frames in keeps the
+// row's order intact for any count, matching or not.
+//
+// This edits LIB_FRAMES in place, and LIB_FRAMES is REBUILT from PICKED
+// whenever a box is ticked — so a replacement lives until the next tick,
+// on purpose: it is a working edit for building something, not a change to
+// the library, which is read-only from here.
+function replaceLibSelection(indices, frames) {
+  const at = indices[0];
+  const span = indices[indices.length - 1] - at + 1;
+  LIB_FRAMES.splice(at, span, ...frames);
+  setLibSelected([]);
+  libRangeStart = null;
+  libPhase = 0;
+  gmCopySelected.classList.remove('ready');
+  gmLibViewToggle.classList.remove('ready');
+  if (libShowSelectedOnly) { libShowSelectedOnly = false; }
+  renderLibFrameRow();
+  applyLibViewMode();
+  const land = Math.min(at, Math.max(0, libViewIndices().length - 1));
+  libSlider.value = land;
+  showLibFrame(land);
+  Players.refresh();
+}
+
+// ── the Audio Menu's own Clear All ───────────────────────────────────────
+// Stops every player and unloads what is in them, so the audio side is
+// back to nothing loaded. Deliberately does NOT untick anything in
+// sarah_clips/libs — that empties the Frame Selector's collection too, and
+// is the Frame Selector Menu's own Clear All.
+gmAudioClearAll.onclick = withActiveFlash(gmAudioClearAll, () => {
+  Players.reset();
+  libStatus.textContent = 'Audio cleared — nothing loaded in any player.';
 });
 
 // ── the three Play buttons ───────────────────────────────────────────────

@@ -35,6 +35,18 @@
       <div class="tlstatus" id="tlStatus">Nothing loaded — click Load.</div>
       <div class="tlrows" id="tlRows"></div>
     </div>
+
+    <!-- Where Carson's OWN clips land, as opposed to sarah_clips/libs to
+         the left, which is what HeyGen and the transition tools produced.
+         Same container and same row shape as that panel on purpose: a
+         clip is a clip, wherever it came from, and the eye should not
+         have to learn a second layout. Only three sections, because only
+         three kinds of thing get built here. -->
+    <div class="panel libpanel wcpanel">
+      <h3>Working Clips</h3>
+      <div class="libstatus" id="wcStatus">Nothing saved yet.</div>
+      <div class="libgroups" id="wcGroups"></div>
+    </div>
   </div>
 
   <div class="libinspector-row" id="gapBuilderView">
@@ -96,7 +108,7 @@
          has its own id already, so wiring it later is filling in an
          .onclick, not hunting for a way to address it. -->
     <div class="panel libpanel gapMenu">
-      <h3>Gap Builder Controller Menu</h3>
+      <h3>Gap Builder Menu</h3>
       <div class="gapMenuList">
         <button class="gapMenuBtn" id="gmAddOpeningStill">Add Sarah Opening Still</button>
         <button class="gapMenuBtn" id="gmAddClosingStill">Add Sarah Closing Still</button>
@@ -106,6 +118,17 @@
         <button class="gapMenuBtn" id="gmDeleteSelected">Delete Selected</button>
         <button class="gapMenuBtn" id="gmClearAll" title="Empty the Clip-Gap Builder collection. Does not touch the Frame Selector, the loaded scene, or Timeline Scenes — only this list.">Clear All</button>
         <button class="gapMenuBtn" id="gmBuilderPlayPause" disabled title="Build the collection above first.">Play Clip-Gap Builder's Audio</button>
+        <!-- Which Working Clips section this collection gets filed under.
+             The three options are the three sections that panel has. -->
+        <div class="gapMenuRow">
+          <label class="gapMenuLabel" for="gmSaveTarget">Save to:</label>
+          <select id="gmSaveTarget" title="Which Working Clips section the saved collection is filed under. Clip goes to IDLE, Bit to SOUND_BITS, Transition to TRANSITIONS.">
+            <option value="idle">Clip &rarr; IDLE</option>
+            <option value="sound_bits">Bit &rarr; SOUND_BITS</option>
+            <option value="transitions">Transition &rarr; TRANSITIONS</option>
+          </select>
+        </div>
+        <button class="gapMenuBtn" id="gmSaveToWorking" disabled title="Build the collection above first.">Save to Working Clips</button>
         <hr class="gapMenuDivider">
         <div class="gapMenuSectionTitle">Frame Selector Menu</div>
         <hr class="gapMenuDivider">
@@ -113,11 +136,13 @@
         <button class="gapMenuBtn" id="gmCopySelected" title="Copies whatever's selected in the Frame Selector's own row above (Select Frames), onto a clipboard — Paste (above) adds it to the Clip-Gap Builder.">Copy Selected</button>
         <button class="gapMenuBtn" id="gmLibViewToggle" title="Turns green along with Copy Selected once a selection is complete. Filters the row and slider above to just your selection, so you can scrub through it before deciding — click again to go back to the full collection.">Show Selected on Timeline</button>
         <button class="gapMenuBtn" id="gmFrameSelectorClearAll" title="Unchecks every clip in sarah_clips/libs and empties the Frame Selector's row above. Does not touch the Clip-Gap Builder, the clipboard, the loaded scene, or Timeline Scenes — only this list.">Clear All</button>
+        <button class="gapMenuBtn" id="gmReplaceSelected" disabled title="Tick a clip in Working Clips, and select frames above, first.">Replace Selected</button>
         <button class="gapMenuBtn" id="gmLibPlayPause" disabled title="Check a clip in sarah_clips/libs above to fill the Frame Selector first.">Play Frame Selector's Audio</button>
         <hr class="gapMenuDivider">
         <div class="gapMenuSectionTitle">Audio Menu</div>
         <hr class="gapMenuDivider">
         <button class="gapMenuBtn" id="gmSoundBitPlayPause" disabled title="Check one or more clips in sarah_clips/libs above first.">Play</button>
+        <button class="gapMenuBtn" id="gmAudioClearAll" title="Stops every player, unloads whatever is in them and puts this menu back to nothing loaded. Does not untick anything in sarah_clips/libs — that is the Frame Selector Menu's own Clear All.">Clear All</button>
         <div class="audioMenuRow">
           <span class="soundBitName" id="soundBitName">No Sound Bit loaded</span>
           <select id="soundBitRate" title="Playback speed — same options as the Segment and Avatar Editor.">
@@ -151,9 +176,12 @@
         FramePlayer.configure({...}), so FramePlayer must already exist.
      2. gap-builder.js next    — app.js's bootstrap, at the bottom of the
         last file, calls straight into functions gap-builder.js defines
-        (loadLibs, rebuildLibFrames, rebuildBuilderFrames). -->
+        (loadLibs, rebuildLibFrames, rebuildBuilderFrames).
+     3. working-clips.js next  — it reads BUILDER_FRAMES and libFrameUrl
+        from gap-builder.js, and app.js's restoreGlobals() calls into it. -->
 <script src="/web/frame-player.js"></script>
 <script src="/web/gap-builder.js"></script>
+<script src="/web/working-clips.js"></script>
 <script src="/web/app.js"></script>
 </body>
 </html>
