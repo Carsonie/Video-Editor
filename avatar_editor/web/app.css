@@ -58,6 +58,24 @@
   .tlscenes h3 { text-align: center; }
   .libpanel { width: 260px; flex: none; text-align: left; display: flex; flex-direction: column; }
   .libpanel h3 { text-align: center; }
+  /* Sits right under the store-name h3, above the status line — a plain
+     subtitle, dimmer than the h3 since it's context, not the label. */
+  .libHeaderVideo {
+    font-size: 11px; color: var(--sub); opacity: .75; margin: -6px 0 8px;
+  }
+  .libstatusRow { display: flex; align-items: center; gap: 6px; }
+  .libstatusRow .libstatus { margin-bottom: 8px; }
+  /* A small rotating ring, shown only while a library's own fetch is in
+     flight — a status line that just says "Loading..." with nothing
+     moving reads as stuck the moment a fetch actually takes a second
+     (has_audible() measures real audio on every file, so it does). */
+  .spinner {
+    width: 12px; height: 12px; flex: none; border-radius: 50%;
+    border: 2px solid var(--border); border-top-color: var(--accent2);
+    animation: spin .7s linear infinite;
+  }
+  .spinner[hidden] { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
   .libstatus { font-size: 11.5px; color: var(--sub); margin-bottom: 8px; }
   .libgroups { display: flex; flex-direction: column; gap: 10px; max-height: 640px; overflow: auto; }
   .libgroup h4 {

@@ -30,11 +30,28 @@
 // where you are in the scene's own combined-frame review.
 const libStatus = document.getElementById('libStatus');
 const libGroups = document.getElementById('libGroups');
+const libSpinner = document.getElementById('libSpinner');
+const libHeaderStore = document.getElementById('libHeaderStore');
+const libHeaderVideo = document.getElementById('libHeaderVideo');
+
+// Pulls the store and video name out of a scene's own base_rel — the same
+// <Business>/<store>/help-videos/videos/<video>/sandbox/<scene>/segment.mp4
+// shape video_root_of() in serve.py already relies on. Returns null rather
+// than guessing when the shape doesn't match, same rule that function
+// follows: a silently wrong label here would read as confidence about
+// which store's panel this is when there wasn't any.
+function storeVideoFromPath(rel) {
+  const parts = (rel || '').split('/');
+  const sbx = parts.indexOf('sandbox');
+  if (parts.length < 2 || sbx < 1) return null;
+  return {store: parts[1], video: parts[sbx - 1]};
+}
 // The second, duplicated panel — Sarah's COMMON library (Sarah/ at the
 // repo root), beside this one. Same rendering function, a different
 // source and a different pair of DOM elements — see renderLibSource().
 const libStatusCommon = document.getElementById('libStatusCommon');
 const libGroupsCommon = document.getElementById('libGroupsCommon');
+const libSpinnerCommon = document.getElementById('libSpinnerCommon');
 const humanSize = b => b < 1024 ? `${b}B` : b < 1048576 ? `${(b / 1024).toFixed(0)}KB` : `${(b / 1048576).toFixed(1)}MB`;
 
 // ── the player ───────────────────────────────────────────────────────────
@@ -549,6 +566,15 @@ function renderLibSource(d, groupsEl, statusEl, source, savedPaths) {
 async function loadLibs() {
   PICKED = [];
   rebuildLibFrames();
+  // The store panel's own header — the store, then the video, replacing
+  // "sarah_clips/libs" (Carson's own call, 2026-09-03): which folder it
+  // reads is an implementation detail; which STORE and VIDEO you're
+  // looking at is what actually matters here. Set from SCENE.base_rel
+  // rather than waiting on the /api/libs_list response below, so it's
+  // right even when that store's own library is empty or archived.
+  const sv = SCENE && storeVideoFromPath(SCENE.base_rel);
+  libHeaderStore.textContent = sv ? sv.store : '—';
+  libHeaderVideo.textContent = sv ? sv.video : '—';
   // A fresh pair may be a different STORE, so both are re-resolved below,
   // never carried over from whatever pair was open before.
   restPosePath = null;
@@ -569,7 +595,11 @@ async function loadLibs() {
   // — matching the two panels' left-to-right order on screen. Independent
   // try/catch: a broken store fetch should not also blank the common
   // panel, and Sarah/ not existing yet on a fresh checkout shouldn't block
-  // the store's own library from loading.
+  // the store's own library from loading. The spinner's own hide sits in a
+  // `finally`, not after the try block, because two of the branches below
+  // `return` early (the store one) — only `finally` is guaranteed to run
+  // on every one of those paths.
+  libSpinnerCommon.hidden = false;
   try {
     const r = await fetch('/api/libs_list?source=common');
     const d = await r.json();
@@ -589,8 +619,11 @@ async function loadLibs() {
     }
   } catch (e) {
     libStatusCommon.textContent = `Couldn't load: ${e.message}`;
+  } finally {
+    libSpinnerCommon.hidden = true;
   }
 
+  libSpinner.hidden = false;
   try {
     const r = await fetch(`/api/libs_list?${pairQS()}`);
     const d = await r.json();
@@ -603,6 +636,8 @@ async function loadLibs() {
     renderLibSource(d, libGroups, libStatus, 'store', savedPaths);
   } catch (e) {
     libStatus.textContent = `Couldn't load: ${e.message}`;
+  } finally {
+    libSpinner.hidden = true;
   }
 }
 

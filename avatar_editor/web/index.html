@@ -21,14 +21,34 @@
          server root a clip's frames and audio come from differs, via each
          clip's own `source` field. -->
     <div class="panel libpanel">
-      <h3>Sarah/ (common)</h3>
-      <div class="libstatus" id="libStatusCommon">Loading…</div>
+      <h3>Sarah</h3>
+      <!-- The spinner is a SEPARATE sibling of .libstatus, not nested
+           inside it — loadLibs() and every render/error path already set
+           .libstatus's own textContent wholesale, and nesting the spinner
+           in there would mean rewriting every one of those to preserve it.
+           Toggled by its own id instead: shown right before the fetch
+           fires, hidden once that source's own try/catch finishes,
+           success or not. -->
+      <div class="libstatusRow">
+        <span class="spinner" id="libSpinnerCommon" hidden></span>
+        <div class="libstatus" id="libStatusCommon">Loading…</div>
+      </div>
       <div class="libgroups" id="libGroupsCommon"></div>
     </div>
 
     <div class="panel libpanel">
-      <h3>sarah_clips/libs</h3>
-      <div class="libstatus" id="libStatus">Loading…</div>
+      <!-- "sarah_clips/libs" told you the folder, not what you were
+           looking at — the store, then the video, is what this panel
+           actually is (Carson's own call, 2026-09-03). Filled in by
+           loadLibs() once a pair is open; "—" is the before-anything-
+           loads placeholder, same as every other not-yet-loaded label on
+           this page. -->
+      <h3 id="libHeaderStore">—</h3>
+      <div class="libHeaderVideo" id="libHeaderVideo">—</div>
+      <div class="libstatusRow">
+        <span class="spinner" id="libSpinner" hidden></span>
+        <div class="libstatus" id="libStatus">Loading…</div>
+      </div>
       <div class="libgroups" id="libGroups"></div>
       <!-- Shared by every Sound Bits row's own play button below — one
            player rather than one per clip, same reasoning as the Frame

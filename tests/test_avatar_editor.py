@@ -208,52 +208,58 @@ REAL_STORE_REL = ("Rentify Demos Corp/bike-demo/help-videos/videos/"
 REAL_SEG = f"{REAL_STORE_REL}/sandbox/01-login/segment.mp4"
 REAL_AV = f"{REAL_STORE_REL}/sandbox/01-login/avatar.webm"
 
-# ski-demo is the one store with a real sarah_clips/libs/ — the Frame
-# Selector's own library — so these three tests borrow it the same way
-# s_load_picker borrows bike-demo. Read-only: /api/lib_frames only ever
-# EXTRACTS into cache/, it never writes into Customers/ itself.
+# ski-demo is the one real store this suite exercises Load/lib_frames
+# against — s_load_picker borrows bike-demo for the same reason. Its OWN
+# sarah_clips/libs/ was archived to sarah_clips/z_history/<ts>/libs/ on
+# 2026-09-03 (Carson's own call: work off the common Sarah/ library from
+# here on, not a per-store copy) — so the two frame-extraction tests below
+# borrow the COMMON library instead, which is where real content actually
+# lives now. Read-only either way: /api/lib_frames only ever EXTRACTS into
+# cache/, it never writes into Customers/ or Sarah/ itself.
 SKI_STORE_REL = "Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering"
 SKI_SEG = f"{SKI_STORE_REL}/sandbox/01-intro-and-login/segment.mp4"
 SKI_AV = f"{SKI_STORE_REL}/sandbox/01-intro-and-login/avatar.webm"
-SKI_LIB_CLIP = f"{SKI_STORE_REL}/sarah_clips/libs/gap-fillers/gap-filler-1.0s.webm"
-SKI_LIB_STILL = f"{SKI_STORE_REL}/sarah_clips/libs/stills/sarah-rest-pose-corner-300-alpha.png"
+COMMON_LIB_CLIP = "idle/sarah-idle-10s-alpha.webm"
+COMMON_LIB_STILL = "stills/sarah-rest-pose-corner-300-alpha.png"
 
 
 def s_libs_list_paths():
     """
-    Each file /api/libs_list returns now carries its own `path` (relative
-    to Customers/), added specifically so the Frame Selector can hand it
-    straight to /api/lib_frames. A name alone can't do that — two different
-    library folders can hold a file with the same name.
+    ski-demo's OWN sarah_clips/libs/ was archived away on 2026-09-03
+    (Carson's own call — see the SKI_STORE_REL comment above): work off
+    the common Sarah/ library from here on, not a per-store copy. What's
+    left in a store's own sarah_clips/ after that is loose leftover files
+    (openings, closings, one-off tests, ...) with no fixed taxonomy of
+    their own — /api/libs_list?base=&overlay= shows exactly those now,
+    under one plain "sarah_clips" group, EXCEPT z_history/ itself, which
+    stays out of the browse on purpose — it's where the archived material
+    actually lives, not something to pick clips from.
     """
-    step("/api/libs_list — every file carries a real, resolvable path")
+    step("/api/libs_list — ski-demo's own sarah_clips/, its loose leftovers")
     d, code = fb_get("/api/libs_list", base=SKI_SEG, overlay=SKI_AV)
     eq("200", code, 200)
-    files = [f for g in d.get("groups", []) for f in g.get("files", [])]
-    check("finds real library files", len(files) > 0, len(files))
-    check("every file has a path", all("path" in f for f in files), files[:1])
-    sample = files[0]
-    check("that path is a real file under Customers/",
-          os.path.isfile(os.path.join(fixture.CUSTOMERS, sample["path"])),
-          sample["path"])
-
-    # Every one of the 7 KNOWN folders shows up, EVEN a store that has
-    # nothing filed in one yet — Carson's own call (2026-09-03): the panel
-    # always shows the full taxonomy at a glance, "(0)" included, rather
-    # than a folder only appearing once something is put in it. ski-demo's
-    # own sarah_clips/libs/ has no openings/ or closings/ on disk, so this
-    # is exactly the case that would otherwise go missing.
-    present = {g["folder"]: len(g["files"]) for g in d.get("groups", [])}
-    check("openings shows even though nothing is filed there yet",
-          present.get("openings") == 0, present.get("openings"))
-    check("closings shows even though nothing is filed there yet",
-          present.get("closings") == 0, present.get("closings"))
-    check("all 5 folders that DO have files still show their real counts",
-          present.get("gap-fillers", 0) > 0 and present.get("idle", 0) > 0
-          and present.get("stills", 0) > 0 and present.get("transitions", 0) > 0
-          and present.get("sound_bits", 0) > 0, present)
+    check("root points at sarah_clips/ itself, not .../libs",
+          (d.get("root") or "").endswith("sarah_clips"), d.get("root"))
+    eq("exactly one group: the loose files", len(d.get("groups", [])), 1)
+    group = d["groups"][0]
+    eq("...named plainly", group.get("folder"), "sarah_clips")
+    files = group.get("files", [])
+    check("finds the real loose files", len(files) > 0, len(files))
+    check("every file has a real, resolvable path",
+          all(os.path.isfile(os.path.join(fixture.CUSTOMERS, f["path"])) for f in files),
+          files[:1])
     check("every entry is tagged source='store'",
           all(f.get("source") == "store" for f in files), files[:1])
+    names = {f["name"] for f in files}
+    check("a real leftover clip shows up", "TRACK_front_sarah.webm" in names, sorted(names))
+    check("z_history/ is never browsed — it's the archive, not a source",
+          not any("z_history" in f["path"] for f in files), names)
+
+    z = os.path.join(fixture.CUSTOMERS, SKI_STORE_REL, "sarah_clips", "z_history")
+    check("...and it's genuinely still there, just out of the browse", os.path.isdir(z), z)
+    libs_dirs = [os.path.join(z, d2, "libs") for d2 in os.listdir(z)] if os.path.isdir(z) else []
+    check("...with the archived library's real files still in it",
+          any(os.path.isdir(p2) and os.listdir(p2) for p2 in libs_dirs), libs_dirs)
 
 
 def s_common_library():
@@ -357,7 +363,7 @@ def s_lib_frames_clip():
     Sarah render), so its frames must be servable the identical way.
     """
     step("/api/lib_frames — a real .webm clip")
-    d, code = fb_get("/api/lib_frames", path=SKI_LIB_CLIP)
+    d, code = fb_get("/api/lib_frames", source="common", path=COMMON_LIB_CLIP)
     eq("200", code, 200)
     eq("kind is clip", d.get("kind"), "clip")
     check("has a real, multi-frame count", isinstance(d.get("n"), int) and d["n"] > 1, d.get("n"))
@@ -370,7 +376,7 @@ def s_lib_frames_clip():
 
     _, code2 = fb_get("/api/lib_frames")
     eq("a missing path is refused", code2, 400)
-    _, code3 = fb_get("/api/lib_frames", path="not/a/real/file.webm")
+    _, code3 = fb_get("/api/lib_frames", source="common", path="not/a/real/file.webm")
     eq("a path that isn't a real file is refused, not a crash", code3, 400)
 
 
@@ -382,7 +388,7 @@ def s_lib_frames_still():
     clip, with no second code path in app.js just for stills.
     """
     step("/api/lib_frames — a still image gets a one-frame cache entry")
-    d, code = fb_get("/api/lib_frames", path=SKI_LIB_STILL)
+    d, code = fb_get("/api/lib_frames", source="common", path=COMMON_LIB_STILL)
     eq("200", code, 200)
     eq("kind is still", d.get("kind"), "still")
     eq("exactly one frame", d.get("n"), 1)
@@ -393,7 +399,7 @@ def s_lib_frames_still():
     eq("that one frame is really servable", r.status, 200)
 
     # Asking again must reuse the same cache entry, not duplicate or rebuild it.
-    d2, code2 = fb_get("/api/lib_frames", path=SKI_LIB_STILL)
+    d2, code2 = fb_get("/api/lib_frames", source="common", path=COMMON_LIB_STILL)
     eq("asking again still answers 200", code2, 200)
     eq("same slug both times", d2.get("slug"), d.get("slug"))
 
@@ -502,6 +508,7 @@ def s_common_library_wiring():
     html = urllib.request.urlopen(AE_BASE + "/", timeout=10).read().decode()
     gb = urllib.request.urlopen(AE_BASE + "/web/gap-builder.js", timeout=10).read().decode()
     fp = urllib.request.urlopen(AE_BASE + "/web/frame-player.js", timeout=10).read().decode()
+    js = urllib.request.urlopen(AE_BASE + "/web/app.js", timeout=10).read().decode()
 
     for el in ("libGroupsCommon", "libStatusCommon"):
         check(f"the common panel has its own {el}", f'id="{el}"' in html)
@@ -533,6 +540,52 @@ def s_common_library_wiring():
     check("the rest pose prefers the common library",
           "restPosePath = f.path; restPoseSource = 'common';" in gb)
     check("...falling back to the store's own copy", "restPoseSource = 'store';" in gb)
+
+    step("the store panel's header names the store and video, not the folder")
+    # "sarah_clips/libs" told you the folder, not what you were looking at
+    # (Carson's own call, 2026-09-03) — replaced with the store name, the
+    # video name under it. HTTP can't open a pair to watch it fill in, so
+    # this checks the WIRING: the two elements exist, the parser that fills
+    # them reads SCENE's own base_rel (right even when that store's library
+    # is empty or archived — it doesn't wait on /api/libs_list), and both
+    # get put back to the loading placeholder on Clear.
+    check("no more static 'sarah_clips/libs' label", "sarah_clips/libs</h3>" not in html)
+    for el in ("libHeaderStore", "libHeaderVideo"):
+        check(f"the header has its own {el}", f'id="{el}"' in html)
+    check("storeVideoFromPath() parses <Business>/<store>/.../<video>/sandbox/...",
+          "function storeVideoFromPath(rel)" in gb
+          and "parts.indexOf('sandbox')" in gb)
+    check("filled from SCENE.base_rel, not from the libs_list response",
+          "storeVideoFromPath(SCENE.base_rel)" in gb)
+    check("Clear puts both back to the placeholder",
+          "libHeaderStore.textContent = '—';" in js
+          and "libHeaderVideo.textContent = '—';" in js)
+
+    step("the common panel's title, and both panels' loading spinners")
+    # "Sarah/ (common)" -> "Sarah" (Carson's own call, 2026-09-03) — the
+    # h3's own text-transform: uppercase already renders it SARAH; the
+    # markup stays title case, matching every other h3 on this page
+    # ("Timeline Scenes", "Working Clips").
+    check("the common panel's h3 is just Sarah now",
+          "<h3>Sarah</h3>" in html and "Sarah/ (common)" not in html)
+    css = urllib.request.urlopen(AE_BASE + "/web/app.css", timeout=10).read().decode()
+    for el in ("libSpinner", "libSpinnerCommon"):
+        check(f"{el} exists, starts hidden", f'id="{el}" hidden' in html)
+    check("a real spinner, not a static icon", ".spinner" in css and "@keyframes spin" in css)
+    # Both fetches show their OWN spinner right before firing and hide it
+    # in a `finally` — not just after the try block, because two of the
+    # store fetch's own branches `return` early; only `finally` runs on
+    # every one of those paths, success or not.
+    check("common's spinner shows before its fetch fires",
+          "libSpinnerCommon.hidden = false;\n  try {\n    const r = await fetch('/api/libs_list?source=common')" in gb)
+    check("...and hides in a finally, not just after the try",
+          "} finally {\n    libSpinnerCommon.hidden = true;\n  }" in gb)
+    check("the store panel's spinner does the same",
+          "libSpinner.hidden = false;\n  try {\n    const r = await fetch(`/api/libs_list?${pairQS()}`)" in gb)
+    check("...also hidden in a finally",
+          "} finally {\n    libSpinner.hidden = true;\n  }\n}" in gb)
+    check("Clear hides both defensively, even mid-fetch",
+          "libSpinner.hidden = true;" in js and "libSpinnerCommon.hidden = true;" in js)
 
 
 def s_tooltips():

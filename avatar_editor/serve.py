@@ -53,7 +53,7 @@ WHAT IT SERVES
     GET  /web/*                               its css and js
     GET  /api/stores                          JSON: every business/store and its videos
     GET  /api/open_pair?base=&overlay=        JSON: slugs, frame counts, label
-    GET  /api/libs_list?base=                 JSON: the store's sarah_clips/libs
+    GET  /api/libs_list?base=                 JSON: the store's own sarah_clips/
     GET  /api/libs_list?source=common         JSON: Sarah's own COMMON library (Sarah/)
     GET  /api/lib_media?path=&source=         a library file's raw bytes, audio intact
     GET  /api/load_store?path=                JSON: standalone — see siblings()/load_store()
@@ -597,16 +597,60 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         except ValueError:
             return (len(self.LIBS_GROUP_ORDER), folder)
 
+    def _entries_in(self, fdir, path_root, source, folder_name, label_lines):
+        """
+        Every FILE directly inside `fdir` (no recursion), each turned into
+        the same entry shape libs_list() has always returned. Shared by
+        _list_groups() below (Sarah's 7-folder taxonomy, one call per known
+        folder) and the store branch of libs_list() (a store's own
+        sarah_clips/, which since the 2026-09-03 archive is just whatever
+        loose files and folders are actually still sitting there — no
+        fixed taxonomy to walk).
+        """
+        files = []
+        if not os.path.isdir(fdir):
+            return files
+        for name in sorted(os.listdir(fdir)):
+            if name.startswith("."):
+                continue
+            p = os.path.join(fdir, name)
+            if not os.path.isfile(p):
+                continue
+            # has_audio is answered for EVERY file, stills included — a
+            # missing key reads as "unknown", and the page's Play runs
+            # need a plain yes/no to filter on.
+            entry = {"name": name, "size": os.path.getsize(p),
+                     "path": os.path.relpath(p, path_root),
+                     "source": source, "has_audio": False}
+            if name.lower().endswith((".webm", ".mp4", ".mov")):
+                # A .webm here is always a transparent HeyGen render — same
+                # rule shared/serve.py's is_alpha() uses, inlined rather
+                # than importing one more name for one check.
+                try:
+                    entry["dur"] = round(float(build_scenes.probe(
+                        p, alpha=name.lower().endswith(".webm"))[1]), 2)
+                except Exception:
+                    entry["dur"] = None
+                # Whether there is a voice in it, MEASURED — the Play runs
+                # skip silent clips, and the buttons only go green when
+                # something audible is actually there to play.
+                entry["has_audio"] = has_audible(p)
+            if folder_name == "sound_bits":
+                label = re.sub(r"^\d+-", "", os.path.splitext(name)[0])
+                if label in label_lines:
+                    entry["line"] = label_lines[label]
+            files.append(entry)
+        return files
+
     def _list_groups(self, libs_dir, path_root, source, label_lines):
         """
-        Shared by both halves of libs_list() below — everything from here
-        down is identical whichever library is being read; only WHERE
-        libs_dir/path_root point differs. `source` ('store'|'common')
-        travels on every file entry, because the client needs it on every
-        later /api/lib_frames or /api/lib_media call to know which root to
-        resolve `path` against — Sarah/ and Customers/ are siblings, not
-        one inside the other, so a bare path alone is ambiguous between
-        them.
+        Sarah's fixed 7-folder taxonomy (openings, gap-fillers, idle,
+        stills, transitions, sound_bits, closings) — used for the COMMON
+        library only. `source` ('store'|'common') travels on every file
+        entry, because the client needs it on every later /api/lib_frames
+        or /api/lib_media call to know which root to resolve `path`
+        against — Sarah/ and Customers/ are siblings, not one inside the
+        other, so a bare path alone is ambiguous between them.
 
         Every one of the 7 KNOWN folders shows up, even one with nothing
         filed in it yet — Carson's own call, so the panel always shows the
@@ -618,53 +662,50 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         found = {n for n in os.listdir(libs_dir)
                  if os.path.isdir(os.path.join(libs_dir, n))}
         all_folders = set(self.LIBS_GROUP_ORDER) | found
+        return [{"folder": folder,
+                 "files": self._entries_in(os.path.join(libs_dir, folder),
+                                            path_root, source, folder, label_lines)}
+                for folder in sorted(all_folders, key=self._group_key)]
 
-        groups = []
-        for folder in sorted(all_folders, key=self._group_key):
-            fdir = os.path.join(libs_dir, folder)
-            files = []
-            if not os.path.isdir(fdir):
-                groups.append({"folder": folder, "files": files})
+    def _store_folder_groups(self, sarah_clips_dir, path_root, label_lines):
+        """
+        A store's own sarah_clips/ — since the 2026-09-03 archive (working
+        off the common Sarah/ library from here on, not a per-store copy),
+        there is no fixed taxonomy left to walk here: just whatever loose
+        files and folders are actually still sitting in a store's own
+        sarah_clips/, shown plainly. Two groups' worth:
+
+          "sarah_clips"   every FILE loose at sarah_clips/'s own root — the
+                          leftovers a store still carries (openings,
+                          closings, TRACK_*, one-off tests, ...)
+          one per SUBFOLDER actually found, alphabetically, EXCEPT
+          z_history/ — archived on purpose, the one place this browser
+          deliberately does not look; see the archive comment in
+          libs_list() below.
+        """
+        loose = self._entries_in(sarah_clips_dir, path_root, "store", "sarah_clips", label_lines)
+        groups = [{"folder": "sarah_clips", "files": loose}]
+        for name in sorted(os.listdir(sarah_clips_dir)):
+            if name == "z_history" or name.startswith("."):
                 continue
-            for name in sorted(os.listdir(fdir)):
-                if name.startswith("."):
-                    continue
-                p = os.path.join(fdir, name)
-                if not os.path.isfile(p):
-                    continue
-                # has_audio is answered for EVERY file, stills included — a
-                # missing key reads as "unknown", and the page's Play runs
-                # need a plain yes/no to filter on.
-                entry = {"name": name, "size": os.path.getsize(p),
-                         "path": os.path.relpath(p, path_root),
-                         "source": source, "has_audio": False}
-                if name.lower().endswith((".webm", ".mp4", ".mov")):
-                    # A .webm here is always a transparent HeyGen render —
-                    # same rule shared/serve.py's is_alpha() uses, inlined
-                    # rather than importing one more name for one check.
-                    try:
-                        entry["dur"] = round(float(build_scenes.probe(
-                            p, alpha=name.lower().endswith(".webm"))[1]), 2)
-                    except Exception:
-                        entry["dur"] = None
-                    # Whether there is a voice in it, MEASURED — the Play
-                    # runs skip silent clips, and the buttons only go green
-                    # when something audible is actually there to play.
-                    entry["has_audio"] = has_audible(p)
-                if folder == "sound_bits":
-                    label = re.sub(r"^\d+-", "", os.path.splitext(name)[0])
-                    if label in label_lines:
-                        entry["line"] = label_lines[label]
-                files.append(entry)
-            groups.append({"folder": folder, "files": files})
+            fdir = os.path.join(sarah_clips_dir, name)
+            if not os.path.isdir(fdir):
+                continue
+            groups.append({"folder": name,
+                            "files": self._entries_in(fdir, path_root, "store", name, label_lines)})
         return groups
 
     def libs_list(self, qs):
         """
         GET /api/libs_list?base=&overlay=       every file under that pair's
-                                                 sarah_clips/libs/ — the clips
-                                                 DEVELOPED for that one store's
-                                                 video, never shared elsewhere.
+                                                 own sarah_clips/ — whatever
+                                                 that store's video still
+                                                 carries, since the
+                                                 2026-09-03 archive (working
+                                                 off the common library from
+                                                 here on, not a per-store
+                                                 copy — see the archive note
+                                                 below).
         GET /api/libs_list?source=common        every file under the top-level
                                                  Sarah/ folder instead — her
                                                  COMMON library, the same
@@ -693,7 +734,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if video_root is None:
             return self.json_error(500, f"expected .../sandbox/<label>/segment.mp4, "
                                          f"got {base_p}")
-        libs_dir = os.path.join(video_root, "sarah_clips", "libs")
+        # sarah_clips/ ITSELF, not sarah_clips/libs/ — a store's own
+        # organized library folder is what gets ARCHIVED to
+        # sarah_clips/z_history/<timestamp>/libs/ (Carson's own call,
+        # 2026-09-03: work off the common Sarah/ library from here on), so
+        # this now shows whatever is actually still there rather than a
+        # fixed taxonomy that would otherwise just always read empty.
+        libs_dir = os.path.join(video_root, "sarah_clips")
         if not os.path.isdir(libs_dir):
             return self._relay(200, {"root": None, "groups": []})
 
@@ -712,7 +759,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             except Exception:
                 pass
 
-        groups = self._list_groups(libs_dir, CUSTOMERS_ROOT, "store", label_lines)
+        groups = self._store_folder_groups(libs_dir, CUSTOMERS_ROOT, label_lines)
         self._relay(200, {"root": os.path.relpath(libs_dir, CUSTOMERS_ROOT), "groups": groups})
 
     def _lib_path(self, qs):

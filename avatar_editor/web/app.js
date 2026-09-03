@@ -433,8 +433,14 @@
     document.getElementById('pageTitle').textContent = 'Avatar Editor — nothing loaded';
     document.title = 'Avatar Editor';
     status.textContent = '';
+    libHeaderStore.textContent = '—';
+    libHeaderVideo.textContent = '—';
     libGroups.innerHTML = '';
     libStatus.textContent = 'Nothing loaded.';
+    // Defensive: a Clear mid-fetch shouldn't leave a spinner turning
+    // forever over a panel that no longer means anything.
+    libSpinner.hidden = true;
+    libSpinnerCommon.hidden = true;
     PICKED = [];
     rebuildLibFrames();
     BUILDER_FRAMES = [];
