@@ -1,8 +1,13 @@
 # PIPELINE — how a help video gets made
 
-One video is finished (ski-demo, *First Time Ordering*). **Twenty-three more are
-coming**, and every one follows this file. If a step here cannot be followed
-cold, that is a defect in this file — fix it here rather than working around it.
+**Four stores, six E2E scenarios each — 24 help videos.** Video 01,
+*First Time Ordering*, is built for all four stores and released for three
+of them; videos 02–06 have not been started for any. Every one of them
+follows this file. `ToDo.md` P1.3 has the current state, store by store —
+including the one that is built but not released.
+
+If a step here cannot be followed cold, that is a defect in this file — fix
+it here rather than working around it.
 
 Rewritten 2026-08-28. The version before that had grown into a record of four
 weeks of struggle: three dated session logs correcting each other, a `final/`

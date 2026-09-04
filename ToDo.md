@@ -10,7 +10,43 @@ below. Git history has them if a decision needs re-reading.
 
 ---
 
-## P1 — the playbook has holes in it
+## P1 — the work itself, and holes in the playbook
+
+### P1.3 The video queue — 20 of 24 not started, and one built-but-unreleased
+
+**This is what the repo is FOR, and it was in no list until 2026-09-04.**
+
+Four stores, six E2E scenarios each, so **24 help videos**. Counted from
+the six recipes in `Basic_E2E_Testing/.claude/skills/`: `owner-one-item`,
+`owner-three-items`, `owner-plus-one-invite-one-item-each`,
+`owner-plus-three-invites-two-items-each`,
+`owner-no-items-plus-one-invite-one-item`, `one-day-rental-owner-one-item`.
+
+State on 2026-09-04, read off the folders rather than off any doc:
+
+| Store | `01-first-time-ordering` | built here | released to `Basic` |
+|---|---|---|---|
+| ski-demo | 13 scenes | `_v32.mp4` | **NO — see below** |
+| canoe-demo | 11 scenes | yes | `canoe-demo_first-time-ordering_v2.mp4` |
+| bike-demo | 12 scenes | yes | `bike-demo_first-time-ordering_v1.mp4` |
+| alpine-sports | 11 scenes | yes | `alpine-sports_first-time-ordering_v2.mp4` |
+
+**Videos 02–06 do not exist for any store. That is 20 of the 24.**
+
+**The odd one out: ski-demo has nothing released.** Its
+`help-videos/` folder in `Basic_E2E_Testing` holds a README and nothing
+else, while the other three each carry a finished mp4. Yet ski-demo is the
+reference video — the one PIPELINE.md is written around, and the only one
+with a `_v32`. Either the release was never run for it or it was undone.
+`build/release_video.py` is the only thing that may write there.
+**Check this first: it is one command, not a video's worth of work.**
+
+`PIPELINE.md` opened with "One video is finished (ski-demo). Twenty-three
+more are coming" — written before the other three shipped. Corrected the
+same day.
+
+Each remaining video is the full nine-step pipeline, and **step 5 spends
+real money on HeyGen**. Nothing here should be batched without asking.
 
 ### P1.2 The demo checklist has never been walked by hand here
 
