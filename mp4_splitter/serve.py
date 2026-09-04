@@ -121,6 +121,7 @@ from editor_base import frames as build_mod                 # noqa: E402
 # No segment_avatar_editor import, no vtt.py — this tool never renders a
 # layered/timeline/VTT page, so it has no use for either.
 from editor_base import paths as PTH                        # noqa: E402
+from mp4_splitter import player                             # noqa: E402  its name for the page footer
 
 # editor_base's two per-editor knobs, set here at import time and not in
 # main(): the test imports this module without ever calling main(), and an
@@ -531,13 +532,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return self.route_get(parsed)
 
     def route_get(self, parsed):
-        # This tool's own routes only — the SAE-only ones (Stores, layered/
+        # This tool's own routes only. The SAE-only ones (Stores, layered/
         # timeline opening, Siblings, VTT, ...) were dropped here on
-        # 2026-09-02 when the two split apart. Their handler methods are
-        # still defined further down (harmless, unreachable dead code) —
-        # not deleted, so nothing this tool DOES need risks breaking by a
-        # mis-guessed "unused" removal; only the paths that let you reach
-        # them are gone.
+        # 2026-09-02 when the two tools split apart, and their handler
+        # methods — 15 of them, plus 5 helpers only they called — were
+        # deleted on 2026-09-03. tests/fixture.py's dead_handlers() walks
+        # the dispatcher transitively and fails the suite if an unreachable
+        # handler reappears.
         if parsed.path == "/api/list":
             return self.api_list(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/open":
@@ -546,8 +547,24 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.api_map(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/marks":
             return self.api_marks(urllib.parse.parse_qs(parsed.query))
+        if parsed.path == "/api/clip":
+            return self.api_clip(urllib.parse.parse_qs(parsed.query))
+        if parsed.path.startswith("/web/"):
+            return self.send_web(parsed.path[len("/web/"):])
         if parsed.path in ("/", "/browse.html"):
             return self.send_html(BROWSE_HTML)
+        # A clip's own page. Answered from web/index.html and NOT from the
+        # file of the same name sitting in the clip's cache folder.
+        #
+        # THIS IS DELIBERATE, and it is what makes the 2026-09-04 migration
+        # safe. player.write() used to render a complete page into
+        # <cache>/<slug>/viewer.html, so every clip ever opened still has a
+        # fully-rendered copy of the OLD page on disk. Serving the static
+        # page here makes all of them correct at once — no re-extraction, no
+        # migration pass, and no fresh-fixture blind spot where the suite
+        # passes while months-old caches keep serving the old page.
+        if parsed.path.endswith("/viewer.html"):
+            return self.send_web("index.html", "text/html; charset=utf-8")
         return super().do_GET()
 
     def do_POST(self):
@@ -687,6 +704,70 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         meta = json.load(open(os.path.join(outdir, "meta.json")))
         self.send_json({"frame_map": build_mod.get_frame_map(meta),
                          "nb_frames": meta["nb_frames"]})
+
+    def api_clip(self, qs):
+        """
+        Everything the clip page needs to draw itself — the 14 values that
+        used to be baked into the HTML by player.py's str.format().
+
+        This endpoint IS the contract between serve.py and web/app.js. Add a
+        field here and read it there; there is no third place to keep in
+        step any more, which was the whole point of making the page static.
+        """
+        outdir = resolve_outdir((qs.get("slug") or [""])[0], (qs.get("which") or [None])[0])
+        if outdir is None:
+            return self.send_json({"error": "unknown slug"}, 400)
+        meta = json.load(open(os.path.join(outdir, "meta.json")))
+        name = meta.get("source_name", os.path.basename(meta["source"]))
+        self.send_json({
+            "title": name,
+            "source": name,
+            "source_path": meta["source"],
+            "slug": os.path.basename(outdir.rstrip(os.sep)),
+            "nb_frames": meta["nb_frames"],
+            "fps": meta["fps"],
+            "disp_w": meta["disp_w"],
+            "disp_h": meta["disp_h"],
+            # Toolbelt puts a fixed-width drawer beside the stage: 264 + the
+            # 14px grid gap. stack_w is the width below which that no longer
+            # fits and the drawer drops under the video instead.
+            "app_w": meta["disp_w"] + 278,
+            "stack_w": meta["disp_w"] + 292,
+            "has_audio": bool(meta.get("has_audio")),
+            # `edited` means frames were added or removed, so the extracted
+            # audio — which is the ORIGINAL — no longer lines up. The page
+            # says so rather than letting a false sync be believed.
+            "edited_flag": bool(meta.get("edited")),
+            "edited": bool(meta.get("edited", False)),
+            "player_label": player.label(),
+        })
+
+    def send_web(self, name, ctype=None):
+        """
+        One of this tool's own static files out of mp4_splitter/web/.
+
+        Served from here rather than by pointing the handler's `directory` at
+        web/, because that root is already the frame CACHE — the frames are
+        the bulk of what this server hands out. `name` is resolved and then
+        checked to still be inside web/, so a `..` cannot walk out.
+        """
+        root = os.path.join(HERE, "web")
+        path = os.path.realpath(os.path.join(root, name))
+        if not path.startswith(os.path.realpath(root) + os.sep) or not os.path.isfile(path):
+            return self.send_json({"error": f"no such file: {name}"}, 404)
+        if ctype is None:
+            ctype = {".js": "application/javascript", ".css": "text/css",
+                     ".html": "text/html; charset=utf-8"}.get(
+                os.path.splitext(path)[1], "application/octet-stream")
+        body = open(path, "rb").read()
+        self.send_response(200)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Length", str(len(body)))
+        # This page is edited while it is open. A cached copy of app.js is a
+        # fix that silently did not apply.
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
 
     def api_marks(self, qs):
         outdir = resolve_outdir(qs.get("slug", [""])[0], qs.get("which", [None])[0])

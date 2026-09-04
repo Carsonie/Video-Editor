@@ -1,0 +1,148 @@
+<!--
+  MP4 Splitter — the clip page.
+
+  Static since 2026-09-04. This file ships with NO clip in it: every value
+  that used to be baked in by str.format() now arrives over /api/clip, and
+  app.js fills the page in once that answers. That is why the counters and
+  the filename read empty in this file.
+-->
+<!doctype html>
+<html><head><meta charset="utf-8"><title>MP4 Splitter</title>
+<link rel="stylesheet" href="/web/app.css">
+<script src="/web/app.js" defer></script>
+  <div id="app">
+    <div id="main">
+      <div id="topbar">
+        <span id="srcName"></span>
+        <span id="srcMeta"></span>
+      </div>
+
+      <div id="stage"><img id="frame" src="frames/frame_00001.jpg"><div id="markOverlay"></div></div>
+      <audio id="aud" src="audio.m4a" preload="auto"></audio>
+
+      <!-- Three rows, one job each: WHERE you are, HOW you move, WHAT you
+           change. The timeline used to sit wedged between the step buttons, so
+           the one control you drag was the narrowest thing on the bar and the
+           frame counter was in the same row as the delete buttons. -->
+      <div id="toolbar">
+
+        <!-- 1. the timeline, and nothing else -->
+        <div class="toolRow" id="rowTimeline">
+          <div id="sliderWrap">
+            <div id="segbar"></div>
+            <div id="sliderRow">
+              <input id="slider" type="range" min="1" max="1" value="1" step="1">
+              <div id="ticks"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. moving through it -->
+        <div class="toolRow" id="rowNav">
+          <button id="playBtn" class="stepbtn navbtn" title="Play / pause (space)">▶</button>
+          <button id="muteBtn" class="stepbtn navbtn" title="Mute / unmute">🔊</button>
+          <select id="rateSel" class="navsel" title="Playback speed. Slow to judge a seam; 2x to skim.">
+            <option value="2">2x</option>
+            <option value="1" selected>1x</option>
+            <option value="0.5">0.5x</option>
+            <option value="0.25">0.25x</option>
+            <option value="0.125">0.125x</option>
+          </select>
+          <button id="prev100" class="stepbtn navbtn" title="Back 100 frames">«100</button>
+          <button id="prev10" class="stepbtn navbtn" title="Back 10 frames">«10</button>
+          <button id="prev" class="stepbtn navbtn one" title="Previous frame (←)">◀</button>
+          <button id="next" class="stepbtn navbtn one" title="Next frame (→)">▶</button>
+          <button id="next10" class="stepbtn navbtn" title="Forward 10 frames">10»</button>
+          <button id="next100" class="stepbtn navbtn" title="Forward 100 frames">100»</button>
+          <label id="loopLbl" title="Play only the zone, over and over. Judging a cut point is watching the same two seconds repeatedly, which is what this is for."><input type="checkbox" id="loopChk" title="Play only the zone — the span between the break points either side of the pointer — over and over. With nothing marked the zone is the whole clip."> ↻ Loop Zone</label>
+
+          <div id="readouts">
+            <div id="posLine"><span id="framecount"></span> · <span id="timecode">0.000s</span></div>
+            <div id="totalTime">total <b>0.000s</b></div>
+            <div id="segNow"></div>
+          </div>
+        </div>
+
+        <!-- 3. changing it -->
+        <div class="toolRow" id="rowEdit">
+          <span class="seg-group">
+            <button id="markBtn" class="mode-btn" title="Mark or unmark this frame as a break point (M)"><span class="msq"></span>Mark</button>
+            <button id="frameEditorBtn" class="mode-btn" title="Frame Editor: the step buttons insert or delete frames instead of navigating">✂️ Edit</button>
+          </span>
+          <span class="seg-group" id="subToggle">
+            <button id="addBtn" class="sub-btn" title="Add — the step buttons duplicate this frame on that side">＋ Add</button>
+            <button id="subtractBtn" class="sub-btn" title="Subtract — the step buttons delete frames on that side">－ Sub</button>
+          </span>
+          <!-- Zone: the whole span between the break points either side of the
+               playhead, acted on in one go. Trimming a dead patch out of a
+               recording is this tool's job, and one frame at a time made a
+               three-second patch seventy-five clicks. -->
+          <span class="seg-group" id="zoneToggle">
+            <button id="addZoneBtn" class="sub-btn" title="Repeat the whole zone — the span between the break points either side of the pointer. With no break points the zone is the whole clip.">＋ Zone</button>
+            <button id="delZoneBtn" class="sub-btn" title="Delete the whole zone in one go — the span between the break points either side of the pointer. This is how an unwanted patch comes out.">－ Zone</button>
+          </span>
+          <button id="undoBtn" class="stepbtn navbtn" disabled title="Step back through this clip's edits, one at a time. Cleared when you save. The source file is never touched either way.">↶ Undo</button>
+        </div>
+      </div>
+
+      <div id="tip"></div>
+      <div id="editStatus"></div>
+      <div id="editNote">Frame Editor edits the preview here. Cut and Save rebuild those frames from the original file — never a screenshot of this preview.</div>
+    </div>
+
+    <aside id="drawer">
+      <div id="tabs">
+        <button class="tab" id="tabMarks" title="The break points you have set, in order, with the time of each. Click one to jump the pointer to it.">Break points <span class="badge hidden" id="markBadge">0</span></button>
+        <button class="tab" id="tabFile" title="This clip's details, and the controls that write to disk: Save, discard edits, and Reset Editor.">File <span class="badge dot hidden" id="editBadge" title="Unsaved Frame Editor edits"></span></button>
+      </div>
+
+      <section class="panel" id="panelMarks">
+        <div class="panelHead">
+          <span class="lbl" id="marksLabel">No break points</span>
+          <button id="clearBtn" disabled title="Remove every break point">Clear all</button>
+        </div>
+        <div id="marksList"></div>
+        <div class="empty" id="marksEmpty">Move to a frame and press <b>Mark</b> (or <b>M</b>) to set a break point. Cutting splits <b class="srcNameText"></b> itself — never these preview frames.</div>
+        <hr class="sep">
+        <!-- What Cut is about to write, above the button that writes it. The
+             durations drawn over the slider say the same thing in a shape you
+             can point at; this one you can read. -->
+        <span class="lbl">Segments</span>
+        <div id="segList"></div>
+        <div id="segTotals"></div>
+        <hr class="sep">
+        <button id="cutBtn" class="stepbtn full" disabled title="Cut the SOURCE FILE at every break point and write the pieces to dev/_cuts/. Reads the original with ffmpeg — never these preview frames. Cutting again keeps the earlier attempt and bumps its version.">✂️ Cut into segments</button>
+        <div id="cutStatus"></div>
+        <!-- The handover. The splitter writes _cuts/Num_3-v1-segment.mp4; the
+             Segment and Avatar Editor reads sandbox/03-<name>/segment.mp4.
+             Naming them here is what turns loose cuts into scenes. -->
+        <div id="handoff" hidden>
+          <hr class="sep">
+          <span class="lbl">Hand off to sandbox</span>
+          <div id="handoffRows"></div>
+          <button id="handoffBtn" class="stepbtn full" title="Copy these segments into the sandbox as named scenes, and write a scene row for each into script.json. This is where the Segment and Avatar Editor picks the work up.">→ Hand off to sandbox</button>
+          <div id="handoffStatus"></div>
+        </div>
+      </section>
+
+      <section class="panel" id="panelFile" hidden>
+        <span class="lbl">Clip</span>
+        <div id="fileMeta"><span class="srcNameText"></span><br><span class="fpsText"></span>fps · <span id="fileFrames"></span></div>
+        <div class="stack" style="margin-top:9px">
+          <a class="stepbtn full" href="../browse.html" title="Browse the Customers folder for another recording">📁 Browse…</a>
+        </div>
+        <hr class="sep">
+        <span class="lbl">Write to disk</span>
+        <div class="stack" style="margin-top:7px">
+          <button id="saveBtn" class="stepbtn full" disabled title="Rebuild this clip's edits and overwrite the file this viewer opened">💾 Save edited segment</button>
+        </div>
+        <hr class="sep">
+        <span class="lbl riskHead">Discard</span>
+        <div class="stack" style="margin-top:7px">
+          <button id="clearEditsBtn" class="stepbtn full" title="Discard every edit and break point in this preview and re-extract clean frames — the source file is never touched">↺ Clear all edits</button>
+          <button id="resetEditorBtn" class="stepbtn full" title="Delete this video's entire cache in the tool — frames, edits, break points, everything — and return to Browse. The original video FILE is never touched.">🗑️ Reset Editor</button>
+        </div>
+      </section>
+    </aside>
+  </div>
+  <div class="playerName" id="playerName"></div>

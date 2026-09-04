@@ -460,6 +460,31 @@ the library exists):
    section to add the one exception: `editor_base/` is shared by
    design, and a change to it runs all five suites.
 
+#### Step 11a.8 — `_splitter_player.py` — DEFERRED, not skipped (2026-09-04)
+
+The plan had this step fold `segment_avatar_editor/_splitter_player.py`
+(a 99% copy of the MP4 Splitter's `player.py`, differing by 16 of ~1,570
+lines) into `editor_base/`. It was **not** done, for three reasons, and
+they should be re-read before anyone tries again:
+
+1. **It would break the purity rule Option A was granted under.**
+   `editor_base/__init__.py` says in as many words that page rendering
+   may not live there. A player renders a page. Putting it in would
+   turn the base library back into the thing `shared/serve.py` became.
+2. **It would re-link two tools Carson split apart on purpose.** The
+   comment in `_splitter_player.py` records the call directly: the link
+   is kept working "by duplication rather than a cross-package import".
+   Option A was scoped to `frames`/`paths`/`vtt`, not to players.
+3. **Steps 12 and 13 change the question entirely.** Both delete the
+   `TEMPLATE` strings that are almost all of those 1,570 lines —
+   `player.py` goes to under 200, `_splitter_player.py` with it. A 16-line
+   difference across 1,570 lines and the same difference across 200 are
+   not the same problem, and de-duplicating now would be work done
+   against a file about to be rewritten.
+
+**Revisit after Step 13**, when both players are small, and treat it as
+its own decision for Carson rather than a leftover of this one.
+
 ### Step 11b. If Option B — make the duplication honest
 
 1. `tests/fixture.py` → add `drift_report(reference, copies)` that
@@ -497,7 +522,7 @@ before their page is rebuilt:
 3. **Its README written** (Steps 5/6), because the rewrite changes what
    the README would have to say anyway.
 
-### Step 12. MP4 Splitter — extract the page
+### Step 12. MP4 Splitter — extract the page  ✅ done 2026-09-04
 
 **Task scope:** MP4 Splitter only.
 
@@ -566,6 +591,33 @@ behaviour as before. `wc -l mp4_splitter/player.py` before/after.
 Ready to commit. This is a restructure (behaviour unchanged) — plain
 subject, no VERSION bump. If Carson prefers to treat "the page is now
 static files" as a visible change, bump and use `ADDED:` — his call.
+
+#### Two things Step 12 learned, that Step 13 must not repeat
+
+1. **Extract from the EVALUATED template, never from its source text.**
+   Slicing `player.py`'s text carries Python's own escapes through
+   verbatim — a JS string written `'…video\\'s cache…'` in the `.py`
+   means `\'` after Python parses it, and the raw slice produced a double
+   backslash and a syntax error.
+2. **Find the section boundaries by MARKER, never by line number.** Line
+   numbers read off the source do not line up with the evaluated string:
+   a `\n` written as an escape is two characters in one and a real
+   newline in the other. That drift silently truncated `app.js` by 40
+   lines, taking `show(1)` and the whole init block with it — and the
+   suite stayed green, because nothing it drives over HTTP depends on
+   them. The browser check is what caught it. Do that check.
+
+Both are already handled in the extractor; the point is that a green
+suite did not catch either one.
+
+#### Test-isolation weakness found in passing (not fixed)
+
+`cache_mp4_splitter/` persists across runs, keyed by the source path, but
+the fixture store is destroyed and rebuilt every run. So break points set
+in one run leak into the next, and clicking Mark in a browser made
+`s_handoff` fail on the next run with "got 3, want 2". Two orphaned
+caches pointing at the deleted fixture were removed. Worth a proper fix —
+the suite should clear its own slugs — but it is not part of this plan.
 
 ### Step 13. Segment and Avatar Editor — extract both pages
 

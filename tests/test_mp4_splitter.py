@@ -381,22 +381,16 @@ def s_session_log():
 
 
 def s_app_js_parses():
-    step("the landing page and the viewer page — does the JavaScript actually run?")
+    step("the pages' JavaScript — does it actually parse?")
     node = shutil.which("node")
     if node is None:
         check("node is available to parse it", False,
               "install node, or this can never catch a broken page again")
         return
-    pages = {}
-    html = urllib.request.urlopen(MP4_BASE + "/", timeout=10).read().decode()
-    pages["landing page"] = html
-    live = live_clip("02-bravo-scene")
-    r = urllib.request.urlopen(f"{MP4_BASE}/{live}/viewer.html", timeout=10)
-    pages["viewer page"] = r.read().decode()
 
-    for name, html in pages.items():
-        js = "\n".join(re.findall(r"<script>(.*?)</script>", html, re.S))
-        tmp = os.path.join(tempfile.gettempdir(), f"mp4splitter_{name}_check.js")
+    def parses(name, js):
+        safe = re.sub(r"[^A-Za-z0-9]+", "_", name)   # "web/app.js" is not a filename
+        tmp = os.path.join(tempfile.gettempdir(), f"mp4splitter_{safe}_check.js")
         with open(tmp, "w") as fh:
             fh.write(js)
         r = subprocess.run([node, "--check", tmp], capture_output=True, text=True)
@@ -405,6 +399,96 @@ def s_app_js_parses():
         check(f"{name}: its JavaScript parses", r.returncode == 0,
               f"{len(js)} bytes" if r.returncode == 0
               else next((l for l in first if "Error" in l), first[0] if first else ""))
+
+    # The landing page still carries an inline <script>.
+    html = urllib.request.urlopen(MP4_BASE + "/", timeout=10).read().decode()
+    parses("landing page", "\n".join(re.findall(r"<script>(.*?)</script>", html, re.S)))
+
+    # The clip page does NOT any more — it is web/app.js, fetched as a file.
+    # Scraping <script> out of its HTML would now find nothing and hand
+    # `node --check` an empty string, which passes while proving nothing.
+    # So this fetches the real file. That is the whole reason the step was
+    # repointed on 2026-09-04 rather than left alone when it stayed green.
+    app_js = urllib.request.urlopen(MP4_BASE + "/web/app.js", timeout=10).read().decode()
+    check("web/app.js is really served, and is not empty", len(app_js) > 10000,
+          f"{len(app_js)} bytes")
+    parses("web/app.js", app_js)
+
+    # ...and the page that loads it must actually reference it, or a served
+    # file nothing links to would still pass the check above.
+    live = live_clip("02-bravo-scene")
+    page = urllib.request.urlopen(f"{MP4_BASE}/{live}/viewer.html", timeout=10).read().decode()
+    check("the clip page loads web/app.js", "/web/app.js" in page)
+    check("the clip page loads web/app.css", "/web/app.css" in page)
+    check("the clip page bakes in NO clip values any more",
+          "{" not in page.split("<body")[0].split("<!--")[-1]
+          or "nb_frames" not in page, "ships empty")
+
+
+def s_api_clip():
+    """
+    /api/clip IS the contract between serve.py and web/app.js since
+    2026-09-04. Every value here used to be baked into the HTML by
+    player.py's str.format(); if one goes missing the page draws itself
+    wrong rather than failing, so all fourteen are named explicitly.
+    """
+    step("/api/clip — the page ships empty and the clip arrives over the API")
+    live = live_clip("02-bravo-scene")
+    check("a live clip to ask about", bool(live), live)
+    clip, code = get("/api/clip", slug=live)
+    eq("a real slug is answered", code, 200)
+
+    WANT = ["title", "source", "source_path", "slug", "nb_frames", "fps",
+            "disp_w", "disp_h", "app_w", "stack_w", "has_audio",
+            "edited_flag", "edited", "player_label"]
+    missing = [k for k in WANT if k not in clip]
+    check("all fourteen fields are present", not missing, missing or "none")
+
+    # Real answers, not just present keys.
+    eq("nb_frames is the clip's real count", clip.get("nb_frames"),
+       frames_of("sandbox/02-bravo-scene/segment.mp4"))
+    check("fps is real", bool(clip.get("fps")), clip.get("fps"))
+    check("the frame size is real",
+          clip.get("disp_w", 0) > 0 and clip.get("disp_h", 0) > 0,
+          (clip.get("disp_w"), clip.get("disp_h")))
+    eq("app_w is disp_w + 278 (the toolbelt drawer)",
+       clip.get("app_w"), clip.get("disp_w", 0) + 278)
+    eq("stack_w is disp_w + 292", clip.get("stack_w"), clip.get("disp_w", 0) + 292)
+    eq("the slug echoes back", clip.get("slug"), live)
+    check("player_label names this tool",
+          str(clip.get("player_label", "")).startswith("MP4 Splitter v"),
+          clip.get("player_label"))
+
+    _, code = get("/api/clip", slug="no-such-clip-at-all")
+    eq("an unknown slug is refused, not answered", code, 400)
+
+
+def s_stale_cached_pages():
+    """
+    THE MIGRATION HAZARD, kept as a permanent check.
+
+    player.write() used to render a complete page into every clip's cache
+    folder, so on 2026-09-04 there were real clips on disk carrying a fully
+    baked copy of the OLD page — one of them from two days earlier. serve.py
+    answers /<slug>/viewer.html from web/index.html and ignores the file on
+    disk, which makes every one of those correct at once.
+
+    A fresh fixture cannot show this on its own: its caches are new. So this
+    writes an old-looking viewer.html into a real clip's folder and proves
+    the server does not serve it.
+    """
+    step("a stale viewer.html on disk is ignored, not served")
+    live = live_clip("02-bravo-scene")
+    path = os.path.join(PLAYERS, "cache_mp4_splitter", live, "viewer.html")
+    marker = "STALE-BAKED-PAGE-FROM-BEFORE-THE-MIGRATION"
+    with open(path, "w") as fh:
+        fh.write(f"<!-- {marker} -->\n<html><body>old</body></html>\n")
+    check("the stale file really is on disk", os.path.isfile(path))
+
+    with urllib.request.urlopen(f"{MP4_BASE}/{live}/viewer.html", timeout=30) as r:
+        page = r.read().decode()
+    check("the stale page is NOT what gets served", marker not in page)
+    check("the static page is served instead", "/web/app.js" in page)
 
 
 def s_no_unreachable_handlers():
@@ -428,7 +512,7 @@ def s_no_unreachable_handlers():
 FUNCTIONS = [s_static_page, s_list, s_open, s_own_cache, s_map, s_dup, s_del,
              s_restore, s_mark, s_save, s_save_stale, s_clear_edits, s_cut,
              s_reset_editor, s_handoff, s_archive, s_dropped_routes_are_gone,
-             s_session_log, s_app_js_parses,
+             s_session_log, s_api_clip, s_stale_cached_pages, s_app_js_parses,
              s_no_unreachable_handlers]
 
 

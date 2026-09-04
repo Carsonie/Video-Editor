@@ -1,0 +1,328 @@
+/*
+ * MP4 Splitter — the clip page's styles.
+ *
+ * A plain .css file since 2026-09-04. It used to be a <style> block inside
+ * a Python string in player.py, where every brace had to be doubled to
+ * survive str.format() and no editor could lint or highlight it.
+ *
+ * The clip's own dimensions are NOT baked in here any more. They arrive as
+ * custom properties, set on the root element by app.js once /api/clip has
+ * answered:
+ *
+ *     --disp-w   the frame's real width
+ *     --disp-h   the frame's real height
+ *     --app-w    the grid's width (disp_w + 278 for the toolbelt drawer)
+ *
+ * The one rule that could NOT become a custom property is the responsive
+ * breakpoint: a @media query cannot read var(). app.js injects that single
+ * block itself with the real number — see applyLayout() there.
+ */
+:root {
+    color-scheme: dark;
+    /* Break points are GREEN on an mp4 and PURPLE on a WebM — the same two
+       colours the layered view uses for background and overlay. In THIS view
+       there is no layer toggle to read, so the marks are the only thing that
+       can say which kind of file is open. Cutting Sarah is not cutting the
+       screen recording, and the two are easy to confuse once a long avatar
+       render is being spliced like any other clip. */
+    --mark:#2ecc40; --markHi:#5aff70; --markGlow:rgba(46,204,64,.35);
+  }
+  :root.alpha {
+    --mark:#a56cff; --markHi:#c9a3ff; --markGlow:rgba(165,108,255,.40);
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1a1a1a; color:#eee; font-family:-apple-system,sans-serif;
+         padding:14px 0 26px; }
+
+  /* ── Toolbelt layout ───────────────────────────────────────────────────
+     The frame takes the whole main column. ONE toolbar under it holds every
+     control touched every few seconds — mode, transport, readouts. Anything
+     touched once a session lives in the drawer on the right, behind a tab,
+     where it cannot be hit by accident.
+
+     Replaced (2026-08-21) a stack of eleven centred full-width rows in which
+     the six step buttons were dealt over three rows, the mode switch that
+     rewrites what those buttons DO sat below them, and Reset Editor — the
+     most destructive control in the tool — sat at the bottom of the scroll
+     with the same weight as Browse. */
+  #app { width:var(--app-w); max-width:100%; margin:0 auto;
+         display:grid; grid-template-columns:var(--disp-w) 264px; gap:14px; align-items:start; }
+  #main { display:flex; flex-direction:column; gap:8px; min-width:0; }
+
+  #topbar { display:flex; align-items:baseline; gap:8px; padding:0 2px 2px; }
+  #topbar #srcName { font-size:12px; color:#bbb; overflow:hidden; text-overflow:ellipsis;
+                     white-space:nowrap; }
+  #topbar #srcMeta { font-size:11px; color:#666; flex-shrink:0; margin-left:auto;
+                     font-variant-numeric:tabular-nums; }
+
+  #stage { width:var(--disp-w); height:var(--disp-h); background:#000; border:1px solid #333;
+           position:relative; }
+  #frame { width:var(--disp-w); height:var(--disp-h); display:block; }
+  /* Marked-frame indicator — CSS drawn on top of the <img>, never part of the
+     pixels themselves. Cutting reads the ORIGINAL source file with ffmpeg, which
+     has no idea this div exists, so this green can never end up in an output
+     .mp4 no matter what. */
+  #markOverlay { position:absolute; inset:0; display:none; pointer-events:none;
+                 background:rgba(46,204,64,0.30); border:4px solid #2ecc40;
+                 box-sizing:border-box; }
+
+  /* ── the one toolbar ── */
+  /* THREE rows, one job each: where you are, how you move, what you change.
+     Was two, and before that one. The segment durations drawn over the slider
+     are only readable if the slider is wide, and a slider sharing a row with
+     eight step buttons is not — so the timeline now has a row to itself and
+     spans the whole width. Splitting nav from edit matters for a different
+     reason: the frame counter used to sit in the same row as the delete
+     buttons. */
+  #toolbar { display:flex; flex-direction:column; align-items:stretch; gap:9px;
+             background:#212629; border:1px solid #353c42; border-radius:7px;
+             padding:9px 11px; }
+  /* Each row gets its own box, so the three jobs read apart at a glance rather
+     than by remembering which button sits where. */
+  .toolRow { display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+             border:1px solid #3d454c; border-radius:7px;
+             padding:8px 10px; background:#1b2024; }
+  /* The timeline row holds ONE thing and it should use the whole width — it was
+     wedged between the step buttons before, which made the only control you
+     drag the narrowest thing on the bar. */
+  #rowTimeline { padding:6px 10px 8px; }
+  #rowTimeline #sliderWrap { flex:1 1 100%; }
+  /* The nav row is the tight one: nine step controls, Loop, and the readouts.
+     It needed 760px in a 726px column, so the readouts fell to a second line.
+     A smaller gap buys the 34px back — the main column is a FIXED width, so
+     this does not come right on a wider window. */
+  #rowNav { gap:5px; }
+  #readouts { text-align:right; min-width:104px; margin-left:auto;
+              font-variant-numeric:tabular-nums; }
+  #readouts #posLine { font-size:12px; color:#e6e9ec; }
+  /* Total Time is the whole reason Frame Editor exists — you stretch or
+     shorten this clip until it matches the narration's fixed length. It used
+     to be plain centred text between two unrelated buttons; here it sits in
+     the readout block, where the eye already is. */
+  #readouts #totalTime { font-size:11px; color:#8b949c; }
+  #readouts #totalTime b { color:#cfd6dc; font-weight:600; }
+  /* On a long clip cut into many segments the bands get too narrow to hold
+     their own label. This line always names the segment the playhead is in
+     and its length, so that figure is never unreadable. */
+  #readouts #segNow { font-size:11px; color:#8b949c; }
+  #readouts #segNow b { color:#9fe0ab; font-weight:600; }
+
+  /* Segmented controls — the mode switch is now physically joined to, and
+     level with, the step buttons whose meaning it rewrites. */
+  .seg-group { display:flex; border:1px solid #4a5259; border-radius:6px; overflow:hidden;
+               flex-shrink:0; }
+  .seg-group > button { border:0; border-radius:0; height:30px; width:auto; padding:0 11px;
+                        font-size:12px; }
+  .seg-group > button + button { border-left:1px solid #4a5259; }
+  /* Both halves stay clickable at all times; only the styling shows which is
+     current. A literal `disabled` on the inactive one would make switching
+     back impossible. */
+  button.mode-btn.active, button.sub-btn.active { background:#1f5c2e; color:#fff; }
+  button.mode-btn.inactive, button.sub-btn.inactive { opacity:0.45; }
+  button.mode-btn.active:hover, button.sub-btn.active:hover { background:#256b37; }
+  /* visibility, not display: Add/Subtract appearing must not re-flow the
+     toolbar. A control bar that changes width or height when you switch mode
+     moves every button out from under the cursor. */
+  #subToggle { visibility:hidden; }
+  #subToggle.visible { visibility:visible; }
+  .sub-btn { font-size:11px !important; padding:0 9px !important; }
+
+  /* Frame Editor tints the six step buttons: green = duplicates frames,
+     red = deletes them — so a click reads as constructive/dangerous at a
+     glance, not by memory of which mode is on. */
+  .edit-add { background:#1f4a2e !important; border-color:#2ecc40 !important; }
+  .edit-add:hover { background:#255a37 !important; }
+  .edit-del { background:#4a2323 !important; border-color:#e05555 !important; }
+  .edit-del:hover { background:#5a2b2b !important; }
+
+  /* ── slider + segment bar ── */
+  #sliderWrap { position:relative; flex:1; min-width:90px; height:44px;
+                display:flex; flex-direction:column; justify-content:flex-end; }
+  /* A range thumb travels from half-a-thumb in to half-a-thumb short of the
+     end, but the ticks and the segment bar were laid out across the FULL
+     width. So a break point and the pointer could only agree at the exact
+     middle, and drifted by up to half a thumb at the ends — clicking a marker
+     left the pointer visibly beside it. Fixed in the Segment and Avatar Editor
+     first; the same bug was still here. The thumb is given an explicit size so
+     the inset is a known number rather than whatever the browser picked. */
+  :root { --thumb:14px; --halfthumb:7px; }
+  #sliderWrap input[type=range] { -webkit-appearance:none; appearance:none;
+       width:100%; margin:0; height:var(--thumb); background:transparent; }
+  #sliderWrap input[type=range]::-webkit-slider-runnable-track {
+       height:6px; border-radius:3px; background:#39424a; }
+  #sliderWrap input[type=range]::-webkit-slider-thumb { -webkit-appearance:none;
+       appearance:none; width:var(--thumb); height:var(--thumb); border-radius:50%;
+       background:var(--mark); border:none; margin-top:-4px; }
+  #sliderWrap input[type=range]::-moz-range-track { height:6px; border-radius:3px;
+       background:#39424a; }
+  #sliderWrap input[type=range]::-moz-range-thumb { width:var(--thumb);
+       height:var(--thumb); border-radius:50%; background:var(--mark); border:none; }
+  #sliderRow { position:relative; height:24px; display:flex; align-items:center; }
+  /* Segment bar — the durations of the files Cut is about to write, drawn
+     over the top of the slider, each band spanning exactly the frames that
+     segment covers. Boundaries mirror /api/cut's own
+     `[1] + marks + [nb_frames+1]` rule, including its skip of an empty
+     segment, so a label here is the duration that actually gets written. */
+  #segbar { position:relative; height:19px; margin:0 var(--halfthumb) 1px; }
+  .seg { position:absolute; top:0; bottom:0; display:flex; align-items:center;
+         justify-content:center; overflow:hidden; background:#2b3237;
+         border-radius:2px; font-size:11px; color:#cfd6dc;
+         font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .seg.alt { background:#232a2e; }
+  .seg.here { background:#1f4a2e; color:#dff5e2; }
+  :root.alpha .seg.here { background:#3a2a5c; color:#ece2ff; }
+  /* No break points means one span and nothing to cut — shown, but dimmed,
+     so the bar never changes height and never implies a cut is available. */
+  .seg.idle { background:#242424; color:#7d858b; }
+  .seg > span { flex:none; padding:0 3px; }
+  .seg.narrow > span { display:none; }
+
+  /* The CONTAINER stays click-through so the slider still takes a click or a
+     drag anywhere along its length; only the ticks themselves opt back in. */
+  #ticks { position:absolute; left:var(--halfthumb); right:var(--halfthumb);
+           top:50%; height:14px; margin-top:-7px; pointer-events:none; }
+  .tick { position:absolute; top:0; width:3px; height:100%; background:var(--mark);
+          transform:translateX(-50%); border-radius:1px;
+          pointer-events:auto; cursor:pointer; }
+  /* A 3px target cannot be hit with a mouse. This widens the CLICKABLE area to
+     15px without widening the 3px line the eye sees. */
+  .tick::before { content:''; position:absolute; left:-6px; right:-6px;
+                  top:-5px; bottom:-5px; }
+  .tick:hover { background:var(--markHi); box-shadow:0 0 0 2px var(--markGlow); }
+  .tick.at { background:#eaff00; box-shadow:0 0 0 2px rgba(234,255,0,.4); }
+
+  button, a.stepbtn { background:#2c3236; color:#eee; border:1px solid #4a5259;
+           border-radius:6px; width:44px; height:36px; font-size:18px; cursor:pointer;
+           font-family:inherit; }
+  button.stepbtn, a.stepbtn { width:auto; padding:0 12px; font-size:13px; height:30px;
+           display:inline-flex; align-items:center; justify-content:center; gap:5px;
+           text-decoration:none; box-sizing:border-box; white-space:nowrap; }
+  .navbtn { height:30px; font-size:13px; padding:0 8px; width:auto; }
+  .navbtn.one { width:32px; padding:0; font-size:15px; }
+  button:hover, a.stepbtn:hover { background:#373e43; }
+  button:disabled { opacity:0.35; cursor:default; }
+  button:focus-visible, a:focus-visible { outline:2px solid #7aa7ff; outline-offset:1px; }
+
+  /* Matched to .navbtn so the transport reads as one row of controls. */
+  .navsel { background:#2c3236; color:#eee; border:1px solid #4a5259; border-radius:6px;
+            height:30px; font-size:13px; font-family:inherit; padding:0 4px; cursor:pointer; }
+  .navsel:hover { background:#373e43; }
+  .navsel:focus-visible { outline:2px solid #7aa7ff; outline-offset:1px; }
+  /* Lit while anything other than 1x is selected, so a clip playing at an odd
+     speed can never be mistaken for one playing normally. */
+  .navsel.off1 { background:#1f5c2e; border-color:#2ecc40; color:#fff; }
+  #editNote { font-size:11px; color:#886; padding:0 2px; }
+  #editStatus { font-size:12px; color:#e0c060; white-space:pre-line; padding:0 2px;
+               min-height:16px; }
+
+  /* ── drawer ── */
+  #drawer { display:flex; flex-direction:column; gap:8px; }
+  #tabs { display:flex; border:1px solid #4a5259; border-radius:6px; overflow:hidden; }
+  .tab { flex:1; border:0; border-radius:0; height:32px; width:auto; font-size:12px;
+         display:inline-flex; align-items:center; justify-content:center; gap:5px; }
+  .tab + .tab { border-left:1px solid #4a5259; }
+  .tab.active { background:#3a4248; color:#fff; }
+  .tab.inactive { opacity:0.5; }
+  /* A tab that hides a control also hides that control's STATE. These two
+     badges put the state back on the outside of the tab: how many break
+     points are waiting, and whether there are unsaved Frame Editor edits. */
+  .badge { font-size:10px; min-width:16px; height:16px; padding:0 4px; border-radius:8px;
+           background:#4a5259; color:#dfe4e8; display:inline-flex; align-items:center;
+           justify-content:center; font-variant-numeric:tabular-nums; }
+  .badge.on { background:#2ecc40; color:#0d2b13; }
+  .msq { display:inline-block; width:11px; height:11px; border-radius:2px;
+          background:var(--mark); margin-right:6px; vertical-align:-1px; }
+  .badge.dot { min-width:8px; width:8px; height:8px; padding:0; border-radius:50%;
+               background:#2e8ecc; }
+  .badge.hidden { display:none; }
+
+  .panel { border:1px solid #353c42; border-radius:7px; background:#212629; padding:11px; }
+  .panel[hidden] { display:none; }
+  .panelHead { display:flex; justify-content:space-between; align-items:center; gap:8px;
+               margin-bottom:9px; }
+  .lbl { font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#7d858b; }
+  #clearBtn { width:auto; height:24px; padding:0 8px; font-size:11px;
+              background:#3a2323; border-color:#663; color:#f99; flex-shrink:0; }
+  #clearBtn:hover { background:#4a2b2b; }
+  #marksList { display:flex; flex-direction:column; gap:3px; max-height:210px;
+               overflow-y:auto; }
+  .markRow { display:flex; justify-content:space-between; align-items:center;
+             background:#181c1f; border-radius:4px; padding:5px 9px; font-size:12px;
+             font-variant-numeric:tabular-nums; }
+  .markRow .jump { cursor:pointer; color:#c8cfd5; }
+  .markRow .jump b { color:#fff; font-weight:600; }
+  .markRow button { background:none; border:none; color:#f66; cursor:pointer;
+                    font-size:14px; width:auto; height:auto; padding:0 3px; }
+  .markRow button:hover { color:#f99; background:none; }
+  .empty { font-size:11px; color:#6d757b; padding:6px 2px; line-height:1.5; }
+
+  .stack { display:flex; flex-direction:column; gap:6px; }
+  .full { width:100%; }
+  /* Actions grouped by consequence, never mixed in one undifferentiated row:
+     Cut and Save WRITE files; Clear all edits and Reset Editor THROW WORK
+     AWAY. The divider and the red block are the only thing standing between
+     a mis-click and a deleted cache. */
+  .riskHead { color:#c08484; }
+  #cutBtn { background:#1f5c2e; border-color:#2ecc40; }
+  #cutBtn:hover { background:#256b37; }
+  :root.alpha #cutBtn { background:#3a2a5c; border-color:var(--mark); }
+  :root.alpha #cutBtn:hover { background:#48357180; background:#483571; }
+  :root.alpha .badge.on { background:var(--mark); color:#1a0d33; }
+  #cutBtn:disabled { background:#2c3236; border-color:#4a5259; }
+  #saveBtn { background:#1a3a5c; border-color:#2e8ecc; }
+  #saveBtn:hover { background:#204a72; }
+  #saveBtn:disabled { background:#2c3236; border-color:#4a5259; }
+  /* Ported from the Segment and Avatar Editor. A native tooltip appears at the
+     browser's own timing and cannot be styled or placed, so a control whose tip
+     runs to three lines is unreadable at the moment you need it. */
+  #segList { margin:6px 0 0; max-height:190px; overflow:auto; }
+  .sgrow { display:flex; align-items:baseline; gap:7px; padding:3px 4px;
+           border-radius:4px; font-size:11px; color:#cfd6dc; cursor:pointer;
+           font-variant-numeric:tabular-nums; }
+  .sgrow:nth-child(odd) { background:#20262a; }
+  .sgrow.here { background:#1f4a2e; color:#dff5e2; }
+  .sgrow .sn { color:#8b949c; width:38px; flex:none; }
+  .sgrow.here .sn { color:#9fe0ab; }
+  .sgrow .sf { margin-left:auto; color:#8b949c; }
+  .sgrow.here .sf { color:#cfe9d4; }
+  #segTotals { margin-top:6px; padding-top:6px; border-top:1px solid #353c42;
+               display:flex; gap:7px; font-size:11px; color:#8b949c;
+               font-variant-numeric:tabular-nums; }
+  #segTotals b { color:#cfd6dc; font-weight:600; }
+  #segTotals .st { margin-left:auto; }
+  #tip { position:fixed; z-index:99; max-width:320px; padding:7px 10px;
+         background:#0f1214; color:#dfe4e7; border:1px solid #66727c;
+         border-radius:6px; font-size:12px; line-height:1.45;
+         box-shadow:0 6px 20px rgba(0,0,0,.55); pointer-events:none;
+         opacity:0; transition:opacity .12s ease; }
+  #tip.on { opacity:1; }
+  #loopLbl { display:inline-flex; align-items:center; gap:5px; font-size:13px;
+             color:#cfd6dc; border:1px solid #4a5259; border-radius:6px;
+             padding:6px 9px; cursor:pointer; user-select:none; white-space:nowrap; }
+  #loopLbl:hover { border-color:var(--mark); }
+  #loopLbl input { margin:0; accent-color:var(--mark); cursor:pointer; }
+  #clearEditsBtn { background:#4a2323; border-color:#e05555; color:#f6c9c9; }
+  #clearEditsBtn:hover { background:#5a2b2b; }
+  #resetEditorBtn { background:#5c1414; border-color:#ff4444; color:#ffdddd; }
+  #resetEditorBtn:hover { background:#711b1b; }
+  #handoff { margin-top:2px; }
+  .hrow { display:flex; align-items:center; gap:6px; margin:5px 0; }
+  .hrow .hn { color:#8a949b; font-size:11px; width:58px; flex:none;
+              font-variant-numeric:tabular-nums; }
+  .hrow input { flex:1; min-width:0; background:#1b2024; color:#e6ebee;
+                border:1px solid #3a4249; border-radius:5px; padding:5px 7px;
+                font:inherit; font-size:12px; }
+  .hrow input:focus { outline:none; border-color:var(--mark); }
+  .hrow input.bad { border-color:#e05555; }
+  #handoffStatus { margin-top:7px; font-size:11px; color:#e0c060;
+                   white-space:pre-line; line-height:1.5; word-break:break-word; }
+  #cutStatus { margin-top:8px; font-size:11px; color:#e0c060; white-space:pre-line;
+              line-height:1.5; word-break:break-word; }
+  #fileMeta { font-size:11px; color:#7d858b; line-height:1.6; word-break:break-word; }
+  hr.sep { border:0; border-top:1px solid #353c42; margin:11px 0 9px; }
+
+  /* The player's own name, at the foot of the page. Three players share this
+     server and look alike at a glance; this is what says which one you are in
+     before you touch a control. */
+  .playerName { margin:22px auto 4px; text-align:center; font-size:12px;
+                letter-spacing:.16em; text-transform:uppercase; color:#6d757b; }

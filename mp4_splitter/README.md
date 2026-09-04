@@ -10,46 +10,97 @@ python3 mp4_splitter/serve.py          # http://localhost:8845
 
 Standalone — nothing else needs to be running. Its own process, its own
 port, its own extracted-frame cache (`cache_mp4_splitter/`, not the
-shared `cache/`), and its own copies of `frames.py` and `paths.py`.
-Split off `shared/serve.py` on 2026-09-02 at Carson's request: MP4
-Splitter and the Segment and Avatar Editor used to share one process on
-port 8842, and he asked for the two to be genuinely independent, code
-and all, so a change to one can never break the other.
+shared `cache/`), its own routes and its own pages. Split off
+`shared/serve.py` on 2026-09-02 at Carson's request: MP4 Splitter and the
+Segment and Avatar Editor used to share one process on port 8842, and he
+asked for the two to be genuinely independent, code and all, so a change
+to one can never break the other.
+
+The one thing it does share is `editor_base/` — frame extraction, path
+shapes and the VTT word count, imported rather than copied since
+2026-09-03. Those three files had existed in triplicate and differed by
+two lines of real code; both are now configuration this tool sets at
+import time (`use_cache()`, `use_player()`). See `CLAUDE.md`, "The one
+exception: editor_base/".
 
 ## What's in here
 
 | | |
 |---|---|
 | `serve.py` | the server and every route. Stateless: each request names what it acts on |
-| `player.py` | the viewer page — see the warning below |
-| `frames.py` | frame extraction, the frame map, the edit maths. **A copy** of `shared/frames.py`, not an import |
-| `paths.py` | where a store's folders are. **A copy**, and currently byte-identical to `shared/`'s |
+| `web/index.html` | the clip page, shipped **empty** — no clip is baked into it |
+| `web/app.css` | its styles. The clip's own size arrives as CSS custom properties |
+| `web/app.js` | its behaviour, ~1,100 lines. Fetches `/api/clip` first, then runs |
+| `player.py` | 66 lines: this player's name and version, and nothing else |
 | `VERSION` | bumped on every commit that changes what this tool does — its own history, not another editor's |
 
-There is no `web/` folder here, and that is the one thing worth knowing
-before editing this tool. See below.
+Frame extraction, path shapes and the edit maths are in `editor_base/`,
+imported — not copied here.
 
-## ⚠ The page is a Python string, not files
+## The page is three static files, and it ships empty
 
-`player.py` builds the entire viewer — HTML, CSS and JavaScript — as one
-`TEMPLATE` string rendered with `str.format()`. That carries two traps
-this project has already paid for, both documented in `CLAUDE.md`:
+`web/index.html`, `web/app.css`, `web/app.js` — plain files, served by
+`serve.py`'s `send_web()` with `Cache-Control: no-store`.
 
-- **Every CSS and JS brace must be doubled** `{{ }}`, or `.format()`
-  eats it.
-- **A stray apostrophe in a single-quoted JS string kills the whole
-  page silently** — every control dies, including Play. Use a backtick
-  literal.
+**No clip is baked into any of them.** The fourteen values the page needs
+arrive over `GET /api/clip?slug=…`, and `app.js` runs only once that has
+answered. That endpoint IS the contract between the server and the page:
+add a field in `serve.py`'s `api_clip()` and read it in `app.js`. There
+is no third place to keep in step.
 
-So: **always check the generated JavaScript, not just that the Python
-parses.** The suite's last step does exactly that (`node --check` on the
-rendered page) and is the only thing standing between a broken page and
-a silent ship. Do not drop it.
+Two values could not simply become data:
 
-Avatar Editor and Frame Blender moved off this pattern on 2026-08-30 to
-plain `web/*.js` files. This tool has not yet — it is Step 12 of
-`README-CODE-CLEANUP-PLAN.md`, and that plan describes the migration
-using those two as the worked example.
+- The clip's width and height drove four baked CSS numbers. Three are now
+  custom properties (`--disp-w`, `--disp-h`, `--app-w`) set on the root
+  element. The fourth is a **responsive breakpoint, and a `@media` query
+  cannot read `var()`** — so `app.js`'s `applyLayout()` injects that one
+  block itself with the real number.
+
+### ⚠ Every clip's cache still holds a stale copy of the OLD page
+
+Until 2026-09-04 `player.write()` rendered the whole page into
+`<cache>/<slug>/viewer.html`, one baked copy per clip. Those files are
+still on disk for every clip ever opened.
+
+`serve.py` answers `/<slug>/viewer.html` from `web/index.html` and
+**ignores whatever file is on disk**. That makes all of them correct at
+once — no re-extraction, no migration pass. `player.write()` is now a
+no-op that deliberately writes nothing, because anything it wrote would
+be a stale copy nothing reads.
+
+The suite pins this down (`s_stale_cached_pages`), because a fresh
+fixture cannot show it: its caches are new, so the suite would pass while
+months-old real caches served the old page.
+
+### What this replaced, and why
+
+`player.py` was 1,568 lines, almost all of it one `TEMPLATE` string
+holding the HTML, the CSS and 1,018 lines of JavaScript, rendered with
+`str.format()`. Every CSS and JS brace had to be doubled `{{ }}`, no
+editor could lint or highlight it, and a stray apostrophe killed the page
+at **render** time rather than at edit time. It is now 66 lines.
+
+The extraction itself hit exactly that class of bug twice, which is the
+best argument for having done it: slicing the template's *source text*
+carried Python's own `\'` escape through into the JavaScript verbatim and
+produced a syntax error, and reading line numbers off the source while
+slicing the *evaluated* string silently truncated `app.js` by 40 lines —
+taking the whole init block with it, while the suite stayed green.
+
+**Keep the `node --check` guard.** It now fetches `/web/app.js` and parses
+the real file, and asserts the page actually references it — a served file
+nothing links to would otherwise pass.
+
+Avatar Editor and Frame Blender moved off the Python-string pattern on
+2026-08-30. The Segment and Avatar Editor has not yet; that is Step 13 of
+`README-CODE-CLEANUP-PLAN.md`, and this tool is its worked example.
+
+### One known rough edge
+
+`HEAD /web/app.js` returns 404 while `GET` returns the file: `do_HEAD`
+falls through to `SimpleHTTPRequestHandler`, which looks in the frame
+cache and finds nothing. Nothing in this project issues a HEAD for these,
+so it is recorded rather than fixed.
 
 ## What it serves
 
