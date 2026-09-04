@@ -729,6 +729,63 @@ def s_original_audio_stack():
                               .split("const OriginalAudio = ")[0])
 
 
+def s_load_order_forward_refs():
+    """
+    Does any file USE, at load time, a name only DECLARED in a later one?
+
+    THE BUG THIS EXISTS FOR, found the day the split was made. timeline.js
+    does, at its top level:
+
+        document.getElementById('tlLoadBtn').onclick = pickStores;
+
+    and pickStores() lives in another file. Inside ONE script that works —
+    function declarations hoist. Across two <script> tags they do not: the
+    earlier script runs first and reads a name that does not exist yet, and
+    the page threw "pickStores is not defined" on every load.
+
+    Nothing else could see it. Every check in this suite drives HTTP, so the
+    server answered perfectly while the page was broken; `node --check`
+    parses each file and the concatenation, and both are valid JavaScript —
+    the failure is at RUNTIME, in load order, not in syntax.
+
+    The heuristic: collect every top-level DECLARATION per file and every
+    top-level STATEMENT that is not one, then flag a statement referencing a
+    name declared in a file loaded later. It is deliberately conservative —
+    it only looks at the real top level, so a name used inside a function
+    body (which runs long after every file has loaded) is correctly ignored.
+    """
+    ORDER = ["frame-player.js", "gap-state.js", "library.js",
+             "clip-gap-builder.js", "gap-menu.js", "wire.js",
+             "working-clips.js", "tooltips.js", "app.js"]
+    step("load order — no file reads a name declared in a later one")
+    DECL = re.compile(r"^(?:async\s+)?(?:function|const|let|var|class)\s+([A-Za-z_$][\w$]*)")
+    pat = re.compile(rf"^{' ' * 0}(\S.*)$")
+
+    declared, stmts = {}, []
+    for i, f in enumerate(ORDER):
+        text = urllib.request.urlopen(AE_BASE + "/web/" + f, timeout=10).read().decode()
+        for line in text.splitlines():
+            m = pat.match(line)
+            if not m or m.group(1).startswith("//"):
+                continue
+            s = m.group(1)
+            d = DECL.match(s)
+            if d:
+                declared.setdefault(d.group(1), i)
+            else:
+                stmts.append((i, f, s))
+
+    check("the files really were read", len(declared) > 10, f"{len(declared)} names")
+    bad = []
+    for i, f, s in stmts:
+        for ident in set(re.findall(r"\b([A-Za-z_$][\w$]*)\b", s)):
+            j = declared.get(ident)
+            if j is not None and j > i:
+                bad.append(f"{f} uses `{ident}` from {ORDER[j]}")
+    check("no file reads a later file's declaration at load time",
+          not bad, bad[:3] or "none")
+
+
 def s_no_unreachable_handlers():
     """
     A route deleted from do_GET/do_POST leaves its handler BODY behind
@@ -799,7 +856,7 @@ def s_own_cache():
        ae_serve.main_serve.CACHE, ae_serve.CACHE)
 
 
-FUNCTIONS = [s_static_page, s_app_js_parses, s_original_audio_stack, s_working_clips, s_common_library_wiring, s_tooltips, s_stateless, s_load_picker, s_load_store,
+FUNCTIONS = [s_static_page, s_app_js_parses, s_load_order_forward_refs, s_original_audio_stack, s_working_clips, s_common_library_wiring, s_tooltips, s_stateless, s_load_picker, s_load_store,
              s_save_scene_proxy,
              s_libs_list_paths, s_common_library, s_libs_group_order,
              s_lib_frames_clip, s_lib_frames_still,

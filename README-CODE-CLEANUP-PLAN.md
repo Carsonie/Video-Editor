@@ -712,7 +712,7 @@ concatenated in load order.
 
 **Verify:** suite PASS; no file over ~400 lines; live editor identical.
 
-### Step 16. `frame_blender/web/app.js` — split by its section banners
+### Step 16. `frame_blender/web/app.js` — split by its section banners  ✅ done 2026-09-04
 
 **Task scope:** Frame Blender only. Separate task.
 

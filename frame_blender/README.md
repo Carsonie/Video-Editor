@@ -23,17 +23,45 @@ that came with the split (a cross-process lock gap).
 | `serve.py` | the server. Stateless: every request that acts on a scene names that scene. |
 | `web/index.html` | the page, with no scene in it |
 | `web/app.css` | its styling |
-| `web/app.js` | everything else: the combine engine, persistence, Timeline Scenes, the Load popup |
+| `web/state.js` | `SCENE`, `SCRIPT`, `pairQS()` — loaded **1st** |
+| `web/persistence.js` | the browser's own storage, not the server — **2nd** |
+| `web/load-picker.js` | `pickStores()` and the Load popup — **3rd** |
+| `web/timeline.js` | Timeline Scenes — **4th** |
+| `web/app.js` | loading and unloading a scene, and the bootstrap — **5th** |
 | `VERSION` | bumped on every commit that touches this tool |
 
-`gap-builder.js` and `app.js` share one flat scope on purpose — neither is
-wrapped in an IIFE, so each can call straight into the other's top-level
-declarations, the same way a page has always shared scope across ordered
-`<script>` tags. No bundler, no import/export. The one real risk that comes
-with that: a `let`/`const` name declared in both would throw the moment
-they share a scope for real, which neither file's own syntax check alone
-would catch — `tests/test_frame_blender.py`'s `s_app_js_parses` checks both
-files together, in load order, specifically to catch that.
+`app.js` was 765 lines covering four concerns; it was split on its own
+section banners on 2026-09-04.
+
+### ⚠ Load order is a behaviour contract, and it bit on day one
+
+These files share one flat top-level scope on purpose — none is wrapped in
+an IIFE, so each can call straight into the others' declarations, the way a
+page has always shared scope across ordered `<script>` tags. No bundler, no
+import/export.
+
+That carries **two** risks, and only the first was known:
+
+1. A `const` name declared in two files throws the moment they share a
+   scope for real. `s_app_js_parses` checks every file alone **and all five
+   concatenated in load order**, which is the only thing that sees it.
+
+2. **A file that USES, at load time, a name declared in a later file.**
+   `timeline.js` does
+
+   ```js
+   document.getElementById('tlLoadBtn').onclick = pickStores;
+   ```
+
+   at its top level, and `pickStores()` is in `load-picker.js`. Inside one
+   file that worked — function declarations hoist. Across two `<script>`
+   tags they do not, and the page threw `pickStores is not defined` on
+   every load. **Nothing in the suite could see it**: every check drives
+   HTTP, so the server answered perfectly, and `node --check` passes
+   because the failure is at runtime, not in syntax. The browser found it.
+
+   `s_load_order_forward_refs` now checks for exactly that, and
+   `load-picker.js` must stay before `timeline.js`.
 
 ## The one idea worth knowing
 

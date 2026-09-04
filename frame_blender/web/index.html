@@ -92,6 +92,26 @@
     </div>
   </div>
 
+<!-- LOAD ORDER IS FORCED. app.js was split into these four on 2026-09-04;
+     none is wrapped in an IIFE, so they share ONE flat top-level scope and
+     this order reproduces the order that single file ran in. A `const` used
+     at load time must be declared in a file loaded earlier — moving a tag
+     here is a behaviour change.
+
+     1. state.js       — SCENE, SCRIPT, pairQS(). Everything below reads them.
+     2. persistence.js — the browser's own storage.
+     3. load-picker.js — defines pickStores(). MUST come before timeline.js,
+                         which assigns it as an onclick AT LOAD TIME. In the
+                         old single file that worked by hoisting; across two
+                         <script> tags it does not, and the page threw
+                         "pickStores is not defined" until this was fixed.
+     4. timeline.js    — Timeline Scenes.
+     5. app.js         — loading/unloading a scene, and the bootstrap, which
+                         must run after everything above. -->
+<script src="/web/state.js"></script>
+<script src="/web/persistence.js"></script>
+<script src="/web/load-picker.js"></script>
+<script src="/web/timeline.js"></script>
 <script src="/web/app.js"></script>
 </body>
 </html>
