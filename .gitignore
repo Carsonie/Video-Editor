@@ -55,6 +55,7 @@ cache-go/
 # only these two got a genuinely separate folder each.
 cache_mp4_splitter/
 cache_segment_avatar_editor/
+cache_avatar_editor/
 
 # Run logs: the record of one machine's work, not source.
 logs/*.log

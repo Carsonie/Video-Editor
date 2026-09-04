@@ -725,7 +725,7 @@ suite's parse step.
 
 ## Phase 6 — Tooling and hygiene
 
-### Step 17. Give Avatar Editor its own cache directory
+### Step 17. Give Avatar Editor its own cache directory  ✅ done 2026-09-04
 
 **Task scope:** Avatar Editor only.
 
@@ -743,6 +743,27 @@ own cache — cache_mp4_splitter/, not the shared cache/"* step.
 or give it `cache_frame_blender/` in its own separate task for
 symmetry. Update `.claude/skills/editor-launchers/SKILL.md`'s cache
 column either way; it currently documents the sharing.
+
+#### What Step 17 turned out to be (2026-09-04)
+
+The plan called this a miss — the pair "was missed" at the 2026-09-02
+split. It was not a miss; the shared cache was **load-bearing**, and
+changing it alone breaks Save.
+
+Avatar Editor does not copy `shared/serve.py`'s pure helpers, it CALLS
+them, so a scene's frame count and pristine/dirty state stay computed one
+way. Two of the borrowed ones — `resolve_outdir()` and `frame_count()` —
+read `shared/serve.py`'s own module-level `CACHE`. Point extraction at a
+new folder and those keep looking in the old one, and Save fails with
+"changed on disk since this was loaded here": a staleness error about a
+file nobody touched.
+
+The fix is one more line, `main_serve.CACHE = CACHE`, in the same
+monkey-patch shape `main()` already uses. Both it and `use_cache()` must
+run AFTER `import serve as main_serve`, because that module sets the cache
+at its own import time and would silently undo an earlier assignment.
+
+`s_own_cache` asserts all three point at the same folder.
 
 ### Step 18. Add a linter — narrow, non-reformatting
 

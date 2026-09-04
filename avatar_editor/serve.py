@@ -75,7 +75,7 @@ import urllib.parse
 
 HERE = os.path.dirname(os.path.abspath(__file__))       # <repo>/avatar_editor
 ROOT = os.path.dirname(HERE)                             # <repo>
-CACHE = os.path.join(ROOT, "cache")                       # SAME cache the editor uses
+CACHE = os.path.join(ROOT, "cache_avatar_editor")          # this tool's OWN cache
 GAP_LOG_DIR = os.path.join(ROOT, "logs")                  # same logs/ the editor's own daily log lives in
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "shared"))
@@ -88,6 +88,39 @@ import serve as main_serve                                # noqa: E402  for its 
 from serve import safe_join, CUSTOMERS_ROOT               # noqa: E402
 import build_scenes                                       # noqa: E402  reuse its real ffmpeg recipe
 from editor_base import paths as PTH                      # noqa: E402  script()/sandbox_root() — see stores()
+
+# Point editor_base at THIS tool's cache, and do it here rather than in
+# main() — the suite imports this module without ever calling main(), and
+# an unset cache would extract into another tool's folder.
+#
+# ORDER MATTERS. shared/serve.py calls use_cache(<repo>/cache) at ITS import
+# time, and it is imported above as main_serve. Setting this before that
+# line would be silently undone.
+#
+# Until 2026-09-04 this tool shared <repo>/cache/ with Frame Blender: MP4
+# Splitter and the SAE each got their own at the 2026-09-02 split and this
+# pair was missed. Frame Blender keeps cache/ to itself, which is fine —
+# giving it its own name is a separate task, in its own scope.
+build_mod.use_cache(CACHE)
+
+# ...and point shared/serve.py's borrowed helpers at it too.
+#
+# This tool does not copy shared/serve.py's pure helpers, it calls them —
+# main_serve.resolve_outdir() and main_serve.frame_count() among them, so a
+# scene's frame count and pristine/dirty state stay computed exactly one
+# way. Both read shared/serve.py's OWN module-level CACHE, which is
+# <repo>/cache.
+#
+# That is why the shared cache was load-bearing rather than an oversight:
+# with it changed and this line missing, extraction goes to
+# cache_avatar_editor/ while every borrowed helper still looks in cache/,
+# and Save fails with "changed on disk since this was loaded here" — a
+# staleness error pointing at a file nobody touched. The suite caught it
+# (s_save_scene_proxy, 409 instead of 200); nothing else would have.
+#
+# The same monkey-patch shape main() already uses for SESSION_OFF,
+# SESSION_LOG and ACTIONS.
+main_serve.CACHE = CACHE
 
 SARAH_ROOT = os.path.join(ROOT, "Sarah")                 # her common library — see Sarah/README.md
 

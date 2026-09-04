@@ -729,11 +729,64 @@ def s_no_unreachable_handlers():
     eq("unreachable handlers", fixture.dead_handlers(AE_SERVE), [])
 
 
+def s_own_cache():
+    """
+    Its own cache — cache_avatar_editor/, not the shared cache/.
+
+    MP4 Splitter and the SAE each got their own extraction cache at the
+    2026-09-02 split; Avatar Editor and Frame Blender were missed and
+    shared <repo>/cache/ until 2026-09-04. Two tools writing frames into
+    one folder means one tool's Clear can throw away frames the other is
+    still using, and neither can be reasoned about alone.
+
+    There is an ordering hazard behind this that no test would otherwise
+    see: shared/serve.py calls editor_base's use_cache(<repo>/cache) at
+    ITS import time, and avatar_editor/serve.py imports it. Setting this
+    tool's cache before that line would be silently undone — the server
+    would come up looking correct and extract into the wrong folder.
+    """
+    # LAST in FUNCTIONS on purpose: these checks share state in the order the
+    # work happens, and opening a pair up front made the save step see the
+    # file as "stale" and fail with a 409.
+    step("its own cache — cache_avatar_editor/, not the shared cache/")
+    d, code = fb_get("/api/open_pair", base=REAL_SEG, overlay=REAL_AV)
+    check("a pair opened", code == 200, code)
+    slug = (d or {}).get("base_slug") or (d or {}).get("slug")
+    check("it reported a slug", bool(slug), slug)
+
+    own = os.path.join(PLAYERS, "cache_avatar_editor")
+    check("the frames landed in cache_avatar_editor/",
+          bool(slug) and os.path.isdir(os.path.join(own, slug)),
+          os.path.join(own, str(slug)))
+
+    # The hazard itself, asserted directly: the module's own CACHE constant
+    # and the one editor_base will actually extract into must be the same
+    # folder. They are set on different lines, and only their order keeps
+    # them equal.
+    sys.path.insert(0, PLAYERS)
+    from avatar_editor import serve as ae_serve       # noqa: E402
+    eq("serve.py's CACHE is this tool's own",
+       os.path.basename(ae_serve.CACHE), "cache_avatar_editor")
+    eq("editor_base will extract into that same folder",
+       ae_serve.build_mod.CACHE, ae_serve.CACHE)
+
+    # The third one, and the one that actually broke. This tool CALLS
+    # shared/serve.py's pure helpers rather than copying them, and two of
+    # them — resolve_outdir() and frame_count() — read that module's own
+    # CACHE. Leave it pointing at <repo>/cache and extraction goes to one
+    # folder while every lookup goes to another: Save then fails with
+    # "changed on disk since this was loaded here", a staleness error about
+    # a file nobody touched.
+    eq("shared/serve.py's borrowed helpers look in that folder too",
+       ae_serve.main_serve.CACHE, ae_serve.CACHE)
+
+
 FUNCTIONS = [s_static_page, s_app_js_parses, s_original_audio_stack, s_working_clips, s_common_library_wiring, s_tooltips, s_stateless, s_load_picker, s_load_store,
              s_save_scene_proxy,
              s_libs_list_paths, s_common_library, s_libs_group_order,
              s_lib_frames_clip, s_lib_frames_still,
-             s_no_unreachable_handlers]
+             s_no_unreachable_handlers,
+             s_own_cache]
 
 
 def main():

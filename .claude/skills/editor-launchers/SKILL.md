@@ -14,8 +14,8 @@ into two) — always these four unless he names a different set:
 |---|---|---|---|---|
 | **MP4 Splitter** | Cuts a raw recording into numbered segments. `mp4_splitter/serve.py` | `mp4-splitter` | 8845 | `cache_mp4_splitter/` |
 | **Segment and Avatar Editor** | Layers a segment + avatar overlay, timelines, Join/Split. `segment_avatar_editor/serve.py` | `segment-avatar-editor` | 8846 | `cache_segment_avatar_editor/` |
-| **Frame Blender** | Monitors how the base and overlay tracks flow together, frame by frame, to form the current scene — and (planned) drives a visual frame-by-frame mp4 build, showing the build as it happens. `frame_blender/` | `frame-blender` | 8843 | `cache/` (repo-root) |
-| **Avatar Editor** | Edits Sarah's own overlay — her clip library (stills, idle loops, transitions, sound bits) via the Gap Builder, for building and adjusting her overlay scene by scene. `avatar_editor/` | `avatar-editor` | 8844 | `cache/` — SAME folder as Frame Blender's, unlike the two below. That split (2026-08-xx) never asked for separate caches; this one (Splitter/SAE, 2026-09-02) explicitly did. Worth knowing if that ever needs fixing to match. |
+| **Frame Blender** | Monitors how the base and overlay tracks flow together, frame by frame, to form the current scene — and (planned) drives a visual frame-by-frame mp4 build, showing the build as it happens. `frame_blender/` | `frame-blender` | 8843 | `cache/` (repo-root) — it has that folder to itself since 2026-09-04. Renaming it `cache_frame_blender/` for symmetry is a separate task. |
+| **Avatar Editor** | Edits Sarah's own overlay — her clip library (stills, idle loops, transitions, sound bits) via the Gap Builder, for building and adjusting her overlay scene by scene. `avatar_editor/` | `avatar-editor` | 8844 | `cache_avatar_editor/` — its own since 2026-09-04. It shared `cache/` with Frame Blender until then. |
 
 **Frame Blender's purpose (2026-09-02):** it exists to watch the two
 tracks — base and overlay — and how they line up, scene by scene, frame
