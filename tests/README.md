@@ -9,9 +9,9 @@ cd .claude/agent-tools/6_end-customer-help-video-creations/video_players
 python3 tests/test_editor.py
 ```
 
-141 checks in 35 steps — one per endpoint, plus the behaviour steps that
-cross several: alpha survival, cache locking, the join's gap filler.
-About 90 seconds cold, 30 warm. Exit code is non-zero if any fail.
+167 checks — one step per endpoint, plus the behaviour steps that cross
+several: alpha survival, cache locking, the join's gap filler. About 90
+seconds cold, 30 warm. Exit code is non-zero if any fail.
 
 Every run writes a log next to the test:
 
@@ -21,6 +21,39 @@ tests/log_reports/editor_<HH>_<MM>_<SS>.log
 
 Same shape as the E2E run logs — a header, the steps with a tick per check, then
 a recap and a `Result: PASS` / `FAIL` verdict. Gitignored, like those are.
+
+## What a check is allowed to assert
+
+A check must drive the server and assert a real result. It must not
+assert that a line of source code is spelled a particular way.
+
+That distinction was not always kept. Avatar Editor's suite reached 210
+checks of which ~79 were source-text greps — asserting that a string
+like `const DELAY = 3000;` appeared in the served JavaScript. Such a
+check passes when the feature is broken and fails when a variable is
+renamed, so it reports the opposite of what it looks like it reports.
+Two of them asserted exact whitespace and indentation. They were removed
+2026-09-03; the suite went 211 -> 141 checks and became worth its
+number.
+
+Three narrow exceptions are allowed, and they are all CONTRACTS rather
+than spelling:
+
+- **Element ids.** Every id the page's JavaScript looks up must exist in
+  the served HTML. Break one and that panel dies silently.
+- **Absence assertions.** "This removed control has not come back",
+  "we did not go back to `window.prompt`", "Clear All does not touch
+  PICKED". Nothing else can see these regressions.
+- **`node --check` on the served pages.** Two editors still build their
+  pages as Python strings, where a stray apostrophe kills the page at
+  render time; this is the only guard against it.
+
+Anything else that cannot be reached over HTTP — a tooltip appearing
+after three seconds, a picture stepping with a voice — is browser
+behaviour. This suite cannot test it. Say so in a comment and leave the
+gap visible; do not paper over it with a grep.
+
+Frame Blender's suite is the model: 50 checks, almost all behavioural.
 
 ## The four standalone editors have their own folders, own logs, own reports
 

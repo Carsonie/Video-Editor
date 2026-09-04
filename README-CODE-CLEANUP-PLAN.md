@@ -45,7 +45,7 @@ go looking.
 *Purpose: put a test in place that will catch the thing being cleaned
 up, BEFORE cleaning it up. Then the fix is proven by a test that stays.*
 
-### Step 1. Add a dead-handler guard to `tests/fixture.py`
+### Step 1. Add a dead-handler guard to `tests/fixture.py`  ✅ done 2026-09-03
 
 **Why:** the review found unreachable handler bodies in MP4 Splitter and
 Segment and Avatar Editor. Every suite asserts the *routes* 404. None
@@ -112,7 +112,7 @@ If it does not report exactly **15** and **4**, the guard is wrong —
 fix the guard before going further. (13 means it is doing a call-site
 diff, not reachability. That is the bug this box is about.)
 
-### Step 2. Wire the guard into all four suites — and watch two of them FAIL
+### Step 2. Wire the guard into all four suites — and watch two of them FAIL  ✅ done 2026-09-03
 
 **What:** add one step to each `tests/test_<editor>.py`:
 
@@ -142,7 +142,7 @@ editors' own files, and `tests/` is shared. Subject: plain, e.g.
 
 ## Phase 1 — Free wins (no behaviour changes)
 
-### Step 3. Delete the 15 unreachable handlers in `mp4_splitter/serve.py`
+### Step 3. Delete the 15 unreachable handlers in `mp4_splitter/serve.py`  ✅ done 2026-09-03 (15 handlers + 5 orphaned helpers, 1,173 lines)
 
 **Task scope:** MP4 Splitter only.
 
@@ -188,7 +188,7 @@ now read *"… are gone entirely"*, because they finally are.
 
 Ready to commit. Plain subject. No VERSION bump.
 
-### Step 4. Delete the 4 dead handlers in `segment_avatar_editor/serve.py`
+### Step 4. Delete the 4 dead handlers in `segment_avatar_editor/serve.py`  ✅ done 2026-09-03 (4 handlers + a stale log branch, 214 lines)
 
 **Task scope:** Segment and Avatar Editor only. A separate task from
 Step 3.
@@ -207,7 +207,7 @@ prune now-unused imports, fix the docstring, verify with
 
 Ready to commit. Plain subject. No VERSION bump.
 
-### Step 5. Write `mp4_splitter/README.md`
+### Step 5. Write `mp4_splitter/README.md`  ✅ done 2026-09-03
 
 **Task scope:** MP4 Splitter only.
 
@@ -230,7 +230,7 @@ the README that `grep` can prove false.
 
 Ready to commit. Docs only, no VERSION bump.
 
-### Step 6. Write `segment_avatar_editor/README.md`
+### Step 6. Write `segment_avatar_editor/README.md`  ✅ done 2026-09-03
 
 **Task scope:** Segment and Avatar Editor only. Separate task from Step 5.
 
@@ -254,7 +254,7 @@ Ready to commit. Docs only.
 is deliberately BEFORE the big structural work in Phases 3–4, because
 that work needs a suite that tests behaviour, not spelling.*
 
-### Step 7. Reclassify every source-text check in `tests/test_avatar_editor.py`
+### Step 7. Reclassify every source-text check in `tests/test_avatar_editor.py`  ✅ done 2026-09-03 (211 -> 141 checks; greps 79 -> 9)
 
 **Task scope:** Avatar Editor's suite only.
 
@@ -308,7 +308,7 @@ sits under a step whose title starts with `structure —`.
 
 Ready to commit. Test-only. No VERSION bump.
 
-### Step 8. Break Avatar Editor's 10-check steps toward one-step-per-concern
+### Step 8. Break Avatar Editor's 10-check steps toward one-step-per-concern  ✅ done 2026-09-03 (fell out of Step 7: mean ~10 -> 5.2)
 
 **Task scope:** Avatar Editor's suite only. Can be the same task as
 Step 7 if convenient.
@@ -326,7 +326,7 @@ of the report.
 **Verify:** `tests/avatar_editor/<latest>.txt` lists more, smaller
 steps; all PASS.
 
-### Step 9. Correct every stated check count
+### Step 9. Correct every stated check count  ✅ done 2026-09-03
 
 **Task scope:** docs. Can be one commit.
 

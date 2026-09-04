@@ -4,6 +4,84 @@ Newest work first. One file so there is one place to check for open work.
 
 ---
 
+## 2026-09-03 (later) — the cleanup plan, Phases 0–2 implemented
+
+Branch **`plan-implementation`**, off `next_gen_editors`. Nothing pushed.
+Steps 0–9 of `README-CODE-CLEANUP-PLAN.md` are done and each is its own
+commit; that file now marks them `✅ done`.
+
+**The suites, after:**
+
+| | before | after |
+|---|---|---|
+| Avatar Editor | 210 | **141** (79 source-text greps -> 9) |
+| Frame Blender | 49 | 50 |
+| MP4 Splitter | 82 | 83 |
+| Segment and Avatar Editor | 90 | 91 |
+| the old combined `test_editor.py` | — | 167, untouched |
+
+All five green. The +1s are the new dead-handler guard.
+
+**What landed:**
+
+- **Step 0 — the plan had four errors; fixed before implementing.** The
+  worst: its dead-handler guard was specified as a call-site diff, which
+  under-reports, because dead code calling dead code looks alive. The
+  real figure was 15 handlers / 930 lines / 36% of mp4_splitter's
+  serve.py, not 13 / 759 / 29%. Following the original plan would have
+  deleted 13, reported clean, and left 171 dead lines behind.
+- **Steps 1–2 — `fixture.dead_handlers()`**, transitive reachability
+  from `do_GET`/`do_POST`, wired into all four suites. Committed
+  deliberately RED so the guard's find was on the record before the fix.
+- **Steps 3–4 — 1,387 unreachable lines deleted.** mp4_splitter
+  2,556 -> 1,383 (15 handlers + 5 orphaned module-level helpers);
+  segment_avatar_editor 2,587 -> 2,373 (4 handlers + a stale
+  `session_log()` branch still formatting a line for `/api/open`).
+- **Steps 5–6 — the two missing READMEs written**, every factual claim
+  verified rather than recalled.
+- **Steps 7–8 — Avatar Editor's suite made honest.** 71 presence-greps
+  removed, 8 absence assertions kept, plus the element-id contracts, the
+  cross-panel isolation invariant (broken twice historically) and the
+  no-silent-control scan. Mean checks per step ~10 -> 5.2.
+- **Step 9 — every stated count corrected** in `CLAUDE.md` and
+  `tests/README.md`, from a fresh run. `tests/README.md` gained a
+  "What a check is allowed to assert" section so the grep habit does not
+  return.
+
+### Where it stops, and why
+
+**Step 10 is a DECISION and needs Carson.** It is the duplication
+strategy, and nothing past it can start without an answer:
+
+- `paths.py` is byte-identical in three places.
+- `_splitter_player.py` differs from `mp4_splitter/player.py` by 16
+  lines out of ~1,570.
+- `mp4_splitter/serve.py` and `segment_avatar_editor/serve.py` were 88%
+  identical before this cleanup.
+- Meanwhile Avatar Editor and Frame Blender each import 13 symbols from
+  the legacy `shared/serve.py` and cannot run without it.
+
+Option A is a shared `editor_base/`; Option B is full duplication made
+honest with a drift report. Both are written out in the plan (11a/11b).
+The review recommends A because the copies have not diverged, but it
+overrides a rule Carson set, so it is his call. Record the answer in the
+plan under `## Decision (Step 10)`.
+
+**Phases 4–6 remain**: moving MP4 Splitter and SAE off Python-string
+pages (Steps 12–13, the big ones — note Step 12's stale-cached-viewer
+hazard, added in Step 0), gathering `gap-builder.js`'s 21 globals before
+splitting it (14 then 15, in that order), Frame Blender's `app.js`
+(16), Avatar Editor's own cache dir (17), a narrow linter (18), and the
+final doc sync (19).
+
+### Still standing, unchanged
+
+- **`build/assemble_video.py` is modified and NOT ours** — someone
+  else's uncommitted crossfade work-in-progress. Never touch it, never
+  stage it, never commit over it.
+
+---
+
 ## 2026-09-03 — Sarah's clips got a real home, and the Avatar Editor now has two library panels
 
 Branch **`next_gen_editors`**. Everything below is **committed AND

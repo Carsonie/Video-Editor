@@ -112,7 +112,7 @@ segment_avatar_editor/   Segment and Avatar Editor — finish them
 shared/                  serve.py  frames.py  paths.py  vtt.py
 build/                   the tools that make the finished video
 Sarah/                   her standards, and the clips every video reuses
-tests/                   142 checks over every endpoint
+tests/                   532 checks over five suites, one per server
 Customers/               the video data — GITIGNORED
 ```
 
@@ -293,10 +293,10 @@ the code they started as a copy of.
 
 ```bash
 python3 tests/test_editor.py                    # shared/serve.py, port 8842 (old combined) — 167 checks
-python3 tests/test_mp4_splitter.py               # mp4_splitter/serve.py, port 8845          — 82 checks
-python3 tests/test_segment_avatar_editor.py      # segment_avatar_editor/serve.py, port 8846  — 90 checks
-python3 tests/test_frame_blender.py              # frame_blender/serve.py, port 8843          — 49 checks
-python3 tests/test_avatar_editor.py              # avatar_editor/serve.py, port 8844           — 210 checks
+python3 tests/test_mp4_splitter.py               # mp4_splitter/serve.py, port 8845          — 83 checks
+python3 tests/test_segment_avatar_editor.py      # segment_avatar_editor/serve.py, port 8846  — 91 checks
+python3 tests/test_frame_blender.py              # frame_blender/serve.py, port 8843          — 50 checks
+python3 tests/test_avatar_editor.py              # avatar_editor/serve.py, port 8844           — 141 checks
 ```
 
 `test_editor.py` is the deepest one — one step per disk function, plus a
