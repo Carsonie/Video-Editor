@@ -1,6 +1,6 @@
 ---
 name: video-development
-description: The small hands-on tasks that come up while editing a help video in the browser. THREE NAMED PHRASES trigger it directly, and they are printed in the Segment and Avatar Editor's own "ASK CLAUDE" box so Carson can read them off the screen: "Capture Still" (take the frame currently on screen, from the right source file, into Sarah's library), "Read Screen" (say which scene, frame, selection and unsaved state his own Chrome tab is showing), and "Which Source" (which of the frame cache, avatar.webm or narration.webm a job should read). Also use whenever asked to grab, capture or save a frame, still or pose, to add something to Sarah's library from what is on screen, to say where he is in an editor, or when a task needs a frame out of a scene at full quality. What a still IS and how it is named lives in the sarah-library skill; this one is how to get one.
+description: The small hands-on tasks that come up while editing a help video in the browser. FOUR NAMED PHRASES trigger it directly, and they are printed in the Segment and Avatar Editor's own "ASK CLAUDE" box so Carson can read them off the screen: "Capture Still" (take the frame currently on screen, from the right source file, into Sarah's library), "Read Screen" (say which scene, frame, selection and unsaved state his own Chrome tab is showing), and "Which Source" (which of the frame cache, avatar.webm or narration.webm a job should read), and "Open Close Pose" (put Sarah's 3-frame rest pose at the end of a scene, the start of the next, or both, so the cut between them is invisible). Also use whenever asked to grab, capture or save a frame, still or pose, to add something to Sarah's library from what is on screen, to say where he is in an editor, or when a task needs a frame out of a scene at full quality. What a still IS and how it is named lives in the sarah-library skill; this one is how to get one.
 user_invocable: true
 ---
 
@@ -16,7 +16,7 @@ pipeline. Each one below has already cost time once.
 - **`editor-launchers`** — starting and reloading the four editors.
 - **`PIPELINE.md`** — the nine steps that make a video.
 
-**THE THREE PHRASES.** Carson says one of these and the matching section
+**THE PHRASES.** Carson says one of these and the matching section
 below is followed rather than improvised. They are printed in the Segment
 and Avatar Editor's own **ASK CLAUDE** box (bottom right of the timeline
 page, under the status bar) so he can read them off the screen:
@@ -26,6 +26,7 @@ page, under the status bar) so he can read them off the screen:
 | **Capture Still** | the frame on screen → the right source → Sarah's library |
 | **Read Screen** | which scene, frame, selection, what is unsaved |
 | **Which Source** | cache vs `avatar.webm` vs `narration.webm` |
+| **Open Close Pose** | Sarah's 3-frame rest pose at a scene boundary |
 
 They are named in this file's `description:` too, so they match exactly
 rather than by judgement. **Adding a phrase means three edits, always
@@ -202,3 +203,55 @@ still that only shows up wrong in a finished video.
 
 A button becomes the right answer once a procedure here is settled and being
 run often. This file is what makes one safe to write.
+
+---
+
+## "Open Close Pose" — making a scene cut invisible
+
+Carson's standard, defined 2026-09-04: a scene **ends** on Sarah's rest pose
+and the next scene **begins** on the same one, so the join reads as one
+continuous shot rather than two clips butted together. Same image both
+sides, so there is nothing for the eye to catch.
+
+**The asset already exists — do not rebuild it:**
+
+```
+Sarah/gap-fillers/sarah-open-closing-pose-3f-alpha.webm
+  1152x1152 · yuva420p · 25fps · 3 frames · no audio
+```
+
+Built from `stills/sarah-rest-pose-corner-300-alpha.png`, scaled to 294x304
+and placed at (836, 848) on a 1152x1152 transparent canvas — the geometry
+measured off a real `avatar.webm` frame, not guessed. Verified against one
+side by side: same size, same position, no jump.
+
+### Why it is a CLIP and not painted frames — the trap
+
+The obvious move is to composite the still onto the last three cache PNGs.
+**It does not survive.** `/api/save` calls `build_segment()`, which rebuilds
+the track **from the source file** using `frame_map`. Painted cache frames
+look right in the editor and are silently discarded on Save — a lie that
+only shows up in the finished video.
+
+Anything that must persist has to be real source footage. That is why this
+is a webm.
+
+### Before placing it, check the tail
+
+The pose fixes 3 frames. Look at what is actually wrong first:
+
+```bash
+python3 -c "import json;m=json.load(open('<cache>/<over_slug>/meta.json'));
+print(m['speech_end'], m['nb_frames'])"
+```
+
+On ski-demo scene 1 she stops speaking at 17.565s (frame 439) but keeps
+**mouthing to frame 480** — 43 bad frames, not 3. Three frames of rest pose
+at the very end leaves 40 wrong ones in front of it. Say so rather than
+placing it and calling the scene fixed.
+
+### Where it goes
+
+Carson names the position each time — end of a scene, start of the next, or
+both. Do not assume: replacing the last frames and appending after them are
+different edits with different lengths.

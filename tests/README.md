@@ -6,13 +6,13 @@ built from real footage; the sixth has no server in it.
 ```bash
 python3 tests/test_editor.py                 # shared/serve.py, port 8842 (old combined) — 166
 python3 tests/test_avatar_editor.py          # avatar_editor/serve.py, port 8844          — 173
-python3 tests/test_segment_avatar_editor.py  # segment_avatar_editor/serve.py, port 8846  — 117
+python3 tests/test_segment_avatar_editor.py  # segment_avatar_editor/serve.py, port 8846  — 119
 python3 tests/test_mp4_splitter.py           # mp4_splitter/serve.py, port 8845           — 102
 python3 tests/test_frame_blender.py          # frame_blender/serve.py, port 8843          —  71
 python3 tests/test_editor_base.py            # editor_base/ — pure functions, no server   —  57
 ```
 
-686 checks. Exit code is non-zero if any fail.
+688 checks. Exit code is non-zero if any fail.
 
 **A change inside `editor_base/` runs all six, not one.** That is the trade
 the shared package makes: it is imported by every editor, so a change there
