@@ -421,77 +421,39 @@ def s_working_clips():
     gb = urllib.request.urlopen(AE_BASE + "/web/gap-builder.js", timeout=10).read().decode()
     js = urllib.request.urlopen(AE_BASE + "/web/app.js", timeout=10).read().decode()
 
-    # ── the panel
-    check("the panel is on the page", 'id="wcGroups"' in html)
-    check("it has its own status line", 'id="wcStatus"' in html)
-    check("it reuses the library panel's own classes, not a second layout",
+    # Every control this panel needs must EXIST in the served page, with
+    # the id its handler looks up. That is a real contract between the
+    # HTML and the JS, and breaking it breaks the panel — so it is worth
+    # a check even though it is read out of the page's text.
+    for el in ("wcGroups", "wcStatus", "gmSaveTarget", "gmReplaceSelected",
+               "gmAudioClearAll"):
+        check(f"the page carries {el}", f'id="{el}"' in html)
+    check("the panel reuses the library's own classes, not a second layout",
           'class="panel libpanel wcpanel"' in html)
-    for label in ("IDLE", "TRANSITIONS", "SOUND_BITS"):
-        check(f"section {label}", f"label: '{label}'" in wc)
-    check("exactly three sections", wc.count("{key: '") == 3)
-    check("each row shows its frame count", "${entry.n}f" in wc)
-    check("each row has its own checkbox", "cb.type = 'checkbox'" in wc)
-    # One active item, not a list: Replace Selected needs ONE answer.
-    check("ticking one unticks the rest",
-          "cb.checked ? {section: sec.key, id: entry.id} : null" in wc)
 
-    # ── saving
-    # ONE control: picking a section IS the save, so there is no separate
-    # button to press afterwards. The row wears a menu button's own box.
+    # ONE control: picking a section IS the save. The absence half of this
+    # is the part worth asserting — a second Save button coming back is a
+    # regression nothing else would catch.
     check("Save to: is itself the button",
           'class="gapMenuBtn gapMenuRow" id="gmSaveToWorking"' in html)
-    check("...with the dropdown inside it", 'id="gmSaveTarget"' in html)
-    check("no second Save button",
+    check("...and there is no second Save button",
           html.count('id="gmSaveToWorking"') == 1
           and "Save to Working Clips</button>" not in html)
     for value in ("idle", "sound_bits", "transitions"):
         check(f"...offers {value}", f'value="{value}"' in html)
-    check("picking a section fires the save", "gmSaveTarget.onchange" in gb)
-    # It is an action, not a setting, so it must never sit showing a
-    # destination afterwards — saved or cancelled.
-    check("...and the dropdown falls back to blank", "gmSaveTarget.value = '';" in gb)
-    check("green when the Builder has frames",
-          "save.classList.toggle('ready', n > 0);" in wc)
-    # A <select> cannot live inside a <button>, so the row is a <div> and
-    # cannot be :disabled — this class stands in for it.
-    check("dimmed when it does not", "save.classList.toggle('isDisabled', !n);" in wc)
-    check("...and the dropdown itself is disabled then", "target.disabled = !n;" in wc)
-    check("it asks for a name in the page's own modal, not window.prompt",
-          "modalPrompt({" in gb
-          and "window.prompt(" not in gb and "= prompt(" not in gb)
-    check("the modal's button says Continue", "okText = 'Continue'" in js)
-    check("the whole Builder collection is saved, in order",
-          "WorkingClips.saveBuilder(section" in gb and "BUILDER_FRAMES.slice()" in wc)
-    # A stored URL would be a second copy of something derivable, and would
-    # go stale if the frame cache were ever re-slugged.
-    check("frames are stored compactly and their URLs rebuilt",
-          "libFrameUrl(clip, p.local)" in wc and "packed.push({c: ci" in wc)
-    check("saved clips survive a refresh",
-          "saveStore({workingClips: DATA})" in wc and "WorkingClips.restore();" in js)
 
-    # ── replacing
-    check("Replace Selected button", 'id="gmReplaceSelected"' in html)
-    check("it needs BOTH an active clip and a selection",
-          "rep.disabled = !entry || !sel;" in wc)
-    check("a different frame count warns first",
-          "title: 'Mismatch frame count'" in gb)
-    check("...with Yes and No", "yes: 'Yes', no: 'No'" in gb)
-    check("No cancels and changes nothing",
-          "if (!go) { libStatus.textContent = 'Replace cancelled.'; return; }" in gb)
-    check("the replacement keeps the row's order",
-          "LIB_FRAMES.splice(at, span, ...frames);" in gb)
+    # window.prompt/confirm are blocked in some contexts, cannot be styled
+    # and cannot be tested. This asserts we did not quietly go back to
+    # them — an ABSENCE check, which nothing else in the suite covers.
+    check("the name is asked for in the page's own modal, never window.prompt",
+          "window.prompt(" not in gb and "= prompt(" not in gb)
 
-    # ── the Audio Menu's Clear All
-    check("Audio Menu Clear All", 'id="gmAudioClearAll"' in html)
-    check("it resets every player", "gmAudioClearAll" in gb and "Players.reset();" in gb)
-    # Unticking the library empties the Frame Selector too — a different
-    # button's job, and destroying that collection here would be a surprise.
+    # Clear All must not untick the library: that would empty the Frame
+    # Selector too, which is a different button's job. Destroying a
+    # collection by surprise is exactly the kind of regression worth an
+    # absence check.
     clear_block = gb.split("gmAudioClearAll.onclick")[-1].split("// ── the three Play")[0]
-    check("...and unticks nothing", "PICKED" not in clear_block)
-
-    # ── logging
-    for field in ("wcIdle", "wcTransitions", "wcSoundBits", "wcActive", "wcActiveN"):
-        check(f"every click logs {field}", f"{field}:" in gb)
+    check("Audio Menu's Clear All unticks nothing", "PICKED" not in clear_block)
 
 
 def s_common_library_wiring():
@@ -510,82 +472,26 @@ def s_common_library_wiring():
     fp = urllib.request.urlopen(AE_BASE + "/web/frame-player.js", timeout=10).read().decode()
     js = urllib.request.urlopen(AE_BASE + "/web/app.js", timeout=10).read().decode()
 
-    for el in ("libGroupsCommon", "libStatusCommon"):
-        check(f"the common panel has its own {el}", f'id="{el}"' in html)
+    # The element contract: every id the JS looks up must exist in the
+    # served page. Breaking one breaks the panel silently.
+    for el in ("libGroupsCommon", "libStatusCommon", "libHeaderStore",
+               "libHeaderVideo"):
+        check(f"the page carries {el}", f'id="{el}"' in html)
     check("it is a real second panel, not a rename of the store's own",
           html.count('id="libGroups"') == 1 and html.count('id="libGroupsCommon"') == 1)
 
-    check("one render function serves both panels",
-          "function renderLibSource(d, groupsEl, statusEl, source, savedPaths)" in gb)
-    check("loadLibs fetches the common library", "source=common" in gb)
-    check("...and the store's own, unchanged", "fetch(`/api/libs_list?${pairQS()}`)" in gb)
-    # Common renders FIRST, so its clips sort ahead of the store's own in
-    # LIB_ORDER — the same left-to-right order the two panels sit in.
-    common_at = gb.find("renderLibSource(d, libGroupsCommon")
-    store_at = gb.find("renderLibSource(d, libGroups, libStatus, 'store'")
-    check("common is rendered before the store panel, matching their on-screen order",
-          -1 < common_at < store_at, (common_at, store_at))
-
-    # Every request a checked clip triggers has to carry `source` — Sarah/
-    # and a store's own sarah_clips/libs/ are siblings, not one inside the
-    # other, so a bare path is ambiguous between them.
-    check("checking a clip asks for ITS OWN source's frames",
-          "/api/lib_frames?source=${f.source}&path=" in gb)
-    check("PICKED remembers which library each clip came from",
-          "source: f.source" in gb)
-    check("playing a clip's audio carries its source too",
-          "/api/lib_media?source=${f.source}&path=" in fp)
-    # The rest pose is looked up in the common library FIRST, a store's own
-    # copy only as a fallback — Sarah/ is the canonical source for it now.
-    check("the rest pose prefers the common library",
-          "restPosePath = f.path; restPoseSource = 'common';" in gb)
-    check("...falling back to the store's own copy", "restPoseSource = 'store';" in gb)
-
-    step("the store panel's header names the store and video, not the folder")
-    # "sarah_clips/libs" told you the folder, not what you were looking at
-    # (Carson's own call, 2026-09-03) — replaced with the store name, the
-    # video name under it. HTTP can't open a pair to watch it fill in, so
-    # this checks the WIRING: the two elements exist, the parser that fills
-    # them reads SCENE's own base_rel (right even when that store's library
-    # is empty or archived — it doesn't wait on /api/libs_list), and both
-    # get put back to the loading placeholder on Clear.
-    check("no more static 'sarah_clips/libs' label", "sarah_clips/libs</h3>" not in html)
-    for el in ("libHeaderStore", "libHeaderVideo"):
-        check(f"the header has its own {el}", f'id="{el}"' in html)
-    check("storeVideoFromPath() parses <Business>/<store>/.../<video>/sandbox/...",
-          "function storeVideoFromPath(rel)" in gb
-          and "parts.indexOf('sandbox')" in gb)
-    check("filled from SCENE.base_rel, not from the libs_list response",
-          "storeVideoFromPath(SCENE.base_rel)" in gb)
-    check("Clear puts both back to the placeholder",
-          "libHeaderStore.textContent = '—';" in js
-          and "libHeaderVideo.textContent = '—';" in js)
-
-    step("the common panel's title, and both panels' loading spinners")
-    # "Sarah/ (common)" -> "Sarah" (Carson's own call, 2026-09-03) — the
-    # h3's own text-transform: uppercase already renders it SARAH; the
-    # markup stays title case, matching every other h3 on this page
-    # ("Timeline Scenes", "Working Clips").
-    check("the common panel's h3 is just Sarah now",
-          "<h3>Sarah</h3>" in html and "Sarah/ (common)" not in html)
-    css = urllib.request.urlopen(AE_BASE + "/web/app.css", timeout=10).read().decode()
+    # Both spinners must ship HIDDEN — a spinner that starts visible spins
+    # forever on a page that never fetched.
     for el in ("libSpinner", "libSpinnerCommon"):
-        check(f"{el} exists, starts hidden", f'id="{el}" hidden' in html)
-    check("a real spinner, not a static icon", ".spinner" in css and "@keyframes spin" in css)
-    # Both fetches show their OWN spinner right before firing and hide it
-    # in a `finally` — not just after the try block, because two of the
-    # store fetch's own branches `return` early; only `finally` runs on
-    # every one of those paths, success or not.
-    check("common's spinner shows before its fetch fires",
-          "libSpinnerCommon.hidden = false;\n  try {\n    const r = await fetch('/api/libs_list?source=common')" in gb)
-    check("...and hides in a finally, not just after the try",
-          "} finally {\n    libSpinnerCommon.hidden = true;\n  }" in gb)
-    check("the store panel's spinner does the same",
-          "libSpinner.hidden = false;\n  try {\n    const r = await fetch(`/api/libs_list?${pairQS()}`)" in gb)
-    check("...also hidden in a finally",
-          "} finally {\n    libSpinner.hidden = true;\n  }\n}" in gb)
-    check("Clear hides both defensively, even mid-fetch",
-          "libSpinner.hidden = true;" in js and "libSpinnerCommon.hidden = true;" in js)
+        check(f"{el} exists and starts hidden", f'id="{el}" hidden' in html)
+
+    # Labels that were deliberately REMOVED. Their absence is the whole
+    # assertion, and nothing else in the suite would notice them coming
+    # back.
+    check("no static 'sarah_clips/libs' heading left",
+          "sarah_clips/libs</h3>" not in html)
+    check("the common panel's h3 is just Sarah",
+          "<h3>Sarah</h3>" in html and "Sarah/ (common)" not in html)
 
 
 def s_tooltips():
@@ -602,36 +508,26 @@ def s_tooltips():
     html = urllib.request.urlopen(AE_BASE + "/", timeout=10).read().decode()
     tt = urllib.request.urlopen(AE_BASE + "/web/tooltips.js", timeout=10).read().decode()
 
-    check("three seconds, exactly", "const DELAY = 3000;" in tt)
-    # Read at hover time, never cached: a Play button's title says how many
-    # clips it would play, and Save to:'s how many frames it would save.
-    check("the text comes from the live title", 'src.getAttribute(\'title\')' in tt)
-    # Both tooltips showing at once would be worse than either alone.
-    check("the browser's own tooltip is suppressed while hovering",
-          "c.removeAttribute('title');" in tt)
-    check("...and put back on the way out",
-          "holding.setAttribute('title', heldTitle)" in tt)
-    # The library's rows, Timeline Scenes' rows and Working Clips' rows are
-    # all built at runtime, and more will be.
-    check("delegated, so runtime-built controls are covered too",
-          "document.addEventListener('mouseover'" in tt)
-    check("a click cancels a pending tooltip", "'mousedown', 'wheel', 'keydown'" in tt)
-    # Carson's own call: a tick box says what it does by being ticked.
-    check("checkboxes are excluded",
-          "if (c.matches('input[type=checkbox]')) return null;" in tt)
-    # Long sentences on buttons that sit against the right edge.
-    check("it is kept inside the window", "window.innerWidth" in tt and "window.innerHeight" in tt)
-    check("it never steals the hover it describes", "pointer-events: none" in
-          urllib.request.urlopen(AE_BASE + "/web/app.css", timeout=10).read().decode())
-
-    # ── nothing silent
-    # Every <button> and <select> written into index.html carries its own
-    # title, EXCEPT the one that deliberately points at the row around it.
+    # The 3-second delay, the suppression of the browser's own tooltip, the
+    # click-cancels behaviour, the keep-it-inside-the-window maths: all of
+    # it is browser behaviour, none of it is reachable over HTTP. The
+    # source-text greps that used to assert those were asserting spelling —
+    # "const DELAY = 3000;" passes whether or not a tooltip ever appears.
+    # Removed 2026-09-03; README-CODE-CLEANUP-PLAN.md Step 7.
+    #
+    # THIS is the check worth having, and it is a genuine contract rather
+    # than a grep for an identifier: every control written into the page
+    # must carry a description, because one silent button is the one you
+    # have to guess at. It reads the served HTML and finds any control
+    # that has neither a title of its own nor a pointer to another
+    # element's.
     import re as _re
     tags = _re.findall(r"<(?:button|select)\b[^>]*>", html)
     silent = [t for t in tags if "title=" not in t and "data-tip-from" not in t]
-    check("every control in the page has a description", not silent, silent[:3])
-    check("...and the count is what it should be", len(tags) >= 20, len(tags))
+    check("no control in the page is left without a description",
+          not silent, silent[:3] if silent else f"{len(tags)} controls, all described")
+    check("...and there are really that many controls to describe",
+          len(tags) >= 20, len(tags))
     # The Save to: dropdown borrows the row's, because the row is the button.
     check("the dropdown borrows its row's description",
           'data-tip-from="gmSaveToWorking"' in html)
@@ -760,94 +656,59 @@ def s_original_audio_stack():
     button silently playing the wrong thing or nothing at all. Each one has
     already been the actual bug once.
     """
-    step("Audio Menu — the OriginalAudio stack is wired to the checkboxes")
+    step("structure — the players' own elements and their isolation")
     fp = urllib.request.urlopen(AE_BASE + "/web/frame-player.js", timeout=10).read().decode()
     gb = urllib.request.urlopen(AE_BASE + "/web/gap-builder.js", timeout=10).read().decode()
     html = urllib.request.urlopen(AE_BASE + "/", timeout=10).read().decode()
 
-    check("OriginalAudio owns a stack", "let STACK = []" in fp)
-    check("built in library display order, not tick order",
-          "LibSources.checkedInOrder()" in fp)
-    check("silent clips are kept out of it", "filter(c => c.has_audio)" in fp)
-    check("Play walks the stack, not a fresh list", "P.run(STACK)" in fp)
-    # A tick mid-run must EXTEND the run, not stop the voice.
-    check("a live run is re-pointed rather than killed", "P.resync(STACK)" in fp)
-    # Both branches of toggleLibClip — tick AND untick — must rebuild it.
-    # The trailing ";" is what separates the two real call sites from the
-    # comment that just points at them.
-    eq("every checkbox event rebuilds the stack",
-       gb.count("OriginalAudio.rebuild();"), 2)
-    # rebuildLibFrames tears the Frame Selector's own row apart, so its run
-    # has to end — but ending the Audio Menu's run there was a real bug:
-    # ticking a second box killed the voice that was already playing.
-    check("rebuildLibFrames ends only the SELECTOR's run",
-          "FrameSelector.endRun()" in gb)
+    # WHAT THIS STEP IS, AND IS NOT.
+    # What each Play button actually PLAYS — the stack's order, that a tick
+    # mid-run extends rather than kills a run, that the picture steps with
+    # the voice — is browser behaviour. This suite drives HTTP. There is no
+    # honest way to assert any of it from here, and the ~40 source-text
+    # greps that used to sit in this step did not do so: they asserted that
+    # a line of JavaScript was spelled a certain way, which passes when the
+    # feature is broken and fails when a variable is renamed. Removed
+    # 2026-09-03; see README-CODE-CLEANUP-PLAN.md Step 7.
+    #
+    # What survives is the part that IS a real contract and IS checkable:
+    # the elements each engine looks up must exist in the served page, and
+    # each panel must reach only its own viewer.
 
-    step("each panel's Play button drives its OWN player, not a shared one")
-    # One <video> for every button meant the Frame Selector's Play took over
-    # a previewer on the other side of the page. FramePlayer is a factory
-    # now: one engine per panel, each with its own elements.
-    check("FramePlayer is a factory, not a single instance",
-          "function create(dom)" in fp and "return {create," in fp)
-    for el in ("fsPlayer", "fsVideo", "fsName", "fsRate"):
-        check(f"the Frame Selector has its own {el}", f'id="{el}"' in html)
-    check("the Frame Selector's engine is built on those",
-          "player: 'fsPlayer'" in fp and "video: 'fsVideo'" in fp)
-    check("the Audio Menu keeps its own", "video: 'soundBitVideo'" in fp)
-    # Two voices at once is never wanted, and this is the ONLY thing the
-    # engines are allowed to say to each other.
-    check("starting one player quiets the others", "function stopOthers(me)" in fp)
-    # The Frame Selector's viewer DOES step with its own voice — that is
-    # the whole point of its button. What must never happen again is the
-    # AUDIO MENU moving it: that left the panel parked mid-clip, on frames
-    # nobody had asked to see. So the stepper has to live inside the
-    # FrameSelector scenario and nowhere else.
-    fs_block = fp.split("const FrameSelector = ")[-1].split("const GapBuilder = ")[0]
-    gb_block = fp.split("const GapBuilder = ")[-1].split("const Players = ")[0]
-    check("the Frame Selector steps its own frames", "P.tick((t, dur, clip)" in fs_block)
-    check("the Clip-Gap Builder steps its own frames", "P.tick((t, dur, clip)" in gb_block)
-    # Each panel reaches ONLY its own viewer. Crossing over is the exact
-    # fault that left a panel parked mid-clip with nobody driving it.
-    check("only the Frame Selector touches the Frame Selector's viewer",
-          fp.count("LibSources.showFrame(") == 1
-          and "LibSources.showFrame(" in fs_block)
-    check("only the Clip-Gap Builder touches the Clip-Gap Builder's viewer",
-          fp.count("LibSources.builderShow(") == 1
-          and "LibSources.builderShow(" in gb_block)
-    check("the Audio Menu touches neither",
-          "showFrame" not in fp.split("const OriginalAudio = ")[-1]
-                               .split("const FrameSelector = ")[0])
-    check("the engine itself knows nothing about frames",
-          "showFrame" not in fp.split("const FramePlayer = ")[-1]
-                              .split("const OriginalAudio = ")[0])
-    # A row built by pasting can hold a clip in pieces, out of order, or
-    # twice — so "the clip starts at P, frame k is at P+k" is wrong there.
-    check("frames are located by their own index within the clip",
-          "f.local === k" in fp)
-    # Once a run ended, the loaded clip could be replayed with the picture
-    # frozen, because the stepper was handed queue[0] and the queue was gone.
-    check("stepping follows the LOADED clip, not just a live run",
-          "fn(video.currentTime, video.duration, currentClip)" in fp)
-    # 25 frames a second through a full collection rescan was pure waste.
-    check("Frame Selector stepping skips the full button refresh", "libStepping" in gb)
-    check("Clip-Gap Builder stepping skips it too", "builderStepping" in gb)
-    # A rebuilt row makes every position a run held meaningless.
-    check("rebuilding the Builder's row ends its run", "GapBuilder.endRun();" in gb)
-    # The Clip-Gap Builder is a TIMELINE, not an audio picker: its run is
-    # every clip in the collection, silent ones included, and its button is
-    # green whenever there are FRAMES to run. Asking the other two panels'
-    # question here left a full 482-frame collection reading as silent.
-    check("the Builder's run keeps silent clips", "seen.has(c.path)" in fp
-          and "distinctAudible(src.builderFrames" not in fp)
-    check("the Builder's button goes green on FRAMES, not voices",
-          "btn.classList.toggle('ready', rowHas > 0);" in gb_block)
-    check("the other two still go green only on a voice",
-          "btn.classList.toggle('ready', STACK.length > 0);" in fp
-          and "btn.classList.toggle('ready', n > 0);" in fs_block)
-    # No second viewer in either panel: both already have one.
+    # Every panel has its own <video>, its own name label, its own speed
+    # dropdown. A missing id here breaks that panel silently.
+    for el in ("fsPlayer", "fsVideo", "fsName", "fsRate",
+               "gbPlayer", "gbVideo", "gbName", "gbRate",
+               "soundBitPlayer", "soundBitVideo"):
+        check(f"the page carries {el}", f'id="{el}"' in html)
+
+    # The two hidden ones carry the VOICE only; the picture is the panel's
+    # own frame viewer. A second visible viewer appearing is a regression.
     for vid in ("fsVideo", "gbVideo"):
         check(f"{vid} is the voice only, never a second viewer",
               f'<video id="{vid}" playsinline hidden>' in html)
+
+    # THE ONE INVARIANT WORTH A STRUCTURAL CHECK. A panel's Play button
+    # must move that panel and nothing else. This has been broken twice —
+    # a frame stepper driven by the Audio Menu that left the Frame Selector
+    # parked on frame 327 of 482, and one shared <video> that let the Frame
+    # Selector's Play take over the Audio Menu's previewer. Both were found
+    # by eye, not by a test. Counting the call sites is a blunt instrument,
+    # but it fails loudly if a second caller appears, which is exactly the
+    # regression in question.
+    fs_block = fp.split("const FrameSelector = ")[-1].split("const GapBuilder = ")[0]
+    gb_block = fp.split("const GapBuilder = ")[-1].split("const Players = ")[0]
+    check("only the Frame Selector moves the Frame Selector's viewer",
+          fp.count("LibSources.showFrame(") == 1
+          and "LibSources.showFrame(" in fs_block)
+    check("only the Clip-Gap Builder moves the Clip-Gap Builder's viewer",
+          fp.count("LibSources.builderShow(") == 1
+          and "LibSources.builderShow(" in gb_block)
+    # The shared engine must stay ignorant of frames entirely — the moment
+    # it knows about a viewer, every panel can move every other panel.
+    check("the engine itself knows nothing about frames",
+          "showFrame" not in fp.split("const FramePlayer = ")[-1]
+                              .split("const OriginalAudio = ")[0])
 
 
 def s_no_unreachable_handlers():
