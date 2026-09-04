@@ -11,6 +11,31 @@ checklist** at the end, so nothing is left to memory.
 
 ---
 
+## Decision (Step 10) — Option A, 2026-09-03
+
+**Carson chose Option A: a supported base library.**
+
+The shared, genuinely-pure code moves into one package all the editors
+import from. `shared/serve.py` stops being "the old server that cannot
+be removed" and becomes an ordinary consumer of the same base.
+
+The mitigations that made Option A acceptable are not optional — they
+are what keeps this from re-creating the coupling the 2026-09-02 split
+removed:
+
+- The base library holds **pure functions only**. No routes, no
+  request state, no page rendering. If it needs `self`, it does not
+  belong there.
+- It has **its own test suite** (`tests/test_editor_base.py`) and its
+  own report folder, like every editor.
+- **A change to the base runs all five suites**, not just one.
+- `CLAUDE.md`'s "editor changes stay inside the one editor" rule gains
+  exactly one named exception, and no more (Step 11a.9).
+
+Implemented in Steps 11a.1–11a.9 below.
+
+---
+
 ## Rules that apply to every step
 
 These come from `CLAUDE.md` and the standing instructions. They are not
@@ -351,7 +376,7 @@ pair (Avatar Editor, Frame Blender) imports 13 symbols from the legacy
 copied everything and got fat. Neither is clean. One decision fixes
 both.*
 
-### Step 10. DECISION — Carson's call, made explicitly, written down
+### Step 10. DECISION — Carson's call, made explicitly, written down  ✅ done 2026-09-03 (Option A)
 
 **This step is a question, not a change.** Do not proceed past it
 without an answer in the chat.
@@ -407,7 +432,7 @@ is his call.
 Record the answer at the top of this file under a heading
 `## Decision (Step 10)` with the date.
 
-### Step 11a. If Option A — build the base library
+### Step 11a. If Option A — build the base library  ✅ done 2026-09-04
 
 Order of operations (each a separate task, one editor at a time after
 the library exists):

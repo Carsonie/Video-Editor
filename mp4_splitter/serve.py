@@ -106,17 +106,27 @@ import time
 import urllib.parse
 
 # This tool's own process, own port, own cache — genuinely standalone since
-# 2026-09-02, not "shared/" any more even though the file layout still says
-# so in spirit (frames.py/paths.py live right beside this file, duplicated
-# from shared/, not imported from it).
+# 2026-09-02.
+#
+# frames.py and paths.py used to sit right beside this file as private copies:
+# 776 + 465 lines, duplicated three times over, differing by two lines of real
+# code. On 2026-09-03 they became editor_base/ — the one package every editor
+# may import from. Standalone still holds where it matters: own process, own
+# port, own cache, own routes, own pages.
 HERE = os.path.dirname(os.path.abspath(__file__))          # <repo>/mp4_splitter
 ROOT = os.path.dirname(HERE)                                # <repo>
-CACHE = os.path.join(ROOT, "cache_mp4_splitter")            # this tool's OWN cache — not shared/'s
+CACHE = os.path.join(ROOT, "cache_mp4_splitter")            # this tool's OWN cache
 sys.path.insert(0, ROOT)                                    # for the mp4_splitter package itself
-import frames as build_mod                                  # noqa: E402  this package's own copy
+from editor_base import frames as build_mod                 # noqa: E402
 # No segment_avatar_editor import, no vtt.py — this tool never renders a
 # layered/timeline/VTT page, so it has no use for either.
-import paths as PTH                                         # noqa: E402  this package's own copy
+from editor_base import paths as PTH                        # noqa: E402
+
+# editor_base's two per-editor knobs, set here at import time and not in
+# main(): the test imports this module without ever calling main(), and an
+# unset cache would extract frames into another tool's folder.
+build_mod.use_cache(CACHE)
+build_mod.use_player("mp4_splitter.player")
 
 # Must match cut_segments.py's ENCODE exactly — this is the same "locked
 # encode standard" every other segment in this project is cut with.

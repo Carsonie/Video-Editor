@@ -108,17 +108,32 @@ import time
 import urllib.parse
 
 # This tool's own process, own port, own cache — genuinely standalone since
-# 2026-09-02, not "shared/" any more even though the file layout still says
-# so in spirit (frames.py/paths.py/vtt.py live right beside this file,
-# duplicated from shared/, not imported from it).
+# 2026-09-02.
+#
+# frames.py, paths.py and vtt.py used to sit right beside this file as private
+# copies. paths.py and vtt.py were byte-identical to shared/'s, and frames.py
+# differed by two lines of real code. On 2026-09-03 all three became
+# editor_base/ — the one package every editor may import from. Standalone
+# still holds where it matters: own process, own port, own cache, own routes,
+# own pages, and its own player.py right here.
 HERE = os.path.dirname(os.path.abspath(__file__))          # <repo>/segment_avatar_editor
 ROOT = os.path.dirname(HERE)                                # <repo>
-CACHE = os.path.join(ROOT, "cache_segment_avatar_editor")   # this tool's OWN cache — not shared/'s
+CACHE = os.path.join(ROOT, "cache_segment_avatar_editor")   # this tool's OWN cache
 sys.path.insert(0, ROOT)                                    # for the segment_avatar_editor package itself
-import frames as build_mod                                  # noqa: E402  this package's own copy
+from editor_base import frames as build_mod                 # noqa: E402
 from segment_avatar_editor import player as sae             # noqa: E402  this package's own player.py
-import paths as PTH                                         # noqa: E402  this package's own copy
-import vtt as vtt_mod                                       # noqa: E402  this package's own copy
+from editor_base import paths as PTH                        # noqa: E402
+from editor_base import vtt as vtt_mod                      # noqa: E402
+
+# editor_base's two per-editor knobs, set here at import time and not in
+# main(): the test imports this module without ever calling main(), and an
+# unset cache would extract frames into another tool's folder.
+#
+# The player is this package's PRIVATE copy of the MP4 Splitter's player
+# (_splitter_player.py). The two tools stopped sharing code on 2026-09-02 and
+# that link is kept working by duplication on purpose — Carson's call.
+build_mod.use_cache(CACHE)
+build_mod.use_player("segment_avatar_editor._splitter_player")
 
 # Must match cut_segments.py's ENCODE exactly — this is the same "locked
 # encode standard" every other segment in this project is cut with.

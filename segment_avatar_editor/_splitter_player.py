@@ -20,7 +20,7 @@ package's own frames.py.
 import json
 import os
 
-from segment_avatar_editor import frames
+from editor_base import frames
 
 probe = frames.probe
 

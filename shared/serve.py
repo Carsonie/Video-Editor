@@ -89,18 +89,24 @@ HERE = os.path.dirname(os.path.abspath(__file__))          # <repo>/shared
 ROOT = os.path.dirname(HERE)                                # <repo>
 CACHE = os.path.join(ROOT, "cache")                         # shared by every player
 sys.path.insert(0, ROOT)                                    # for the player packages
-import frames as build_mod                                  # noqa: E402
+# frames.py, paths.py and vtt.py used to live in shared/ beside this file.
+# Since 2026-09-03 they are editor_base/ — one copy instead of three. The
+# files still here under those names are thin re-export shims, kept only so
+# the scripts in build/ keep importing them unchanged; this module reaches
+# past the shims and imports the real thing.
+from editor_base import frames as build_mod                 # noqa: E402
 from segment_avatar_editor import player as sae             # noqa: E402
-# paths.py and vtt.py live in shared/ here, beside this file. In
-# Basic_E2E_Testing they sit a level ABOVE video_players/ and this reached up
-# out of the tree to import them — which is exactly what could not survive the
-# move, since the folder it climbed to does not exist in this repo.
-import paths as PTH                                         # noqa: E402
+from editor_base import paths as PTH                        # noqa: E402
 # The word count comes from vtt.py rather than being written again here. It is
 # not `line.split()`: a token with no letter or digit is punctuation standing
 # alone, the voice does not say it, and counting it added 0.29s of imaginary
 # speech to every line written with a spaced em dash.
-import vtt as vtt_mod                                       # noqa: E402
+from editor_base import vtt as vtt_mod                      # noqa: E402
+
+# This server extracts into the repo-root cache/ and renders the Segment and
+# Avatar Editor's page, so it points editor_base at both.
+build_mod.use_cache(CACHE)
+build_mod.use_player("segment_avatar_editor._splitter_player")
 
 # Must match cut_segments.py's ENCODE exactly — this is the same "locked
 # encode standard" every other segment in this project is cut with.

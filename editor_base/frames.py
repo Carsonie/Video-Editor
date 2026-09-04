@@ -32,14 +32,44 @@ import subprocess
 import sys
 import threading
 
-# This tool's OWN cache — not shared/'s cache/, and not the Segment and
-# Avatar Editor's own separate copy either (see that package's own
-# frames.py). Split apart on 2026-09-02, Carson's own call: fully separate
-# cache folders, not just separate code, so the two tools' extracted-frame
-# data never mixes even by accident.
+# The cache is SHARED by every player: one extraction of a clip serves the
+# splitter, the layered editor and the timeline alike. It therefore lives at
+# video_players/cache, one level above this package, not inside it.
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-CACHE = os.path.join(ROOT, "cache_mp4_splitter")
+
+# THE ONE LINE THAT MADE THREE COPIES OF THIS FILE.
+#
+# Until 2026-09-03 this module existed three times over — shared/frames.py,
+# mp4_splitter/frames.py, segment_avatar_editor/frames.py — 776 lines each,
+# and the ONLY difference between them in real code was this constant:
+#
+#     shared/                 cache
+#     mp4_splitter/           cache_mp4_splitter
+#     segment_avatar_editor/  cache_segment_avatar_editor
+#
+# One line of configuration, paid for with two full duplicate files. So it
+# is configuration now, and there is one file.
+#
+# This is process-level config, set once at startup, NOT request state —
+# and it is safe for exactly one reason: every editor is its own OS
+# process. That is the whole point of the 2026-09-02 split. If two editors
+# are ever put in one process they will fight over this value, and that
+# would be a real bug. See editor_base/__init__.py.
+CACHE = os.path.join(ROOT, "cache")
+
+
+def use_cache(path):
+    """
+    Point this process's extraction cache somewhere else. Call once, at
+    startup, before anything extracts — every editor does it in main().
+
+    Takes an absolute path so the caller owns the decision; this module
+    does not guess a folder name from a tool's name.
+    """
+    global CACHE
+    CACHE = path
+    return CACHE
 
 # ── one worker at a time, per cache folder ──────────────────────────────────
 # The server is threaded, so two clicks a second apart run at once. Nothing
@@ -758,19 +788,41 @@ def restore_map(outdir, target, log=print):
     return len(target)
 
 
+# The second of this module's two per-editor knobs (CACHE is the other).
+# Which player module writes a clip's own page differs by tool: the MP4
+# Splitter uses its own player.py, the Segment and Avatar Editor uses its
+# private _splitter_player.py copy. That single differing import line was
+# half the reason three near-identical copies of this 776-line file existed.
+#
+# It stays a dotted NAME rather than an imported module because the import
+# must happen late — inside the call. This module is the layer every player
+# is built ON, so importing one at module level would make frames depend on
+# the thing that depends on it, and neither would load.
+PLAYER = "mp4_splitter.player"
+
+
+def use_player(dotted_name):
+    """Point write_viewer() at this editor's own player module.
+
+    Call once at startup, beside use_cache(). Takes a dotted import path
+    ("segment_avatar_editor._splitter_player"), not a module object, so the
+    import stays late.
+    """
+    global PLAYER
+    PLAYER = dotted_name
+    return PLAYER
+
+
 def write_viewer(outdir, meta):
     """
-    (Re)write a clip's OWN page — the MP4 Splitter — from meta.json.
+    (Re)write a clip's OWN page from meta.json, using whichever player this
+    process was pointed at — see use_player() above.
 
     Every extracted clip gets one, including the clips a layered or timeline
     view is built from: it is what "Open this scene on its own" opens, and it
     is what a frame edit has to refresh.
-
-    Imported late, inside the call. shared/ is the layer both players are built
-    ON, so importing a player at module level would make shared depend on the
-    thing that depends on it, and neither module would load.
     """
-    from mp4_splitter import player
-    player.write(outdir, meta)
+    import importlib
+    importlib.import_module(PLAYER).write(outdir, meta)
 
 

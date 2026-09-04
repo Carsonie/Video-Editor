@@ -30,8 +30,11 @@ import os
 import subprocess
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import paths  # noqa: E402
+# Sibling module inside editor_base, so a plain package import — no
+# sys.path games. This file was byte-identical in shared/ and
+# segment_avatar_editor/ until 2026-09-03; those two lines were the
+# only reason it needed a path hack at all.
+from editor_base import paths  # noqa: E402
 
 
 def words(line):

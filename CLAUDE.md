@@ -76,6 +76,36 @@ current task, stop and ask Carson first, even if the change looks small,
 obviously correct, or identical to one already approved for another
 editor.
 
+### The one exception: `editor_base/`
+
+`editor_base/` is the single shared package every editor may import
+from — `frames.py`, `paths.py`, `vtt.py`. It exists because those three
+files were duplicated three times over (776 + 465 + 300 lines each) and
+differed by **two lines of real code**: the cache folder name, and which
+player module writes a clip's page. Both are now configuration
+(`use_cache()`, `use_player()`), set by each editor at import time.
+
+Carson chose this on 2026-09-03 (Option A) with four conditions, and they
+are not optional:
+
+1. **Pure functions and constants only.** No routes, no `Handler`, no
+   `self`, nothing that knows about HTTP. `shared/serve.py` is the
+   cautionary tale — it began as helpers and grew into a server four
+   tools could not be untangled from.
+2. **It has its own suite**, `tests/test_editor_base.py`, which enforces
+   that purity mechanically.
+3. **A change here runs all six suites, not one.** This is the trade the
+   package makes: a change in `editor_base/` is not "one editor's
+   change" — it can break four tools at once.
+4. **It is the only exception.** Everything else still stays inside the
+   one editor in scope.
+
+`shared/paths.py`, `shared/frames.py` and `shared/vtt.py` still exist
+under those names but are **thin re-export shims**, kept solely so the
+nine scripts in `build/` keep importing them unchanged — one of which,
+`build/assemble_video.py`, must not be edited at all. Nothing new should
+import a shim.
+
 ---
 
 ## ⚠ Money: ask before every HeyGen render
@@ -109,10 +139,11 @@ Never print it, never commit it.
 ```
 mp4_splitter/            MP4 Splitter — cut a recording into segments
 segment_avatar_editor/   Segment and Avatar Editor — finish them
-shared/                  serve.py  frames.py  paths.py  vtt.py
+editor_base/             frames.py  paths.py  vtt.py — the ONE shared package
+shared/                  serve.py, plus re-export shims for build/
 build/                   the tools that make the finished video
 Sarah/                   her standards, and the clips every video reuses
-tests/                   532 checks over five suites, one per server
+tests/                   589 checks over six suites, one per server + editor_base
 Customers/               the video data — GITIGNORED
 ```
 

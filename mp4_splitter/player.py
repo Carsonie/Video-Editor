@@ -14,7 +14,7 @@ independent tools, not imported from shared/ any more.
 import json
 import os
 
-from mp4_splitter import frames
+from editor_base import frames
 
 probe = frames.probe
 

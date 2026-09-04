@@ -71,11 +71,14 @@ PREVIEWS = os.path.join(CACHE, "_previews")               # this tool's own mp4 
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "shared"))
 sys.path.insert(0, os.path.join(ROOT, "build"))
-import frames as build_mod                               # noqa: E402
+# frames.py and paths.py are editor_base/ since 2026-09-03 — one copy
+# instead of three. The names still resolvable through shared/ are
+# re-export shims for build/; import the real package directly.
+from editor_base import frames as build_mod               # noqa: E402
 import serve as main_serve                                # noqa: E402  for its session_log — see log()
 from serve import safe_join, CUSTOMERS_ROOT               # noqa: E402
 import build_scenes                                       # noqa: E402  reuse its real ffmpeg recipe
-import paths as PTH                                       # noqa: E402  script()/sandbox_root() — see stores()
+from editor_base import paths as PTH                      # noqa: E402  script()/sandbox_root() — see stores()
 
 
 # This tool's own action labels, set as main_serve.ACTIONS in main() (same

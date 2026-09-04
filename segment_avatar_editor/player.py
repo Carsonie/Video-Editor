@@ -15,7 +15,7 @@ tools, not imported from shared/ any more.
 import json
 import os
 
-from segment_avatar_editor import frames
+from editor_base import frames
 
 probe = frames.probe
 get_frame_map = frames.get_frame_map
