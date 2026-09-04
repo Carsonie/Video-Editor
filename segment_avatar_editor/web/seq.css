@@ -493,3 +493,19 @@
   .act[data-trk="both"]    { border-color:var(--both); color:#cdf3d4; }
   .act[data-trk="base"]    { border-color:var(--seg);  color:#cfe8f7; }
   .act[data-trk="overlay"] { border-color:var(--over); color:#e4d3f5; }
+
+/* ── ASK CLAUDE ──────────────────────────────────────────────────────────────
+   The phrases that reach a skill, parked in the empty space under the report.
+   Deliberately styled DOWN: it is a reminder, not a control, and it must not
+   read as another row of buttons. Same border and background as .ctlrow so it
+   belongs to the stack, but no hover, no cursor, nothing clickable. */
+.ctlrow.askrow { align-items:flex-start; }
+#ask { width:100%; }
+.askhead { font-size:10px; font-weight:700; letter-spacing:.14em;
+           color:#6d757b; margin:0 0 7px; }
+.askgrid { display:grid; grid-template-columns:auto 1fr;
+           column-gap:14px; row-gap:6px; align-items:baseline; }
+.askgrid .ak { font-size:12px; font-weight:700; color:#c8d0d6; white-space:nowrap; }
+.askgrid .av { font-size:12px; color:#8b949c; min-width:0; }
+.askgrid code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+                font-size:11px; color:#c3a9e0; }

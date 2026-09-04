@@ -1,6 +1,6 @@
 ---
 name: video-development
-description: The small hands-on tasks that come up while editing a help video in the browser — capturing a still from the frame currently on screen, reading the live state of Carson's own Chrome tab (which scene, which frame, what is dirty), and choosing the right source file for a given job. Use whenever asked to grab, capture or save a frame or still, to add something to Sarah's library from what is on screen, to say where Carson is in an editor, or when a task needs a frame out of a scene at full quality. What a still IS and how it is named lives in the sarah-library skill; this one is how to get one.
+description: The small hands-on tasks that come up while editing a help video in the browser. THREE NAMED PHRASES trigger it directly, and they are printed in the Segment and Avatar Editor's own "ASK CLAUDE" box so Carson can read them off the screen: "Capture Still" (take the frame currently on screen, from the right source file, into Sarah's library), "Read Screen" (say which scene, frame, selection and unsaved state his own Chrome tab is showing), and "Which Source" (which of the frame cache, avatar.webm or narration.webm a job should read). Also use whenever asked to grab, capture or save a frame, still or pose, to add something to Sarah's library from what is on screen, to say where he is in an editor, or when a task needs a frame out of a scene at full quality. What a still IS and how it is named lives in the sarah-library skill; this one is how to get one.
 user_invocable: true
 ---
 
@@ -16,12 +16,29 @@ pipeline. Each one below has already cost time once.
 - **`editor-launchers`** — starting and reloading the four editors.
 - **`PIPELINE.md`** — the nine steps that make a video.
 
+**THE THREE PHRASES.** Carson says one of these and the matching section
+below is followed rather than improvised. They are printed in the Segment
+and Avatar Editor's own **ASK CLAUDE** box (bottom right of the timeline
+page, under the status bar) so he can read them off the screen:
+
+| Phrase | Section |
+|---|---|
+| **Capture Still** | the frame on screen → the right source → Sarah's library |
+| **Read Screen** | which scene, frame, selection, what is unsaved |
+| **Which Source** | cache vs `avatar.webm` vs `narration.webm` |
+
+They are named in this file's `description:` too, so they match exactly
+rather than by judgement. **Adding a phrase means three edits, always
+together** — the box in `seq.html`, the `description:` above, and a section
+here. A phrase in the box with no procedure behind it is a promise the
+skill cannot keep.
+
 Two copies of the same rule drift. If something here starts explaining what
 a still *is*, it belongs in `sarah-library` instead.
 
 ---
 
-## Reading Carson's live screen
+## "Read Screen" — reading Carson's live tab
 
 He works in his own Chrome, not the Browser pane. The pane's copy of a page
 is a *different browser* — it loads fresh at frame 1 and knows nothing about
@@ -88,12 +105,12 @@ do not exist.
 
 ---
 
-## Capturing a still from the frame on screen
+## "Capture Still" — from the frame on screen
 
 The job: Carson is looking at a frame and wants it kept. Today's example was
 Sarah's smile at frame 441 of `01-intro-and-login`.
 
-### Which file to take it from — this is the whole task
+### "Which Source" — which file to take it from, and it is the whole task
 
 Three files hold "the same" frame and only ONE is right.
 

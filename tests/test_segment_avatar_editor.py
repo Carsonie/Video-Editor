@@ -578,6 +578,43 @@ def s_app_js_parses():
     # a page out of a Python string now.
 
 
+def s_ask_claude_box():
+    """
+    The ASK CLAUDE box, and the one way it can go wrong.
+
+    It prints the phrases that reach the video-development skill, so Carson
+    can read them off the screen instead of remembering them. The failure
+    mode is drift: a phrase in the box with no procedure behind it is a
+    promise the skill cannot keep, and a phrase in the skill that is not in
+    the box is one he will never think to say.
+
+    So this asserts the two agree. It is a source-text check, which this
+    suite normally refuses — but the thing being checked IS text in two
+    files, and nothing driven over HTTP can see it.
+    """
+    step("ASK CLAUDE — the box and the skill say the same phrases")
+    html = urllib.request.urlopen(SAE_BASE + "/web/seq.html", timeout=10).read().decode()
+    check("the box is on the timeline page", 'id="ask"' in html)
+    check("it is not clickable — a reminder, not a control",
+          "<button" not in html.split('id="ask"')[1].split("</div>")[0])
+
+    skill = os.path.join(PLAYERS, ".claude", "skills",
+                         "video-development", "SKILL.md")
+    check("the skill exists where it registers", os.path.isfile(skill), skill)
+    text = open(skill).read() if os.path.isfile(skill) else ""
+
+    import re as _re
+    phrases = _re.findall(r'<span class="ak">([^<]+)</span>', html)
+    check("the box lists some phrases", len(phrases) >= 3, phrases)
+    for ph in phrases:
+        check(f'"{ph}" is in the skill', ph in text)
+        # ...and in its description, so it matches exactly rather than by
+        # judgement. The description is the first `description:` line.
+        desc = _re.search(r"^description: (.+)$", text, _re.M)
+        check(f'"{ph}" is named in the description',
+              bool(desc) and ph in desc.group(1))
+
+
 def s_api_view():
     """
     /api/view IS the contract between serve.py and web/{pair,seq}.js since
@@ -712,7 +749,7 @@ FUNCTIONS = [s_static_page, s_list, s_siblings, s_stores, s_open_base,
              s_mark, s_save, s_save_stale, s_cut, s_vtt, s_line, s_join,
              s_renumber_state, s_renumber_clear, s_split, s_archive,
              s_save_archive, s_dropped_routes_are_gone, s_session_log,
-             s_api_view, s_deeper_paths_are_not_the_layered_page,
+             s_api_view, s_ask_claude_box, s_deeper_paths_are_not_the_layered_page,
              s_stale_cached_pages, s_app_js_parses,
              s_no_unreachable_handlers]
 
