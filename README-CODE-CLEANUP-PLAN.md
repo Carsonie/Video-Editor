@@ -690,7 +690,7 @@ behave identically. Zero top-level `let` left in `gap-builder.js`
 
 Ready to commit. Restructure, no VERSION bump.
 
-### Step 15. `gap-builder.js` — now split it
+### Step 15. `gap-builder.js` — now split it  ✅ done 2026-09-04
 
 **Task scope:** Avatar Editor only. After Step 14.
 

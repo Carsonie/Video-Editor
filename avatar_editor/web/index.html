@@ -209,18 +209,42 @@
     </div>
   </div>
 
-<!-- Load order is forced, in this order, for two separate reasons:
-     1. frame-player.js first  — gap-builder.js's last statement is
-        FramePlayer.configure({...}), so FramePlayer must already exist.
-     2. gap-builder.js next    — app.js's bootstrap, at the bottom of the
-        last file, calls straight into functions gap-builder.js defines
-        (loadLibs, rebuildLibFrames, rebuildBuilderFrames).
-     3. working-clips.js next  — it reads BUILDER_FRAMES and libFrameUrl
-        from gap-builder.js, and app.js's restoreGlobals() calls into it.
-     4. tooltips.js           — order does not matter to it: it listens on
-        the document and reads each control's own title at hover time. -->
+<!-- LOAD ORDER IS FORCED, and it is a behaviour contract, not a style.
+     None of these files is wrapped in an IIFE — they share ONE flat
+     top-level scope on purpose, the way ordered <script> tags always
+     have. A `const` used at load time must therefore be declared in a
+     file loaded EARLIER. Moving a tag here is a behaviour change.
+
+     gap-builder.js was split into five of these on 2026-09-04 (it was
+     1,184 lines doing eight jobs); the order below reproduces exactly the
+     order that one file ran in.
+
+     1. frame-player.js   — owns all three Play buttons in its own private
+        scope. wire.js's FramePlayer.configure({...}) needs it to exist.
+     2. gap-state.js      — LIB, BUILDER and SHARED. Everything below
+        mutates them, so they are declared before anything else.
+     3. library.js        — sarah_clips/libs: the two library panels and
+        the Frame Selector's own row.
+     4. clip-gap-builder.js — the second frame row and its selection.
+     5. gap-menu.js       — the Gap Builder Menu, the Audio Menu's Clear
+        All, and the three Play buttons' click handlers.
+     6. wire.js           — hands frame-player.js its data sources. Last
+        of the gap files, because everything it names must already exist.
+     7. working-clips.js  — reads BUILDER.frames and libFrameUrl, and now
+        also carries the Gap Builder Menu's wiring FOR its own panel
+        (Save to, Replace Selected), which needs gap-menu.js's
+        withActiveFlash() and gm* elements. app.js's restoreGlobals()
+        calls into it.
+     8. tooltips.js       — order does not matter to it: it listens on the
+        document and reads each control's own title at hover time.
+     9. app.js last       — its bootstrap calls straight into loadLibs(),
+        rebuildLibFrames() and rebuildBuilderFrames(). -->
 <script src="/web/frame-player.js"></script>
-<script src="/web/gap-builder.js"></script>
+<script src="/web/gap-state.js"></script>
+<script src="/web/library.js"></script>
+<script src="/web/clip-gap-builder.js"></script>
+<script src="/web/gap-menu.js"></script>
+<script src="/web/wire.js"></script>
 <script src="/web/working-clips.js"></script>
 <script src="/web/tooltips.js"></script>
 <script src="/web/app.js"></script>

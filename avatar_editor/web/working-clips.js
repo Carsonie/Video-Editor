@@ -222,3 +222,95 @@ const WorkingClips = (function () {
     _data: () => DATA,
   };
 })();
+
+
+// ---------------------------------------------------------------------------
+// Moved here from gap-builder.js on 2026-09-04, when that file was split.
+// This is the Gap Builder Menu's wiring FOR this panel — Save to, Replace
+// Selected — and it belongs beside the panel it drives rather than in a
+// menu file it only reaches into.
+//
+// It depends on withActiveFlash() and the gm* elements from gap-menu.js, so
+// this file must stay loaded AFTER gap-menu.js in index.html.
+// ---------------------------------------------------------------------------
+
+// ── Working Clips: saving out, and dropping back in ──────────────────────
+// Save: the whole Clip-Gap Builder collection, in its own order, filed
+// under the section PICKING one names — the dropdown is the button, there
+// is no second click. The popup that asks for the name is the page's own
+// modal, not window.prompt; see modalPrompt() in app.js for why.
+//
+// The dropdown falls back to its own blank option afterwards, whether the
+// save happened or was cancelled, so it never sits showing a destination
+// as though it were a setting. It is an action.
+gmSaveTarget.onchange = withActiveFlash(gmSaveToWorking, async () => {
+  const section = gmSaveTarget.value;
+  gmSaveTarget.value = '';
+  if (!section) return;
+  const label = (WorkingClips.sections().find(s => s.key === section) || {}).label || section;
+  const r = await WorkingClips.saveBuilder(section, () => modalPrompt({
+    title: 'Save to Working Clips',
+    label: `${BUILDER.frames.length} frame(s) → ${label}. Name this clip:`,
+    value: '',
+  }));
+  libStatus.textContent = r.ok
+    ? `Saved "${r.entry.name}" (${r.entry.n} frames) to ${label}.`
+    : r.why === 'cancelled' ? 'Save cancelled.' : r.why;
+});
+
+// Replace: the active Working Clip goes in where the Frame Selector's own
+// selection is. A different frame count is allowed — the two collections
+// are Carson's to line up — but never silently, because a replacement that
+// changes the length changes the timing of everything after it.
+gmReplaceSelected.onclick = withActiveFlash(gmReplaceSelected, async () => {
+  const entry = WorkingClips.active();
+  if (!entry) {
+    libStatus.textContent = 'Tick a clip in Working Clips to make it active first.';
+    return;
+  }
+  if (!LIB.selected.size) {
+    libStatus.textContent = 'Select Frames above, then click a frame to start a selection '
+      + '(click again to finish it) — then Replace Selected.';
+    return;
+  }
+  const indices = [...LIB.selected].sort((a, b) => a - b);
+  if (entry.n !== indices.length) {
+    const go = await modalConfirm({
+      title: 'Mismatch frame count',
+      msg: `The selection is ${indices.length} frame(s) and "${entry.name}" is `
+         + `${entry.n}. Use it anyway?`,
+      yes: 'Yes', no: 'No',
+    });
+    if (!go) { libStatus.textContent = 'Replace cancelled.'; return; }
+  }
+  replaceLibSelection(indices, WorkingClips.activeFrames());
+  libStatus.textContent = `Replaced ${indices.length} frame(s) with "${entry.name}" `
+    + `(${entry.n} frames).`;
+});
+
+// The selection is a set of positions in the row, and Copy/Paste already
+// only ever produce a CONTIGUOUS one (the 3-click cycle picks a start and
+// an end). Splicing the whole span out and the new frames in keeps the
+// row's order intact for any count, matching or not.
+//
+// This edits LIB.frames in place, and LIB.frames is REBUILT from LIB.picked
+// whenever a box is ticked — so a replacement lives until the next tick,
+// on purpose: it is a working edit for building something, not a change to
+// the library, which is read-only from here.
+function replaceLibSelection(indices, frames) {
+  const at = indices[0];
+  const span = indices[indices.length - 1] - at + 1;
+  LIB.frames.splice(at, span, ...frames);
+  setLibSelected([]);
+  LIB.rangeStart = null;
+  LIB.phase = 0;
+  gmCopySelected.classList.remove('ready');
+  gmLibViewToggle.classList.remove('ready');
+  if (LIB.showSelectedOnly) { LIB.showSelectedOnly = false; }
+  renderLibFrameRow();
+  applyLibViewMode();
+  const land = Math.min(at, Math.max(0, libViewIndices().length - 1));
+  libSlider.value = land;
+  showLibFrame(land);
+  Players.refresh();
+}

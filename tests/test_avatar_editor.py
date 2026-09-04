@@ -417,7 +417,15 @@ def s_working_clips():
     """
     step("Working Clips — the panel, saving into it, and replacing from it")
     html = urllib.request.urlopen(AE_BASE + "/", timeout=10).read().decode()
-    gb = urllib.request.urlopen(AE_BASE + "/web/gap-builder.js", timeout=10).read().decode()
+    # gap-builder.js was split on 2026-09-04. The Audio Menu's Clear All and
+    # the three Play buttons live in gap-menu.js; this panel's own Save to /
+    # Replace Selected wiring moved into working-clips.js beside the module
+    # it drives. Both are read here, joined, so an absence assertion still
+    # covers wherever the code actually ended up.
+    gb = "\n".join(
+        urllib.request.urlopen(AE_BASE + "/web/" + f, timeout=10).read().decode()
+        for f in ("gap-menu.js", "working-clips.js", "library.js",
+                  "clip-gap-builder.js"))
 
     # Every control this panel needs must EXIST in the served page, with
     # the id its handler looks up. That is a real contract between the
@@ -548,33 +556,45 @@ def s_static_page():
     check("says nothing is loaded", "nothing loaded" in html, html[:0] or "ok")
     for gone in ("base_slug", "over_slug", "01-opening-with-login"):
         check(f"no {gone} baked in", gone not in html)
-    # gap-builder.js must be named BEFORE app.js — app.js's own bootstrap
-    # calls straight into functions gap-builder.js defines, so if load
-    # order here ever regressed, the page would fail at the very last line
-    # of app.js with everything above it having worked perfectly.
+    # THE LOAD ORDER IS A BEHAVIOUR CONTRACT, and this is what pins it.
+    #
+    # None of these files is wrapped in an IIFE — they share ONE flat
+    # top-level scope, so a `const` used at load time must be declared in a
+    # file loaded earlier. gap-builder.js was split into five of them on
+    # 2026-09-04, and the order below is the order that one file ran in.
+    #
     # Match the <script src> attributes, never a bare filename — the
-    # comments above these tags name all three files too, in a different
-    # order, and matching those measures nothing.
-    tt_pos = html.find('src="/web/tooltips.js"')
-    wc_pos = html.find('src="/web/working-clips.js"')
-    fp_pos = html.find('src="/web/frame-player.js"')
-    gb_pos = html.find('src="/web/gap-builder.js"')
-    app_pos = html.find('src="/web/app.js"')
-    check("gap-builder.js is named before app.js", -1 < gb_pos < app_pos, (gb_pos, app_pos))
-    # frame-player.js has to be FIRST: gap-builder.js's very last statement
-    # is FramePlayer.configure({...}), so the component must already exist.
-    check("frame-player.js is named before gap-builder.js", -1 < fp_pos < gb_pos,
-          (fp_pos, gb_pos))
-    # working-clips.js reads BUILDER_FRAMES and libFrameUrl from
-    # gap-builder.js, and app.js's restoreGlobals() calls into it.
-    check("working-clips.js sits between gap-builder.js and app.js",
-          gb_pos < wc_pos < app_pos, (gb_pos, wc_pos, app_pos))
+    # comment above these tags names every file too, and matching that
+    # measures nothing.
+    ORDER = ["frame-player.js",      # owns the Play buttons; wire.js needs it
+             "gap-state.js",         # LIB / BUILDER / SHARED, before any mutator
+             "library.js",
+             "clip-gap-builder.js",
+             "gap-menu.js",          # withActiveFlash + the gm* elements
+             "wire.js",              # FramePlayer.configure(...) — needs all above
+             "working-clips.js",     # reads BUILDER.frames; needs gap-menu.js
+             "tooltips.js",
+             "app.js"]               # its bootstrap calls into library.js
+    pos = {f: html.find(f'src="/web/{f}"') for f in ORDER}
+    missing = [f for f, p_ in pos.items() if p_ == -1]
+    check("every script the page needs is named", not missing, missing or "all nine")
+    seq = [pos[f] for f in ORDER]
+    check("they are named in the required order", seq == sorted(seq),
+          [f for f in ORDER if pos[f] != -1])
+
+    # The old single file must be gone, not merely unreferenced — a stale
+    # copy left on disk would keep being served and quietly shadow nothing,
+    # while the reader assumes it is still the source of truth.
+    try:
+        urllib.request.urlopen(AE_BASE + "/web/gap-builder.js", timeout=10)
+        check("gap-builder.js is gone (it was split)", False, "still served")
+    except urllib.error.HTTPError as e:
+        eq("gap-builder.js is gone (it was split)", e.code, 404)
+
+    tt_pos = pos["tooltips.js"]
     check("tooltips.js is on the page", tt_pos > -1, tt_pos)
-    for asset, ctype in (("/web/app.js", "javascript"), ("/web/gap-builder.js", "javascript"),
-                         ("/web/frame-player.js", "javascript"),
-                         ("/web/working-clips.js", "javascript"),
-                         ("/web/tooltips.js", "javascript"),
-                         ("/web/app.css", "css")):
+    for asset, ctype in ([(f"/web/{f}", "javascript") for f in ORDER]
+                         + [("/web/app.css", "css")]):
         r = urllib.request.urlopen(AE_BASE + asset, timeout=10)
         eq(f"{asset} served", r.status, 200)
         check(f"{asset} content-type", ctype in r.headers.get("Content-Type", ""),
@@ -615,14 +635,16 @@ def s_app_js_parses():
         check("node is available to parse it", False,
               "install node, or this can never catch a broken page again")
         return
-    fp = urllib.request.urlopen(AE_BASE + "/web/frame-player.js", timeout=10).read().decode()
-    gb = urllib.request.urlopen(AE_BASE + "/web/gap-builder.js", timeout=10).read().decode()
-    wc = urllib.request.urlopen(AE_BASE + "/web/working-clips.js", timeout=10).read().decode()
-    tt = urllib.request.urlopen(AE_BASE + "/web/tooltips.js", timeout=10).read().decode()
-    js = urllib.request.urlopen(AE_BASE + "/web/app.js", timeout=10).read().decode()
+    ORDER = ["frame-player.js", "gap-state.js", "library.js",
+             "clip-gap-builder.js", "gap-menu.js", "wire.js",
+             "working-clips.js", "tooltips.js", "app.js"]
+    src = {}
+    for f in ORDER:
+        src[f] = urllib.request.urlopen(AE_BASE + "/web/" + f, timeout=10).read().decode()
 
     def parses(name, text):
-        tmp = os.path.join(tempfile.gettempdir(), f"fb_{name}_check.js")
+        safe = re.sub(r"[^A-Za-z0-9]+", "_", name)
+        tmp = os.path.join(tempfile.gettempdir(), f"ae_{safe}_check.js")
         with open(tmp, "w") as fh:
             fh.write(text)
         r = subprocess.run([node, "--check", tmp], capture_output=True, text=True)
@@ -632,13 +654,16 @@ def s_app_js_parses():
               f"{len(text)} bytes" if r.returncode == 0
               else next((l for l in first if "Error" in l), first[0] if first else ""))
 
-    parses("frame-player.js", fp)
-    parses("gap-builder.js", gb)
-    parses("working-clips.js", wc)
-    parses("tooltips.js", tt)
-    parses("app.js", js)
-    parses("all five together (load order)",
-           fp + "\n" + gb + "\n" + wc + "\n" + tt + "\n" + js)
+    for f in ORDER:
+        parses(f, src[f])
+
+    # AND CONCATENATED, in load order. This is the check that matters most
+    # now there are nine files instead of two: they share one flat scope, so
+    # two files that each parse perfectly alone can still declare the same
+    # `const` and throw the moment the page loads them together. Nothing
+    # else in this suite can see that.
+    parses("all nine together (load order)",
+           "\n".join(src[f] for f in ORDER))
 
 
 def s_original_audio_stack():

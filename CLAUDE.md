@@ -143,7 +143,7 @@ editor_base/             frames.py  paths.py  vtt.py — the ONE shared package
 shared/                  serve.py, plus re-export shims for build/
 build/                   the tools that make the finished video
 Sarah/                   her standards, and the clips every video reuses
-tests/                   639 checks over six suites, one per server + editor_base
+tests/                   655 checks over six suites, one per server + editor_base
 Customers/               the video data — GITIGNORED
 ```
 

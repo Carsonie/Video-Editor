@@ -31,18 +31,22 @@ the same scene at once).
 | `serve.py` | the server. Stateless: every request that acts on a scene names that scene. |
 | `web/index.html` | the page, with no scene in it |
 | `web/app.css` | its styling |
-| `web/frame-player.js` | the three Play buttons, one player each — loaded FIRST |
-| `web/gap-builder.js` | both library panels, the Frame Selector, the Clip-Gap Builder, the menus — loaded SECOND |
-| `web/working-clips.js` | the Working Clips panel: Carson's own saved clips — loaded THIRD |
-| `web/tooltips.js` | the 3-second hover tooltip on every control |
-| `web/app.js` | everything else: the combine engine, persistence, Timeline Scenes, the Load popup |
+| `web/frame-player.js` | the three Play buttons, one player each — loaded **1st** |
+| `web/gap-state.js` | `LIB`, `BUILDER`, `SHARED` — the state everything below mutates — **2nd** |
+| `web/library.js` | `sarah_clips/libs`: both library panels and the Frame Selector — **3rd** |
+| `web/clip-gap-builder.js` | the second frame row and its selection — **4th** |
+| `web/gap-menu.js` | the Gap Builder Menu, the Audio Menu's Clear All, the Play buttons' handlers — **5th** |
+| `web/wire.js` | hands `frame-player.js` its data sources. Last of the gap files — **6th** |
+| `web/working-clips.js` | the Working Clips panel, and the menu wiring for it — **7th** |
+| `web/tooltips.js` | the 3-second hover tooltip on every control — **8th** |
+| `web/app.js` | everything else: the combine engine, persistence, Timeline Scenes, the Load popup — **9th** |
 | `VERSION` | bumped on every commit that touches this tool — starts at 1, its OWN history, not Frame Blender's |
 
 `frame-player.js` is the one exception to the flat scope below: it wraps
 itself in an IIFE and exposes `FramePlayer` — a FACTORY, one engine per
 panel — plus three named scenarios built on it, and `Players`, the one
 door the other two files come through. Each scenario logs
-`Inside: <name>`, so a click traces button → `gap-builder.js` →
+`Inside: <name>`, so a click traces button → `gap-menu.js` →
 scenario → engine.
 
 | Button | Plays | Picture |
@@ -70,8 +74,8 @@ in `.claude/skills/sarah-library/SKILL.md`** — read that, not this file,
 for anything about what Sarah's clips ARE or where they belong; this file
 is about how the CODE is put together.
 
-`gap-builder.js` and `app.js` share one flat scope on purpose — neither is
-wrapped in an IIFE, so each can call straight into the other's top-level
+These files share one flat scope on purpose — none is wrapped in an IIFE
+(`frame-player.js` excepted), so each can call straight into the others' top-level
 declarations, the same way a page has always shared scope across ordered
 `<script>` tags. No bundler, no import/export. The one real risk that comes
 with that: a `let`/`const` name declared in both would throw the moment
@@ -80,7 +84,7 @@ would catch.
 
 ### The shared state lives in three objects, not 21 loose names
 
-`gap-builder.js` used to declare **21 top-level `let`s**, mutated from 25
+`gap-builder.js` declared **21 top-level `let`s**, mutated from 25
 functions and a good many inline handlers. That — not the line count — was
 what made the file impossible to split: every part of it reached into the
 same loose scope, so moving any part moved the state with it. Since
@@ -99,9 +103,36 @@ that is the part that matters across files: `working-clips.js` reads
 A reassigned `let` could go stale under a holder; a mutated `const` object
 cannot.
 
-**There are zero top-level `let`s left in `gap-builder.js`** — `grep -cE
-"^let " avatar_editor/web/gap-builder.js` returns 0. Keep it that way: a
-new loose one puts the file back where it was.
+**There are zero top-level `let`s across the gap files** — `grep -cE "^let "
+avatar_editor/web/*.js` returns 0 for each. Keep it that way: a new loose
+one puts them back where they were.
+
+### The split, and why load order is a contract
+
+`gap-builder.js` was 1,184 lines doing eight jobs. On 2026-09-04 it became
+five files, cut on its own section banners — which already marked the
+seams. Nothing was rewritten; the code was moved.
+
+**The order in `index.html` is a behaviour contract, not a style choice.**
+These files share ONE flat top-level scope, so a `const` used at load time
+must be declared in a file loaded earlier, and the order in the table above
+reproduces exactly the order the single file ran in. Moving a `<script>`
+tag is a behaviour change.
+
+Two consequences worth knowing:
+
+- `gap-state.js` is second because everything below it mutates `LIB`,
+  `BUILDER` and `SHARED`.
+- `wire.js` is last of the gap files for the reason its own header gives:
+  everything it names must already exist.
+
+The suite pins both — `s_static_page` asserts all nine are named in that
+order and that `/web/gap-builder.js` now 404s, and `s_app_js_parses` runs
+`node --check` on each file alone **and on all nine concatenated in load
+order**. That last one is the check that matters most with nine files: two
+files that each parse perfectly alone can still declare the same `const`
+and throw the moment the page loads them together, and nothing else can
+see it.
 
 ## The one idea worth knowing
 
