@@ -272,22 +272,23 @@ def s_map():
     check("starts as an identity map", d["frame_map"] == list(range(1, 41)), "1..40")
 
 
-def s_open_pair():
-    step("/api/open-pair — the layered view")
+def s_open_base():
+    """
+    A scene's BASE track, taken off a timeline.
+
+    Was s_open_pair, driving /api/open-pair — the layered view, deleted
+    2026-09-04 (Carson's call). The frame-editing checks below still need a
+    real extracted clip; a timeline gives them one, and its manifest hands
+    back each track's own slug.
+    """
+    step("a scene's own base slug, off a timeline")
     global PAIR
-    seg = f"{fixture.ROOT_REL}/sandbox/01-alpha-scene/segment.mp4"
-    av = f"{fixture.ROOT_REL}/sandbox/01-alpha-scene/avatar.webm"
-    d, _ = get("/api/open-pair", base=seg, overlay=av)
-    PAIR = d.get("slug")
-    check("segment under avatar, both extracted", bool(PAIR), PAIR or json.dumps(d)[:90])
-
-
-def s_open_pair_go():
-    step("/api/open-pair-go — and its redirect")
-    seg = f"{fixture.ROOT_REL}/sandbox/01-alpha-scene/segment.mp4"
-    av = f"{fixture.ROOT_REL}/sandbox/01-alpha-scene/avatar.webm"
-    eq("redirects to the page it built",
-       raw_status("/api/open-pair-go", base=seg, overlay=av), 302)
+    doc = json.load(open(os.path.join(fixture.STORE, "sandbox", "script.json")))
+    ns = ",".join(str(x["n"]) for x in doc["scenes"])
+    d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns=ns)
+    view = json.load(open(os.path.join(CACHE, d.get("slug"), "view.json")))
+    PAIR = (view.get("manifest") or [{}])[0].get("base_slug")
+    check("a timeline opened and gave a base slug", bool(PAIR), PAIR)
 
 
 def s_open_seq():
@@ -732,12 +733,9 @@ def s_pages_parse():
     sc = doc["scenes"][-1]
     folder = f"{sc['n']:02d}-{sc['label']}"
     seg = f"{fixture.ROOT_REL}/sandbox/{folder}/segment.mp4"
-    av = f"{fixture.ROOT_REL}/sandbox/{folder}/avatar.webm"
     pages = {}
     d, _ = get("/api/open", path=seg)
     pages["MP4 Splitter"] = d.get("url")
-    d, _ = get("/api/open-pair", base=seg, overlay=av)
-    pages["Segment and Avatar Editor (layered)"] = f"{d.get('slug')}/viewer.html"
     ns = ",".join(str(x["n"]) for x in doc["scenes"])
     d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns=ns)
     pages["Segment and Avatar Editor (timeline)"] = f"{d.get('slug')}/viewer.html"
@@ -982,7 +980,7 @@ def s_bookends_and_gaps():
 # Every disk function, in dependency order. The count in the log's footer is
 # taken from this list, so a new endpoint that is not here is visibly missing.
 FUNCTIONS = [
-    s_list, s_siblings, s_open, s_map, s_open_pair, s_open_pair_go,
+    s_list, s_siblings, s_open, s_map, s_open_base,
     s_open_seq, s_open_seq_go,
     s_dup, s_del, s_dup_span, s_del_span, s_restore,
     s_mark, s_marks, s_clear_marks,

@@ -4,15 +4,15 @@ Six of them. Five drive a real server over HTTP against a disposable store
 built from real footage; the sixth has no server in it.
 
 ```bash
-python3 tests/test_editor.py                 # shared/serve.py, port 8842 (old combined) — 168
+python3 tests/test_editor.py                 # shared/serve.py, port 8842 (old combined) — 166
 python3 tests/test_avatar_editor.py          # avatar_editor/serve.py, port 8844          — 173
-python3 tests/test_segment_avatar_editor.py  # segment_avatar_editor/serve.py, port 8846  — 118
+python3 tests/test_segment_avatar_editor.py  # segment_avatar_editor/serve.py, port 8846  — 107
 python3 tests/test_mp4_splitter.py           # mp4_splitter/serve.py, port 8845           — 102
 python3 tests/test_frame_blender.py          # frame_blender/serve.py, port 8843          —  71
 python3 tests/test_editor_base.py            # editor_base/ — pure functions, no server   —  57
 ```
 
-689 checks. Exit code is non-zero if any fail.
+676 checks. Exit code is non-zero if any fail.
 
 **A change inside `editor_base/` runs all six, not one.** That is the trade
 the shared package makes: it is imported by every editor, so a change there
@@ -36,7 +36,8 @@ completely dead while the server answers perfectly.
    short by 40 lines, taking `show(1)` and the whole init block with it.
    101/101 passed; the page drew nothing.
 2. **A route serving the wrong page.** The SAE's `send_viewer()` swallowed
-   `/<slug>/base/viewer.html` and returned the layered page. 91/91 passed,
+   `/<slug>/base/viewer.html` and returned the layered page (itself since
+   deleted). 91/91 passed,
    because the only check on that page scraped `<script>` out of the HTML
    and the new static page has none — an empty string parses fine.
 3. **A load-order forward reference.** `timeline.js` assigned `pickStores`
@@ -182,7 +183,7 @@ is not a report.
 | Editor control | Endpoint |
 |---|---|
 | browse to a clip | `/api/list`, `/api/siblings` |
-| open one clip / layered / timeline | `/api/open`, `/api/open-pair`, `/api/open-seq` (+ both `-go` redirects) |
+| open one clip / timeline | `/api/open`, `/api/open-seq` (+ its `-go` redirect) |
 | ＋ Frame, − Frame | `/api/frames/dup`, `/api/frames/del` (both sides) |
 | ＋ Zone, − Zone | `/api/frames/dup-span`, `/api/frames/del-span` |
 | Undo | `/api/frames/restore` |

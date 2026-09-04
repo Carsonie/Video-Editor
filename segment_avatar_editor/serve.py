@@ -42,10 +42,9 @@ Routes:
   GET  /api/siblings?path=<rel to a scene file>
                               JSON: every scene of that store, resolved —
                               frame counts, cache slugs, pristine/dirty state
-  GET  /api/open-pair?base=<rel>&overlay=<rel>
                               layered view — mp4 underneath, alpha WebM on top,
                               each independently editable via `which`
-  GET  /api/open-pair-go, /api/open-seq-go, /api/open-seq
+  GET  /api/open-seq-go, /api/open-seq
                               same idea, redirect-style / whole-timeline forms
   GET  /api/vtt?path=<rel>   JSON: this video's timing table (shared/vtt.py)
   POST /api/line             body {slug, n, line} — edit a scene's narration line
@@ -254,9 +253,7 @@ ACTIONS = {
     "/api/renumber-clear":  ("Lift lock",    ()),
     "/api/archive":         ("Archive",      ("folder",)),
     "/api/save-archive":    ("Save All archive", ("root",)),
-    "/api/open-pair":       ("Open layered", ("base",)),
     "/api/open-seq":        ("Open timeline", ("root", "ns")),
-    "/api/open-pair-go":    ("Open layered", ("base",)),
     "/api/open-seq-go":     ("Open timeline", ("root", "ns")),
 }
 # result keys worth showing, in the order they read best
@@ -763,8 +760,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         # saying what you opened is what makes the edits under it readable.
         # Every other GET is a frame image or a poll, and logging those would
         # bury the record in its own noise.
-        if parsed.path in ("/api/open-pair", "/api/open-seq",
-                           "/api/open-pair-go", "/api/open-seq-go"):
+        if parsed.path in ("/api/open-seq", "/api/open-seq-go"):
             qs = urllib.parse.parse_qs(parsed.query)
             flat = {k: v[0] for k, v in qs.items() if v}
             self._last_json, self._last_status = None, 200
@@ -783,10 +779,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.api_list(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/stores":
             return self.api_stores()
-        if parsed.path == "/api/open-pair":
-            return self.api_open_pair(urllib.parse.parse_qs(parsed.query))
-        if parsed.path == "/api/open-pair-go":
-            return self.api_open_pair_go(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/open-seq-go":
             return self.api_open_seq_go(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/open-seq":
@@ -986,59 +978,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     out.append({"business": biz, "store": store, "videos": videos})
         self.send_json({"stores": out})
 
-    def api_open_pair(self, qs, redirect=False):
-        """
-        Open TWO clips as one layered view: an mp4 running underneath and an
-        alpha WebM on top, which is how the finished video is actually built.
-
-        Each half gets its OWN complete extraction under `<slug>/base/` and
-        `<slug>/overlay/` — frames, meta and break points — so either can be cut
-        or frame-edited without touching the other. Compositing them to a single
-        set of frames would have been less code and would have thrown that away.
-
-        The overlay is extracted as PNG with its real alpha; the browser stacks
-        the two <img>. That is also why the base stays JPEG: only the layer that
-        needs transparency pays for it.
-        """
-        b_rel, o_rel = qs.get("base", [""])[0], qs.get("overlay", [""])[0]
-        base, over = safe_join(b_rel), safe_join(o_rel)
-        for label, p, rel in (("base", base, b_rel), ("overlay", over, o_rel)):
-            if p is None or not os.path.isfile(p) or not p.lower().endswith(VIDEO_EXTS):
-                return self.send_json({"error": f"{label} is not a video under Customers/: {rel}"}, 400)
-        import hashlib
-        slug = "pair_" + hashlib.sha1((base + "|" + over).encode()).hexdigest()[:10]
-        outdir = os.path.join(CACHE, slug)
-        os.makedirs(outdir, exist_ok=True)
-        log = lambda m: sys.stderr.write(m + "\n")
-        try:
-            bmeta_dir = build_mod.build_frames(base, out=os.path.join(outdir, "base"),
-                                               box=750, log=log)
-            ometa_dir = build_mod.build_frames(over, out=os.path.join(outdir, "overlay"),
-                                               box=750, log=log, alpha_png=True)
-        except RuntimeError as e:
-            return self.send_json({"error": str(e)}, 500)
-        bmeta = json.load(open(os.path.join(bmeta_dir, "meta.json")))
-        ometa = json.load(open(os.path.join(ometa_dir, "meta.json")))
-        sae.write_pair(outdir, bmeta, ometa, box=750,
-                                     base_rel=b_rel, overlay_rel=o_rel)
-        if redirect:
-            self.send_response(302)
-            self.send_header("Location", f"/{slug}/viewer.html")
-            self.end_headers()
-            return
-        self.send_json({"url": f"{slug}/viewer.html", "slug": slug,
-                        "base_frames": bmeta["nb_frames"], "overlay_frames": ometa["nb_frames"]})
-
-    def api_open_pair_go(self, qs):
-        """
-        Same as /api/open-pair but redirects straight to the viewer.
-
-        The scene list needs a plain navigation, not a fetch-then-assign: the
-        extraction can take a while and a link that simply goes somewhere is
-        both simpler and honest about what is happening.
-        """
-        self.api_open_pair(qs, redirect=True)
-
     def api_open_seq_go(self, qs):
         """Build the timeline and redirect — extraction can take a while and a
         link that simply goes somewhere is honest about that."""
@@ -1047,11 +986,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def api_open_seq(self, qs, redirect=False):
         """
         Open SEVERAL scenes as one timeline.
-
-        A scene on its own cannot show the thing that most often goes wrong —
-        how one scene JOINS the next. A hard cut, a pose that jumps, a voice that
-        starts before the picture settles: all of them live at a boundary, and a
-        single-clip viewer has no boundaries in it.
 
         Each scene keeps its OWN extraction (they are ordinary pairs, cached and
         reused), and the sequence viewer holds a manifest that maps a global
@@ -1338,10 +1272,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def send_viewer(self, slug):
         """
-        A view's page: web/pair.html or web/seq.html, chosen by view.json.
+        A timeline's page — web/seq.html.
 
         NOT the viewer.html sitting in the cache folder. Until 2026-09-04
-        write_pair()/write_seq() rendered a complete page into every cache,
+        write_seq() rendered a complete page into every cache,
         so old caches still hold one — serving the static page here makes
         all of them correct at once, with no re-extraction.
 
@@ -1354,8 +1288,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         view = self._view_of(slug)
         if view is None:
             return super().do_GET()      # pre-2026-09-04 cache: its own page
-        page = "seq.html" if view.get("kind") == "seq" else "pair.html"
-        return self.send_web(page, "text/html; charset=utf-8")
+        # THE LAYERED VIEW IS GONE (2026-09-04, Carson's call). A cache written
+        # before then still says kind "pair"; refuse it rather than serving a
+        # page that no longer exists. Open the scene on a timeline instead —
+        # a timeline of one scene is the single-scene view now.
+        if view.get("kind") != "seq":
+            return self.send_json({"error": "the layered view is gone — "
+                                   "open the scene on a timeline instead"}, 404)
+        return self.send_web("seq.html", "text/html; charset=utf-8")
 
     def send_web(self, name, ctype=None):
         """

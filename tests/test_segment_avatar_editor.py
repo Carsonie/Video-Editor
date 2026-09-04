@@ -56,7 +56,7 @@ SAE_BASE = None    # set by main()
 RESULTS = []
 LOG = []
 STEPS = []
-PAIR = None          # the layered-view slug, set by s_open_pair
+PAIR = None          # a scene's base-track slug, set by s_open_base
 SEQ = None           # the timeline slug, set by s_open_seq
 
 
@@ -225,22 +225,29 @@ def s_stores():
         check("its scenes list is real", isinstance(v.get("scenes"), list) and v["scenes"], v)
 
 
-def s_open_pair():
-    step("/api/open-pair — the layered view")
+def s_open_base():
+    """
+    A scene's BASE track, taken off a timeline.
+
+    This used to be s_open_pair, driving /api/open-pair — the layered view,
+    deleted 2026-09-04 (Carson's call). The frame-editing checks below still
+    need a real extracted clip to work on, and a timeline gives them one:
+    open-seq extracts every scene's two tracks itself and the manifest hands
+    back their slugs.
+
+    Note there is no `which` any more. A pair kept its two halves as
+    <slug>/base/ and <slug>/overlay/; a scene's tracks are two ordinary
+    slugs, which is how seq.js has always addressed them.
+    """
+    step("a scene's own base slug, off a timeline")
     global PAIR
-    seg = f"{fixture.ROOT_REL}/sandbox/01-alpha-scene/segment.mp4"
-    av = f"{fixture.ROOT_REL}/sandbox/01-alpha-scene/avatar.webm"
-    d, _ = get("/api/open-pair", base=seg, overlay=av)
-    PAIR = d.get("slug")
-    check("segment under avatar, both extracted", bool(PAIR), PAIR or json.dumps(d)[:90])
-
-
-def s_open_pair_go():
-    step("/api/open-pair-go — and its redirect")
-    seg = f"{fixture.ROOT_REL}/sandbox/01-alpha-scene/segment.mp4"
-    av = f"{fixture.ROOT_REL}/sandbox/01-alpha-scene/avatar.webm"
-    eq("redirects to the page it built",
-       raw_status("/api/open-pair-go", base=seg, overlay=av), 302)
+    ns = ",".join(str(x["n"]) for x in
+                  json.load(open(os.path.join(fixture.STORE, "sandbox",
+                                              "script.json")))["scenes"])
+    d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns=ns)
+    view, _ = get("/api/view", slug=d.get("slug"))
+    PAIR = (view.get("manifest") or [{}])[0].get("base_slug")
+    check("a timeline opened and gave a base slug", bool(PAIR), PAIR)
 
 
 def s_open_seq():
@@ -275,84 +282,84 @@ def s_own_cache():
 
 def s_map():
     step("/api/frames/map — read the frame map (base half of the pair)")
-    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    d, _ = get("/api/frames/map", slug=PAIR)
     eq("40 entries, one per source frame", d.get("nb_frames"), 40)
     check("starts as an identity map", d["frame_map"] == list(range(1, 41)), "1..40")
 
 
 def s_dup():
     step("/api/frames/dup — ＋ Frame")
-    must("/api/frames/dup", slug=PAIR, which="base", at=10, count=1, side="right")
-    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    must("/api/frames/dup", slug=PAIR, at=10, count=1, side="right")
+    d, _ = get("/api/frames/map", slug=PAIR)
     m = d["frame_map"]
     eq("one more frame", len(m), 41)
     eq("the new frame repeats frame 10", m[10], 10)
-    _, code = post("/api/frames/dup", slug=PAIR, which="base", at=10, count=1, side="sideways")
+    _, code = post("/api/frames/dup", slug=PAIR, at=10, count=1, side="sideways")
     eq("refuses a side that is neither left nor right", code, 400)
 
 
 def s_del():
     step("/api/frames/del — − Frame")
-    before, _ = get("/api/frames/map", slug=PAIR, which="base")
-    d = must("/api/frames/del", slug=PAIR, which="base", at=10, count=1, side="left")
-    after, _ = get("/api/frames/map", slug=PAIR, which="base")
+    before, _ = get("/api/frames/map", slug=PAIR)
+    d = must("/api/frames/del", slug=PAIR, at=10, count=1, side="left")
+    after, _ = get("/api/frames/map", slug=PAIR)
     eq("one frame gone", after["nb_frames"], before["nb_frames"] - 1)
     eq("and reports how many it actually took", d.get("actual", 1), 1)
 
 
 def s_dup_span():
     step("/api/frames/dup-span — ＋ Zone, and Update Frame Imbalance")
-    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    d, _ = get("/api/frames/map", slug=PAIR)
     before = d["nb_frames"]
-    must("/api/frames/dup-span", slug=PAIR, which="base", a=5, b=9)
-    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    must("/api/frames/dup-span", slug=PAIR, a=5, b=9)
+    d, _ = get("/api/frames/map", slug=PAIR)
     eq("a 5-frame zone repeated", d.get("nb_frames"), before + 5)
 
 
 def s_del_span():
     step("/api/frames/del-span — − Zone")
-    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    d, _ = get("/api/frames/map", slug=PAIR)
     before = d["nb_frames"]
-    must("/api/frames/del-span", slug=PAIR, which="base", a=5, b=9)
-    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    must("/api/frames/del-span", slug=PAIR, a=5, b=9)
+    d, _ = get("/api/frames/map", slug=PAIR)
     eq("the zone removed again", d.get("nb_frames"), before - 5)
 
 
 def s_restore():
     step("/api/frames/restore — Undo")
     original = list(range(1, 41))
-    must("/api/frames/restore", slug=PAIR, which="base", frame_map=original)
-    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    must("/api/frames/restore", slug=PAIR, frame_map=original)
+    d, _ = get("/api/frames/map", slug=PAIR)
     check("restore puts the exact map back", d["frame_map"] == original,
           f"{d.get('nb_frames')} frames")
 
 
 def s_paste():
     step("/api/frames/paste — copy a frame, put it somewhere else")
-    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    d, _ = get("/api/frames/map", slug=PAIR)
     before, m0 = d["nb_frames"], d["frame_map"]
-    must("/api/frames/paste", slug=PAIR, which="base", **{"from": 5, "at": 20})
-    d, _ = get("/api/frames/map", slug=PAIR, which="base")
+    must("/api/frames/paste", slug=PAIR, **{"from": 5, "at": 20})
+    d, _ = get("/api/frames/map", slug=PAIR)
     m1 = d["frame_map"]
     eq("one more frame", d["nb_frames"], before + 1)
     eq("the pasted frame carries frame 5's SOURCE number", m1[20], m0[4])
     eq("everything after it shifted right by one", m1[21], m0[20])
-    must("/api/frames/restore", slug=PAIR, which="base", frame_map=list(range(1, 41)))
+    must("/api/frames/restore", slug=PAIR, frame_map=list(range(1, 41)))
 
 
 def s_mark():
     step("/api/mark, /api/marks, /api/clear-marks — Mark / Unmark / Unmark all")
-    slug, which = PAIR, "base"
-    must("/api/clear-marks", slug=slug, which=which)
-    must("/api/mark", slug=slug, which=which, frame=5, on=True)
-    must("/api/mark", slug=slug, which=which, frame=20, on=True)
-    d, _ = get("/api/marks", slug=slug, which=which)
+    slug = PAIR
+    must("/api/clear-marks", slug=slug)
+    must("/api/mark", slug=slug, frame=5, on=True)
+    must("/api/mark", slug=slug, frame=20, on=True)
+    d, _ = get("/api/marks", slug=slug)
     eq("two marks set", sorted(d.get("marks", [])), [5, 20])
-    must("/api/mark", slug=slug, which=which, frame=5, on=False)
-    d, _ = get("/api/marks", slug=slug, which=which)
+    must("/api/mark", slug=slug, frame=5, on=False)
+    d, _ = get("/api/marks", slug=slug)
     eq("unmarking removes just that one", sorted(d.get("marks", [])), [20])
-    must("/api/clear-marks", slug=slug, which=which)
-    d, _ = get("/api/marks", slug=slug, which=which)
+    must("/api/clear-marks", slug=slug)
+    d, _ = get("/api/marks", slug=slug)
     eq("Clear All leaves none", d.get("marks", []), [])
 
 
@@ -360,8 +367,8 @@ def s_save():
     step("/api/save — 💾 Save scene")
     eq("the file starts at 40 frames",
        frames_of("sandbox/01-alpha-scene/segment.mp4"), 40)
-    must("/api/frames/dup-span", slug=PAIR, which="base", a=5, b=9)   # 40 -> 45
-    d = must("/api/save", slug=PAIR, which="base")
+    must("/api/frames/dup-span", slug=PAIR, a=5, b=9)   # 40 -> 45
+    d = must("/api/save", slug=PAIR)
     check("no frame-count warning", not d.get("warning"), d.get("warning", "none"))
     eq("the FILE now has exactly 45 frames",
        frames_of("sandbox/01-alpha-scene/segment.mp4"), 45)
@@ -373,22 +380,22 @@ def s_save_stale():
     step("/api/save — refuses when the file changed elsewhere first")
     seg_path = os.path.join(fixture.STORE, "sandbox", "01-alpha-scene", "segment.mp4")
     os.utime(seg_path, None)
-    d, code = post("/api/save", slug=PAIR, which="base")
+    d, code = post("/api/save", slug=PAIR)
     eq("refused with 409", code, 409)
     eq("named as a stale conflict", d.get("error"), "stale")
-    d2 = must("/api/save", slug=PAIR, which="base", force=True)
+    d2 = must("/api/save", slug=PAIR, force=True)
     check("force overrides the refusal", not d2.get("error"), d2)
 
 
 def s_cut():
     step("/api/cut — ✂ Cut scene")
-    slug, which = PAIR, "base"
-    must("/api/clear-marks", slug=slug, which=which)
-    must("/api/mark", slug=slug, which=which, frame=15, on=True)
-    must("/api/mark", slug=slug, which=which, frame=30, on=True)
-    d = must("/api/cut", slug=slug, which=which)
+    slug = PAIR
+    must("/api/clear-marks", slug=slug)
+    must("/api/mark", slug=slug, frame=15, on=True)
+    must("/api/mark", slug=slug, frame=30, on=True)
+    d = must("/api/cut", slug=slug)
     eq("two break points make three segments", d.get("count"), 3)
-    must("/api/clear-marks", slug=slug, which=which)
+    must("/api/clear-marks", slug=slug)
 
 
 def s_vtt():
@@ -543,7 +550,7 @@ def s_app_js_parses():
               else next((l for l in first if "Error" in l), first[0] if first else ""))
 
     # --- the two static pages: parse the real files ---
-    for f in ("pair.js", "seq.js"):
+    for f in ("seq.js",):
         with urllib.request.urlopen(f"{SAE_BASE}/web/{f}", timeout=30) as r:
             js = r.read().decode()
         check(f"web/{f} is really served, and is not empty", len(js) > 5000,
@@ -552,19 +559,13 @@ def s_app_js_parses():
 
     # --- and the pages that load them must actually reference them ---
     doc = json.load(open(os.path.join(fixture.STORE, "sandbox", "script.json")))
-    sc = doc["scenes"][-1]
-    folder = f"{sc['n']:02d}-{sc['label']}"
-    seg = f"{fixture.ROOT_REL}/sandbox/{folder}/segment.mp4"
-    av = f"{fixture.ROOT_REL}/sandbox/{folder}/avatar.webm"
 
-    d, _ = get("/api/open-pair", base=seg, overlay=av)
-    pair_slug = d.get("slug")
     ns = ",".join(str(x["n"]) for x in doc["scenes"])
     d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns=ns)
     seq_slug = d.get("slug")
 
-    for name, slug, want in (("layered page", pair_slug, "/web/pair.js"),
-                             ("timeline page", seq_slug, "/web/seq.js")):
+    # One page now. The layered view and its web/pair.* went on 2026-09-04.
+    for name, slug, want in (("timeline page", seq_slug, "/web/seq.js"),):
         with urllib.request.urlopen(f"{SAE_BASE}/{slug}/viewer.html", timeout=30) as r:
             html = r.read().decode()
         check(f"{name} loads {want}", want in html)
@@ -586,27 +587,9 @@ def s_api_view():
     """
     step("/api/view — the pages ship empty and the view arrives over the API")
     doc = json.load(open(os.path.join(fixture.STORE, "sandbox", "script.json")))
-    sc = doc["scenes"][-1]
-    folder = f"{sc['n']:02d}-{sc['label']}"
-    seg = f"{fixture.ROOT_REL}/sandbox/{folder}/segment.mp4"
-    av = f"{fixture.ROOT_REL}/sandbox/{folder}/avatar.webm"
 
-    d, _ = get("/api/open-pair", base=seg, overlay=av)
-    pair_slug = d.get("slug")
-    view, code = get("/api/view", slug=pair_slug)
-    eq("a real pair slug is answered", code, 200)
-    eq("it says which kind it is", view.get("kind"), "pair")
-    PAIR = ["player_label", "title", "box", "slug", "base_rel", "overlay_rel",
-            "max_n", "base_n", "over_n", "base_ext", "over_ext", "base_fps",
-            "over_fps", "base_name", "over_name", "base_audio", "over_audio"]
-    missing = [k for k in PAIR if k not in view]
-    check("all seventeen layered fields are present", not missing, missing or "none")
-    eq("max_n is the longer of the two tracks", view.get("max_n"),
-       max(view.get("base_n", 0), view.get("over_n", 0)))
-    check("base_rel is a real relative path — it exists nowhere else on disk",
-          bool(view.get("base_rel")) and view["base_rel"].endswith("segment.mp4"),
-          view.get("base_rel"))
-
+    # Only one kind of view exists now — the layered one was deleted
+    # 2026-09-04, and with it /api/open-pair and its seventeen fields.
     ns = ",".join(str(x["n"]) for x in doc["scenes"])
     d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns=ns)
     seq_slug = d.get("slug")
@@ -622,11 +605,10 @@ def s_api_view():
     eq("total is the sum of the scenes' frames", view.get("total"),
        sum(m["base_n"] for m in view["manifest"]))
 
-    # `title` is the BARE name in both kinds. web/pair.js and web/seq.js
-    # compose the tab title as "Segment and Avatar Editor — <title>"
+    # `title` is the BARE name. web/seq.js composes the tab title as "Segment and Avatar Editor — <title>"
     # (Carson's format, 2026-09-04). Prefixing it here too would double it,
     # and the suite cannot see document.title — this guards the half it can.
-    for slug, what in ((pair_slug, "layered"), (seq_slug, "timeline")):
+    for slug, what in ((seq_slug, "timeline"),):
         v, _ = get("/api/view", slug=slug)
         check(f"{what}: title is bare, not prefixed with the editor",
               not str(v.get("title", "")).startswith("Segment and Avatar"),
@@ -654,17 +636,14 @@ def s_deeper_paths_are_not_the_layered_page():
     """
     step("a deeper path is a 404, never the layered page")
     doc = json.load(open(os.path.join(fixture.STORE, "sandbox", "script.json")))
-    sc = doc["scenes"][-1]
-    folder = f"{sc['n']:02d}-{sc['label']}"
-    d, _ = get("/api/open-pair",
-               base=f"{fixture.ROOT_REL}/sandbox/{folder}/segment.mp4",
-               overlay=f"{fixture.ROOT_REL}/sandbox/{folder}/avatar.webm")
+    ns = ",".join(str(x["n"]) for x in doc["scenes"])
+    d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns=ns)
     slug = d.get("slug")
-    check("a pair to open", bool(slug), slug)
+    check("a timeline to open", bool(slug), slug)
 
     with urllib.request.urlopen(f"{SAE_BASE}/{slug}/viewer.html", timeout=30) as r:
         layered = r.read().decode()
-    check("two segments still give the layered page", "/web/pair.js" in layered)
+    check("two segments still give the timeline page", "/web/seq.js" in layered)
 
     cache = os.path.join(PLAYERS, "cache", "segment-avatar-editor", slug)
     for half in ("base", "overlay"):
@@ -677,7 +656,7 @@ def s_deeper_paths_are_not_the_layered_page():
                     f"{SAE_BASE}/{slug}/{half}/viewer.html", timeout=30) as r:
                 page = r.read().decode()
             check(f"{half}: three segments must not serve the layered page",
-                  "/web/pair.js" not in page, f"served {len(page)} bytes")
+                  "/web/seq.js" not in page, f"served {len(page)} bytes")
         except urllib.error.HTTPError as e:
             eq(f"{half}: three segments give a 404", e.code, 404)
 
@@ -704,7 +683,7 @@ def s_stale_cached_pages():
                 f"{SAE_BASE}/pair_stalefixture99/viewer.html", timeout=30) as r:
             page = r.read().decode()
         check("it still serves its own baked page", marker in page)
-        check("it is not handed the new static page", "/web/pair.js" not in page)
+        check("it is not handed the new static page", "/web/seq.js" not in page)
     finally:
         shutil.rmtree(stale, ignore_errors=True)
 
@@ -727,8 +706,8 @@ def s_no_unreachable_handlers():
     eq("unreachable handlers", fixture.dead_handlers(SAE_SERVE), [])
 
 
-FUNCTIONS = [s_static_page, s_list, s_siblings, s_stores, s_open_pair,
-             s_open_pair_go, s_open_seq, s_open_seq_go, s_own_cache, s_map,
+FUNCTIONS = [s_static_page, s_list, s_siblings, s_stores, s_open_base,
+             s_open_seq, s_open_seq_go, s_own_cache, s_map,
              s_dup, s_del, s_dup_span, s_del_span, s_restore, s_paste,
              s_mark, s_save, s_save_stale, s_cut, s_vtt, s_line, s_join,
              s_renumber_state, s_renumber_clear, s_split, s_archive,

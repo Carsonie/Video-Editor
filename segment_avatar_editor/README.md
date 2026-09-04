@@ -26,7 +26,6 @@ shapes and the VTT word count, imported rather than copied since
 | | |
 |---|---|
 | `serve.py` | the server and every route. Stateless: each request names what it acts on |
-| `web/pair.html` `.css` `.js` | the layered page, shipped **empty** — see below |
 | `web/seq.html` `.css` `.js` | the timeline page, shipped **empty** |
 | `player.py` | 134 lines: writes each view's `view.json`. No pages in it |
 | `_splitter_player.py` | a private copy of MP4 Splitter's viewer — see below |
@@ -35,29 +34,25 @@ shapes and the VTT word count, imported rather than copied since
 Frame extraction, path shapes and the VTT word count are in
 `editor_base/`, imported — not copied here.
 
-### Two pages, and they ship empty
+### One page, and it ships empty
 
-- **`web/pair.*`** — the layered view: one scene, mp4 underneath, alpha
-  WebM on top, each track independently editable.
-- **`web/seq.*`** — the timeline: several scenes joined, so the
-  *boundaries* can be judged. A scene on its own cannot show the thing
-  that most often goes wrong — how one scene joins the next.
+**`web/seq.*`** — the timeline: scenes on one ruler, so the *boundaries* can
+be judged. Tick one scene and it is the single-scene view too.
 
-Two pages rather than one, because they were two templates for a reason:
-they share the tools but not the span. They share nothing but `serve.py`.
+**The layered view was deleted on 2026-09-04** (Carson's call). It was a
+one-scene page with Background / Overlay / Solo, at `/api/open-pair`. Both
+its routes, `write_pair()`, and `web/pair.html/.css/.js` are gone, from this
+tool and from the old 8842 server, which shared the same player. A cache
+written before then still says `kind: "pair"`; `send_viewer()` refuses it
+with a 404 rather than serving a page that no longer exists.
 
-**No view is baked into either.** `player.py`'s `write_pair()` and
-`write_seq()` write a small **`view.json`** into the cache folder, and
-the page fetches it back over `GET /api/view?slug=…` before it draws
-anything. One endpoint for both, because the page does not choose which
-kind it is: `kind` in the answer says so, and `send_viewer()` has already
-sent the matching page.
+**No view is baked into the page.** `write_seq()` writes a small
+**`view.json`** into the cache folder, and the page fetches it back over
+`GET /api/view?slug=…` before drawing anything.
 
-**Why a file and not a rebuild from `meta.json`.** Most of what a view
-needs cannot be recovered afterwards. `base_rel` and `overlay_rel` are
-handed in when a pair is opened; the timeline's `manifest`, mapping every
-global frame to (scene, local frame), is built at open time and exists
-nowhere else. A rebuild would have to guess them, so the open writes them
+**Why a file and not a rebuild from `meta.json`.** The manifest — mapping
+every global frame to (scene, local frame) — is built at open time and
+exists nowhere else. A rebuild would have to guess it, so the open writes it
 down.
 
 ### ⚠ Three pages live under one cache folder
@@ -65,14 +60,14 @@ down.
 A pair's cache holds **three** `viewer.html` paths, not one:
 
 ```
-/<slug>/viewer.html            the layered page      (static, web/pair.*)
+/<slug>/viewer.html            the timeline page     (static, web/seq.*)
 /<slug>/base/viewer.html       that scene on its own (_splitter_player.py)
 /<slug>/overlay/viewer.html    the overlay on its own
 ```
 
 `serve.py` routes **exactly two path segments** to the static page. The
 first version of that route matched `path.endswith("/viewer.html")` and
-swallowed all three, serving the layered page for every one — and **the
+swallowed all three, serving the timeline page for every one — and **the
 suite passed**, because its only check on those pages scraped `<script>`
 out of the HTML, and the new static page has none, so it handed
 `node --check` an empty string. `s_single_clip_page_still_works` now
@@ -96,7 +91,7 @@ and a stray apostrophe killed the page at **render** time rather than at
 edit time. It is now 134 lines.
 
 **Keep the `node --check` guard, and note it is no longer uniform.** The
-two static pages are parsed as real files (`/web/pair.js`, `/web/seq.js`);
+static page is parsed as a real file (`/web/seq.js`);
 the single-clip page is *still* a Python template, so that one is still
 scraped out of the served HTML. Scraping the static pages would find
 nothing and pass on an empty string.

@@ -47,9 +47,8 @@ def label():
 # editor could lint or highlight any of it, and a stray apostrophe killed the
 # page at RENDER time rather than at edit time.
 #
-# The pages are now static files in web/ — pair.html/.css/.js and
-# seq.html/.css/.js — and these two functions write a small view.json
-# instead. serve.py hands that back over /api/view, and the page fills
+# The page is now static files in web/ — seq.html/.css/.js — and
+# write_seq() writes a small view.json instead. serve.py hands that back over /api/view, and the page fills
 # itself in once it arrives.
 #
 # WHY A FILE AND NOT A REBUILD FROM meta.json. Most of what a view needs is
@@ -67,47 +66,9 @@ def _write_view(outdir, view):
         json.dump(view, fh, indent=2)
 
 
-def write_pair(outdir, base_meta, over_meta, box=750, base_rel="", overlay_rel=""):
-    """
-    Record the layered view of a base/overlay pair.
-
-    `base_rel`/`overlay_rel` are the two sources' paths relative to
-    Customers/. The page needs them to list the base's sibling scenes and to
-    reload itself against a different one while carrying the same overlay
-    across — and nothing else on disk holds them, which is why they are
-    written here rather than derived later.
-    """
-    _write_view(outdir, {
-        "kind": "pair",
-        "player_label": label(),
-        "title": f"{base_meta.get('source_name', 'base')} + "
-                 f"{over_meta.get('source_name', 'overlay')}",
-        "box": box,
-        "slug": os.path.basename(outdir.rstrip("/")),
-        "base_rel": base_rel,
-        "overlay_rel": overlay_rel,
-        "max_n": max(base_meta["nb_frames"], over_meta["nb_frames"]),
-        "base_n": base_meta["nb_frames"],
-        "over_n": over_meta["nb_frames"],
-        "base_ext": base_meta.get("ext", ".jpg"),
-        "over_ext": over_meta.get("ext", ".png"),
-        "base_fps": base_meta["fps"],
-        "over_fps": over_meta["fps"],
-        "base_name": base_meta.get("source_name", "base"),
-        "over_name": over_meta.get("source_name", "overlay"),
-        "base_audio": bool(base_meta.get("has_audio")),
-        "over_audio": bool(over_meta.get("has_audio")),
-    })
-
-
 # ---------------------------------------------------------------------------
 # SEQUENCE VIEW — several scenes on ONE timeline
 # ---------------------------------------------------------------------------
-#
-# A scene on its own cannot show the thing that most often goes wrong: how one
-# scene JOINS the next. A hard cut, a pose that jumps, a voice that starts
-# before the picture settles — all of them live at a boundary, and a
-# single-clip viewer has no boundaries in it.
 #
 # Each scene keeps its OWN extraction and its own cache; the manifest maps a
 # global frame to (scene, local frame). Concatenating frames into one new
