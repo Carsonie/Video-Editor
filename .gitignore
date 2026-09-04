@@ -72,6 +72,8 @@ tests/mp4_splitter/*.log
 tests/mp4_splitter/*.txt
 tests/segment_avatar_editor/*.log
 tests/segment_avatar_editor/*.txt
+tests/editor_base/*.log
+tests/editor_base/*.txt
 !tests/*/.gitkeep
 
 # Generation archives — dev/, sandbox/ and video/ each keep their previous
