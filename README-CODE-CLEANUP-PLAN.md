@@ -765,7 +765,7 @@ at its own import time and would silently undo an earlier assignment.
 
 `s_own_cache` asserts all three point at the same folder.
 
-### Step 18. Add a linter — narrow, non-reformatting
+### Step 18. Add a linter — narrow, non-reformatting  ✅ done 2026-09-04
 
 **Task scope:** repo-wide config, one commit.
 

@@ -1,0 +1,48 @@
+# Linting only. This project has no build, no packaging, and no
+# dependencies to declare — four editors and a build pipeline, all run
+# straight from source with `python3 <file>.py`. This file exists solely
+# so `ruff check .` means the same thing for everyone.
+#
+#   pip install ruff        (or: brew install ruff)
+#   ruff check .
+
+[tool.ruff]
+target-version = "py311"
+
+# NOT FORMATTED, DELIBERATELY. Every file here is hand-styled — aligned
+# comment columns, deliberate blank lines, long explanatory blocks that a
+# formatter would reflow into mush. `ruff format` is never run on this
+# repo. If you want that argued out, argue it before running it, not
+# after; the diff would be unreviewable.
+exclude = [
+    "cache",
+    "cache_mp4_splitter",
+    "cache_segment_avatar_editor",
+    "cache_avatar_editor",
+    "Customers",
+    "next-editor-version",
+    # Someone else's uncommitted work-in-progress. It is not to be edited,
+    # so linting it only produces findings nobody may act on. See
+    # ToDo.md if it ever needs raising.
+    "build/assemble_video.py",
+]
+
+[tool.ruff.lint]
+# A deliberately small set — real errors only, nothing stylistic.
+#
+#   F   pyflakes: unused imports, unused variables, undefined names,
+#       f-strings with no placeholders, redefinitions
+#   E9  syntax errors and IO errors
+#
+# Style rules (E1/E2/E3/E7, line length, import order) are OFF on purpose.
+# They would flag hundreds of intentional choices and drown the handful of
+# findings that mean something.
+select = ["F", "E9"]
+
+[tool.ruff.lint.per-file-ignores]
+# These three exist to re-export editor_base under the old names, for the
+# nine scripts in build/ that still `import paths as PTH`. A star-import
+# with unused names IS the job.
+"shared/paths.py" = ["F403", "F405", "F401"]
+"shared/frames.py" = ["F403", "F405", "F401"]
+"shared/vtt.py" = ["F403", "F405", "F401"]

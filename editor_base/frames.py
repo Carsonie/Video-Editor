@@ -217,7 +217,7 @@ def build_frames(video, out=None, box=750, force=False, log=print, alpha_png=Fal
             write_viewer(outdir, prior)
             log(f"  using cached extraction: {outdir}")
             log(f"  ({prior['nb_frames']} frames, {prior['fps']:g}fps) — open video_players/cache/{os.path.basename(outdir)}/viewer.html")
-            log(f"  --force to re-extract")
+            log("  --force to re-extract")
             return outdir
         log("  source changed since last extraction — re-extracting")
 

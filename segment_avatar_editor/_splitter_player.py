@@ -1548,8 +1548,10 @@ TEMPLATE = """<!doctype html>
 </body></html>
 """
 
-if __name__ == "__main__":
-    main()
+# No `if __name__ == "__main__": main()` here. There was one until
+# 2026-09-04, calling a main() this file has never defined — a leftover
+# from the copy it was made from. Running this module directly crashed
+# with NameError, which nothing noticed because nobody ever did.
 
 
 # ---------------------------------------------------------------------------

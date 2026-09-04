@@ -417,9 +417,7 @@ def s_working_clips():
     """
     step("Working Clips — the panel, saving into it, and replacing from it")
     html = urllib.request.urlopen(AE_BASE + "/", timeout=10).read().decode()
-    wc = urllib.request.urlopen(AE_BASE + "/web/working-clips.js", timeout=10).read().decode()
     gb = urllib.request.urlopen(AE_BASE + "/web/gap-builder.js", timeout=10).read().decode()
-    js = urllib.request.urlopen(AE_BASE + "/web/app.js", timeout=10).read().decode()
 
     # Every control this panel needs must EXIST in the served page, with
     # the id its handler looks up. That is a real contract between the
@@ -468,9 +466,6 @@ def s_common_library_wiring():
     """
     step("the common library panel exists and is wired through, not bolted on")
     html = urllib.request.urlopen(AE_BASE + "/", timeout=10).read().decode()
-    gb = urllib.request.urlopen(AE_BASE + "/web/gap-builder.js", timeout=10).read().decode()
-    fp = urllib.request.urlopen(AE_BASE + "/web/frame-player.js", timeout=10).read().decode()
-    js = urllib.request.urlopen(AE_BASE + "/web/app.js", timeout=10).read().decode()
 
     # The element contract: every id the JS looks up must exist in the
     # served page. Breaking one breaks the panel silently.
@@ -506,7 +501,6 @@ def s_tooltips():
     """
     step("tooltips — every control says what it does, after 3 seconds")
     html = urllib.request.urlopen(AE_BASE + "/", timeout=10).read().decode()
-    tt = urllib.request.urlopen(AE_BASE + "/web/tooltips.js", timeout=10).read().decode()
 
     # The 3-second delay, the suppression of the browser's own tooltip, the
     # click-cancels behaviour, the keep-it-inside-the-window maths: all of
@@ -658,7 +652,6 @@ def s_original_audio_stack():
     """
     step("structure — the players' own elements and their isolation")
     fp = urllib.request.urlopen(AE_BASE + "/web/frame-player.js", timeout=10).read().decode()
-    gb = urllib.request.urlopen(AE_BASE + "/web/gap-builder.js", timeout=10).read().decode()
     html = urllib.request.urlopen(AE_BASE + "/", timeout=10).read().decode()
 
     # WHAT THIS STEP IS, AND IS NOT.

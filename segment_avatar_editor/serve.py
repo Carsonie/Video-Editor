@@ -2360,27 +2360,27 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         sys.stderr.write("  " + (fmt % args) + "\n")
 
 
-BROWSE_HTML = f"""<!doctype html>
+BROWSE_HTML = """<!doctype html>
 <html><head><meta charset="utf-8"><title>Segment and Avatar Editor</title>
 <style>
-  :root {{ color-scheme: dark; }}
-  body {{ margin:0; background:#1a1a1a; color:#eee; font-family:-apple-system,sans-serif;
-         display:flex; flex-direction:column; align-items:center; padding:16px 0; }}
-  #panel {{ width:750px; }}
-  h1 {{ font-size:15px; font-weight:600; margin:0 0 10px; color:#ccc; }}
-  #crumb {{ font-size:12px; color:#888; margin-bottom:10px; cursor:pointer; }}
-  #crumb:hover {{ color:#ccc; }}
-  #crumb:empty {{ display:none; }}
-  #status {{ font-size:13px; color:#e0c060; min-height:18px; margin-bottom:8px; }}
-  #list {{ border:1px solid #333; border-radius:8px; overflow:hidden; }}
-  .row {{ padding:9px 14px; cursor:pointer; border-bottom:1px solid #2a2a2a;
-         display:flex; justify-content:space-between; align-items:center; font-size:13px; }}
-  .row:last-child {{ border-bottom:none; }}
-  .row:hover {{ background:#2a2a2a; }}
-  .row.disabled {{ cursor:default; color:#666; }}
-  .row.disabled:hover {{ background:none; }}
-  .sub {{ display:block; font-size:11px; color:#888; margin-top:2px; }}
-  .empty {{ padding:14px; color:#666; font-size:13px; }}
+  :root { color-scheme: dark; }
+  body { margin:0; background:#1a1a1a; color:#eee; font-family:-apple-system,sans-serif;
+         display:flex; flex-direction:column; align-items:center; padding:16px 0; }
+  #panel { width:750px; }
+  h1 { font-size:15px; font-weight:600; margin:0 0 10px; color:#ccc; }
+  #crumb { font-size:12px; color:#888; margin-bottom:10px; cursor:pointer; }
+  #crumb:hover { color:#ccc; }
+  #crumb:empty { display:none; }
+  #status { font-size:13px; color:#e0c060; min-height:18px; margin-bottom:8px; }
+  #list { border:1px solid #333; border-radius:8px; overflow:hidden; }
+  .row { padding:9px 14px; cursor:pointer; border-bottom:1px solid #2a2a2a;
+         display:flex; justify-content:space-between; align-items:center; font-size:13px; }
+  .row:last-child { border-bottom:none; }
+  .row:hover { background:#2a2a2a; }
+  .row.disabled { cursor:default; color:#666; }
+  .row.disabled:hover { background:none; }
+  .sub { display:block; font-size:11px; color:#888; margin-top:2px; }
+  .empty { padding:14px; color:#666; font-size:13px; }
 </style></head>
 <body>
   <div id="panel">
@@ -2397,63 +2397,63 @@ BROWSE_HTML = f"""<!doctype html>
   // like a working path. This page now shows the SAME store -> video ->
   // sandbox scenes picker the in-editor Load button already used — just as
   // the first thing you see, not something buried inside an open session.
-  function row(label, sub, onclick, disabled) {{
+  function row(label, sub, onclick, disabled) {
     const d = document.createElement('div');
     d.className = 'row' + (disabled ? ' disabled' : '');
     const l = document.createElement('span');
-    l.innerHTML = label + (sub ? `<span class="sub">${{sub}}</span>` : '');
+    l.innerHTML = label + (sub ? `<span class="sub">${sub}</span>` : '');
     d.appendChild(l);
     if (!disabled) d.onclick = onclick;
     return d;
-  }}
-  function setStatus(msg) {{ document.getElementById('status').textContent = msg; }}
+  }
+  function setStatus(msg) { document.getElementById('status').textContent = msg; }
 
-  async function showStores() {{
+  async function showStores() {
     document.getElementById('h1').textContent = 'Load a video — choose a store';
     document.getElementById('crumb').innerHTML = '';
     setStatus('Loading stores…');
     const list = document.getElementById('list');
     list.innerHTML = '';
     let stores;
-    try {{
+    try {
       const r = await fetch('/api/stores');
       const d = await r.json();
       stores = d.stores || [];
-    }} catch (e) {{ setStatus(`Could not list stores: ${{e}}`); return; }}
+    } catch (e) { setStatus(`Could not list stores: ${e}`); return; }
     setStatus('');
-    if (!stores.length) {{
+    if (!stores.length) {
       list.appendChild(Object.assign(document.createElement('div'),
-        {{ className: 'empty', textContent: 'No store with a ready video was found under Customers/.' }}));
+        { className: 'empty', textContent: 'No store with a ready video was found under Customers/.' }));
       return;
-    }}
-    for (const s of stores) {{
-      list.appendChild(row(`🎬  ${{s.store}}`,
-        `${{s.business}} — ${{s.videos.length}} video${{s.videos.length === 1 ? '' : 's'}}`,
+    }
+    for (const s of stores) {
+      list.appendChild(row(`🎬  ${s.store}`,
+        `${s.business} — ${s.videos.length} video${s.videos.length === 1 ? '' : 's'}`,
         () => showVideos(s)));
-    }}
-  }}
-  function showVideos(s) {{
-    document.getElementById('h1').textContent = `Load a video — ${{s.store}}`;
+    }
+  }
+  function showVideos(s) {
+    document.getElementById('h1').textContent = `Load a video — ${s.store}`;
     const crumb = document.getElementById('crumb');
     crumb.textContent = '← back to stores';
     crumb.onclick = showStores;
     setStatus('');
     const list = document.getElementById('list');
     list.innerHTML = '';
-    for (const v of s.videos) {{
+    for (const v of s.videos) {
       const reason = !v.scenes.length ? 'its script has no scenes'
         : !v.has_sandbox ? 'no sandbox/ built yet — cut it in MP4 Splitter first'
         : null;
-      list.appendChild(row(`📼  ${{v.name}}`,
-        `${{v.scenes.length}} scene${{v.scenes.length === 1 ? '' : 's'}}` + (reason ? ` — ${{reason}}` : ''),
+      list.appendChild(row(`📼  ${v.name}`,
+        `${v.scenes.length} scene${v.scenes.length === 1 ? '' : 's'}` + (reason ? ` — ${reason}` : ''),
         () => confirmLoad(s, v), !!reason));
-    }}
-  }}
-  function confirmLoad(s, v) {{
-    if (!confirm(`Load ${{s.store}} — ${{v.name}}?\\n\\n${{v.scenes.length}} scene(s).`)) return;
-    setStatus(`Loading ${{s.store}} — ${{v.name}}…`);
-    location.href = `/api/open-seq-go?root=${{encodeURIComponent(v.root)}}&ns=${{v.scenes.join(',')}}`;
-  }}
+    }
+  }
+  function confirmLoad(s, v) {
+    if (!confirm(`Load ${s.store} — ${v.name}?\\n\\n${v.scenes.length} scene(s).`)) return;
+    setStatus(`Loading ${s.store} — ${v.name}…`);
+    location.href = `/api/open-seq-go?root=${encodeURIComponent(v.root)}&ns=${v.scenes.join(',')}`;
+  }
   showStores();
 </script>
 </body></html>

@@ -21,7 +21,6 @@ WHAT IS LEFT OF THIS FILE, AND WHY IT IS SHORT
     app.js — and the fourteen values that used to be baked into it arrive
     over GET /api/clip. What remains here is the player's identity.
 """
-import json
 import os
 
 from editor_base import frames
