@@ -7,8 +7,18 @@ genuinely independent, no shared code, each on its own port. This file
 started as a literal copy of shared/serve.py and was trimmed down to just
 what this tool's own pages (this package's player.py) actually call —
 Splitter-only routes (open a single clip, Archive/Handoff, Discard edits,
-Reset editor) are gone from the dispatch tables below. It also gets its
-OWN extracted-frame cache (cache_segment_avatar_editor/, not shared/'s
+Reset editor) are gone ENTIRELY.
+
+    Careful: for a year they were only HALF gone. The 2026-09-02 split
+    removed them from the dispatch tables below but left their handler
+    bodies in place — 4 unreachable methods, 211 lines, plus a stale
+    branch in session_log() formatting a line for /api/open. Every test
+    passed the whole time, because a route with no dispatch entry 404s
+    exactly like a route whose handler was deleted. Removed 2026-09-03.
+    What stops it recurring is fixture.dead_handlers(), which walks out
+    from do_GET/do_POST and fails the suite on anything unreachable.
+
+It also gets its OWN extracted-frame cache (cache_segment_avatar_editor/, not shared/'s
 cache/) and its own frames.py/paths.py/vtt.py — duplicated, not imported,
 same reason. See mp4_splitter/serve.py for that tool's own copy of this
 same split.
@@ -262,9 +272,6 @@ def session_log(path, payload, result, status):
         args = " ".join(f"{k}={payload.get(k)}" for k in keys if payload.get(k) is not None)
         # what it acted on: a cache slug for frame work, a store for the rest
         who = payload.get("slug") or payload.get("root") or ""
-        if path == "/api/open":
-            who = os.path.basename(os.path.dirname(str(payload.get("path", "")))) or ""
-            args = os.path.basename(str(payload.get("path", "")))
         res = result if isinstance(result, dict) else {}
         if status != 200 or res.get("error"):
             tail = f"REFUSED: {res.get('error', status)}"
@@ -946,26 +953,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 if videos:
                     out.append({"business": biz, "store": store, "videos": videos})
         self.send_json({"stores": out})
-
-    def api_open(self, qs):
-        rel = qs.get("path", [""])[0]
-        target = safe_join(rel)
-        if target is None or not os.path.isfile(target) or not target.lower().endswith(VIDEO_EXTS):
-            return self.send_json({"error": f"not a video under Customers/: {rel}"}, 400)
-        try:
-            # An ALPHA clip has to be extracted as PNG or its transparency is
-            # gone. .webm was added to VIDEO_EXTS so an avatar could be opened
-            # here and inspected frame by frame like anything else — but this
-            # never passed alpha_png, so it came back flat, and the very thing
-            # you open an avatar to look at was the thing that got dropped.
-            # open-pair and open-seq both got this right; this did not.
-            outdir = build_mod.build_frames(
-                target, alpha_png=is_alpha(target),
-                log=lambda m: sys.stderr.write(m + "\n"))
-        except RuntimeError as e:
-            return self.send_json({"error": str(e)}, 500)
-        slug = os.path.basename(outdir)
-        self.send_json({"url": f"{slug}/viewer.html"})
 
     def api_open_pair(self, qs, redirect=False):
         """
@@ -1726,150 +1713,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             shutil.copy2(script_p, os.path.join(dest, "script.json"))
         self.send_json({"folder": folder, "archived_to": dest, "empty": False})
 
-    def api_handoff(self, payload):
-        """
-        Hand a cut's segments over to the sandbox, named.
-
-        The MP4 Splitter writes dev/_cuts/Num_3-v1-segment.mp4; naming it here
-        makes it dev/03-catalogue-search/segment-v1.mp4 — a scene, and the
-        starting point of a video.
-
-        dev holds ONE generation. Depositing archives the one before it to
-        dev/z_History/<date>-v_N/ and starts the numbering again at 1, so what
-        is in dev is always exactly the cut you last made, not a pile of them.
-
-        This is that step: name each cut, and it lands where the editor looks,
-        with a scene row in script.json to match. That row is what makes it a
-        scene rather than a loose file: paths.sandbox_dir() finds a folder by
-        its NN- prefix, and the VTT and every scene list read the script.
-
-        COPIES out of _cuts, never moves. _cuts is the versioned record of what
-        the splitter produced, and a second attempt at naming has to stay
-        possible.
-        """
-        outdir = resolve_outdir(payload.get("slug"), payload.get("which"))
-        if outdir is None:
-            return self.send_json({"error": "unknown slug"}, 400)
-        try:
-            meta = json.load(open(os.path.join(outdir, "meta.json")))
-        except OSError:
-            return self.send_json({"error": "this clip has no extraction to hand off"}, 400)
-        src = meta.get("source")
-        if not src or not os.path.isfile(src):
-            return self.send_json({"error": f"source no longer exists: {src}"}, 400)
-
-        cuts_dir = derive_segments_dir(src)
-        if not os.path.isdir(cuts_dir):
-            return self.send_json({"error": "nothing has been cut yet"}, 400)
-        # The video folder is the one holding sandbox/ — two up from _cuts.
-        final = os.path.dirname(os.path.dirname(cuts_dir))
-
-        # derive_segments_dir() falls back to "a sandbox beside the source" for
-        # a clip that is not inside a store's videos/<name>/ tree. That is fine
-        # for CUTTING -- the pieces land next to what they came from -- but a
-        # handoff there writes a whole parallel mini-store: measured once as
-        # sandbox/01-alpha-scene/sandbox/01-login-screen/ plus its own
-        # script.json, reported as a success, with nothing where the editor
-        # looks. A scene only means something inside a video folder, so this
-        # says no rather than building a store nobody asked for.
-        parent = os.path.basename(os.path.dirname(final))
-        if parent != "videos" and os.path.basename(final) != "final":
-            return self.send_json(
-                {"error": "this clip is not inside a store's videos/<name>/ folder, "
-                          "so there is no video for these scenes to belong to. "
-                          f"Cutting still works; the pieces are in {cuts_dir}."}, 400)
-
-        try:
-            version = int(payload.get("version"))
-        except (TypeError, ValueError):
-            return self.send_json({"error": "version must be an integer"}, 400)
-        found = []
-        for f in sorted(os.listdir(cuts_dir)):
-            m = SEGMENT_NAME_RE.match(f)
-            if m and int(m.group(2)) == version:
-                found.append((int(m.group(1)), f))
-        found.sort()
-        if not found:
-            return self.send_json({"error": f"no cut segments at version {version}"}, 400)
-
-        names = payload.get("names") or []
-        if len(names) != len(found):
-            return self.send_json(
-                {"error": f"{len(found)} segments but {len(names)} name(s)"}, 400)
-        for nm in names:
-            if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,48}", nm or ""):
-                return self.send_json(
-                    {"error": f"bad name: {nm!r} — lower-case letters, digits and hyphens"}, 400)
-        if len(set(names)) != len(names):
-            return self.send_json({"error": "two segments cannot share a name"}, 400)
-
-        script_p = PTH.script(final)
-        doc = json.load(open(script_p)) if os.path.isfile(script_p) else {}
-
-        # A fresh cut REPLACES dev, it does not append to it. dev holds one
-        # generation of segments — the starting point of one video — and the
-        # generation it replaces goes to dev/z_History/<date>-v_N/ first, with
-        # the script that described it, because a scene list and the folders it
-        # names are only meaningful together.
-        droot = PTH.dev_root(final)
-        os.makedirs(droot, exist_ok=True)
-        archived = PTH.archive_contents(droot, keep=("_cuts",))
-        if archived and os.path.isfile(script_p):
-            shutil.move(script_p, os.path.join(archived, "script.json"))
-            doc.pop("scenes", None)
-        scenes = doc.setdefault("scenes", [])
-        start = 1
-
-        sroot = droot
-        planned = []
-        for k, (num, fname) in enumerate(found):
-            n = start + k
-            d = os.path.join(sroot, f"{n:02d}-{names[k]}")
-            # Checking the exact folder name is not enough. paths.sandbox_dir()
-            # finds a scene by its NN- PREFIX, so any folder already using that
-            # number wins the lookup and the new scene is invisible while a
-            # different one answers to its number. Measured: handing off beside
-            # an orphaned 02-bravo-scene made scene 2 resolve to bravo, not to
-            # the segment just handed over.
-            clash = [x for x in (os.listdir(sroot) if os.path.isdir(sroot) else [])
-                     if re.match(rf"^{n:02d}(-|$)", x)
-                     and os.path.isdir(os.path.join(sroot, x))]
-            if clash:
-                return self.send_json(
-                    {"error": f"sandbox already has {clash[0]}, so scene {n} is taken. "
-                              f"The script and the folders disagree — fix that before "
-                              f"handing off, or these scenes cannot be found."}, 400)
-            planned.append((n, names[k], d, os.path.join(cuts_dir, fname)))
-
-        if scenes and os.path.isfile(script_p):
-            hist = os.path.join(final, "z_History", "handoff")
-            os.makedirs(hist, exist_ok=True)
-            shutil.copy2(script_p, os.path.join(
-                hist, f"script-{time.strftime('%Y%m%d-%H%M%S')}.json"))
-
-        made = []
-        for n, name, d, srcf in planned:
-            os.makedirs(d, exist_ok=True)
-            # dev's own convention: versioned filenames, which paths.py's
-            # DEV_SEG_RE/DEV_AV_RE look for. A fresh deposit starts at v1 —
-            # the generations above it live in z_History, not in the filename.
-            dst = os.path.join(d, "avatar-v1.webm" if is_alpha(srcf) else "segment-v1.mp4")
-            shutil.copy2(srcf, dst)
-            scenes.append({"n": n, "label": name, "line": "",
-                           "_line_todo": "written by the splitter's handoff; the line is still to write"})
-            made.append({"n": n, "label": name,
-                         "folder": os.path.basename(d),
-                         "frames": build_mod.decoded_frames(dst, dec_for(dst))})
-
-        os.makedirs(os.path.dirname(script_p), exist_ok=True)
-        with open(script_p, "w") as fh:
-            json.dump(doc, fh, indent=2)
-
-        self.send_json({"handed_off": made, "first_n": start,
-                        "scenes": len(scenes), "script": script_p,
-                        "into": droot,
-                        "archived_to": archived})
-
     def api_join(self, payload):
         """
         Join several scenes into one, in the store's sandbox.
@@ -2406,53 +2249,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                         "nb_frames": nb_frames,
                         "frames_written": wrote, "frames_expected": want_frames,
                         "warning": warning})
-
-    def api_clear_edits(self, payload):
-        """
-        Reset this cache to exactly the state a first-ever `Open` produces —
-        discards every Frame Editor edit and every break point, but the video
-        stays loaded. Re-extracts straight from meta.json's `source`, which
-        build_frames() never writes to; only the cache (frames/, meta.json,
-        breakpoints.json) changes. Confirmation happens in the browser before
-        this is ever called.
-        """
-        outdir = resolve_outdir(payload.get("slug"), payload.get("which"))
-        if outdir is None:
-            return self.send_json({"error": "unknown slug"}, 400)
-        meta = json.load(open(os.path.join(outdir, "meta.json")))
-        src, box = meta["source"], meta.get("box", 750)
-        if not os.path.isfile(src):
-            return self.send_json({"error": f"source no longer exists: {src}"}, 500)
-        try:
-            # alpha_png carried over from the meta being replaced. Without it an
-            # OVERLAY came back as flat JPEG — no alpha, and named .jpg while the
-            # page asks for .png. Every overlay frame then 404s, so the avatar
-            # vanishes and only the background shows through. Silent: the clip is
-            # still there, still the right length, just not transparent and not
-            # where the page looks. restore_map already did this; this did not.
-            build_mod.build_frames(src, out=outdir, box=box, force=True,
-                                    alpha_png=(meta.get("ext") == ".png"),
-                                    log=lambda m: sys.stderr.write(m + "\n"))
-        except RuntimeError as e:
-            return self.send_json({"error": str(e)}, 500)
-        save_marks(outdir, [])
-        new_meta = json.load(open(os.path.join(outdir, "meta.json")))
-        self.send_json({"nb_frames": new_meta["nb_frames"]})
-
-    def api_reset_editor(self, payload):
-        """
-        Unload this video from the tool entirely: delete its whole cache
-        directory — every extracted frame, meta.json, breakpoints.json, and
-        this very viewer.html. The SOURCE FILE named inside meta.json is
-        never touched or even opened here; only the regenerable cache goes.
-        There is no page left to reload afterward, so the browser navigates
-        back to Browse once this succeeds.
-        """
-        outdir = resolve_outdir(payload.get("slug"), payload.get("which"))
-        if outdir is None:
-            return self.send_json({"error": "unknown slug"}, 400)
-        shutil.rmtree(outdir, ignore_errors=True)
-        self.send_json({"ok": True})
 
     def log_message(self, fmt, *args):
         sys.stderr.write("  " + (fmt % args) + "\n")
