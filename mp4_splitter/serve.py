@@ -18,13 +18,13 @@ timeline opening, ...) are gone ENTIRELY.
     stops it recurring is fixture.dead_handlers(), which walks out from
     do_GET/do_POST and fails the suite on anything it cannot reach.
 
-It also gets its OWN extracted-frame cache (cache_mp4_splitter/, not shared/'s
+It also gets its OWN extracted-frame cache (cache/mp4-splitter/, not the shared
 cache/) and its own frames.py/paths.py — duplicated, not imported, same
 reason. See segment_avatar_editor/serve.py for that tool's own copy of
 this same split.
 
 Serves the extracted-frame cache (same as
-`python3 -m http.server --directory cache_mp4_splitter`) and adds a
+`python3 -m http.server --directory cache/mp4-splitter`) and adds a
 folder-tree browser rooted at Customers/, so a raw recording can be found
 and opened without already knowing its path.
 
@@ -115,7 +115,7 @@ import urllib.parse
 # port, own cache, own routes, own pages.
 HERE = os.path.dirname(os.path.abspath(__file__))          # <repo>/mp4_splitter
 ROOT = os.path.dirname(HERE)                                # <repo>
-CACHE = os.path.join(ROOT, "cache_mp4_splitter")            # this tool's OWN cache
+CACHE = os.path.join(ROOT, "cache", "mp4-splitter")         # this tool's OWN cache
 sys.path.insert(0, ROOT)                                    # for the mp4_splitter package itself
 from editor_base import frames as build_mod                 # noqa: E402
 # No segment_avatar_editor import, no vtt.py — this tool never renders a

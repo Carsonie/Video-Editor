@@ -68,7 +68,8 @@ ENDPOINTS_TESTED = ENDPOINTS_TOTAL = 0
 
 
 def cache_for(server):
-    return os.path.join(PLAYERS, "cache" if server == "python" else "cache-go")
+    return os.path.join(PLAYERS, "cache",
+                        "_shared" if server == "python" else "go")
 
 
 def endpoint_counts():

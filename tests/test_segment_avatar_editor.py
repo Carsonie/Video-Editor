@@ -265,11 +265,11 @@ def s_own_cache():
     run can legitimately leave a same-named folder in the shared cache/ it
     uses, and that is not a collision: it is a different directory. What
     matters, and what this checks, is that THIS pair landed in this
-    tool's own cache_segment_avatar_editor/.
+    tool's own cache/segment-avatar-editor/.
     """
-    step("its own cache — cache_segment_avatar_editor/, not the shared cache/")
-    own = os.path.join(PLAYERS, "cache_segment_avatar_editor", PAIR)
-    check("the pair just opened landed in cache_segment_avatar_editor/",
+    step("its own cache — cache/segment-avatar-editor/, not the shared cache/")
+    own = os.path.join(PLAYERS, "cache", "segment-avatar-editor", PAIR)
+    check("the pair just opened landed in cache/segment-avatar-editor/",
           os.path.isdir(own), own)
 
 
@@ -654,7 +654,7 @@ def s_deeper_paths_are_not_the_layered_page():
         layered = r.read().decode()
     check("two segments still give the layered page", "/web/pair.js" in layered)
 
-    cache = os.path.join(PLAYERS, "cache_segment_avatar_editor", slug)
+    cache = os.path.join(PLAYERS, "cache", "segment-avatar-editor", slug)
     for half in ("base", "overlay"):
         f = os.path.join(cache, half, "viewer.html")
         check(f"{half}: no page is written for it any more",
@@ -679,7 +679,7 @@ def s_stale_cached_pages():
     replaces it.
     """
     step("a pre-migration cache still serves its own page")
-    stale = os.path.join(PLAYERS, "cache_segment_avatar_editor",
+    stale = os.path.join(PLAYERS, "cache", "segment-avatar-editor",
                          "pair_stalefixture99")
     os.makedirs(stale, exist_ok=True)
     marker = "PRE-MIGRATION-BAKED-PAGE"

@@ -18,7 +18,7 @@ Reset editor) are gone ENTIRELY.
     What stops it recurring is fixture.dead_handlers(), which walks out
     from do_GET/do_POST and fails the suite on anything unreachable.
 
-It also gets its OWN extracted-frame cache (cache_segment_avatar_editor/, not shared/'s
+It also gets its OWN extracted-frame cache (cache/segment-avatar-editor/, not the shared
 cache/) and its own frames.py/paths.py/vtt.py — duplicated, not imported,
 same reason. See mp4_splitter/serve.py for that tool's own copy of this
 same split.
@@ -29,7 +29,7 @@ player (_splitter_player.py, in this same package) — see frames.py's own
 write_viewer() for where that's wired in.
 
 Serves the extracted-frame cache (same as
-`python3 -m http.server --directory cache_segment_avatar_editor`) and adds
+`python3 -m http.server --directory cache/segment-avatar-editor`) and adds
 a folder-tree browser rooted at Customers/, so a raw recording can be
 found and opened without already knowing its path.
 
@@ -118,7 +118,7 @@ import urllib.parse
 # own pages, and its own player.py right here.
 HERE = os.path.dirname(os.path.abspath(__file__))          # <repo>/segment_avatar_editor
 ROOT = os.path.dirname(HERE)                                # <repo>
-CACHE = os.path.join(ROOT, "cache_segment_avatar_editor")   # this tool's OWN cache
+CACHE = os.path.join(ROOT, "cache", "segment-avatar-editor")  # this tool's OWN cache
 sys.path.insert(0, ROOT)                                    # for the segment_avatar_editor package itself
 from editor_base import frames as build_mod                 # noqa: E402
 from segment_avatar_editor import player as sae             # noqa: E402  this package's own player.py

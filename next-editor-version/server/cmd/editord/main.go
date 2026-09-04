@@ -46,7 +46,7 @@ func main() {
 	// each of them decide the other's extraction was stale and redo it — slow,
 	// and confusing to debug. Point them at one folder deliberately, not by
 	// accident.
-	cacheDir := flag.String("cache", "", "frame cache (default <repo>/cache-go)")
+	cacheDir := flag.String("cache", "", "frame cache (default <repo>/cache/go)")
 	rootFlag := flag.String("root", "", "repo root holding Customers/ (default: found by walking up)")
 	// The test drives hundreds of calls and writes its own log. Without this it
 	// would bury a day of real editing in its own fixture traffic.
@@ -74,7 +74,7 @@ func main() {
 	}
 	cache := *cacheDir
 	if cache == "" {
-		cache = filepath.Join(root, "cache-go")
+		cache = filepath.Join(root, "cache", "go")
 	}
 	if err := os.MkdirAll(cache, 0o755); err != nil {
 		log.Fatal(err)

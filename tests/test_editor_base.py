@@ -122,9 +122,9 @@ def s_cache_is_configurable():
     step("frames.CACHE — the one piece of state, and it is reachable")
     original = eb_frames.CACHE
     try:
-        eq("there is a default", os.path.basename(original), "cache")
+        eq("there is a default", os.path.basename(original), "_shared")
 
-        probe = os.path.join(REPO, "cache_test_editor_base_probe")
+        probe = os.path.join(REPO, "cache", "_test_editor_base_probe")
         eq("use_cache returns what it set", eb_frames.use_cache(probe), probe)
         eq("...and the module now reads it", eb_frames.CACHE, probe)
 

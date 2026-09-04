@@ -38,24 +38,16 @@ Customers/**/z_History/**
 # map is regenerable diagnostics that runs to thousands of lines.
 Customers/**/.render_jobs.json
 Customers/**/cache/**
-Customers/**/_cuts/**
 
-# ── regenerable ─────────────────────────────────────────────────────────────
-# Extracted frames. One extraction of a clip serves every player, and it is
-# rebuilt from the source video on first open.
+# EVERY extracted-frame cache, under one folder since 2026-09-04 — there were
+# five at the repo root and Carson did not want to scroll past them:
+#   cache/_shared/                the old 8842 server and Frame Blender
+#   cache/mp4-splitter/           |
+#   cache/segment-avatar-editor/  | one per standalone editor, so one tool's
+#   cache/avatar-editor/          | Clear can never throw away another's frames
+#   cache/go/                     the next-gen Go server's own
+#   cache/ruff/                   ruff's, via cache-dir in pyproject.toml
 cache/
-# The rebuild's own cache. A folder EACH, because the two servers derive an
-# extraction's mtime independently — sharing one would have each of them decide
-# the other's work was stale and redo it.
-cache-go/
-# MP4 Splitter's and the Segment and Avatar Editor's OWN caches, since they
-# split into fully independent tools on 2026-09-02 and stopped sharing
-# cache/ above on purpose (Carson's own call — see editor-launchers/
-# SKILL.md). Frame Blender and Avatar Editor still share cache/ itself;
-# only these two got a genuinely separate folder each.
-cache_mp4_splitter/
-cache_segment_avatar_editor/
-cache_avatar_editor/
 
 # Run logs: the record of one machine's work, not source.
 logs/*.log

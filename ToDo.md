@@ -114,37 +114,19 @@ per P4.1) still doesn't touch them.
 
 ---
 
-### P3.x `ruff` flags nine things in `build/`, unfixed on purpose
+### ~~P3.x `ruff` flags nine things in `build/`~~ — **fixed 2026-09-04**
 
-`ruff` was added on 2026-09-04 (`pyproject.toml`, rules `F` + `E9` only,
-never `ruff format`). The four editors, `editor_base/`, `shared/` and
-`tests/` are clean. `build/` is not, and was left alone: it is the video
-pipeline, it was outside that step's scope, and one file in it is
-someone else's uncommitted work.
+All nine gone, and `ruff check .` is now clean across the whole repo, not
+just the editors.
 
-```
-build/cut_segments.py:306,307,328,542   F541  f-string with no placeholders
-build/export_bookends.py:19             F401  `paths` imported but unused
-build/make_scene_overlays.py:38         F401  `subprocess` imported but unused
-build/make_scene_overlays.py:49         F401  `morph_avatar_corner.measure` unused
-build/qualify_avatar.py:52              F401  `re` imported but unused
-build/release_video.py:48               F401  `paths` imported but unused
-```
+The two `import paths` cases were checked by hand first, as this entry
+warned to: in both `export_bookends.py` and `release_video.py` the only
+other mentions of `paths` are comments, and the `sys.path.insert` that puts
+`shared/` on the path is a separate line above, which stays. The imports
+really were doing nothing.
 
-All nine are cosmetic — no undefined names, no real errors. `ruff check
-build --fix` handles every one, but check the two `import paths` cases by
-hand first: those scripts put `shared/` on `sys.path` to reach it, and
-the import may be doing that bootstrap work rather than nothing.
-
-`build/assemble_video.py` is excluded in `pyproject.toml` and must stay
-excluded while it is uncommitted work-in-progress.
-
-To run it:
-
-```bash
-pip install ruff        # or: brew install ruff
-ruff check .
-```
+`build/assemble_video.py` stays excluded in `pyproject.toml` while it is
+uncommitted work-in-progress.
 
 ### P3.5 Nothing can seed this repo's demo data on a fresh machine
 

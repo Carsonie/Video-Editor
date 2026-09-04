@@ -9,16 +9,19 @@
 [tool.ruff]
 target-version = "py311"
 
+# ruff's own cache joins the others rather than sitting at the root as
+# .ruff_cache.
+cache-dir = "cache/ruff"
+
 # NOT FORMATTED, DELIBERATELY. Every file here is hand-styled — aligned
 # comment columns, deliberate blank lines, long explanatory blocks that a
 # formatter would reflow into mush. `ruff format` is never run on this
 # repo. If you want that argued out, argue it before running it, not
 # after; the diff would be unreviewable.
+# Every extracted-frame cache lives under one cache/ since 2026-09-04 —
+# five folders at the repo root was five things to scroll past.
 exclude = [
     "cache",
-    "cache_mp4_splitter",
-    "cache_segment_avatar_editor",
-    "cache_avatar_editor",
     "Customers",
     "next-editor-version",
     # Someone else's uncommitted work-in-progress. It is not to be edited,

@@ -806,7 +806,7 @@ def s_no_unreachable_handlers():
 
 def s_own_cache():
     """
-    Its own cache — cache_avatar_editor/, not the shared cache/.
+    Its own cache — cache/avatar-editor/, not the shared cache/.
 
     MP4 Splitter and the SAE each got their own extraction cache at the
     2026-09-02 split; Avatar Editor and Frame Blender were missed and
@@ -823,14 +823,14 @@ def s_own_cache():
     # LAST in FUNCTIONS on purpose: these checks share state in the order the
     # work happens, and opening a pair up front made the save step see the
     # file as "stale" and fail with a 409.
-    step("its own cache — cache_avatar_editor/, not the shared cache/")
+    step("its own cache — cache/avatar-editor/, not the shared cache/")
     d, code = fb_get("/api/open_pair", base=REAL_SEG, overlay=REAL_AV)
     check("a pair opened", code == 200, code)
     slug = (d or {}).get("base_slug") or (d or {}).get("slug")
     check("it reported a slug", bool(slug), slug)
 
-    own = os.path.join(PLAYERS, "cache_avatar_editor")
-    check("the frames landed in cache_avatar_editor/",
+    own = os.path.join(PLAYERS, "cache", "avatar-editor")
+    check("the frames landed in cache/avatar-editor/",
           bool(slug) and os.path.isdir(os.path.join(own, slug)),
           os.path.join(own, str(slug)))
 
@@ -841,7 +841,7 @@ def s_own_cache():
     sys.path.insert(0, PLAYERS)
     from avatar_editor import serve as ae_serve       # noqa: E402
     eq("serve.py's CACHE is this tool's own",
-       os.path.basename(ae_serve.CACHE), "cache_avatar_editor")
+       os.path.basename(ae_serve.CACHE), "avatar-editor")
     eq("editor_base will extract into that same folder",
        ae_serve.build_mod.CACHE, ae_serve.CACHE)
 

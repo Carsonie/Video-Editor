@@ -75,7 +75,7 @@ import urllib.parse
 
 HERE = os.path.dirname(os.path.abspath(__file__))       # <repo>/avatar_editor
 ROOT = os.path.dirname(HERE)                             # <repo>
-CACHE = os.path.join(ROOT, "cache_avatar_editor")          # this tool's OWN cache
+CACHE = os.path.join(ROOT, "cache", "avatar-editor")       # this tool's OWN cache
 GAP_LOG_DIR = os.path.join(ROOT, "logs")                  # same logs/ the editor's own daily log lives in
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "shared"))
@@ -113,7 +113,8 @@ build_mod.use_cache(CACHE)
 #
 # That is why the shared cache was load-bearing rather than an oversight:
 # with it changed and this line missing, extraction goes to
-# cache_avatar_editor/ while every borrowed helper still looks in cache/,
+# cache/avatar-editor/ while every borrowed helper still looks in
+# cache/_shared/,
 # and Save fails with "changed on disk since this was loaded here" — a
 # staleness error pointing at a file nobody touched. The suite caught it
 # (s_save_scene_proxy, 409 instead of 200); nothing else would have.

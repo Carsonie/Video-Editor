@@ -44,9 +44,9 @@ ROOT = os.path.dirname(HERE)
 # mp4_splitter/frames.py, segment_avatar_editor/frames.py — 776 lines each,
 # and the ONLY difference between them in real code was this constant:
 #
-#     shared/                 cache
-#     mp4_splitter/           cache_mp4_splitter
-#     segment_avatar_editor/  cache_segment_avatar_editor
+#     shared/                 cache/_shared
+#     mp4_splitter/           cache/mp4-splitter
+#     segment_avatar_editor/  cache/segment-avatar-editor
 #
 # One line of configuration, paid for with two full duplicate files. So it
 # is configuration now, and there is one file.
@@ -56,7 +56,7 @@ ROOT = os.path.dirname(HERE)
 # process. That is the whole point of the 2026-09-02 split. If two editors
 # are ever put in one process they will fight over this value, and that
 # would be a real bug. See editor_base/__init__.py.
-CACHE = os.path.join(ROOT, "cache")
+CACHE = os.path.join(ROOT, "cache", "_shared")
 
 
 def use_cache(path):

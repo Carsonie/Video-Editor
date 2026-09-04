@@ -87,7 +87,7 @@ import urllib.parse
 # only which module renders the page at the end.
 HERE = os.path.dirname(os.path.abspath(__file__))          # <repo>/shared
 ROOT = os.path.dirname(HERE)                                # <repo>
-CACHE = os.path.join(ROOT, "cache")                         # shared by every player
+CACHE = os.path.join(ROOT, "cache", "_shared")              # shared by every player
 sys.path.insert(0, ROOT)                                    # for the player packages
 # frames.py, paths.py and vtt.py used to live in shared/ beside this file.
 # Since 2026-09-03 they are editor_base/ — one copy instead of three. The

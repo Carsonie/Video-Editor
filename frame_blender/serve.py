@@ -66,7 +66,7 @@ import urllib.parse
 
 HERE = os.path.dirname(os.path.abspath(__file__))       # <repo>/frame_blender
 ROOT = os.path.dirname(HERE)                             # <repo>
-CACHE = os.path.join(ROOT, "cache")                       # SAME cache the editor uses
+CACHE = os.path.join(ROOT, "cache", "_shared")            # SAME cache the old 8842 server uses
 PREVIEWS = os.path.join(CACHE, "_previews")               # this tool's own mp4 output
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "shared"))

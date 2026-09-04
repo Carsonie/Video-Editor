@@ -45,7 +45,7 @@ go run ./cmd/editord --port 8870
 | Flag | Default | |
 |---|---|---|
 | `--port` | `8870` | the Python server is on 8842, so both can run at once |
-| `--cache` | `<repo>/cache-go` | its own, deliberately — see below |
+| `--cache` | `<repo>/cache/go` | its own, deliberately — see below |
 | `--root` | found by walking up | the folder holding `Customers/` |
 | `--no-session-log` | off | for a test run, so fixture traffic does not bury a day of editing |
 

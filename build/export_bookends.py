@@ -16,7 +16,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                 os.pardir, "shared"))
 from morph_avatar_corner import measure
 import assemble_video as av
-import paths as PTH
 
 if len(sys.argv) < 2:
     sys.exit("usage: export_bookends.py \"<store>/help-videos/final\"")

@@ -172,11 +172,11 @@ def s_own_cache():
     folder sitting in the shared cache/ they use, and that is not a
     collision: it is a different directory. What actually matters, and
     what this checks, is that THIS extraction landed in this tool's own
-    cache_mp4_splitter/ — the two never write into the same folder.
+    cache/mp4-splitter/ — the two never write into the same folder.
     """
-    step("its own cache — cache_mp4_splitter/, not the shared cache/")
-    own = os.path.join(PLAYERS, "cache_mp4_splitter", SEG)
-    check("the clip just opened landed in cache_mp4_splitter/", os.path.isdir(own), own)
+    step("its own cache — cache/mp4-splitter/, not the shared cache/")
+    own = os.path.join(PLAYERS, "cache", "mp4-splitter", SEG)
+    check("the clip just opened landed in cache/mp4-splitter/", os.path.isdir(own), own)
 
 
 def s_map():
@@ -289,7 +289,7 @@ def s_reset_editor():
     d = must("/api/reset-editor", slug=SEG)
     check("returns cleanly", d.get("ok") is True, json.dumps(d)[:60])
     check("really deleted the cache slug", not os.path.isdir(
-        os.path.join(PLAYERS, "cache_mp4_splitter", SEG)), SEG)
+        os.path.join(PLAYERS, "cache", "mp4-splitter", SEG)), SEG)
 
 
 def live_clip(folder="03-charlie-scene", name="segment.mp4"):
@@ -479,7 +479,7 @@ def s_stale_cached_pages():
     """
     step("a stale viewer.html on disk is ignored, not served")
     live = live_clip("02-bravo-scene")
-    path = os.path.join(PLAYERS, "cache_mp4_splitter", live, "viewer.html")
+    path = os.path.join(PLAYERS, "cache", "mp4-splitter", live, "viewer.html")
     marker = "STALE-BAKED-PAGE-FROM-BEFORE-THE-MIGRATION"
     with open(path, "w") as fh:
         fh.write(f"<!-- {marker} -->\n<html><body>old</body></html>\n")

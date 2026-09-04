@@ -303,8 +303,8 @@ def build_plan(a):
     for (n1, t1), (n2, t2) in zip(actions, actions[1:]):
         if 0 < t2 - t1 < 0.6 and "registration" not in n1.lower():
             print(f"  ⚠ only {t2-t1:.2f}s between \"{n1[:38]}\" and \"{n2[:38]}\"")
-            print(f"    That screen barely existed — check the store's SHAPE before "
-                  f"writing a script.")
+            print("    That screen barely existed — check the store's SHAPE before "
+                  "writing a script.")
     print(f"  first step is {actions[0][1] - t0:+.2f}s into the recording")
     if actions[0][1] < t0:
         print("  ⚠ the flow starts BEFORE the recording — mismatched log and take?")
@@ -325,7 +325,7 @@ def build_plan(a):
         k, v = spec.split("=", 1)
         ov[int(k)] = float(v)
     if ov:
-        print(f"  overrides: " + ", ".join(f"scene {k} -> {v}s" for k, v in sorted(ov.items())))
+        print("  overrides: " + ", ".join(f"scene {k} -> {v}s" for k, v in sorted(ov.items())))
 
     plan = []
     for i, sc in enumerate(scenes):
@@ -539,7 +539,7 @@ def cmd_analyse(a):
               f"{'FORCED' if p.get('overridden') else ('yes' if p['snapped'] else 'NO — log time used')}")
     print(f"\n  proposal -> {os.path.join(tmp,'boundaries.json')}")
     print(f"  ⚠ LOOK AT {sheet(plan, files, tmp)} before cutting — a mid-render")
-    print(f"    frame here becomes the frozen frame under the opening bridge.")
+    print("    frame here becomes the frozen frame under the opening bridge.")
 
 
 def cmd_cut(a):

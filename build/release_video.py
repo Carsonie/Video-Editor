@@ -45,7 +45,6 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, os.pardir, "shared"))
-import paths as PTH  # noqa: E402
 
 # The sibling repo that serves customers. Overridable so this is not a machine
 # fact baked into a script — see BASIC_REPO in the environment.

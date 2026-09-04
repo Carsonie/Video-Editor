@@ -9,7 +9,7 @@ python3 mp4_splitter/serve.py          # http://localhost:8845
 ```
 
 Standalone — nothing else needs to be running. Its own process, its own
-port, its own extracted-frame cache (`cache_mp4_splitter/`, not the
+port, its own extracted-frame cache (`cache/mp4-splitter/`, not the
 shared `cache/`), its own routes and its own pages. Split off
 `shared/serve.py` on 2026-09-02 at Carson's request: MP4 Splitter and the
 Segment and Avatar Editor used to share one process on port 8842, and he

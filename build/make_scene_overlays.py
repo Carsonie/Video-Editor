@@ -35,7 +35,6 @@ import hashlib
 import json
 import os
 import re
-import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -46,7 +45,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                 os.pardir, "shared"))
 import assemble_video as av
 import paths as PTH
-from morph_avatar_corner import measure
 
 
 def main():

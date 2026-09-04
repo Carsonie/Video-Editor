@@ -10,7 +10,7 @@ python3 segment_avatar_editor/serve.py          # http://localhost:8846
 ```
 
 Standalone — nothing else needs to be running. Its own process, its own
-port, its own extracted-frame cache (`cache_segment_avatar_editor/`, not
+port, its own extracted-frame cache (`cache/segment-avatar-editor/`, not
 the shared `cache/`), its own routes and its own pages. Split off
 `shared/serve.py` on 2026-09-02 at Carson's request: this tool and MP4
 Splitter used to share one process on port 8842, and he asked for the two
