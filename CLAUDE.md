@@ -143,7 +143,7 @@ editor_base/             frames.py  paths.py  vtt.py — the ONE shared package
 shared/                  serve.py, plus re-export shims for build/
 build/                   the tools that make the finished video
 Sarah/                   her standards, and the clips every video reuses
-tests/                   681 checks over six suites, one per server + editor_base
+tests/                   689 checks over six suites, one per server + editor_base
 Customers/               the video data — GITIGNORED
 ```
 
@@ -381,7 +381,7 @@ python3 tests/test_frame_blender.py             # frame_blender/serve.py, port 8
 python3 tests/test_editor_base.py               # editor_base/ — no server, pure functions   —  57 checks
 ```
 
-681 checks in total. **A change inside `editor_base/` runs all six**, not
+689 checks in total. **A change inside `editor_base/` runs all six**, not
 one — that is the trade the shared package makes.
 
 `test_editor.py` is the deepest one — one step per disk function, plus a

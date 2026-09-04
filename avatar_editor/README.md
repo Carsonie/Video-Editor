@@ -134,6 +134,40 @@ files that each parse perfectly alone can still declare the same `const`
 and throw the moment the page loads them together, and nothing else can
 see it.
 
+## Timeline Scenes has two load buttons
+
+| Button | What it loads | From |
+|---|---|---|
+| **Load Sandbox** | the store's whole scene list | `sandbox/`, never `dev/` |
+| **Load Frame Selector** | the OPEN scene's avatar track | that scene's own cache |
+
+`Load Sandbox` was just `Load` until 2026-09-04, which never said from
+where. It reads `sandbox/` only — `sandbox_only()` returns `None` rather
+than falling through to `dev/`, so a missing file shows as missing instead
+of an edit appearing to work somewhere else.
+
+**Load Frame Selector** puts Sarah's own performance in the open scene into
+the Frame Selector, alongside whatever library clips are ticked — so a
+gap-filler can be built from frames of the very scene it has to sit in,
+not only from her library.
+
+Two things about it worth knowing before changing it:
+
+- **It needs no endpoint.** `openPair()` already puts `over_slug`, `over_n`
+  and `over_ext` on `SCENE`, because opening the pair is what extracted it.
+  The button builds the same clip object `toggleLibClip()` builds and lets
+  `rebuildLibFrames()` do the rest.
+- **The clip is marked `has_audio: false`, and that is load-bearing.** A
+  clip's `source` is `'store'` or `'common'` — which of Sarah's two
+  libraries it came from — and `/api/lib_media` passes it back to find the
+  file. A scene is in neither, so that call could never serve it. The audio
+  stack is built by filtering on `has_audio`, so `false` keeps a scene clip
+  out of the one code path that would ask.
+
+It loads the AVATAR track, not the segment. The Frame Selector exists to
+pick Sarah frames and copy them into the Clip-Gap Builder; screen-recording
+frames could never be part of her overlay.
+
 ## The one idea worth knowing
 
 **The page starts empty and the scene arrives over the API.** `SCENE` in

@@ -804,6 +804,45 @@ def s_no_unreachable_handlers():
     eq("unreachable handlers", fixture.dead_handlers(AE_SERVE), [])
 
 
+def s_timeline_load_buttons():
+    """
+    Timeline Scenes has TWO load buttons since 2026-09-04, and they do very
+    different things:
+
+      Load Sandbox         the store's whole scene list, from sandbox/
+      Load Frame Selector  the OPEN scene's avatar track, into the Frame
+                           Selector's own collection
+
+    The second is pure front-end — openPair() already put over_slug, over_n
+    and over_ext on SCENE, so no endpoint was added for it. That means the
+    only thing this suite can check is the CONTRACT between the HTML and the
+    JS: both ids must exist, because a handler that looks up a missing id
+    dies silently and takes the panel with it. Whether the button actually
+    fills the Frame Selector is browser behaviour, and was verified there —
+    482 frames from ski-demo's 01-intro-and-login, the frame URL serving 200,
+    and a second press refusing to stack the same scene twice.
+    """
+    step("Timeline Scenes — its two load buttons")
+    html = urllib.request.urlopen(AE_BASE + "/", timeout=10).read().decode()
+    for el in ("tlLoadBtn", "tlLoadFsBtn", "tlClearBtn"):
+        check(f"the page carries {el}", f'id="{el}"' in html)
+    check("the old bare 'Load' label is gone — it never said from WHERE",
+          ">&#128193; Load<" not in html)
+    check("Load Sandbox says which folder it reads",
+          "Load Sandbox" in html and "sandbox/" in html)
+    check("Load Frame Selector is on the page", "Load Frame Selector" in html)
+
+    js = urllib.request.urlopen(AE_BASE + "/web/app.js", timeout=10).read().decode()
+    check("its handler is wired", "tlLoadFsBtn" in js)
+    # The one thing that would break it silently rather than loudly: a scene
+    # clip carries source:'scene', which is neither of Sarah's two libraries,
+    # so /api/lib_media could never serve it. has_audio:false is what keeps
+    # it out of the audio stack, which is the only code path that would ask.
+    check("a scene clip is marked has_audio:false, keeping it out of the "
+          "audio stack that would call /api/lib_media with source:'scene'",
+          "has_audio: false" in js)
+
+
 def s_own_cache():
     """
     Its own cache — cache/avatar-editor/, not the shared cache/.
@@ -861,7 +900,7 @@ FUNCTIONS = [s_static_page, s_app_js_parses, s_load_order_forward_refs, s_origin
              s_libs_list_paths, s_common_library, s_libs_group_order,
              s_lib_frames_clip, s_lib_frames_still,
              s_no_unreachable_handlers,
-             s_own_cache]
+             s_timeline_load_buttons, s_own_cache]
 
 
 def main():

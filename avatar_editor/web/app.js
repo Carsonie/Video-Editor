@@ -220,6 +220,56 @@
 
   document.getElementById('tlLoadBtn').onclick = pickStores;
 
+  // ── Load Frame Selector ──────────────────────────────────────────────────
+  // Puts the OPEN scene's avatar track into the Frame Selector, alongside
+  // whatever library clips are ticked.
+  //
+  // WHY THE AVATAR TRACK AND NOT THE SEGMENT: the Frame Selector exists to
+  // pick Sarah frames and copy them down into the Clip-Gap Builder. Loading
+  // the screen recording there would fill it with frames that can never be
+  // part of her overlay. This is the same idea as ticking one of her library
+  // clips, except the source is her performance in THIS scene.
+  //
+  // No new endpoint. openPair() already put everything needed on SCENE —
+  // over_slug, over_n, over_ext — because the pair was extracted when the
+  // scene was opened. This builds the same clip object shape toggleLibClip()
+  // builds and lets rebuildLibFrames() do the rest.
+  document.getElementById('tlLoadFsBtn').onclick = () => {
+    if (!SCENE) {
+      status.textContent = 'Open a scene first — click its row in Timeline Scenes.';
+      return;
+    }
+    // has_audio: false on purpose, and it is load-bearing rather than lazy.
+    // `source` on a clip is 'store' or 'common' — which of Sarah's two
+    // libraries it came from — and every later /api/lib_media call passes it
+    // back. A scene is in NEITHER library, so that call would fail. The audio
+    // stack is built by filtering on has_audio (frame-player.js:88 and :404),
+    // so false keeps this clip out of the one code path that would use
+    // `source` at all.
+    const clip = {
+      path: SCENE.over_rel,
+      name: `${SCENE.label} — avatar.webm`,
+      n: SCENE.over_n,
+      slug: SCENE.over_slug,
+      ext: SCENE.over_ext,
+      has_audio: false,
+      source: 'scene',
+    };
+    // Idempotent: pressing it twice must not stack the same scene twice.
+    // `path` is the identity key everywhere else in this file, so it is here.
+    const already = LIB.picked.some(c => c.path === clip.path);
+    if (already) {
+      status.textContent = `${SCENE.label} is already in the Frame Selector `
+                         + `(${SCENE.over_n} frames).`;
+      return;
+    }
+    LIB.picked.push(clip);
+    rebuildLibFrames();
+    savePickedForCurrentPair();
+    status.textContent = `Frame Selector: added ${SCENE.label} — `
+                       + `${SCENE.over_n} frames from its avatar track.`;
+  };
+
   // A REAL unload, not a repaint. Three separate places hold this scene and
   // all three have to let go, or the page looks empty while every tool
   // still quietly acts on the scene that was supposedly cleared:
