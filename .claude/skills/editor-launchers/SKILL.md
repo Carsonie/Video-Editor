@@ -93,8 +93,14 @@ Use the Browser-pane preview tool with the exact `name` from the table:
   immediately, no restart of the frontend needed — Vite's dev proxy checks the
   backend per request, not once at boot.
 
-`preview_start` reuses an already-running server on that port instead of
-double-starting it — safe to call again if unsure whether one is up.
+⚠ **`preview_start` REUSES an already-running server on that port. It does
+not restart it.** That is what you want when launching — call it again if
+you are unsure whether one is up, and nothing is double-started.
+
+It is exactly what you do NOT want when reloading. A Python server imports
+its modules once, at startup, so a reused process keeps serving the code it
+started with. Reusing it after a code change reports success and changes
+nothing. See "Reload" below, which stops each server first.
 
 ## "Run the editors" — all four, in Chrome
 
@@ -123,12 +129,15 @@ sat on a blank/error page): "reload" means restart the SERVERS, not just
 refresh the tabs. A browser refresh alone proves nothing — it cannot tell
 you whether the process behind it is even still running.
 
-1. `preview_start` all four, same as launching them (safe to call even if
-   they're already up — it reuses a running one instead of double-starting):
-   - `preview_start({name: "frame-blender"})` — 8843
-   - `preview_start({name: "avatar-editor"})` — 8844
-   - `preview_start({name: "mp4-splitter"})` — 8845
-   - `preview_start({name: "segment-avatar-editor"})` — 8846
+1. **STOP each running server, then START it.** `preview_start` alone is not
+   a reload — it reuses the running process, which still holds the code it
+   was launched with.
+   - `preview_list()` — returns a `serverId` per running server
+   - `preview_stop({serverId})` for each of the four
+   - then `preview_start({name})` for each: `mp4-splitter` 8845,
+     `segment-avatar-editor` 8846, `frame-blender` 8843, `avatar-editor` 8844
+   - each result should say `"reused": false`. **If it says `true`, the stop
+     did not take and you are about to test stale code.**
 2. Reload each real Chrome tab whose URL contains one of those four ports,
    via `osascript`:
    ```applescript
@@ -147,6 +156,26 @@ you whether the process behind it is even still running.
    the tab titled plain `localhost`, not the editor's own name) — the same
    `osascript` shape as step 2, but returning `URL of t & " | " & title of t`
    instead of `reload`ing.
+4. **If step 2 reloaded ZERO tabs, the tabs are gone, not broken.** Chrome
+   was closed, or they were. Open them with `open -a "Google Chrome" <url>`
+   as in "Run the editors" above, and say so — do not report a successful
+   reload of nothing. This happened twice on 2026-09-04.
+
+   Reopen each on the URL it was last on where you know it, rather than the
+   landing page — except a URL whose cache you have just cleared or
+   invalidated, which would only 404.
+
+### Why this section is written this way (2026-09-04)
+
+Until then step 1 said "`preview_start` all four, safe to call even if
+they're already up". That is a reload that does not reload. It was hit for
+real: `_splitter_player.py` had been commented out, the SAE was told to
+reload, `preview_start` reused the old process, and the server went on
+serving the deleted module — while the reply said all four had restarted.
+A test of "is this page still used" was about to be run against code that
+was still there.
+
+The tell is `"reused": true` in the result. Watch for it.
 
 Whichever tab was mid-session on a specific page (a viewer, a loaded pair)
 reloads to THAT same URL, same as any browser refresh — this does not send
