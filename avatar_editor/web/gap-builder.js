@@ -1,14 +1,14 @@
 // Avatar Editor — sarah_clips/libs, the Frame Selector, and the Clip-Gap
 // Builder. Split out of app.js on 2026-09-01, specifically because this is
 // the one area about to grow a lot (the ten Gap Builder Menu actions all
-// act on BUILDER_FRAMES, defined here) — everything else on the
+// act on BUILDER.frames, defined here) — everything else on the
 // page (the combine engine, Timeline Scenes, the Load popup, persistence)
 // was staying roughly the size it already was.
 //
 // Neither this file nor app.js is wrapped in an IIFE — both need one flat
 // top-level scope, not two separate private ones, so each can call
-// straight into the other's declarations by name (this file's PICKED,
-// LIB_FRAMES, BUILDER_FRAMES, rebuildLibFrames, rebuildBuilderFrames,
+// straight into the other's declarations by name (this file's LIB and
+// BUILDER state objects, rebuildLibFrames, rebuildBuilderFrames,
 // toggleLibClip, loadLibs, savePickedForCurrentPair; app.js's SCENE,
 // pairQS(), pad(), and the localStorage helpers loadStore/saveStore/
 // savePair/pairKey). Loaded BEFORE app.js in index.html, because app.js's
@@ -28,6 +28,133 @@
 // inspector is a SEPARATE viewer, slider and frame strip from the
 // scene's own — Carson's call, so browsing a library clip never disturbs
 // where you are in the scene's own combined-frame review.
+// ── the two rows' state, gathered ───────────────────────────────────────────
+//
+// These were 21 separate top-level `let`s until 2026-09-04, mutated from 25
+// functions and a good many inline handlers, and that — not the line count —
+// was what made this file impossible to split: every part of it reached into
+// the same loose scope, so moving any part moved the state with it.
+//
+// They are grouped here by CONCERN, and each object is `const`: the binding
+// never changes, only what is inside it. That is what lets another file hold
+// a reference (working-clips.js keeps one) without it going stale — which a
+// reassigned `let` did not.
+//
+// Two rows, plus the one thing genuinely shared between them.
+
+const LIB = {
+  picked:           [],   // checked clips' metadata, in the order checked
+  frames:           [],   // every picked clip's frames, flattened into one list
+
+  // Every file in sarah_clips/libs, by path, in the order the list DISPLAYS
+  // them — top to bottom, group by group. LIB.picked is in the order boxes were
+  // TICKED, which is not the same thing: OriginalAudio plays its stack in
+  // the order they appear on screen, so it needs this to sort by.
+  order:            [],
+
+  // Whichever clip the Frame Selector viewer is showing RIGHT NOW — what
+  // Copy/Paste act on. The Frame Selector's Play button does NOT read this:
+  // it plays the whole collection, not the frame under the playhead.
+  curClip:          null,
+  restPosePath:     null,
+  restPoseSource:   null,
+  restPoseFrame:    null,
+
+  // Which LIB.frames indices are selected for Copy Selected — the Frame
+  // Selector's own equivalent of the Clip-Gap Builder's BUILDER.selected. Armed by
+  // its own button, gmSelectFrames, below — while armed, a plain single
+  // click on a frame here does the selecting instead of only navigating,
+  // following a 3-click cycle (see gmSelectFrames.onclick and LIB.phase).
+  selected:         new Set(),
+
+  // The pending start of a click-1/click-2 range pick — null except between
+  // those two clicks (LIB.phase === 1).
+  rangeStart:       null,
+
+  // 0: next click is click 1 (starts a selection). 1: next click is click 2
+  // (finishes it — same frame as click 1 collapses it to one frame). 2: a
+  // selection sits complete; the next click is click 3, a reset back to 0
+  // that clears it rather than picking anything.
+  phase:            0,
+
+  // Whether gmSelectFrames is armed — while true, a plain click on a Frame
+  // Selector thumbnail (renderLibFrameRow's onclick, above) drives the
+  // 3-click start/end/reset cycle instead of only navigating. Toggled by
+  // the button itself; turning it off mid-cycle only stops arming FURTHER
+  // clicks — it does not clear a selection already sitting there ready for
+  // Copy Selected (that only happens on click 3, or on an actual copy).
+  armed:            false,
+
+  // Whether the row and slider above are filtered down to JUST LIB.selected
+  // (gmLibViewToggle, below) — a review mode, not a second selection
+  // mechanism. Toggling it OFF (back to the full collection) un-stages
+  // whatever was selected, same as click 3 does, since backing out of the
+  // review means starting over rather than leaving a stale pick armed.
+  showSelectedOnly: false,
+
+  // Set while the Frame Selector's own stepper is driving the viewer. The
+  // buttons cannot change from one frame to the next, and Players.refresh()
+  // rescans the whole collection, so doing it 25 times a second was pure
+  // waste. The stepper redraws once when it starts and once when it stops.
+  stepping:         false,
+};
+
+const BUILDER = {
+  // A second, separate strip below the Frame Selector. The Selector browses
+  // whatever's checked; clicking its Frame N/Total button COPIES that one
+  // frame down here, in the order copied. This is how a gap-filler gets
+  // hand-assembled: pick a frame, look at it, pick the next, and scrub back
+  // and forth down here to see the run of idle motion it adds up to.
+  //
+  // Deliberately NOT reset when a clip is un/re-checked above, or when the
+  // Load picker switches to a different scene — a collection built by hand
+  // is real work, and only Clear (which empties everything) should lose it.
+  frames:     [],
+
+  // Whichever clip the Clip-Gap Builder viewer is showing RIGHT NOW. Handed
+  // to frame-player.js as `builderClip` (see the configure() call at the
+  // bottom of this file) — its Play button plays what is on screen here.
+  curClip:    null,
+
+  // Set while the Clip-Gap Builder's own stepper is driving its viewer —
+  // same reasoning as LIB.stepping above: the buttons cannot change from one
+  // animation frame to the next, and Players.refresh() rescans both
+  // collections.
+  stepping:   false,
+
+  // Which BUILDER.frames indices are selected FOR AN ACTION (Delete,
+  // Duplicate, Copy Selected, ...) — separate from which one is merely being
+  // VIEWED (that's `showBuilderFrame`'s own job, the blue .cur highlight).
+  selected:   new Set(),
+
+  // The pending start of a click-1/click-2 range pick — null except between
+  // those two clicks (BUILDER.phase === 1).
+  rangeStart: null,
+
+  // 0: next click is click 1 (starts a selection). 1: next click is click 2
+  // (finishes it — same frame as click 1 collapses it to one frame). 2: a
+  // selection sits complete; the next click is click 3, a reset back to 0.
+  phase:      0,
+
+  // Whether gmBuilderSelectFrames is armed — the SAME 3-click start/end/
+  // reset cycle gmSelectFrames runs on the Frame Selector row (LIB.armed/
+  // LIB.phase), just scoped to this row instead (see renderBuilderFrameRow's
+  // onclick). Toggled by the button itself; turning it off mid-cycle only
+  // stops arming FURTHER clicks — it does not clear a selection already
+  // sitting there.
+  armed:      false,
+};
+
+const SHARED = {
+  // What Copy Selected fills and Paste (not wired yet) will read from —
+  // plain frame objects, the same shape LIB.frames and BUILDER.frames both
+  // already use, copied by VALUE so later edits to the Frame Selector's own
+  // list can never reach back and change what's on the clipboard. Not saved
+  // to storage: a clipboard is working state for the rest of this session,
+  // not something a refresh should be expected to bring back.
+  clipboard: [],
+};
+
 const libStatus = document.getElementById('libStatus');
 const libGroups = document.getElementById('libGroups');
 const libSpinner = document.getElementById('libSpinner');
@@ -72,46 +199,12 @@ const libNEl = document.getElementById('libN');
 const libTotalEl = document.getElementById('libTotal');
 const libSelectedNEl = document.getElementById('libSelectedN');
 
-let PICKED = [];        // checked clips' metadata, in the order checked
-let LIB_FRAMES = [];    // every picked clip's frames, flattened into one list
-// Every file in sarah_clips/libs, by path, in the order the list DISPLAYS
-// them — top to bottom, group by group. PICKED is in the order boxes were
-// TICKED, which is not the same thing: OriginalAudio plays its stack in
-// the order they appear on screen, so it needs this to sort by.
-let LIB_ORDER = [];
-// Whichever clip the Frame Selector viewer is showing RIGHT NOW — what
-// Copy/Paste act on. The Frame Selector's Play button does NOT read this:
-// it plays the whole collection, not the frame under the playhead.
-let libCurClip = null;
-
-// Which LIB_FRAMES indices are selected for Copy Selected — the Frame
-// Selector's own equivalent of the Clip-Gap Builder's SELECTED. Armed by
-// its own button, gmSelectFrames, below — while armed, a plain single
-// click on a frame here does the selecting instead of only navigating,
-// following a 3-click cycle (see gmSelectFrames.onclick and libPhase).
-let LIB_SELECTED = new Set();
-// The pending start of a click-1/click-2 range pick — null except between
-// those two clicks (libPhase === 1).
-let libRangeStart = null;
-// 0: next click is click 1 (starts a selection). 1: next click is click 2
-// (finishes it — same frame as click 1 collapses it to one frame). 2: a
-// selection sits complete; the next click is click 3, a reset back to 0
-// that clears it rather than picking anything.
-let libPhase = 0;
-
-// Whether the row and slider above are filtered down to JUST LIB_SELECTED
-// (gmLibViewToggle, below) — a review mode, not a second selection
-// mechanism. Toggling it OFF (back to the full collection) un-stages
-// whatever was selected, same as click 3 does, since backing out of the
-// review means starting over rather than leaving a stale pick armed.
-let libShowSelectedOnly = false;
-
 const libFrameUrl = (clip, local) => `/${clip.slug}/frames/frame_${pad(local + 1)}${clip.ext}`;
 
 function setLibSelected(indices) {
-  LIB_SELECTED = new Set(indices);
-  libSelectedNEl.textContent = LIB_SELECTED.size;
-  [...libFrameRow.children].forEach((d, j) => d.classList.toggle('selected', LIB_SELECTED.has(j)));
+  LIB.selected = new Set(indices);
+  libSelectedNEl.textContent = LIB.selected.size;
+  [...libFrameRow.children].forEach((d, j) => d.classList.toggle('selected', LIB.selected.has(j)));
   // Replace Selected needs BOTH a selection here and an active Working
   // Clip, so it has to be re-judged whenever either half moves.
   WorkingClips.refreshButtons();
@@ -119,40 +212,40 @@ function setLibSelected(indices) {
 
 function renderLibFrameRow() {
   libFrameRow.innerHTML = '';
-  LIB_FRAMES.forEach((f, i) => {
+  LIB.frames.forEach((f, i) => {
     const d = document.createElement('div');
-    d.className = 'libframe' + (LIB_SELECTED.has(i) ? ' selected' : '');
+    d.className = 'libframe' + (LIB.selected.has(i) ? ' selected' : '');
     d.style.backgroundImage = `url(${f.url})`;
     d.title = `${f.clip.name} — frame ${f.local + 1}/${f.clip.n}`;
     d.onclick = () => {
-      if (libArmed) {
-        if (libPhase === 0) {
-          libRangeStart = i;
+      if (LIB.armed) {
+        if (LIB.phase === 0) {
+          LIB.rangeStart = i;
           setLibSelected([i]);
-          libPhase = 1;
-        } else if (libPhase === 1) {
-          if (i === libRangeStart) {
+          LIB.phase = 1;
+        } else if (LIB.phase === 1) {
+          if (i === LIB.rangeStart) {
             setLibSelected([i]);
           } else {
-            const lo = Math.min(libRangeStart, i), hi = Math.max(libRangeStart, i);
+            const lo = Math.min(LIB.rangeStart, i), hi = Math.max(LIB.rangeStart, i);
             const range = [];
             for (let k = lo; k <= hi; k++) range.push(k);
             setLibSelected(range);
           }
-          libRangeStart = null;
-          libPhase = 2;
+          LIB.rangeStart = null;
+          LIB.phase = 2;
           gmCopySelected.classList.add('ready');
           gmLibViewToggle.classList.add('ready');
         } else {
           // Click 3 — reset, and this click picks nothing on its own.
           setLibSelected([]);
-          libRangeStart = null;
-          libPhase = 0;
+          LIB.rangeStart = null;
+          LIB.phase = 0;
           gmCopySelected.classList.remove('ready');
           gmLibViewToggle.classList.remove('ready');
         }
       }
-      gapLog('lib_frame_click', {i, libArmed, after: gapSnapshot()});
+      gapLog('lib_frame_click', {i, libArmed: LIB.armed, after: gapSnapshot()});
       // Still moves the viewer here too, armed or not, same as before — as
       // a POSITION in the current view, not necessarily this thumbnail's
       // raw index (the two differ once "Show Selected on Timeline" has
@@ -164,33 +257,27 @@ function renderLibFrameRow() {
   });
 }
 
-// The indices INTO LIB_FRAMES that the slider/viewer currently scrub
-// through — every frame normally, or just LIB_SELECTED, sorted, while
+// The indices INTO LIB.frames that the slider/viewer currently scrub
+// through — every frame normally, or just LIB.selected, sorted, while
 // "Show Selected on Timeline" is on. showLibFrame's own argument is a
-// POSITION into whichever of these is current, not a raw LIB_FRAMES index.
+// POSITION into whichever of these is current, not a raw LIB.frames index.
 function libViewIndices() {
-  return libShowSelectedOnly
-    ? [...LIB_SELECTED].sort((a, b) => a - b)
-    : LIB_FRAMES.map((_, i) => i);
+  return LIB.showSelectedOnly
+    ? [...LIB.selected].sort((a, b) => a - b)
+    : LIB.frames.map((_, i) => i);
 }
-
-// Set while the Frame Selector's own stepper is driving the viewer. The
-// buttons cannot change from one frame to the next, and Players.refresh()
-// rescans the whole collection, so doing it 25 times a second was pure
-// waste. The stepper redraws once when it starts and once when it stops.
-let libStepping = false;
 
 function showLibFrame(pos) {
   const indices = libViewIndices();
   const i = indices[pos];
-  const f = i != null ? LIB_FRAMES[i] : undefined;
+  const f = i != null ? LIB.frames[i] : undefined;
   [...libFrameRow.children].forEach((d, j) => d.classList.toggle('cur', j === i));
-  // libCurClip is still tracked — Copy/Paste care what is on screen. What
+  // LIB.curClip is still tracked — Copy/Paste care what is on screen. What
   // it no longer does is gate the Frame Selector's Play button: that plays
   // the whole collection now, not the one frame under the playhead.
-  libCurClip = f ? f.clip : null;
-  // Skipped while the stepper is running — see libStepping above.
-  if (!libStepping) Players.refresh();
+  LIB.curClip = f ? f.clip : null;
+  // Skipped while the stepper is running — see LIB.stepping above.
+  if (!LIB.stepping) Players.refresh();
   if (!f) { libViewerImg.removeAttribute('src'); libNEl.textContent = '—'; return; }
   libViewerImg.src = f.url;
   libNEl.textContent = pos + 1;
@@ -198,7 +285,7 @@ function showLibFrame(pos) {
   if (cur) cur.scrollIntoView({block: 'nearest', inline: 'center'});
 }
 
-// Applies libShowSelectedOnly to what's actually on screen: hides every
+// Applies LIB.showSelectedOnly to what's actually on screen: hides every
 // thumbnail not in the current view, resizes the slider to match, and
 // relabels gmLibViewToggle to say what clicking it will do NEXT (the
 // label names the action, not the current mode).
@@ -206,24 +293,24 @@ function applyLibViewMode() {
   const indices = libViewIndices();
   const indexSet = new Set(indices);
   [...libFrameRow.children].forEach((d, j) => {
-    d.classList.toggle('hiddenByView', libShowSelectedOnly && !indexSet.has(j));
+    d.classList.toggle('hiddenByView', LIB.showSelectedOnly && !indexSet.has(j));
   });
   libSlider.max = Math.max(0, indices.length - 1);
   libSlider.disabled = indices.length === 0;
   libTotalEl.textContent = indices.length || '—';
   libSlider.value = 0;
   showLibFrame(0);
-  gmLibViewToggle.textContent = libShowSelectedOnly ? 'Show the Collection' : 'Show Selected on Timeline';
+  gmLibViewToggle.textContent = LIB.showSelectedOnly ? 'Show the Collection' : 'Show Selected on Timeline';
   // "Show Selected on Timeline" narrows what the Frame Selector's own run
   // would play, so its button's count/green state is recomputed here too,
   // not only on a check/uncheck.
   Players.refresh();
 }
 
-// Rebuilds the flattened frame list from PICKED, in checked order —
+// Rebuilds the flattened frame list from LIB.picked, in checked order —
 // called after every check/uncheck, and on Clear / a scene switch.
 function rebuildLibFrames() {
-  LIB_FRAMES = [];
+  LIB.frames = [];
   // A run over the OLD collection is meaningless now, and leaving it in
   // place was a real bug: check a clip, play it, pause, then change what
   // is checked, and the next press RESUMED the old paused run — the old
@@ -238,20 +325,20 @@ function rebuildLibFrames() {
   // the moment the list is rebuilt, so this starts clean rather than
   // carrying a selection over onto whatever now happens to sit at the
   // same index.
-  LIB_SELECTED = new Set();
+  LIB.selected = new Set();
   libSelectedNEl.textContent = 0;
-  libRangeStart = null;
-  libPhase = 0;
-  libShowSelectedOnly = false;
+  LIB.rangeStart = null;
+  LIB.phase = 0;
+  LIB.showSelectedOnly = false;
   // Full reset of the whole selection mechanism, not just its data — a
   // Clear All that leaves Select Frames still armed (red) is only half
   // cleared.
-  libArmed = false;
+  LIB.armed = false;
   gmSelectFrames.classList.remove('armed');
   gmCopySelected.classList.remove('ready');
   gmLibViewToggle.classList.remove('ready');
-  for (const clip of PICKED)
-    for (let i = 0; i < clip.n; i++) LIB_FRAMES.push({url: libFrameUrl(clip, i), clip, local: i});
+  for (const clip of LIB.picked)
+    for (let i = 0; i < clip.n; i++) LIB.frames.push({url: libFrameUrl(clip, i), clip, local: i});
   renderLibFrameRow();
   applyLibViewMode();
   // Runs on every check/uncheck and on every reset, which is exactly when
@@ -269,109 +356,76 @@ libSlider.oninput = () => showLibFrame(+libSlider.value);
 //
 // Called only from an explicit check/uncheck (toggleLibClip) — never from
 // rebuildLibFrames() itself, which also runs during the RESET at the
-// start of loading a pair (PICKED = [] before restorePairProgress() gets
+// start of loading a pair (LIB.picked = [] before restorePairProgress() gets
 // a chance to read what was saved), and saving there would overwrite the
 // very data a refresh is about to restore before restore can read it.
 function savePickedForCurrentPair() {
   if (!SCENE) return;
-  savePair(pairKey(SCENE.base_rel, SCENE.over_rel), {picked: PICKED});
+  savePair(pairKey(SCENE.base_rel, SCENE.over_rel), {picked: LIB.picked});
 }
 
 // ── Clip-Gap Builder ─────────────────────────────────────────────────────
-// A second, separate strip below the Frame Selector. The Selector browses
-// whatever's checked; clicking its Frame N/Total button COPIES that one
-// frame down here, in the order copied. This is how a gap-filler gets
-// hand-assembled: pick a frame, look at it, pick the next, and scrub back
-// and forth down here to see the run of idle motion it adds up to.
-//
-// Deliberately NOT reset when a clip is un/re-checked above, or when the
-// Load picker switches to a different scene — a collection built by hand
-// is real work, and only Clear (which empties everything) should lose it.
-let BUILDER_FRAMES = [];
 const builderPanel = document.getElementById('builderPanel');
 const builderViewerImg = document.getElementById('builderViewerImg');
 const builderSlider = document.getElementById('builderSlider');
 const builderFrameRow = document.getElementById('builderFrameRow');
 const builderNEl = document.getElementById('builderN');
 const builderTotalEl = document.getElementById('builderTotal');
-// Whichever clip the Clip-Gap Builder viewer is showing RIGHT NOW. Handed
-// to frame-player.js as `builderClip` (see the configure() call at the
-// bottom of this file) — its Play button plays what is on screen here.
-let builderCurClip = null;
-
-// Which BUILDER_FRAMES indices are selected FOR AN ACTION (Delete,
-// Duplicate, Copy Selected, ...) — separate from which one is merely being
-// VIEWED (that's `showBuilderFrame`'s own job, the blue .cur highlight).
-let SELECTED = new Set();
-// Whether gmBuilderSelectFrames is armed — the SAME 3-click start/end/
-// reset cycle gmSelectFrames runs on the Frame Selector row (libArmed/
-// libPhase), just scoped to this row instead (see renderBuilderFrameRow's
-// onclick). Toggled by the button itself; turning it off mid-cycle only
-// stops arming FURTHER clicks — it does not clear a selection already
-// sitting there.
-let builderArmed = false;
-// 0: next click is click 1 (starts a selection). 1: next click is click 2
-// (finishes it — same frame as click 1 collapses it to one frame). 2: a
-// selection sits complete; the next click is click 3, a reset back to 0.
-let builderPhase = 0;
-// The pending start of a click-1/click-2 range pick — null except between
-// those two clicks (builderPhase === 1).
-let builderRangeStart = null;
 
 // A full reset of the Builder's own select/copy mechanism — called at hard
 // reset points (a scene switch/Clear in app.js's showEmpty(), and
 // gmClearAll below), never from inside the 3-click cycle itself (which
 // only ever clears what its OWN click needs cleared).
 function disarmSelectMode() {
-  builderArmed = false;
-  builderPhase = 0;
-  builderRangeStart = null;
+  BUILDER.armed = false;
+  BUILDER.phase = 0;
+  BUILDER.rangeStart = null;
   gmBuilderSelectFrames.classList.remove('armed');
   gmBuilderCopySelected.classList.remove('ready');
 }
 
 function setSelected(indices) {
-  SELECTED = new Set(indices);
-  [...builderFrameRow.children].forEach((d, j) => d.classList.toggle('selected', SELECTED.has(j)));
+  BUILDER.selected = new Set(indices);
+  [...builderFrameRow.children].forEach((d, j) => d.classList.toggle('selected', BUILDER.selected.has(j)));
 }
 
 function renderBuilderFrameRow() {
   builderFrameRow.innerHTML = '';
-  BUILDER_FRAMES.forEach((f, i) => {
+  BUILDER.frames.forEach((f, i) => {
     const d = document.createElement('div');
-    d.className = 'libframe' + (SELECTED.has(i) ? ' selected' : '');
+    d.className = 'libframe' + (BUILDER.selected.has(i) ? ' selected' : '');
     d.style.backgroundImage = `url(${f.url})`;
     d.title = `${f.clip.name} — frame ${f.local + 1}/${f.clip.n}`;
     d.onclick = () => {
       // Same 3-click cycle as the Frame Selector's own row (see
-      // copySelectDblClick's old comment, now libPhase's) — click 1: start.
+      // copySelectDblClick's old comment, now LIB.phase's) — click 1: start.
       // Click 2: end (or the same frame again for a one-frame selection).
       // Click 3: reset, and this click picks nothing on its own.
-      if (builderArmed) {
-        if (builderPhase === 0) {
-          builderRangeStart = i;
+      if (BUILDER.armed) {
+        if (BUILDER.phase === 0) {
+          BUILDER.rangeStart = i;
           setSelected([i]);
-          builderPhase = 1;
-        } else if (builderPhase === 1) {
-          if (i === builderRangeStart) {
+          BUILDER.phase = 1;
+        } else if (BUILDER.phase === 1) {
+          if (i === BUILDER.rangeStart) {
             setSelected([i]);
           } else {
-            const lo = Math.min(builderRangeStart, i), hi = Math.max(builderRangeStart, i);
+            const lo = Math.min(BUILDER.rangeStart, i), hi = Math.max(BUILDER.rangeStart, i);
             const range = [];
             for (let k = lo; k <= hi; k++) range.push(k);
             setSelected(range);
           }
-          builderRangeStart = null;
-          builderPhase = 2;
+          BUILDER.rangeStart = null;
+          BUILDER.phase = 2;
           gmBuilderCopySelected.classList.add('ready');
         } else {
           setSelected([]);
-          builderRangeStart = null;
-          builderPhase = 0;
+          BUILDER.rangeStart = null;
+          BUILDER.phase = 0;
           gmBuilderCopySelected.classList.remove('ready');
         }
       }
-      gapLog('builder_frame_click', {i, builderArmed, after: gapSnapshot()});
+      gapLog('builder_frame_click', {i, builderArmed: BUILDER.armed, after: gapSnapshot()});
       // Still moves the viewer here too, armed or not, same as before —
       // and THIS is what tells Paste Selected where "here" is: a plain
       // click on a frame here, then Paste Selected, no arming step of its
@@ -383,17 +437,11 @@ function renderBuilderFrameRow() {
   });
 }
 
-// Set while the Clip-Gap Builder's own stepper is driving its viewer —
-// same reasoning as libStepping above: the buttons cannot change from one
-// animation frame to the next, and Players.refresh() rescans both
-// collections.
-let builderStepping = false;
-
 function showBuilderFrame(i) {
-  const f = BUILDER_FRAMES[i];
+  const f = BUILDER.frames[i];
   [...builderFrameRow.children].forEach((d, j) => d.classList.toggle('cur', j === i));
-  builderCurClip = f ? f.clip : null;
-  if (!builderStepping) Players.refresh();
+  BUILDER.curClip = f ? f.clip : null;
+  if (!BUILDER.stepping) Players.refresh();
   if (!f) { builderViewerImg.removeAttribute('src'); builderNEl.textContent = '—'; return; }
   builderViewerImg.src = f.url;
   builderNEl.textContent = i + 1;
@@ -402,7 +450,7 @@ function showBuilderFrame(i) {
 }
 
 // Deliberately does NOT save to storage — it also runs during the RESET
-// at the start of showEmpty() (BUILDER_FRAMES = [] before restoreGlobals()
+// at the start of showEmpty() (BUILDER.frames = [] before restoreGlobals()
 // gets a chance to read what was saved), and saving there would overwrite
 // the very collection a refresh is about to bring back before it can.
 // Only the actual mutation sites (doPaste, and the Gap Builder Menu
@@ -414,9 +462,9 @@ function rebuildBuilderFrames(landOn) {
   // position it held is meaningless — same rule the Frame Selector's row
   // follows in rebuildLibFrames().
   GapBuilder.endRun();
-  builderSlider.max = Math.max(0, BUILDER_FRAMES.length - 1);
-  builderSlider.disabled = BUILDER_FRAMES.length === 0;
-  builderTotalEl.textContent = BUILDER_FRAMES.length || '—';
+  builderSlider.max = Math.max(0, BUILDER.frames.length - 1);
+  builderSlider.disabled = BUILDER.frames.length === 0;
+  builderTotalEl.textContent = BUILDER.frames.length || '—';
   renderBuilderFrameRow();
   const i = landOn != null ? landOn : 0;
   builderSlider.value = i;
@@ -431,40 +479,40 @@ builderSlider.oninput = () => showBuilderFrame(+builderSlider.value);
 // wherever that left builderSlider sitting. An empty Builder has no frame
 // to have clicked, so it always inserts at the very start (0) instead.
 function doPaste(insertAt) {
-  const builderLenBefore = BUILDER_FRAMES.length;
-  BUILDER_FRAMES.splice(insertAt, 0, ...CLIPBOARD);
-  const landOn = insertAt + CLIPBOARD.length - 1;
-  const n = CLIPBOARD.length;
-  gapLog('do_paste', {insertAt, n, builderLenBefore, builderLenAfter: BUILDER_FRAMES.length});
-  CLIPBOARD = [];
+  const builderLenBefore = BUILDER.frames.length;
+  BUILDER.frames.splice(insertAt, 0, ...SHARED.clipboard);
+  const landOn = insertAt + SHARED.clipboard.length - 1;
+  const n = SHARED.clipboard.length;
+  gapLog('do_paste', {insertAt, n, builderLenBefore, builderLenAfter: BUILDER.frames.length});
+  SHARED.clipboard = [];
   gmPasteSelected.classList.remove('ready');
   // The whole select → copy → paste cycle is done — every button that was
   // part of it goes back to plain white, both Select Frames buttons
   // included (the clipboard could have come from either row), exactly
   // like finishing a copy already resets its own Copy Selected's green.
-  libArmed = false;
+  LIB.armed = false;
   gmSelectFrames.classList.remove('armed');
-  builderArmed = false;
+  BUILDER.armed = false;
   gmBuilderSelectFrames.classList.remove('armed');
   rebuildBuilderFrames(landOn);
-  saveStore({builderFrames: BUILDER_FRAMES});
+  saveStore({builderFrames: BUILDER.frames});
   libStatus.textContent = insertAt > 0
     ? `Pasted ${n} frame(s) after frame ${insertAt}.`
     : `Pasted ${n} frame(s).`;
 }
 
 // `f.source` ('store' | 'common') says which library the clip came from,
-// and travels on every PICKED/LIB_FRAMES entry from here on — the server
+// and travels on every LIB.picked/LIB.frames entry from here on — the server
 // needs it on every later /api/lib_frames or /api/lib_media call, since
 // Sarah/ and a store's own sarah_clips/libs/ are siblings, not one nested
 // in the other, so a bare path is ambiguous between them. `path` itself
-// stays the identity key for lookups (PICKED.filter(c => c.path !== ...)
+// stays the identity key for lookups (LIB.picked.filter(c => c.path !== ...)
 // below): the two sources' paths can never collide, because a store path
 // always carries that store's own long Customers/-relative prefix and a
 // common path never does.
 async function toggleLibClip(f, checked) {
   if (!checked) {
-    PICKED = PICKED.filter(c => c.path !== f.path);
+    LIB.picked = LIB.picked.filter(c => c.path !== f.path);
     rebuildLibFrames();
     OriginalAudio.rebuild();   // the stack follows every checkbox
     savePickedForCurrentPair();
@@ -477,7 +525,7 @@ async function toggleLibClip(f, checked) {
     // has_audio is MEASURED server-side (see has_audible() in serve.py) —
     // every .webm in this library carries an Opus stream, including the
     // silent idle loops, so "has a stream" was never the right question.
-    PICKED.push({path: f.path, name: f.name, n: d.n, slug: d.slug, ext: d.ext,
+    LIB.picked.push({path: f.path, name: f.name, n: d.n, slug: d.slug, ext: d.ext,
                  has_audio: !!f.has_audio, source: f.source});
     rebuildLibFrames();
     OriginalAudio.rebuild();   // the stack follows every checkbox
@@ -494,7 +542,7 @@ async function toggleLibClip(f, checked) {
 // the Play buttons, Working Clips) reads it straight off the clip rather
 // than asking which panel it came from.
 //
-// LIB_ORDER — the FLAT, combined display order both panels' checked
+// LIB.order — the FLAT, combined display order both panels' checked
 // clips share, for OriginalAudio's stack (Carson's rule: it plays down
 // the list the way you read it) — is appended to, not reset, so calling
 // this once per panel in the same pass builds one continuous order:
@@ -518,7 +566,7 @@ function renderLibSource(d, groupsEl, statusEl, source, savedPaths) {
       box.appendChild(e);
     }
     for (const f of g.files) {
-      LIB_ORDER.push(f.path);   // display order, for OriginalAudio's stack
+      LIB.order.push(f.path);   // display order, for OriginalAudio's stack
       const row = document.createElement('div');
       row.className = 'libfile';
       const meta = f.dur != null ? `${f.dur}s` : humanSize(f.size);
@@ -564,7 +612,7 @@ function renderLibSource(d, groupsEl, statusEl, source, savedPaths) {
 }
 
 async function loadLibs() {
-  PICKED = [];
+  LIB.picked = [];
   rebuildLibFrames();
   // The store panel's own header — the store, then the video, replacing
   // "sarah_clips/libs" (Carson's own call, 2026-09-03): which folder it
@@ -577,21 +625,21 @@ async function loadLibs() {
   libHeaderVideo.textContent = sv ? sv.video : '—';
   // A fresh pair may be a different STORE, so both are re-resolved below,
   // never carried over from whatever pair was open before.
-  restPosePath = null;
-  restPoseSource = null;
-  restPoseFrame = null;
-  LIB_ORDER = [];
+  LIB.restPosePath = null;
+  LIB.restPoseSource = null;
+  LIB.restPoseFrame = null;
+  LIB.order = [];
 
   // What was checked for THIS pair last time — a refresh, or coming back
   // to a scene already visited this session, both restore it. Shared by
-  // both panels: PICKED can hold entries from either source, and their
+  // both panels: LIB.picked can hold entries from either source, and their
   // paths never collide (a store path always carries that store's own
   // long Customers/-relative prefix; a common path never does), so one
   // Set correctly re-ticks the right box in whichever panel it belongs to.
   const rec = SCENE && loadStore().pairs?.[pairKey(SCENE.base_rel, SCENE.over_rel)];
   const savedPaths = new Set((rec?.picked || []).map(c => c.path));
 
-  // COMMON first, so its clips sort ahead of the store's own in LIB_ORDER
+  // COMMON first, so its clips sort ahead of the store's own in LIB.order
   // — matching the two panels' left-to-right order on screen. Independent
   // try/catch: a broken store fetch should not also blank the common
   // panel, and Sarah/ not existing yet on a fresh checkout shouldn't block
@@ -614,7 +662,7 @@ async function loadLibs() {
       // been checked yet.
       for (const g of d.groups)
         for (const f of g.files)
-          if (f.name === REST_POSE_NAME) { restPosePath = f.path; restPoseSource = 'common'; }
+          if (f.name === REST_POSE_NAME) { LIB.restPosePath = f.path; LIB.restPoseSource = 'common'; }
       renderLibSource(d, libGroupsCommon, libStatusCommon, 'common', savedPaths);
     }
   } catch (e) {
@@ -629,10 +677,10 @@ async function loadLibs() {
     const d = await r.json();
     if (d.error) { libStatus.textContent = d.error; return; }
     if (!d.root) { libStatus.textContent = 'No sarah_clips/libs/ folder for this store yet.'; return; }
-    if (restPosePath === null)
+    if (LIB.restPosePath === null)
       for (const g of d.groups)
         for (const f of g.files)
-          if (f.name === REST_POSE_NAME) { restPosePath = f.path; restPoseSource = 'store'; }
+          if (f.name === REST_POSE_NAME) { LIB.restPosePath = f.path; LIB.restPoseSource = 'store'; }
     renderLibSource(d, libGroups, libStatus, 'store', savedPaths);
   } catch (e) {
     libStatus.textContent = `Couldn't load: ${e.message}`;
@@ -682,45 +730,26 @@ const gmSoundBitPlayPause = document.getElementById('gmSoundBitPlayPause');
 const gmLibPlayPause = document.getElementById('gmLibPlayPause');
 const gmBuilderPlayPause = document.getElementById('gmBuilderPlayPause');
 
-// Whether gmSelectFrames is armed — while true, a plain click on a Frame
-// Selector thumbnail (renderLibFrameRow's onclick, above) drives the
-// 3-click start/end/reset cycle instead of only navigating. Toggled by
-// the button itself; turning it off mid-cycle only stops arming FURTHER
-// clicks — it does not clear a selection already sitting there ready for
-// Copy Selected (that only happens on click 3, or on an actual copy).
-let libArmed = false;
-
-// What Copy Selected fills and Paste (not wired yet) will read from —
-// plain frame objects, the same shape LIB_FRAMES and BUILDER_FRAMES both
-// already use, copied by VALUE so later edits to the Frame Selector's own
-// list can never reach back and change what's on the clipboard. Not saved
-// to storage: a clipboard is working state for the rest of this session,
-// not something a refresh should be expected to bring back.
-let CLIPBOARD = [];
-
 // The standardized "rest pose" — Sarah, settled, not speaking. Sarah/'s
 // own stills/ is now the canonical source for it (Carson's own split,
 // 2026-09-03; see Sarah/README.md), with a store's own sarah_clips/libs/
 // stills/ copy as a fallback — see loadLibs() above, which checks common
-// first. restPosePath+restPoseSource are found once per pair there;
-// restPoseFrame is the actual {url, clip, local} for it, fetched lazily on
+// first. LIB.restPosePath+LIB.restPoseSource are found once per pair there;
+// LIB.restPoseFrame is the actual {url, clip, local} for it, fetched lazily on
 // first use and kept — it never changes mid-pair, so there is no reason to
 // ask the server for it twice.
 const REST_POSE_NAME = 'sarah-rest-pose-corner-300-alpha.png';
-let restPosePath = null;
-let restPoseSource = null;
-let restPoseFrame = null;
 
 async function getRestPoseFrame() {
-  if (restPoseFrame) return restPoseFrame;
-  if (!restPosePath) return null;
-  const r = await fetch(`/api/lib_frames?source=${restPoseSource}&path=${encodeURIComponent(restPosePath)}`);
+  if (LIB.restPoseFrame) return LIB.restPoseFrame;
+  if (!LIB.restPosePath) return null;
+  const r = await fetch(`/api/lib_frames?source=${LIB.restPoseSource}&path=${encodeURIComponent(LIB.restPosePath)}`);
   const d = await r.json();
   if (d.error) return null;
-  const clip = {path: restPosePath, name: REST_POSE_NAME, n: d.n, slug: d.slug, ext: d.ext,
-                source: restPoseSource};
-  restPoseFrame = {url: libFrameUrl(clip, 0), clip, local: 0};
-  return restPoseFrame;
+  const clip = {path: LIB.restPosePath, name: REST_POSE_NAME, n: d.n, slug: d.slug, ext: d.ext,
+                source: LIB.restPoseSource};
+  LIB.restPoseFrame = {url: libFrameUrl(clip, 0), clip, local: 0};
+  return LIB.restPoseFrame;
 }
 
 function loadImage(src) {
@@ -770,10 +799,10 @@ async function fadeFrames(urlA, urlB, n) {
 // more than reading a variable or a Set's size.
 function gapSnapshot() {
   return {
-    libArmed, libPhase, libSelected: LIB_SELECTED.size, libRangeStart,
-    builderArmed, builderPhase, builderRangeStart, selected: SELECTED.size,
-    clipboard: CLIPBOARD.length, builderCur: +builderSlider.value,
-    builderFrames: BUILDER_FRAMES.length, libFrames: LIB_FRAMES.length,
+    libArmed: LIB.armed, libPhase: LIB.phase, libSelected: LIB.selected.size, libRangeStart: LIB.rangeStart,
+    builderArmed: BUILDER.armed, builderPhase: BUILDER.phase, builderRangeStart: BUILDER.rangeStart, selected: BUILDER.selected.size,
+    clipboard: SHARED.clipboard.length, builderCur: +builderSlider.value,
+    builderFrames: BUILDER.frames.length, libFrames: LIB.frames.length,
     // Working Clips: how many are saved in each section, and which one is
     // active. Both change what Save to Working Clips and Replace Selected
     // will DO, so a click log without them cannot explain either.
@@ -839,9 +868,9 @@ gmAddOpeningStill.onclick = withActiveFlash(gmAddOpeningStill, async () => {
     libStatus.textContent = `Couldn't find ${REST_POSE_NAME} in this store's sarah_clips/libs/stills/.`;
     return;
   }
-  for (let i = 0; i < 4; i++) BUILDER_FRAMES.push(rp);
-  rebuildBuilderFrames(BUILDER_FRAMES.length - 1);
-  saveStore({builderFrames: BUILDER_FRAMES});
+  for (let i = 0; i < 4; i++) BUILDER.frames.push(rp);
+  rebuildBuilderFrames(BUILDER.frames.length - 1);
+  saveStore({builderFrames: BUILDER.frames});
 });
 
 // Closing: 3 frames fading from whatever the Builder currently ends on
@@ -854,66 +883,66 @@ gmAddClosingStill.onclick = withActiveFlash(gmAddClosingStill, async () => {
     libStatus.textContent = `Couldn't find ${REST_POSE_NAME} in this store's sarah_clips/libs/stills/.`;
     return;
   }
-  if (BUILDER_FRAMES.length) {
-    const last = BUILDER_FRAMES[BUILDER_FRAMES.length - 1];
+  if (BUILDER.frames.length) {
+    const last = BUILDER.frames[BUILDER.frames.length - 1];
     const blended = await fadeFrames(last.url, rp.url, 3);
     const clip = {name: 'closing transition to rest pose', n: 3};
-    blended.forEach((url, i) => BUILDER_FRAMES.push({url, clip, local: i}));
+    blended.forEach((url, i) => BUILDER.frames.push({url, clip, local: i}));
   }
-  for (let i = 0; i < 4; i++) BUILDER_FRAMES.push(rp);
-  rebuildBuilderFrames(BUILDER_FRAMES.length - 1);
-  saveStore({builderFrames: BUILDER_FRAMES});
+  for (let i = 0; i < 4; i++) BUILDER.frames.push(rp);
+  rebuildBuilderFrames(BUILDER.frames.length - 1);
+  saveStore({builderFrames: BUILDER.frames});
 });
 
 // Arms/disarms the 3-click start/end/reset cycle on the Clip-Gap Builder
 // row below — same mechanism gmSelectFrames uses on the Frame Selector
-// row (see renderBuilderFrameRow's onclick and builderPhase). Click again
+// row (see renderBuilderFrameRow's onclick and BUILDER.phase). Click again
 // to disarm early — that only stops arming further clicks, it does not
 // clear a selection already sitting there.
 gmBuilderSelectFrames.onclick = withActiveFlash(gmBuilderSelectFrames, () => {
-  builderArmed = !builderArmed;
-  gmBuilderSelectFrames.classList.toggle('armed', builderArmed);
+  BUILDER.armed = !BUILDER.armed;
+  gmBuilderSelectFrames.classList.toggle('armed', BUILDER.armed);
 });
 
-// Copies whatever's selected in the Clip-Gap Builder's own row (SELECTED,
-// filled by the gmBuilderSelectFrames cycle) onto CLIPBOARD — the SAME
+// Copies whatever's selected in the Clip-Gap Builder's own row (BUILDER.selected,
+// filled by the gmBuilderSelectFrames cycle) onto SHARED.clipboard — the SAME
 // clipboard Copy Selected/Paste Selected (Frame Selector side) already
 // use, so this doubles as "duplicate a range in place": select it here,
 // Copy Selected, then Paste Selected picks where the copy lands.
 gmBuilderCopySelected.onclick = withActiveFlash(gmBuilderCopySelected, () => {
-  if (!SELECTED.size) {
+  if (!BUILDER.selected.size) {
     libStatus.textContent = 'Select Frames, then click a frame below to start a selection '
       + '(click again to finish it) — then Copy Selected.';
     return;
   }
-  const indices = [...SELECTED].sort((a, b) => a - b);
-  CLIPBOARD = indices.map(i => BUILDER_FRAMES[i]);
-  libStatus.textContent = `Copied ${CLIPBOARD.length} frame(s) — Paste Selected is ready.`;
+  const indices = [...BUILDER.selected].sort((a, b) => a - b);
+  SHARED.clipboard = indices.map(i => BUILDER.frames[i]);
+  libStatus.textContent = `Copied ${SHARED.clipboard.length} frame(s) — Paste Selected is ready.`;
   gmBuilderCopySelected.classList.remove('ready');
   gmPasteSelected.classList.add('ready');
   setSelected([]);
-  builderRangeStart = null;
-  builderPhase = 0;
+  BUILDER.rangeStart = null;
+  BUILDER.phase = 0;
 });
 
 // Removes EVERY selected frame — whatever the gmBuilderSelectFrames cycle
-// currently left in SELECTED, one frame (click the same frame twice) or a
+// currently left in BUILDER.selected, one frame (click the same frame twice) or a
 // whole range. One selection mechanism serves both counts, so there is no
 // separate Delete a Frame any more. Indices are removed HIGHEST first, so
 // splicing one out never shifts the position of another one still waiting
 // to go — removing low-to-high would delete the wrong frame the moment
 // the first splice moved everything after it down.
 gmDeleteSelected.onclick = withActiveFlash(gmDeleteSelected, () => {
-  if (!SELECTED.size) {
+  if (!BUILDER.selected.size) {
     libStatus.textContent = 'Select Frames, then click one or more frames below, first.';
     return;
   }
-  const indices = [...SELECTED].sort((a, b) => b - a);
-  const landOn = Math.min(...SELECTED);
-  for (const i of indices) BUILDER_FRAMES.splice(i, 1);
-  SELECTED = new Set();
-  rebuildBuilderFrames(Math.min(landOn, BUILDER_FRAMES.length - 1));
-  saveStore({builderFrames: BUILDER_FRAMES});
+  const indices = [...BUILDER.selected].sort((a, b) => b - a);
+  const landOn = Math.min(...BUILDER.selected);
+  for (const i of indices) BUILDER.frames.splice(i, 1);
+  BUILDER.selected = new Set();
+  rebuildBuilderFrames(Math.min(landOn, BUILDER.frames.length - 1));
+  saveStore({builderFrames: BUILDER.frames});
 });
 
 // Empties the WHOLE collection, selected or not — no confirmation, same as
@@ -921,71 +950,71 @@ gmDeleteSelected.onclick = withActiveFlash(gmDeleteSelected, () => {
 // the loaded scene, and Timeline Scenes are all untouched (that is what
 // the main Clear button, in Timeline Scenes, is for).
 gmClearAll.onclick = withActiveFlash(gmClearAll, () => {
-  BUILDER_FRAMES = [];
-  SELECTED = new Set();
+  BUILDER.frames = [];
+  BUILDER.selected = new Set();
   disarmSelectMode();
   rebuildBuilderFrames();
-  saveStore({builderFrames: BUILDER_FRAMES});
+  saveStore({builderFrames: BUILDER.frames});
 });
 
 // Arms/disarms the 3-click start/end/reset cycle on the Frame Selector row
-// above (see renderLibFrameRow's onclick and libPhase). Click again to
+// above (see renderLibFrameRow's onclick and LIB.phase). Click again to
 // disarm early — that only stops arming further clicks, it does not clear
 // a selection already sitting there.
 gmSelectFrames.onclick = withActiveFlash(gmSelectFrames, () => {
-  libArmed = !libArmed;
-  gmSelectFrames.classList.toggle('armed', libArmed);
+  LIB.armed = !LIB.armed;
+  gmSelectFrames.classList.toggle('armed', LIB.armed);
 });
 
-// Copies whatever's selected in the Frame Selector's own row (LIB_SELECTED,
-// filled by the gmSelectFrames 3-click cycle) onto CLIPBOARD, in frame
+// Copies whatever's selected in the Frame Selector's own row (LIB.selected,
+// filled by the gmSelectFrames 3-click cycle) onto SHARED.clipboard, in frame
 // order — not necessarily the order the two clicks happened in, since
 // either end can be clicked first. Turns its own 'ready' green back off
 // and resets the cycle to click 1, so the very next click on a frame
 // starts a fresh pick rather than landing on click 3 by surprise.
 function copySelectedLibFrames() {
-  if (!LIB_SELECTED.size) {
+  if (!LIB.selected.size) {
     libStatus.textContent = 'Select Frames, then click a frame above to start a selection '
       + '(click again to finish it) — then Copy Selected.';
     return;
   }
-  const indices = [...LIB_SELECTED].sort((a, b) => a - b);
-  CLIPBOARD = indices.map(i => LIB_FRAMES[i]);
-  libStatus.textContent = `Copied ${CLIPBOARD.length} frame(s) — Paste Selected is ready.`;
+  const indices = [...LIB.selected].sort((a, b) => a - b);
+  SHARED.clipboard = indices.map(i => LIB.frames[i]);
+  libStatus.textContent = `Copied ${SHARED.clipboard.length} frame(s) — Paste Selected is ready.`;
   gmCopySelected.classList.remove('ready');
   gmLibViewToggle.classList.remove('ready');
   // The clipboard now has something in it — Paste Selected is the next
   // step, same "ready" green Copy Selected itself just had.
   gmPasteSelected.classList.add('ready');
   setLibSelected([]);
-  libRangeStart = null;
-  libPhase = 0;
+  LIB.rangeStart = null;
+  LIB.phase = 0;
   // Copied — the review is over either way, so land back on the full
   // collection rather than leaving the view filtered to a selection that
   // no longer exists.
-  if (libShowSelectedOnly) { libShowSelectedOnly = false; applyLibViewMode(); }
+  if (LIB.showSelectedOnly) { LIB.showSelectedOnly = false; applyLibViewMode(); }
 }
 
 gmCopySelected.onclick = withActiveFlash(gmCopySelected, copySelectedLibFrames);
 
 // Switches the row/slider above between the full collection and just
-// LIB_SELECTED, so a selection can be scrubbed through before deciding —
+// LIB.selected, so a selection can be scrubbed through before deciding —
 // Copy Selected if it looks right, or click this again to back out.
 // Backing out UN-STAGES the pick (same as click 3 of the select cycle):
 // this is a review step, not a second way to hold a selection.
 gmLibViewToggle.onclick = withActiveFlash(gmLibViewToggle, () => {
-  if (!libShowSelectedOnly) {
-    if (!LIB_SELECTED.size) {
+  if (!LIB.showSelectedOnly) {
+    if (!LIB.selected.size) {
       libStatus.textContent = 'Select Frames, then click a frame above to start a selection '
         + '(click again to finish it) — then Show Selected on Timeline.';
       return;
     }
-    libShowSelectedOnly = true;
+    LIB.showSelectedOnly = true;
   } else {
-    libShowSelectedOnly = false;
+    LIB.showSelectedOnly = false;
     setLibSelected([]);
-    libRangeStart = null;
-    libPhase = 0;
+    LIB.rangeStart = null;
+    LIB.phase = 0;
     gmCopySelected.classList.remove('ready');
     gmLibViewToggle.classList.remove('ready');
   }
@@ -993,11 +1022,11 @@ gmLibViewToggle.onclick = withActiveFlash(gmLibViewToggle, () => {
 });
 
 // Empties the Frame Selector's OWN collection — unchecks every clip in
-// sarah_clips/libs and clears PICKED, same idea as gmClearAll above but
-// for this row instead. Does not touch the Clip-Gap Builder, CLIPBOARD,
+// sarah_clips/libs and clears LIB.picked, same idea as gmClearAll above but
+// for this row instead. Does not touch the Clip-Gap Builder, CLIPBOARD: SHARED.clipboard,
 // the loaded scene, or Timeline Scenes.
 gmFrameSelectorClearAll.onclick = withActiveFlash(gmFrameSelectorClearAll, () => {
-  PICKED = [];
+  LIB.picked = [];
   [...libGroups.querySelectorAll('input[type=checkbox]')].forEach(cb => { cb.checked = false; });
   rebuildLibFrames();
   savePickedForCurrentPair();
@@ -1009,11 +1038,11 @@ gmFrameSelectorClearAll.onclick = withActiveFlash(gmFrameSelectorClearAll, () =>
 // frame there first, THEN click this. An empty Builder has no frame to
 // have clicked, so it always inserts at the very start instead.
 gmPasteSelected.onclick = withActiveFlash(gmPasteSelected, () => {
-  if (!CLIPBOARD.length) {
+  if (!SHARED.clipboard.length) {
     libStatus.textContent = 'Nothing on the clipboard — Select Frames above, then Copy Selected, first.';
     return;
   }
-  doPaste(BUILDER_FRAMES.length ? +builderSlider.value + 1 : 0);
+  doPaste(BUILDER.frames.length ? +builderSlider.value + 1 : 0);
 });
 
 // ── Working Clips: saving out, and dropping back in ──────────────────────
@@ -1032,7 +1061,7 @@ gmSaveTarget.onchange = withActiveFlash(gmSaveToWorking, async () => {
   const label = (WorkingClips.sections().find(s => s.key === section) || {}).label || section;
   const r = await WorkingClips.saveBuilder(section, () => modalPrompt({
     title: 'Save to Working Clips',
-    label: `${BUILDER_FRAMES.length} frame(s) → ${label}. Name this clip:`,
+    label: `${BUILDER.frames.length} frame(s) → ${label}. Name this clip:`,
     value: '',
   }));
   libStatus.textContent = r.ok
@@ -1050,12 +1079,12 @@ gmReplaceSelected.onclick = withActiveFlash(gmReplaceSelected, async () => {
     libStatus.textContent = 'Tick a clip in Working Clips to make it active first.';
     return;
   }
-  if (!LIB_SELECTED.size) {
+  if (!LIB.selected.size) {
     libStatus.textContent = 'Select Frames above, then click a frame to start a selection '
       + '(click again to finish it) — then Replace Selected.';
     return;
   }
-  const indices = [...LIB_SELECTED].sort((a, b) => a - b);
+  const indices = [...LIB.selected].sort((a, b) => a - b);
   if (entry.n !== indices.length) {
     const go = await modalConfirm({
       title: 'Mismatch frame count',
@@ -1075,20 +1104,20 @@ gmReplaceSelected.onclick = withActiveFlash(gmReplaceSelected, async () => {
 // an end). Splicing the whole span out and the new frames in keeps the
 // row's order intact for any count, matching or not.
 //
-// This edits LIB_FRAMES in place, and LIB_FRAMES is REBUILT from PICKED
+// This edits LIB.frames in place, and LIB.frames is REBUILT from LIB.picked
 // whenever a box is ticked — so a replacement lives until the next tick,
 // on purpose: it is a working edit for building something, not a change to
 // the library, which is read-only from here.
 function replaceLibSelection(indices, frames) {
   const at = indices[0];
   const span = indices[indices.length - 1] - at + 1;
-  LIB_FRAMES.splice(at, span, ...frames);
+  LIB.frames.splice(at, span, ...frames);
   setLibSelected([]);
-  libRangeStart = null;
-  libPhase = 0;
+  LIB.rangeStart = null;
+  LIB.phase = 0;
   gmCopySelected.classList.remove('ready');
   gmLibViewToggle.classList.remove('ready');
-  if (libShowSelectedOnly) { libShowSelectedOnly = false; }
+  if (LIB.showSelectedOnly) { LIB.showSelectedOnly = false; }
   renderLibFrameRow();
   applyLibViewMode();
   const land = Math.min(at, Math.max(0, libViewIndices().length - 1));
@@ -1133,8 +1162,8 @@ gmBuilderPlayPause.onclick = withActiveFlash(gmBuilderPlayPause, () => {
 // frame-player.js owns all three Play buttons but none of the data they
 // act on — the checked library, the Frame Selector's row, and the
 // Clip-Gap Builder's current clip all live here and change as the user
-// works. Every one is handed over as a FUNCTION, not a value: PICKED and
-// LIB_FRAMES are REASSIGNED on every check/uncheck, so a captured
+// works. Every one is handed over as a FUNCTION, not a value: LIB.picked and
+// LIB.frames are REASSIGNED on every check/uncheck, so a captured
 // reference would go stale the first time a box was ticked.
 //
 // Last thing in this file on purpose — everything named below has to
@@ -1142,14 +1171,14 @@ gmBuilderPlayPause.onclick = withActiveFlash(gmBuilderPlayPause, () => {
 Players.configure({
   // showFrame and slider are the Frame Selector's OWN viewer, and only its
   // OWN Play button reaches them — see the stepper in frame-player.js.
-  showFrame: pos => { libStepping = true; showLibFrame(pos); libStepping = false; },
+  showFrame: pos => { LIB.stepping = true; showLibFrame(pos); LIB.stepping = false; },
   slider: () => libSlider,
   // ...and the Clip-Gap Builder's own, reached only by ITS own button.
-  builderFrames: () => BUILDER_FRAMES,
-  builderShow: i => { builderStepping = true; showBuilderFrame(i); builderStepping = false; },
+  builderFrames: () => BUILDER.frames,
+  builderShow: i => { BUILDER.stepping = true; showBuilderFrame(i); BUILDER.stepping = false; },
   builderSlider: () => builderSlider,
-  picked: () => PICKED,
-  frames: () => LIB_FRAMES,
+  picked: () => LIB.picked,
+  frames: () => LIB.frames,
   viewIndices: () => libViewIndices(),
-  order: () => LIB_ORDER,
+  order: () => LIB.order,
 });

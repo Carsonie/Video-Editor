@@ -81,8 +81,8 @@
   function restoreGlobals() {
     const s = loadStore();
     if (Array.isArray(s.builderFrames) && s.builderFrames.length) {
-      BUILDER_FRAMES = s.builderFrames;
-      rebuildBuilderFrames(BUILDER_FRAMES.length - 1);
+      BUILDER.frames = s.builderFrames;
+      rebuildBuilderFrames(BUILDER.frames.length - 1);
     }
     // Guarded on STORE_SCENES already being empty — showEmpty() does NOT
     // reset it (see showEmpty()'s own comment on what it deliberately
@@ -441,13 +441,13 @@
     // forever over a panel that no longer means anything.
     libSpinner.hidden = true;
     libSpinnerCommon.hidden = true;
-    PICKED = [];
+    LIB.picked = [];
     rebuildLibFrames();
-    BUILDER_FRAMES = [];
-    SELECTED = new Set();
+    BUILDER.frames = [];
+    BUILDER.selected = new Set();
     disarmSelectMode();
     rebuildBuilderFrames();
-    CLIPBOARD = [];
+    SHARED.clipboard = [];
     // The player is frame-player.js's business, not this file's — one
     // call, rather than nine lines reaching into its internals.
     Players.reset();

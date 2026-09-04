@@ -648,7 +648,7 @@ layered view and a real timeline open in Chrome and behave identically.
 
 ## Phase 5 — Front-end structure in the modern pair
 
-### Step 14. `gap-builder.js` — gather the 21 globals into one state object FIRST
+### Step 14. `gap-builder.js` — gather the 21 globals into one state object FIRST  ✅ done 2026-09-04
 
 **Task scope:** Avatar Editor only.
 

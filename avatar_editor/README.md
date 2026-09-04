@@ -78,6 +78,31 @@ with that: a `let`/`const` name declared in both would throw the moment
 they share a scope for real, which neither file's own syntax check alone
 would catch.
 
+### The shared state lives in three objects, not 21 loose names
+
+`gap-builder.js` used to declare **21 top-level `let`s**, mutated from 25
+functions and a good many inline handlers. That — not the line count — was
+what made the file impossible to split: every part of it reached into the
+same loose scope, so moving any part moved the state with it. Since
+2026-09-04 they are grouped by concern:
+
+| | |
+|---|---|
+| `LIB` | the library / Frame Selector: its collection **and** its 3-click selection state machine |
+| `BUILDER` | the Clip-Gap Builder: same two things, its own |
+| `SHARED` | `clipboard` — the one thing genuinely shared between the two rows |
+
+Each is `const`. The binding never changes, only what is inside it, and
+that is the part that matters across files: `working-clips.js` reads
+`BUILDER.frames` and `LIB.selected`, and `app.js`'s `showEmpty()` resets
+`LIB.picked`, `BUILDER.frames`, `BUILDER.selected` and `SHARED.clipboard`.
+A reassigned `let` could go stale under a holder; a mutated `const` object
+cannot.
+
+**There are zero top-level `let`s left in `gap-builder.js`** — `grep -cE
+"^let " avatar_editor/web/gap-builder.js` returns 0. Keep it that way: a
+new loose one puts the file back where it was.
+
 ## The one idea worth knowing
 
 **The page starts empty and the scene arrives over the API.** `SCENE` in

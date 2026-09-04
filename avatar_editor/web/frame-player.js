@@ -36,7 +36,7 @@
 // frames, and the Clip-Gap Builder's own current clip all belong to
 // gap-builder.js and change as the user works. They arrive as FUNCTIONS,
 // not values, so this file always reads what is true NOW rather than a copy
-// taken at wiring time — PICKED and LIB_FRAMES are both REASSIGNED as the
+// taken at wiring time — LIB.picked and LIB.frames are both REASSIGNED as the
 // user works, so a captured reference would go stale the first time a box
 // was ticked.
 //
@@ -46,19 +46,19 @@
 // which panel it belongs to.
 const LibSources = (function () {
   let src = {
-    picked: () => [],        // PICKED — the checked clips, in checked order
-    frames: () => [],        // LIB_FRAMES — the Frame Selector's flat row
+    picked: () => [],        // LIB.picked — the checked clips, in checked order
+    frames: () => [],        // LIB.frames — the Frame Selector's flat row
     viewIndices: () => [],   // which of those the row is showing right now
-    order: () => [],         // LIB_ORDER — every library path, as DISPLAYED
+    order: () => [],         // LIB.order — every library path, as DISPLAYED
     showFrame: () => {},     // move the Frame Selector's viewer to a position
     slider: () => null,      // the Frame Selector's own slider element
-    builderFrames: () => [], // BUILDER_FRAMES — the Clip-Gap Builder's row
+    builderFrames: () => [], // BUILDER.frames — the Clip-Gap Builder's row
     builderShow: () => {},   // move the Clip-Gap Builder's viewer
     builderSlider: () => null,
   };
 
   // The checked clips in the order the LIBRARY SHOWS them, top to bottom —
-  // not the order the boxes happened to be ticked in, which is what PICKED
+  // not the order the boxes happened to be ticked in, which is what LIB.picked
   // records. Carson's own rule for the Audio Menu's stack: it plays down
   // the list the way you read it.
   function checkedInOrder() {

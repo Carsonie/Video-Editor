@@ -19,7 +19,7 @@
 // reached by accident from the two files that share a flat scope.
 //
 // WHAT IT BORROWS, and when
-// BUILDER_FRAMES, libFrameUrl() and pad() come from gap-builder.js;
+// BUILDER.frames, libFrameUrl() and pad() come from gap-builder.js;
 // loadStore/saveStore and the two modal dialogs come from app.js, which
 // loads AFTER this file. Nothing here runs at load time except wiring, so
 // by the time any of it is called, all of it exists.
@@ -73,7 +73,7 @@ const WorkingClips = (function () {
             name, n: frames.length, clips, frames: packed};
   }
 
-  // Back to the {url, clip, local} shape LIB_FRAMES and BUILDER_FRAMES use,
+  // Back to the {url, clip, local} shape LIB.frames and BUILDER.frames use,
   // with the URL rebuilt rather than stored — a stored URL would be a
   // second copy of something already derivable, and would go stale if the
   // frame cache were ever re-slugged.
@@ -158,10 +158,10 @@ const WorkingClips = (function () {
   // that collection, so a later edit there cannot reach back and change
   // what was saved.
   async function saveBuilder(section, askName) {
-    if (!BUILDER_FRAMES.length) return {ok: false, why: 'The Clip-Gap Builder is empty.'};
+    if (!BUILDER.frames.length) return {ok: false, why: 'The Clip-Gap Builder is empty.'};
     const name = await askName();
     if (!name) return {ok: false, why: 'cancelled'};
-    const entry = pack(BUILDER_FRAMES.slice(), name);
+    const entry = pack(BUILDER.frames.slice(), name);
     DATA[section] = list(section).concat([entry]);
     persist();
     render();
@@ -177,7 +177,7 @@ const WorkingClips = (function () {
     const save = document.getElementById('gmSaveToWorking');
     const target = document.getElementById('gmSaveTarget');
     if (save && target) {
-      const n = typeof BUILDER_FRAMES === 'undefined' ? 0 : BUILDER_FRAMES.length;
+      const n = typeof BUILDER.frames === 'undefined' ? 0 : BUILDER.frames.length;
       target.disabled = !n;
       save.classList.toggle('ready', n > 0);
       save.classList.toggle('isDisabled', !n);
@@ -189,7 +189,7 @@ const WorkingClips = (function () {
     const rep = document.getElementById('gmReplaceSelected');
     if (rep) {
       const entry = find(ACTIVE);
-      const sel = typeof LIB_SELECTED === 'undefined' ? 0 : LIB_SELECTED.size;
+      const sel = typeof LIB.selected === 'undefined' ? 0 : LIB.selected.size;
       rep.disabled = !entry || !sel;
       rep.classList.toggle('ready', !!entry && sel > 0);
       rep.title = !entry
