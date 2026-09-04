@@ -51,7 +51,11 @@ function fillChrome(CLIP) {
   document.getElementById('fileFrames').textContent = CLIP.nb_frames + ' frames';
   document.getElementById('playerName').textContent = CLIP.player_label;
   document.getElementById('slider').max = CLIP.nb_frames;
-  document.title = CLIP.title;
+  // Same shape as Frame Blender's and the Avatar Editor's tabs, which is
+  // Carson's own preference (2026-09-04): the EDITOR first, then a dash,
+  // then whatever is open. A tab showing only a filename does not say
+  // which of the four tools it belongs to.
+  document.title = `MP4 Splitter — ${CLIP.title}`;
 }
 
 (async function () {

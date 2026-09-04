@@ -592,7 +592,8 @@ def s_api_view():
     av = f"{fixture.ROOT_REL}/sandbox/{folder}/avatar.webm"
 
     d, _ = get("/api/open-pair", base=seg, overlay=av)
-    view, code = get("/api/view", slug=d.get("slug"))
+    pair_slug = d.get("slug")
+    view, code = get("/api/view", slug=pair_slug)
     eq("a real pair slug is answered", code, 200)
     eq("it says which kind it is", view.get("kind"), "pair")
     PAIR = ["player_label", "title", "box", "slug", "base_rel", "overlay_rel",
@@ -608,7 +609,8 @@ def s_api_view():
 
     ns = ",".join(str(x["n"]) for x in doc["scenes"])
     d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns=ns)
-    view, code = get("/api/view", slug=d.get("slug"))
+    seq_slug = d.get("slug")
+    view, code = get("/api/view", slug=seq_slug)
     eq("a real timeline slug is answered", code, 200)
     eq("it says which kind it is", view.get("kind"), "seq")
     SEQ = ["player_label", "title", "box", "total", "manifest", "root_rel"]
@@ -619,6 +621,16 @@ def s_api_view():
           len(view.get("manifest") or []))
     eq("total is the sum of the scenes' frames", view.get("total"),
        sum(m["base_n"] for m in view["manifest"]))
+
+    # `title` is the BARE name in both kinds. web/pair.js and web/seq.js
+    # compose the tab title as "Segment and Avatar Editor — <title>"
+    # (Carson's format, 2026-09-04). Prefixing it here too would double it,
+    # and the suite cannot see document.title — this guards the half it can.
+    for slug, what in ((pair_slug, "layered"), (seq_slug, "timeline")):
+        v, _ = get("/api/view", slug=slug)
+        check(f"{what}: title is bare, not prefixed with the editor",
+              not str(v.get("title", "")).startswith("Segment and Avatar"),
+              v.get("title"))
 
     _, code = get("/api/view", slug="no-such-slug-at-all")
     eq("an unknown slug is refused, not answered", code, 400)

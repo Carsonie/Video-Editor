@@ -459,6 +459,16 @@ def s_api_clip():
           str(clip.get("player_label", "")).startswith("MP4 Splitter v"),
           clip.get("player_label"))
 
+    # `title` is the BARE clip name. web/app.js composes the tab title as
+    # "MP4 Splitter — <title>" (Carson's format, 2026-09-04: editor, dash,
+    # what is open). Prefixing it here as well would read
+    # "MP4 Splitter — MP4 Splitter — segment.mp4", which is the one way this
+    # can break — and the suite cannot see document.title, so this guards
+    # the half it can.
+    check("title is the bare clip name, not prefixed with the editor",
+          not str(clip.get("title", "")).startswith("MP4 Splitter"),
+          clip.get("title"))
+
     _, code = get("/api/clip", slug="no-such-clip-at-all")
     eq("an unknown slug is refused, not answered", code, 400)
 

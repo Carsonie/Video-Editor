@@ -33,7 +33,9 @@ function viewSlug() {
   const VIEW = await res.json();
   document.documentElement.style.setProperty('--box', VIEW.box + 'px');
   document.getElementById('playerName').textContent = VIEW.player_label;
-  document.title = VIEW.title;
+  // EDITOR — what is open. See mp4_splitter/web/app.js for the why; the
+  // same line is in pair.js.
+  document.title = `Segment and Avatar Editor — ${VIEW.title}`;
   document.getElementById('slider').max = VIEW.total;
 
 

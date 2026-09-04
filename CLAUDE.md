@@ -143,7 +143,7 @@ editor_base/             frames.py  paths.py  vtt.py — the ONE shared package
 shared/                  serve.py, plus re-export shims for build/
 build/                   the tools that make the finished video
 Sarah/                   her standards, and the clips every video reuses
-tests/                   678 checks over six suites, one per server + editor_base
+tests/                   681 checks over six suites, one per server + editor_base
 Customers/               the video data — GITIGNORED
 ```
 
@@ -322,6 +322,28 @@ out of the served HTML: those pages have none, so it would hand `node` an
 empty string and pass while proving nothing. That exact mistake hid a live
 routing bug for a day.
 
+### Tab titles: EDITOR — what is open
+
+Carson's format, stated 2026-09-04. Every editor's tab reads the tool's
+name, then an em dash, then whatever is loaded:
+
+```
+MP4 Splitter — segment.mp4
+Segment and Avatar Editor — timeline: scenes 1, 2, 3
+Frame Blender — 01-intro-and-login
+Avatar Editor — 01-intro-and-login
+```
+
+With nothing loaded it is just the editor's name. A tab showing only a
+filename does not say which of the four tools it belongs to, which is the
+whole point when all four are open at once.
+
+**The page composes it, not the API.** `/api/clip` and `/api/view` return
+the BARE name in `title`; `web/*.js` adds the prefix. Prefixing server-side
+as well gives "MP4 Splitter — MP4 Splitter — segment.mp4", and each suite
+now has a check against exactly that — the suites cannot see
+`document.title`, so that is the half they can guard.
+
 ### Load order in the static pages is a behaviour contract
 
 Avatar Editor loads nine `web/*.js` files, Frame Blender five, and none is
@@ -353,13 +375,13 @@ actually run, not only against the code they started as a copy of.
 ```bash
 python3 tests/test_editor.py                    # shared/serve.py, port 8842 (old combined) — 168 checks
 python3 tests/test_avatar_editor.py             # avatar_editor/serve.py, port 8844          — 165 checks
-python3 tests/test_segment_avatar_editor.py     # segment_avatar_editor/serve.py, port 8846  — 116 checks
-python3 tests/test_mp4_splitter.py              # mp4_splitter/serve.py, port 8845           — 101 checks
+python3 tests/test_segment_avatar_editor.py     # segment_avatar_editor/serve.py, port 8846  — 118 checks
+python3 tests/test_mp4_splitter.py              # mp4_splitter/serve.py, port 8845           — 102 checks
 python3 tests/test_frame_blender.py             # frame_blender/serve.py, port 8843          —  71 checks
 python3 tests/test_editor_base.py               # editor_base/ — no server, pure functions   —  57 checks
 ```
 
-678 checks in total. **A change inside `editor_base/` runs all six**, not
+681 checks in total. **A change inside `editor_base/` runs all six**, not
 one — that is the trade the shared package makes.
 
 `test_editor.py` is the deepest one — one step per disk function, plus a
