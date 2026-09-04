@@ -141,6 +141,70 @@ def destroy():
     shutil.rmtree(STORE, ignore_errors=True)
 
 
+def dead_handlers(serve_py_path):
+    """
+    Handler methods that no dispatcher can reach, transitively.
+
+    A route can be deleted from do_GET/do_POST while its handler body
+    stays behind. Every suite's own "this route is gone" check asserts a
+    404 — and a 404 is exactly what an unreachable handler produces — so
+    those checks pass either way. This is the only thing that can see
+    the body is still there. That is not hypothetical: the 2026-09-02
+    split left 15 such handlers in mp4_splitter (930 lines, 36% of its
+    serve.py) and 4 in segment_avatar_editor, all of them invisible to
+    a green test run for a year.
+
+    REACHABILITY, NOT "IS IT CALLED ANYWHERE". Those differ, and the
+    difference hides code: mp4_splitter's api_open_pair and api_open_seq
+    ARE called — but only from api_open_pair_go and api_open_seq_go,
+    which are themselves dead. A call-site diff counts them live and
+    misses 171 lines. So this walks OUT from do_GET/do_POST following
+    self.<name>() calls, and whatever is never arrived at is dead —
+    including a whole chain of dead handlers calling each other.
+
+    The candidate set is one rule for all four editors, no per-editor
+    prefix lists: everything on the Handler class except framework and
+    base-class plumbing (do_*, _*, send_*, end_*, translate_*, log_*,
+    address_*). mp4_splitter/SAE name their handlers api_*; avatar_editor
+    and frame_blender use plain names. One rule covers both.
+
+    AST only. Never imports or runs the server — a test that had to boot
+    four servers to find dead code would be too slow to keep.
+
+    Returns a sorted list of names, so `eq(..., [], ...)` reads as the
+    assertion and a failure prints exactly what to delete.
+    """
+    import ast
+    tree = ast.parse(open(serve_py_path).read())
+    handler = next((n for n in ast.walk(tree)
+                    if isinstance(n, ast.ClassDef) and n.name == "Handler"), None)
+    if handler is None:                      # no Handler class — nothing to judge
+        return []
+
+    methods = {m.name: m for m in handler.body if isinstance(m, ast.FunctionDef)}
+
+    # name -> the set of sibling methods it calls as self.<name>(...)
+    calls = {
+        name: {c.func.attr for c in ast.walk(node)
+               if isinstance(c, ast.Call) and isinstance(c.func, ast.Attribute)
+               and isinstance(c.func.value, ast.Name) and c.func.value.id == "self"}
+        for name, node in methods.items()
+    }
+
+    # walk out from the dispatchers until the reachable set stops growing
+    reachable, stack = set(), [f for f in ("do_GET", "do_POST") if f in methods]
+    while stack:
+        fn = stack.pop()
+        if fn in reachable:
+            continue
+        reachable.add(fn)
+        stack.extend(c for c in calls.get(fn, ()) if c in methods and c not in reachable)
+
+    PLUMBING = ("do_", "_", "send_", "end_", "translate_", "log_", "address_")
+    candidates = {n for n in methods if not n.startswith(PLUMBING)}
+    return sorted(candidates - reachable)
+
+
 def write_report(editor, log_lines, results, steps):
     """
     Write one run's output to tests/<editor>/ — a .log (the full printed
