@@ -45,8 +45,9 @@ written down, and it changes as the library does.
 Read **`.claude/skills/editor-launchers/SKILL.md`** first, every time. Six
 separate tools now — MP4 Splitter, Segment and Avatar Editor, Frame
 Blender, Avatar Editor, the still-existing old combined server
-(shared/serve.py, port 8842 — cannot be removed, Frame Blender/Avatar
-Editor both import plain functions out of it), and the next-gen web
+(shared/serve.py, port 8842 — still not removable: Frame Blender and
+Avatar Editor both import plain functions out of it, and Avatar Editor
+also monkey-patches its CACHE), and the next-gen web
 editor — each its own process, and the next-gen one is secretly two
 processes — skip the skill and it's easy to start its UI without its API
 and get a page full of 502s. "Run the editors"/"run all 4 editors" is
@@ -301,34 +302,68 @@ Write what the player *does now*, not what you edited. `ADDED:` is the form
 even when the change is a fix. A restructure is not an `ADDED:` — commit that
 plainly and leave `VERSION` alone.
 
-### The pages are Python `.format()` templates
+### One page is still a Python `.format()` template. One.
 
-Every CSS and JS brace is doubled `{{ }}`. Two traps that have both shipped:
+`segment_avatar_editor/_splitter_player.py` — the private copy of the MP4
+Splitter's single-clip page, kept by duplication on purpose so the two
+tools stay unlinked. Everything else moved to static files in `web/`:
+Avatar Editor and Frame Blender on 2026-08-30, MP4 Splitter and the SAE's
+two pages on 2026-09-04.
+
+In that one file, every CSS and JS brace is doubled `{{ }}`, and two traps
+have both shipped:
 
 - A stray **apostrophe** in a single-quoted JS string kills the whole page
   silently — every control dies, including Play. Use a backtick literal.
-- `\n` in the source becomes a real newline. Inside a backtick literal that is
-  legal; inside a single-quoted string it is a syntax error. Write `\\n`.
+- `\n` in the source becomes a real newline. Inside a backtick literal that
+  is legal; inside a single-quoted string it is a syntax error. Write
+  `\\n`.
 
 **Always check the generated JavaScript, not just that the Python parses.**
-`tests/test_editor.py` step 30 does exactly this. Do not drop it.
+Each suite's `node --check` step does this. Do not drop it — and note the
+steps are no longer uniform: for the static pages they fetch and parse the
+real `web/*.js` files, because scraping `<script>` out of a page that has
+none hands `node` an empty string and passes while proving nothing.
+
+### Load order in the static pages is a behaviour contract
+
+Avatar Editor loads nine `web/*.js` files, Frame Blender five, and none is
+wrapped in an IIFE — they share ONE flat top-level scope, deliberately.
+So a `const` used at load time must be declared in a file loaded earlier,
+and **moving a `<script>` tag is a behaviour change.**
+
+Two failure modes, and both are invisible to a suite that only drives HTTP:
+
+- Two files each declaring the same `const`. Each parses alone; together
+  they throw. `s_app_js_parses` parses every file alone **and the whole
+  concatenation in load order**.
+- A file reading a name declared in a **later** file. Function declarations
+  hoist within one file, not across `<script>` tags. This shipped for real
+  on 2026-09-04 (`timeline.js` assigned `pickStores` as an onclick at load
+  time) and the page threw on every load while the suite stayed green at
+  65/65. `s_load_order_forward_refs` now checks for it.
 
 ---
 
 ## Tests
 
-**Five suites now, one per server** — split 2026-09-02 alongside logging
-(below), so each editor's own dispatch table, cache and log get checked
-against the real standalone process people actually run, not only against
-the code they started as a copy of.
+**Six suites now** — five servers plus the shared base package. Split
+2026-09-02 alongside logging (below), so each editor's own dispatch table,
+cache and log get checked against the real standalone process people
+actually run, not only against the code they started as a copy of.
+`test_editor_base.py` joined on 2026-09-03 with `editor_base/` itself.
 
 ```bash
 python3 tests/test_editor.py                    # shared/serve.py, port 8842 (old combined) — 167 checks
-python3 tests/test_mp4_splitter.py               # mp4_splitter/serve.py, port 8845          — 83 checks
-python3 tests/test_segment_avatar_editor.py      # segment_avatar_editor/serve.py, port 8846  — 91 checks
-python3 tests/test_frame_blender.py              # frame_blender/serve.py, port 8843          — 50 checks
-python3 tests/test_avatar_editor.py              # avatar_editor/serve.py, port 8844           — 141 checks
+python3 tests/test_avatar_editor.py             # avatar_editor/serve.py, port 8844          — 165 checks
+python3 tests/test_segment_avatar_editor.py     # segment_avatar_editor/serve.py, port 8846  — 117 checks
+python3 tests/test_mp4_splitter.py              # mp4_splitter/serve.py, port 8845           — 101 checks
+python3 tests/test_frame_blender.py             # frame_blender/serve.py, port 8843          —  71 checks
+python3 tests/test_editor_base.py               # editor_base/ — no server, pure functions   —  57 checks
 ```
+
+678 checks in total. **A change inside `editor_base/` runs all six**, not
+one — that is the trade the shared package makes.
 
 `test_editor.py` is the deepest one — one step per disk function, plus a
 `node --check` on every generated page, about 90 seconds cold. The four

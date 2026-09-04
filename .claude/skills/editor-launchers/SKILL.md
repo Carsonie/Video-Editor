@@ -51,13 +51,21 @@ PRIVATE duplicate of MP4 Splitter's player baked into
 `segment_avatar_editor/_splitter_player.py` — not an import of the real
 `mp4_splitter` package.
 
-**`shared/serve.py` still exists, unchanged, still on port 8842** — it has
-to: Frame Blender and Avatar Editor both import plain functions out of it
-directly (`resolve_outdir`, `build_segment`, `cache_state`, ...), so it
-cannot be removed or gutted. Starting it (`video-editor` in launch.json)
-still works and still serves both tools combined on one page — but it is
-no longer part of "run the editors." Only mention/launch it if Carson
-specifically asks for the old combined page.
+**`shared/serve.py` still exists, still on port 8842** — it has to: Frame
+Blender and Avatar Editor both import plain functions out of it directly
+(`resolve_outdir`, `build_segment`, `cache_state`, ...), so it cannot be
+removed or gutted. Avatar Editor also *monkey-patches* its `CACHE` at
+import time (2026-09-04), because two of those borrowed helpers read it.
+
+What did change on 2026-09-03: `shared/frames.py`, `shared/paths.py` and
+`shared/vtt.py` are now ~25-line **re-export shims** over `editor_base/`,
+the one package every editor imports from. They keep the nine scripts in
+`build/` working unchanged. The real code is in `editor_base/`.
+
+Starting it (`video-editor` in launch.json) still works and still serves
+both tools combined on one page — but it is no longer part of "run the
+editors." Only mention/launch it if Carson specifically asks for the old
+combined page.
 
 **The next-gen web editor is a FIFTH, separate tool** — not part of "the
 four," not started by "run the editors." Launch it only when Carson names

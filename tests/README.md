@@ -1,26 +1,53 @@
-# Editor test
+# The test suites
 
-Runs every function the **Segment and Avatar Editor** offers against a
-disposable store built from real footage, and asserts an exact frame count
-after each one.
+Six of them. Five drive a real server over HTTP against a disposable store
+built from real footage; the sixth has no server in it.
 
 ```bash
-cd .claude/agent-tools/6_end-customer-help-video-creations/video_players
-python3 tests/test_editor.py
+python3 tests/test_editor.py                 # shared/serve.py, port 8842 (old combined) — 167
+python3 tests/test_avatar_editor.py          # avatar_editor/serve.py, port 8844          — 165
+python3 tests/test_segment_avatar_editor.py  # segment_avatar_editor/serve.py, port 8846  — 117
+python3 tests/test_mp4_splitter.py           # mp4_splitter/serve.py, port 8845           — 101
+python3 tests/test_frame_blender.py          # frame_blender/serve.py, port 8843          —  71
+python3 tests/test_editor_base.py            # editor_base/ — pure functions, no server   —  57
 ```
 
-167 checks — one step per endpoint, plus the behaviour steps that cross
-several: alpha survival, cache locking, the join's gap filler. About 90
-seconds cold, 30 warm. Exit code is non-zero if any fail.
+678 checks. Exit code is non-zero if any fail.
 
-Every run writes a log next to the test:
+**A change inside `editor_base/` runs all six, not one.** That is the trade
+the shared package makes: it is imported by every editor, so a change there
+is not one editor's change.
 
-```
-tests/log_reports/editor_<HH>_<MM>_<SS>.log
-```
+`test_editor.py` is the deepest — one step per disk function, about 90
+seconds cold, 30 warm. `test_editor_base.py` is the odd one out: it boots
+nothing, because `editor_base/` has no server in it. Testing it through an
+editor would only prove that one editor's use of it works.
 
-Same shape as the E2E run logs — a header, the steps with a tick per check, then
-a recap and a `Result: PASS` / `FAIL` verdict. Gitignored, like those are.
+Every run writes a log and a report into the suite's own folder — see
+"The four standalone editors have their own folders" below.
+
+## Three things only the BROWSER can see
+
+Worth stating plainly, because all three shipped in one day while the
+suites stayed green. Every check here drives HTTP, so a page can be
+completely dead while the server answers perfectly.
+
+1. **A truncated script.** An extraction bug cut `mp4_splitter/web/app.js`
+   short by 40 lines, taking `show(1)` and the whole init block with it.
+   101/101 passed; the page drew nothing.
+2. **A route serving the wrong page.** The SAE's `send_viewer()` swallowed
+   `/<slug>/base/viewer.html` and returned the layered page. 91/91 passed,
+   because the only check on that page scraped `<script>` out of the HTML
+   and the new static page has none — an empty string parses fine.
+3. **A load-order forward reference.** `timeline.js` assigned `pickStores`
+   as an onclick at load time, and that function moved to a file loaded
+   later. Function declarations hoist within a file, not across `<script>`
+   tags. 65/65 passed; the page threw on every load.
+
+Two of the three now have permanent guards (`s_single_clip_page_still_works`,
+`s_load_order_forward_refs`). The first does not, and probably cannot.
+**So: open the tool in a browser after any change to a page.** A green
+suite is not the same as a working page.
 
 ## What a check is allowed to assert
 
@@ -33,7 +60,8 @@ like `const DELAY = 3000;` appeared in the served JavaScript. Such a
 check passes when the feature is broken and fails when a variable is
 renamed, so it reports the opposite of what it looks like it reports.
 Two of them asserted exact whitespace and indentation. They were removed
-2026-09-03; the suite went 211 -> 141 checks and became worth its
+2026-09-03; the suite went 211 -> 141 checks (165 today,
+after real behavioural steps were added back) and became worth its
 number.
 
 Three narrow exceptions are allowed, and they are all CONTRACTS rather
@@ -53,7 +81,8 @@ after three seconds, a picture stepping with a voice — is browser
 behaviour. This suite cannot test it. Say so in a comment and leave the
 gap visible; do not paper over it with a grep.
 
-Frame Blender's suite is the model: 50 checks, almost all behavioural.
+Frame Blender's suite was the model at 50 checks, almost all behavioural;
+it is 71 now, after its own page split added a load-order guard.
 
 ## The four standalone editors have their own folders, own logs, own reports
 
@@ -69,6 +98,7 @@ tests/avatar_editor/avatar_editor_<HH>_<MM>_<SS>.txt            # the pass/fail 
 tests/frame_blender/frame_blender_<HH>_<MM>_<SS>.{log,txt}
 tests/mp4_splitter/mp4_splitter_<HH>_<MM>_<SS>.{log,txt}
 tests/segment_avatar_editor/segment_avatar_editor_<HH>_<MM>_<SS>.{log,txt}
+tests/editor_base/editor_base_<HH>_<MM>_<SS>.{log,txt}
 ```
 
 Same base filename for both — only the extension differs. The `.log` is the
@@ -76,7 +106,7 @@ same text the terminal showed, step by step. The `.txt` report is the short
 version: total run, total passed, every step's own PASS/FAIL, and — only
 when something failed — a `Failures:` section naming exactly which check
 and what it found. Both are written by `fixture.write_report()`, shared
-across all four so the shape can't drift between them. Gitignored, like
+across all five so the shape can't drift between them. Gitignored, like
 `test_editor.py`'s own `tests/log_reports/`.
 
 ## The other log — real editing

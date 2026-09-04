@@ -4,6 +4,70 @@ Newest work first. One file so there is one place to check for open work.
 
 ---
 
+## 2026-09-04 — the cleanup plan is FINISHED, Phases 3–7
+
+Branch **`plan-implementation`**. **Nothing pushed** — Carson merges it
+back himself. Every step of `README-CODE-CLEANUP-PLAN.md` is now `✅ done`,
+one commit each.
+
+**The suites, after:**
+
+| | start of plan | now |
+|---|---|---|
+| old combined server | 167 | 167 |
+| Avatar Editor | 210 | **165** |
+| Segment and Avatar Editor | 90 | **117** |
+| MP4 Splitter | 82 | **101** |
+| Frame Blender | 49 | **71** |
+| `editor_base` | — | **57** (new) |
+| **total** | | **678** |
+
+**What landed, briefly:**
+
+- **11a — `editor_base/`.** Carson chose Option A. `frames.py`, `paths.py`
+  and `vtt.py` existed three times over and differed by **two lines of
+  real code**; both are configuration now (`use_cache()`, `use_player()`).
+  3,850 duplicated lines gone. `shared/` keeps ~25-line re-export shims so
+  the nine `build/` scripts import unchanged — one of them,
+  `assemble_video.py`, must not be edited.
+- **12, 13 — the pages are static files.** `mp4_splitter/player.py` 1,568
+  -> 66 lines; `segment_avatar_editor/player.py` 3,966 -> 134. Pages ship
+  empty and the clip arrives over `/api/clip` and `/api/view`.
+- **14, 15, 16 — the front end.** `gap-builder.js`'s 21 globals became
+  three `const` state objects, then the file split into five; Frame
+  Blender's `app.js` split into five.
+- **17 — Avatar Editor's own cache.** Not the free change the plan
+  assumed; see below.
+- **18 — `ruff`**, rules `F` + `E9` only, never a formatter.
+
+**The four things worth carrying forward:**
+
+1. **A GREEN SUITE IS NOT A WORKING PAGE.** Three separate bugs shipped in
+   one day with every suite green: a script truncated by 40 lines, a route
+   serving the wrong page, and a load-order forward reference that threw on
+   every page load. All three were found in the browser. Two now have
+   permanent guards; the first probably cannot have one. **Open the tool
+   after any change to a page.**
+2. **`shared/serve.py` is more load-bearing than it looks.** Avatar Editor
+   calls its helpers rather than copying them, and two of those read its
+   module-level `CACHE`. Giving Avatar Editor its own cache therefore also
+   needed `main_serve.CACHE = CACHE`, and both assignments must come after
+   `import serve as main_serve`, which sets the cache at its own import
+   time.
+3. **Load order in the static pages is a behaviour contract.** Nine files
+   in Avatar Editor, five in Frame Blender, one flat scope, no IIFEs.
+   Moving a `<script>` tag is a behaviour change.
+4. **`_splitter_player.py` is the last Python-string page**, and
+   de-duplicating it was **deferred, not skipped** — the reasons are under
+   Step 11a.8 in the plan. Revisit it as its own decision.
+
+**Still open:** `ruff` flags 9 cosmetic things in `build/`, left alone and
+written up in `ToDo.md` P3. `Sarah/sarah-scene-12-CORNER-preview-alpha.webm`
+still sits unsorted at the library root — nobody has said what "scene 12"
+is.
+
+---
+
 ## 2026-09-03 (later) — the cleanup plan, Phases 0–2 implemented
 
 Branch **`plan-implementation`**, off `next_gen_editors`. Nothing pushed.

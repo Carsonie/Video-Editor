@@ -11,6 +11,19 @@ checklist** at the end, so nothing is left to memory.
 
 ---
 
+## STATUS: COMPLETE — all 19 steps done, 2026-09-04
+
+Every step below is marked `✅ done`. Branch `plan-implementation`, one
+commit per step, **nothing pushed**. See `HANDOFF.md`'s 2026-09-04 entry
+for the summary and the four things worth carrying forward.
+
+Two steps did not go the way this plan predicted, and both write-ups are
+inline below rather than here: **Step 17** was not a free change (the
+shared cache was load-bearing), and **Step 11a.8** was deferred rather than
+done, on purpose.
+
+---
+
 ## Decision (Step 10) — Option A, 2026-09-03
 
 **Carson chose Option A: a supported base library.**
@@ -485,7 +498,7 @@ they should be re-read before anyone tries again:
 **Revisit after Step 13**, when both players are small, and treat it as
 its own decision for Carson rather than a leftover of this one.
 
-### Step 11b. If Option B — make the duplication honest
+### Step 11b. If Option B — make the duplication honest  ✗ NOT TAKEN — Carson chose Option A
 
 1. `tests/fixture.py` → add `drift_report(reference, copies)` that
    diffs and returns line counts; `write_report()` appends a `Drift:`
@@ -791,7 +804,7 @@ Fix only what it flags in the editors (the dead-code deletions in Phase
 
 ## Phase 7 — Sync every document that describes the four editors
 
-### Step 19. Update the docs the cleanup made stale
+### Step 19. Update the docs the cleanup made stale  ✅ done 2026-09-04
 
 One pass, one commit, after everything above:
 
