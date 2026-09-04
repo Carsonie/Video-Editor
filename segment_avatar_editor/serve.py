@@ -211,7 +211,9 @@ def find_repo_root(start):
         if parent == d:
             break
         d = parent
-    sys.exit("could not find a Customers/ folder above shared/ — run setup_demo.py first")
+    sys.exit("could not find a Customers/ folder above this file — this repo's video "
+             "data is gitignored and there is no script that fetches it; see "
+             "ToDo.md P3.5")
 
 
 REPO_ROOT = find_repo_root(HERE)

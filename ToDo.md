@@ -3,7 +3,10 @@
 Open work in this repo. Ranked `P1`–`P4`, most severe first, same convention as
 `Basic_E2E_Testing`'s own list.
 
-`SVM.md` is the plan and the end state. This is what is left to get there.
+**This is the only open-work list in the repo.** `SVM.md` (the migration plan)
+and `README-CODE-CLEANUP-PLAN.md` (the four editors' cleanup) were both
+finished and deleted on 2026-09-04; whatever they still had that mattered is
+below. Git history has them if a decision needs re-reading.
 
 ---
 
@@ -11,10 +14,31 @@ Open work in this repo. Ranked `P1`–`P4`, most severe first, same convention a
 
 ### P1.2 The demo checklist has never been walked by hand here
 
-`SVM.md` §3 lists what "working" means. The endpoints all pass (106 checks) and
-both pages load, but **no one has clicked the controls in this repo**: mark,
-cut, hand off, join, split, save, edit a line. A dead page answers every
-endpoint perfectly — that already happened once.
+The suites all pass (678 checks) and every page loads, but **no one has
+clicked these controls by hand in this repo**. A dead page answers every
+endpoint perfectly — that has now happened three separate times, and only a
+browser ever caught it.
+
+The list, kept from `SVM.md` §3 (deleted 2026-09-04) and brought up to date —
+the ports and the paths in the original were pre-split:
+
+- [ ] each of the four editors starts and prints its browse root and session
+      log (`.claude/skills/editor-launchers/SKILL.md` launches them)
+- [ ] the browse page lists the ski-demo store
+- [ ] **MP4 Splitter** (8845): opens a raw recording, plays with sound, marks,
+      ＋/− Frame, ＋/− Zone, Undo, Loop Zone, the segment list matches the
+      slider bands, Cut writes to `dev/_cuts/`
+- [ ] **Hand off** deposits into `dev/`, archiving what was there to
+      `dev/z_History/<date>-v_N/`
+- [ ] **Segment and Avatar Editor** (8846): opens a scene layered, and 2+ as a
+      timeline; frame and zone edits; Save writes the exact frame count; Cut;
+      Join; Split; the save-as-a-set lock; the VTT reads and its lines save
+- [ ] **Avatar Editor** (8844) and **Frame Blender** (8843): the same pass over
+      their own controls — neither existed when this list was written
+
+Partly done 2026-09-04: the Avatar Editor's library, Frame Selector, Copy
+Selected, Paste and Clear were driven by hand, and MP4 Splitter's navigation,
+Mark and Frame Editor. The rest of the list has not been.
 
 ---
 
@@ -26,6 +50,11 @@ endpoint perfectly — that already happened once.
 `find_repo_root()` walks up looking for one. It works, but it means this repo's
 data folder has to carry `Basic_E2E_Testing`'s name for it. Make the root
 configurable — an argument or an env var — with `Customers/` the default.
+
+Kept from `SVM.md` (deleted 2026-09-04): `find_repo_root()` walks up looking
+for a folder literally called `Customers/`, so it lands on this repo root by
+itself — but the demo data still has to carry `Basic_E2E_Testing`'s name for
+it. That is the whole of the problem; there is nothing subtler in it.
 
 *(P2.2 and P2.3 were both done 2026-08-28 — see Done.)*
 
@@ -46,10 +75,14 @@ single-scene save does not. ski-demo's sandbox is 80 MB, so per-click would
 fill a disk with near-identical copies, and each scene already keeps its own
 file history. **My call, not asked for** — worth confirming or changing.
 
-### P3.3 `layers.sh` — used, or an orphan?
+### ~~P3.3 `layers.sh` — used, or an orphan?~~ — **an orphan. Deleted 2026-09-04.**
 
-It came across with the players and nothing imports it. Either it earns its
-place or it goes.
+It was worse than unused: it pointed at
+`Basic_E2E_Testing/.claude/agent-tools/6_end-customer-help-video-creations/video_players`,
+a path that stopped existing when the tools moved here on 2026-08-28, and it
+drove port 8842 — the old combined server, which is no longer part of "run the
+editors". `.claude/skills/editor-launchers/SKILL.md` is what launches an editor
+now.
 
 ### P3.4 bike-demo's `TRACK_*` files — moved aside, not read by any build
 
@@ -113,6 +146,35 @@ pip install ruff        # or: brew install ruff
 ruff check .
 ```
 
+### P3.5 Nothing can seed this repo's demo data on a fresh machine
+
+`setup_demo.py` used to copy ~150 MB of ski-demo out of `Basic_E2E_Testing`.
+It was deleted on 2026-09-04 because **it can no longer do that**: the store's
+`help-videos/` moved HERE on 2026-08-28, and the folder it copied FROM now
+holds a single `README.md`.
+
+So the gap it papered over is now open, and it is worth stating plainly rather
+than discovering it on a new laptop:
+
+- `Customers/` is gitignored, so a clone of this repo has **no video data at
+  all** — no store, no scenes, no raw recordings.
+- Every test suite builds its own fixture under `Customers/_Editor_Test/`, so
+  **the 678 checks still pass on a bare clone**. It is the editors that have
+  nothing to open.
+
+Nobody has needed this yet, because there is one machine. Whoever needs it
+second needs either a copy script pointed at wherever the data actually lives,
+or a documented "bring the folder by hand" step. Not worth building on spec.
+
+### P3.6 The extraction cache is keyed on the SOURCE PATH
+
+Kept from `SVM.md` (deleted 2026-09-04) because it costs time once per person:
+move or rename a store's folder and every cached extraction is invalidated —
+the slug is a hash of the absolute source path. Nothing breaks; the first open
+of each clip is just slow again while it re-extracts.
+
+---
+
 ## P4 — later, by design
 
 *(P4.1 was done 2026-08-28 — see Done.)*
@@ -128,6 +190,15 @@ is a deliberate human step.
 
 ## Done
 
+- ~~The four editors' code cleanup~~ — all 19 steps of
+  `README-CODE-CLEANUP-PLAN.md`, done 2026-09-03/04 on branch
+  `plan-implementation`, one commit per step. `editor_base/` replaced three
+  copies of `frames`/`paths`/`vtt`; every page became static files fed by an
+  API; `gap-builder.js`'s 21 globals became three state objects and the file
+  split five ways; Frame Blender's `app.js` split five ways; Avatar Editor got
+  its own cache; `ruff` was added. 538 -> 678 checks. **The plan file is
+  deleted; `HANDOFF.md`'s 2026-09-04 entry is the summary, and the four things
+  worth carrying forward are in it.**
 - ~~P2.2 import a raw recording from `Basic`~~ — **not needed**: `record_flow.ts`
   over there now writes the capture straight into this repo's `raw_mp4/`, so
   there is no import step to build (2026-08-28)
@@ -142,8 +213,9 @@ is a deliberate human step.
 - ~~Reproducible builds~~ — `build/build_scenes.py`. The per-scene recipe that
   produced v27 existed only in a shell history until 2026-08-28
 
-- ~~Decide git vs LFS for the video~~ — neither; `setup_demo.py` copies it and
-  `Customers/` is gitignored
+- ~~Decide git vs LFS for the video~~ — neither; `Customers/` is gitignored.
+  (`setup_demo.py` copied it in from `Basic_E2E_Testing` until 2026-09-04 —
+  see P3.5 for why that stopped being possible)
 - ~~Decide the tree shape~~ — flat, `paths.py`/`vtt.py` in `shared/`
 - ~~Copy the 13 code files~~ — plus the 9 build tools
 - ~~Copy the demo data~~ — the whole ski-demo store, 2.2 GB

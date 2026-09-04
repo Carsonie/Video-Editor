@@ -317,8 +317,7 @@ It deletes every `z_History` nested inside another one first: a backup does not
 keep backups, and that was 514 MB of ski-demo's 1.3 GB.
 
 ```bash
-python3 setup_demo.py --check    # what demo data is here
-python3 tests/test_editor.py     # 30 steps, 142 checks, ~90s cold
+python3 tests/test_editor.py     # 38 steps, 168 checks, ~90s cold
 ```
 
 Every assertion in the test suite is an exact **decoded frame count**. Every

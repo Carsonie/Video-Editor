@@ -7,8 +7,7 @@ customer's `help-videos/` working files while a video is being made.
 `Basic_E2E_Testing` keeps the E2E testing, the BCP work, and the customer
 folders — and receives finished videos.
 
-- **`SVM.md`** — the plan, the end state, and the traps
-- **`ToDo.md`** — open work, ranked `P1`–`P4`
+- **`ToDo.md`** — open work, ranked `P1`–`P4`, and the only such list here
 - **`PIPELINE.md`** — how a help video actually gets made. Read before building
 - **`docs/`** — the HeyGen knowledge `PIPELINE.md` cites, and `Sarah/` her standards
 
@@ -207,10 +206,13 @@ editors WRITE to, and git keeps every version of every file forever and cannot
 pack video down — one commit of a working state would add its full size again,
 permanently.
 
-```bash
-python3 setup_demo.py          # the 150 MB subset the editors and tests need
-python3 setup_demo.py --check  # what is here, copies nothing
-```
+There is no script that fetches it. `setup_demo.py` used to copy a 150 MB
+subset out of `Basic_E2E_Testing`, and was deleted on 2026-09-04 because it
+can no longer do that — the store's `help-videos/` moved HERE on 2026-08-28,
+and the folder it copied FROM now holds one README. **A clone of this repo has
+no video data at all.** The test suites build their own fixture under
+`Customers/_Editor_Test/`, so all 678 checks still pass on a bare clone; it is
+the editors that would have nothing to open. See `ToDo.md` P3.5.
 
 **`z_History` is therefore the only undo there is**, which is also why it grows
 without limit. Trim it:
