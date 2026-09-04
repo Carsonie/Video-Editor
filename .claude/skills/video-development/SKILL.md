@@ -1,6 +1,6 @@
 ---
 name: video-development
-description: The small hands-on tasks that come up while editing a help video in the browser. FOUR NAMED PHRASES trigger it directly, and they are printed in the Segment and Avatar Editor's own "ASK CLAUDE" box so Carson can read them off the screen: "Capture Still" (take the frame currently on screen, from the right source file, into Sarah's library), "Read Screen" (say which scene, frame, selection and unsaved state his own Chrome tab is showing), and "Which Source" (which of the frame cache, avatar.webm or narration.webm a job should read), and "Open Close Pose" (put Sarah's 3-frame rest pose at the end of a scene, the start of the next, or both, so the cut between them is invisible). Also use whenever asked to grab, capture or save a frame, still or pose, to add something to Sarah's library from what is on screen, to say where he is in an editor, or when a task needs a frame out of a scene at full quality. What a still IS and how it is named lives in the sarah-library skill; this one is how to get one.
+description: The small hands-on tasks that come up while editing a help video in the browser. FOUR NAMED PHRASES trigger it directly, and they are printed in the Segment and Avatar Editor's own "ASK CLAUDE" box so Carson can read them off the screen: "Capture Still" (take the frame currently on screen, from the right source file, into Sarah's library), "Read Screen" (say which scene, frame, selection and unsaved state his own Chrome tab is showing), and "Which Source" (which of the frame cache, avatar.webm or narration.webm a job should read), and "Open Close Pose" (put Sarah's 3-frame rest pose at the end of a scene, the start of the next, or both, so the cut between them is invisible), and "Push Narrative" / "Pull Narrative" (slide Sarah's whole performance N frames later or earlier inside a scene, picture and voice together, without changing the scene's frame count or length). Also use whenever asked to grab, capture or save a frame, still or pose, to add something to Sarah's library from what is on screen, to say where he is in an editor, or when a task needs a frame out of a scene at full quality. What a still IS and how it is named lives in the sarah-library skill; this one is how to get one.
 user_invocable: true
 ---
 
@@ -27,6 +27,8 @@ page, under the status bar) so he can read them off the screen:
 | **Read Screen** | which scene, frame, selection, what is unsaved |
 | **Which Source** | cache vs `avatar.webm` vs `narration.webm` |
 | **Open Close Pose** | Sarah's 3-frame rest pose at a scene boundary |
+| **Push Narrative** | slide her performance N frames LATER, same length |
+| **Pull Narrative** | slide her performance N frames EARLIER, same length |
 
 They are named in this file's `description:` too, so they match exactly
 rather than by judgement. **Adding a phrase means three edits, always
@@ -255,3 +257,109 @@ placing it and calling the scene fixed.
 Carson names the position each time — end of a scene, start of the next, or
 both. Do not assume: replacing the last frames and appending after them are
 different edits with different lengths.
+
+---
+
+## "Push Narrative" / "Pull Narrative" — sliding her performance
+
+Carson's standard, defined 2026-09-04. **"Push narrative 15 frames"** moves
+Sarah's whole performance 15 frames LATER inside the scene. **"Pull
+narrative 15 frames"** moves it 15 frames EARLIER.
+
+**The scene's frame count and duration never change.** That is the point of
+the phrase — it slides her against the screen recording underneath without
+touching the scene's place on the timeline. If a step changes the count, the
+step is wrong.
+
+### What moves, and it is BOTH
+
+Picture and voice move **together**. Her mouth and her voice stay in sync
+with each other; only their position inside the scene changes. Moving one
+and not the other is the bug this section exists to stop.
+
+| | picture | voice |
+|---|---|---|
+| **push N** | prepend N pose frames, drop the last N | delay by N/fps |
+| **pull N** | drop the first N, append N pose frames | advance by N/fps |
+
+The frames added are the open close pose — `Sarah/gap-fillers/
+sarah-open-closing-pose-3f-alpha.webm`, one frame of it looped to N. See
+**"Open Close Pose"** above for why it must be real footage and not painted
+cache frames.
+
+### THE AUDIO TRAP — `-itsoffset` DOES NOT WORK
+
+Cost an hour on ski-demo scene 2, and it fails *silently*.
+
+```bash
+# WRONG. Looks right, measures right in the container, is not delayed.
+ffmpeg -i in.webm -itsoffset 0.4 -i in.webm -map 0:v -map 1:a -c:a copy out.webm
+```
+
+`ffprobe` reported the audio stream's `start_time` as `0.401` — so the
+container carried the offset — and the **decoded** audio still began at
+0.133s, exactly where it always had. Every player ignored it.
+
+**Re-encode with a filter instead.** The filter changes the samples, so
+there is nothing left to ignore:
+
+```bash
+# push: N frames later.  MS = round(N / fps * 1000)
+ffmpeg -v error -c:v libvpx-vp9 -i in.webm \
+       -af "adelay=${MS}:all=1" \
+       -c:v copy -c:a libopus -b:a 96k -y out.webm
+
+# pull: N frames earlier. atrim takes it off the front, apad puts the
+# length back on the end, -t holds the clip to its original duration.
+ffmpeg -v error -c:v libvpx-vp9 -i in.webm \
+       -af "atrim=start=${MS}ms,asetpts=PTS-STARTPTS,apad" \
+       -t $(python3 -c "print(NFRAMES/25)") \
+       -c:v copy -c:a libopus -b:a 96k -y out.webm
+```
+
+`:all=1` is not optional on `adelay` — without it only the first channel is
+delayed and the clip goes out of phase. `-c:a copy` cannot be used on either
+one; the whole fix is the re-encode.
+
+### Before a pull: check the head silence
+
+A pull cuts N/fps off the **front of the audio**. If her first word starts
+before that, the pull eats it. Measure first:
+
+```bash
+python3 -c "
+import subprocess,wave,struct
+subprocess.run(['ffmpeg','-v','error','-i','avatar.webm','-vn','-ar','48000',
+                '-ac','1','-f','wav','-y','/tmp/h.wav'],check=True)
+w=wave.open('/tmp/h.wav');n=w.getnframes();sr=w.getframerate()
+d=struct.unpack(f'<{n}h',w.readframes(n))
+i=next((k for k,v in enumerate(d) if abs(v)>900),None)
+print(f'first sound at {i/sr:.3f}s = {i/sr*25:.1f} frames of head silence')"
+```
+
+More frames than that is not a pull, it is a re-record. Say so.
+
+### VERIFY — the file, then the browser, and they are different failures
+
+Three numbers, every time:
+
+1. **Frame count unchanged.** `ffprobe -c:v libvpx-vp9 -select_streams v
+   -count_frames -show_entries stream=nb_read_frames -of csv=p=0 out.webm`
+2. **First audible sample moved by exactly N/fps** — the snippet above, run
+   on the old file and the new one.
+3. **Her mouth starts N frames later/earlier**, measured on the picture, not
+   assumed. Downscale each frame to 48×32 cropped to her mouth
+   (`crop=140:80:910:1030` on the 1152 canvas) and print the per-frame mean
+   difference; the first big number is where she starts.
+
+Then reload the page and listen. **A correct file can still play wrong.**
+The timeline's audio URL was cached by Chrome without a `?v=` buster, so
+after a re-extract the picture refreshed and the **voice did not** — it
+played from the previous extract, 0.4s ahead of her mouth, while the file on
+disk measured perfect. Fixed in `seq.js` `audioFor()` on 2026-09-04; if a
+voice is ever early again by exactly the last edit's amount, suspect the
+cache before the file.
+
+### Archive first
+
+`z_History/<YY-MM-DD>_<what>/avatar.webm` beside the scene, before writing.

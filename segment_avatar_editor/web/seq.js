@@ -1851,8 +1851,15 @@ Nothing was changed. Untick the shorter track, or move to a `
     const s = SEQ[i];
     // Sarah's voice rides on the AVATAR clip. The footage is normally silent,
     // so falling through to it gives silence rather than the wrong voice.
-    if (s.over_audio) return `../${s.over_slug}/audio.m4a`;
-    if (s.base_audio) return `../${s.base_slug}/audio.m4a`;
+    //
+    // ?v=ver, THE SAME CACHE-BUSTER THE FRAMES USE. Without it the browser
+    // served a stale audio.m4a after a re-extract: scene 2's picture was
+    // rebuilt with 10 pose frames on the front, the frames refreshed because
+    // their URLs carried ?v=, and the audio did not -- so the voice played
+    // from the PREVIOUS extract and ran 0.4s ahead of her mouth. Nothing was
+    // wrong with the file on disk; only the copy in Chrome's cache was old.
+    if (s.over_audio) return `../${s.over_slug}/audio.m4a?v=${ver}`;
+    if (s.base_audio) return `../${s.base_slug}/audio.m4a?v=${ver}`;
     return null;
   }
   // ── VTT ─────────────────────────────────────────────────────────────────
