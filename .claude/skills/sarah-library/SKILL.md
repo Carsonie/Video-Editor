@@ -75,6 +75,12 @@ it. Loose files that don't fit any of the 7 sit at `Sarah/`'s own root —
 Carson's own rule for anything ambiguous: don't guess a folder, drop a copy
 at the root and sort it by hand later.
 
+**Capturing a NEW still from a frame on screen** is a different job, and
+it has its own traps — which of three near-identical source files to take
+the frame from, and why two of them are wrong. That procedure is in the
+**`video-development`** skill. This file stays the reference for what a
+still IS; that one is how to get one.
+
 ### The rest pose — how she must look whenever she is NOT speaking
 
 `stills/sarah-rest-pose-full-alpha.png` / `-corner-300-alpha.png` /

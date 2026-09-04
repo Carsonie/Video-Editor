@@ -9,6 +9,9 @@ folders — and receives finished videos.
 
 - **`ToDo.md`** — open work, ranked `P1`–`P4`, and the only such list here
 - **`PIPELINE.md`** — how a help video actually gets made. Read before building
+- **`.claude/skills/video-development/`** — the hands-on jobs done while
+  looking at an editor: capturing a still from the frame on screen, and
+  reading the live state of Carson's own Chrome tab
 - **`docs/`** — the HeyGen knowledge `PIPELINE.md` cites, and `Sarah/` her standards
 
 ---
