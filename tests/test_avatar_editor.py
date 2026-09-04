@@ -850,10 +850,29 @@ def s_original_audio_stack():
               f'<video id="{vid}" playsinline hidden>' in html)
 
 
+def s_no_unreachable_handlers():
+    """
+    A route deleted from do_GET/do_POST leaves its handler BODY behind
+    unless someone removes it too, and every "this route is gone" check
+    in this file asserts a 404 — which an unreachable handler produces
+    just as well as a deleted one. So those checks cannot tell the two
+    apart. This one can.
+
+    fixture.dead_handlers() walks out from the dispatchers and reports
+    whatever is never reached. Reachability, not "is it called": dead
+    code calling dead code looks alive to a plain call-site diff, and
+    that is exactly how mp4_splitter's api_open_pair/api_open_seq stayed
+    hidden behind two dead _go wrappers.
+    """
+    step("no handler is defined that the dispatcher cannot reach")
+    eq("unreachable handlers", fixture.dead_handlers(AE_SERVE), [])
+
+
 FUNCTIONS = [s_static_page, s_app_js_parses, s_original_audio_stack, s_working_clips, s_common_library_wiring, s_tooltips, s_stateless, s_load_picker, s_load_store,
              s_save_scene_proxy,
              s_libs_list_paths, s_common_library, s_libs_group_order,
-             s_lib_frames_clip, s_lib_frames_still]
+             s_lib_frames_clip, s_lib_frames_still,
+             s_no_unreachable_handlers]
 
 
 def main():

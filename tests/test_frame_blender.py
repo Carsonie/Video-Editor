@@ -327,8 +327,27 @@ def s_app_js_parses():
     parses("app.js", js)
 
 
+def s_no_unreachable_handlers():
+    """
+    A route deleted from do_GET/do_POST leaves its handler BODY behind
+    unless someone removes it too, and every "this route is gone" check
+    in this file asserts a 404 — which an unreachable handler produces
+    just as well as a deleted one. So those checks cannot tell the two
+    apart. This one can.
+
+    fixture.dead_handlers() walks out from the dispatchers and reports
+    whatever is never reached. Reachability, not "is it called": dead
+    code calling dead code looks alive to a plain call-site diff, and
+    that is exactly how mp4_splitter's api_open_pair/api_open_seq stayed
+    hidden behind two dead _go wrappers.
+    """
+    step("no handler is defined that the dispatcher cannot reach")
+    eq("unreachable handlers", fixture.dead_handlers(FB_SERVE), [])
+
+
 FUNCTIONS = [s_static_page, s_app_js_parses, s_stateless, s_load_picker, s_load_store,
-             s_save_scene_proxy, s_build_clip, s_save_mp4_versions]
+             s_save_scene_proxy, s_build_clip, s_save_mp4_versions,
+             s_no_unreachable_handlers]
 
 
 def main():
