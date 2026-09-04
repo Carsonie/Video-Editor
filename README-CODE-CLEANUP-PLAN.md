@@ -47,62 +47,78 @@ up, BEFORE cleaning it up. Then the fix is proven by a test that stays.*
 
 ### Step 1. Add a dead-handler guard to `tests/fixture.py`
 
-**Why:** the review found 759 unreachable lines in MP4 Splitter and 207
-in Segment and Avatar Editor. Every suite asserts the *routes* 404. None
+**Why:** the review found unreachable handler bodies in MP4 Splitter and
+Segment and Avatar Editor. Every suite asserts the *routes* 404. None
 can see that the *handler bodies* are still there. This guard closes
 that gap, permanently.
+
+**⚠ REACHABILITY, NOT "IS IT CALLED".** The first draft of this plan
+specified "collect every `self.<name>(` call site and diff." That is
+wrong, and it under-reports: **dead code calling dead code looks alive.**
+In `mp4_splitter/serve.py`, `api_open_pair` and `api_open_seq` *are*
+called — but only from `api_open_pair_go` and `api_open_seq_go`, which
+are themselves dead. A call-site diff marks them live and leaves 171
+lines hidden, then reports "clean" after Step 3.
+
+The guard must compute **transitive reachability from the dispatchers**
+(`do_GET`, `do_POST`) and treat everything not reached as dead.
 
 **What:** add one function to `tests/fixture.py`, shared by all four
 suites (same reasoning as `write_report()` — one place, no drift):
 
 ```python
-def dead_handlers(serve_py_path, prefixes=("api_",)):
-    """Handler methods on the Handler class that no dispatcher ever
-    calls. A route can be deleted from do_GET/do_POST while its body
-    stays behind — the suite's own 404 checks pass either way, so this
-    is the only thing that can see it."""
+def dead_handlers(serve_py_path):
+    """Handler methods that no dispatcher can reach, transitively.
+
+    A route can be deleted from do_GET/do_POST while its body stays
+    behind — the suite's own 404 checks pass either way, so this is
+    the only thing that can see it. Walks OUT from do_GET/do_POST
+    following self.<name>() calls; whatever is never arrived at is
+    dead, including a chain of dead handlers calling each other.
+
+    Returns a sorted list of names. AST only — never imports or runs
+    the server.
+    """
 ```
 
-It parses `serve.py` with `ast`, collects method names on `class
-Handler` matching the prefixes, collects every `self.<name>(` call
-site, and returns the difference. Method: plain text/AST only — it
-must NOT import or run the server.
+Method: parse with `ast`, take the `Handler` class, build a
+name → {called names} map, then walk out from `do_GET`/`do_POST`
+until the reachable set stops growing. Dead = candidate methods minus
+reachable.
 
-**Prefixes per editor** (their handlers are named differently):
+**Candidate set — one rule, all four editors.** No prefix lists and no
+hand-maintained name sets (the first draft needed those and they were
+the reason it was hand-wavy for the two plain-named editors). Exclude
+only framework/base plumbing by prefix:
 
-| Editor | handler naming | prefix to pass |
-|---|---|---|
-| mp4_splitter | `api_*` | `("api_",)` |
-| segment_avatar_editor | `api_*` | `("api_",)` |
-| avatar_editor | plain names (`libs_list`, `siblings`, …) | see note |
-| frame_blender | plain names | see note |
+```
+do_    _    send_    end_    translate_    log_    address_
+```
 
-Note: for the two plain-named editors, pass the set of known
-dispatcher-called names from `do_GET`/`do_POST` and diff against all
-public methods on `Handler`, excluding `do_*`, `_*`, `send_*`,
-`json_error`, `log`, `end_headers`, `translate_path`. Today this
-returns 0 for both — the guard is there for the future.
+Everything else on `Handler` is a candidate. Verified below that this
+one rule gives the right answer for all four.
 
 **Verify:** call it from a scratch Python one-liner against all four
 `serve.py` files. Expected right now:
 
 ```
-mp4_splitter:           13 dead
-segment_avatar_editor:   4 dead
-avatar_editor:           0 dead
-frame_blender:           0 dead
+avatar_editor:            0 unreachable,    0 lines
+frame_blender:            0 unreachable,    0 lines
+mp4_splitter:            15 unreachable,  930 lines  (36% of serve.py)
+segment_avatar_editor:    4 unreachable,  207 lines  (8%)
 ```
 
-If it does not report exactly 13 and 4, the guard is wrong — fix the
-guard before going further.
+If it does not report exactly **15** and **4**, the guard is wrong —
+fix the guard before going further. (13 means it is doing a call-site
+diff, not reachability. That is the bug this box is about.)
 
 ### Step 2. Wire the guard into all four suites — and watch two of them FAIL
 
 **What:** add one step to each `tests/test_<editor>.py`:
 
 ```
-step("no handler is defined that the dispatcher never calls")
-eq("dead handlers", fixture.dead_handlers(<SERVE_PATH>, ...), [])
+step("no handler is defined that the dispatcher cannot reach")
+eq("unreachable handlers", fixture.dead_handlers(<SERVE_PATH>), [])
 ```
 
 Place it right after the existing "routes this split deliberately
@@ -110,7 +126,7 @@ dropped — confirmed gone" step in `test_mp4_splitter.py` and
 `test_segment_avatar_editor.py`; anywhere sensible in the other two.
 
 **Verify:** run all four.
-- `test_mp4_splitter.py` — **must FAIL**, listing the 13 names.
+- `test_mp4_splitter.py` — **must FAIL**, listing the 15 names.
 - `test_segment_avatar_editor.py` — **must FAIL**, listing the 4.
 - `test_avatar_editor.py`, `test_frame_blender.py` — must pass.
 
@@ -126,7 +142,7 @@ editors' own files, and `tests/` is shared. Subject: plain, e.g.
 
 ## Phase 1 — Free wins (no behaviour changes)
 
-### Step 3. Delete the 13 dead handlers in `mp4_splitter/serve.py`
+### Step 3. Delete the 15 unreachable handlers in `mp4_splitter/serve.py`
 
 **Task scope:** MP4 Splitter only.
 
@@ -134,12 +150,18 @@ editors' own files, and `tests/` is shared. Subject: plain, e.g.
 docstrings:
 
 ```
-api_join            api_line            api_open_pair_go
-api_open_seq_go     api_paste           api_renumber_clear
-api_renumber_state  api_save_archive    api_siblings
-api_span            api_split           api_stores
-api_vtt
+api_join            api_line            api_open_pair
+api_open_pair_go    api_open_seq        api_open_seq_go
+api_paste           api_renumber_clear  api_renumber_state
+api_save_archive    api_siblings        api_span
+api_split           api_stores          api_vtt
 ```
+
+`api_open_pair` and `api_open_seq` are on this list for the reason in
+Step 1's warning box: they are reachable ONLY from `api_open_pair_go`
+and `api_open_seq_go`, which are themselves dead. Delete all four
+together — deleting the two `_go` wrappers alone would leave the other
+two orphaned and the guard would then (correctly) fail again.
 
 **Before deleting each one, confirm it really is unreachable:** `grep
 -n "self.api_join(" mp4_splitter/serve.py` must return nothing (the
@@ -162,7 +184,7 @@ now read *"… are gone entirely"*, because they finally are.
 - The pre-existing "routes this split deliberately dropped — confirmed
   gone" step still passes (the routes still 404 — nothing changed
   there).
-- File shrinks by roughly 759 lines. `wc -l` before and after.
+- File shrinks by roughly 930 lines — about 36% of it. `wc -l` before and after.
 
 Ready to commit. Plain subject. No VERSION bump.
 
@@ -435,9 +457,20 @@ the library exists):
 already exists in this repo — Avatar Editor and Frame Blender did
 exactly this on 2026-08-30. Copy their shape, do not invent a new one.*
 
-**Prerequisite:** Phases 1–2 done for the editor in question. Its suite
-must be behavioural before its page is rebuilt, or a broken rebuild can
-pass.
+**Prerequisite — corrected.** The first draft said "Phases 1–2 done for
+the editor in question." That is wrong: **Phase 2 is entirely about
+Avatar Editor's suite** and does nothing for these two, so as written
+the prerequisite was vacuous. What MP4 Splitter and SAE actually need
+before their page is rebuilt:
+
+1. **Phase 1 done for that editor** (Steps 3/4 — its dead code gone, so
+   the rewrite is not carrying corpses across).
+2. **Its `node --check` page guard confirmed green and understood** —
+   MP4 Splitter's Step 20, SAE's Step 32. That guard is the only thing
+   standing between a broken page and a silent ship, and sub-step 7
+   below repoints it. Know what it covers before you move it.
+3. **Its README written** (Steps 5/6), because the rewrite changes what
+   the README would have to say anyway.
 
 ### Step 12. MP4 Splitter — extract the page
 
@@ -475,6 +508,25 @@ pass.
    `/?slug=<slug>`, or `serve.py` handles `/<slug>/viewer.html` by
    serving `web/index.html` directly. Pick the one that keeps every
    existing URL working — the suite's "open one clip" step is the test.
+
+   **⚠ STALE CACHED PAGES — the migration hazard.** `player.write()`
+   writes a *physical `viewer.html` into every clip's own cache folder*
+   (`<cache>/<slug>/viewer.html`). So every clip ever opened already has
+   a fully-rendered copy of the OLD page sitting on disk, and those keep
+   being served after the rewrite. A fresh test store will not show
+   this — the fixture builds clean caches — so the suite can pass while
+   Carson's real, months-old caches still serve the old page.
+
+   Handle it explicitly, one of:
+   - have `serve.py` route `/<slug>/viewer.html` to the new static page
+     and ignore any file on disk (simplest, and makes every old cache
+     correct for free); or
+   - bump the cache format so existing slugs re-extract; or
+   - delete the stale `viewer.html` files as a one-off migration.
+
+   **Verify against a clip cached BEFORE the change** — not just a
+   fresh one. Open something already in `cache_mp4_splitter/` from
+   earlier work and confirm it serves the new page.
 7. **Keep the `node --check` guard, but point it at the static files.**
    Today `s_…does the JavaScript actually run?` checks the *generated*
    page. Change it to fetch `/web/app.js` and `node --check` it — the
@@ -668,9 +720,9 @@ Every finding from the third-pass review, and the step that closes it.
 
 | # | Finding | Severity | Closed by |
 |---|---|---|---|
-| 1 | 13 unreachable handlers, 759 lines, in `mp4_splitter/serve.py` | High | Step 3 |
+| 1 | 15 unreachable handlers, 930 lines (36%), in `mp4_splitter/serve.py` | High | Step 3 |
 | 2 | 4 unreachable handlers, 207 lines, in `segment_avatar_editor/serve.py` | High | Step 4 |
-| 3 | No test can see dead handler bodies — suites only assert routes 404 | High | Steps 1–2 |
+| 3 | No test can see unreachable handler bodies — suites only assert routes 404; and a call-site diff is not enough, dead code calling dead code looks alive | High | Steps 1–2 |
 | 4 | ~78 of Avatar Editor's 173 checks are source-text greps (45%); "210 checks" is inflated | High | Steps 7, 9 |
 | 5 | Avatar Editor packs ~10 checks/step; failures hard to locate | Medium | Step 8 |
 | 6 | MP4 Splitter has no README | Medium | Step 5 |
