@@ -473,7 +473,24 @@ the library exists):
    section to add the one exception: `editor_base/` is shared by
    design, and a change to it runs all five suites.
 
-#### Step 11a.8 — `_splitter_player.py` — DEFERRED, not skipped (2026-09-04)
+#### Step 11a.8 — `_splitter_player.py` — RESOLVED BY DELETION (2026-09-04)
+
+**Outcome, added after the fact:** it was neither de-duplicated nor
+migrated. Carson had it commented out in full, worked with the editors for
+a session, found nothing missing, and said delete it. The whole player hook
+went with it — `PLAYER`, `use_player()` and `write_viewer()` in
+`editor_base/frames.py`, plus nine call sites — because every remaining
+player's `write()` had already become a no-op when the pages went static.
+
+The deciding facts were that **nothing in any UI linked to the page**, and
+that disabling it for a day changed nothing anybody noticed.
+
+The original write-up follows, because the reasoning for NOT folding it
+into `editor_base/` still stands and would apply to anything similar.
+
+---
+
+#### (original) DEFERRED, not skipped
 
 The plan had this step fold `segment_avatar_editor/_splitter_player.py`
 (a 99% copy of the MP4 Splitter's `player.py`, differing by 16 of ~1,570

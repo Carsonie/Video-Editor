@@ -127,7 +127,6 @@ from mp4_splitter import player                             # noqa: E402  its na
 # main(): the test imports this module without ever calling main(), and an
 # unset cache would extract frames into another tool's folder.
 build_mod.use_cache(CACHE)
-build_mod.use_player("mp4_splitter.player")
 
 # Must match cut_segments.py's ENCODE exactly — this is the same "locked
 # encode standard" every other segment in this project is cut with.

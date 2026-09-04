@@ -214,7 +214,6 @@ def build_frames(video, out=None, box=750, force=False, log=print, alpha_png=Fal
             # Frames are cached, but always rewrite viewer.html against the
             # CURRENT template — otherwise a template fix never reaches an old
             # cache without a wasteful full re-extraction.
-            write_viewer(outdir, prior)
             log(f"  using cached extraction: {outdir}")
             log(f"  ({prior['nb_frames']} frames, {prior['fps']:g}fps) — open video_players/cache/{os.path.basename(outdir)}/viewer.html")
             log("  --force to re-extract")
@@ -324,7 +323,6 @@ def build_frames(video, out=None, box=750, force=False, log=print, alpha_png=Fal
                 # clip genuinely edited).
                 edited=False)
     json.dump(meta, open(meta_path, "w"), indent=2)
-    write_viewer(outdir, meta)
 
     log(f"  {nb_frames} frames extracted ({fps:g}fps)")
     log(f"  wrote {os.path.join(outdir, 'viewer.html')}")
@@ -487,7 +485,6 @@ def duplicate_frame_right(outdir, at, count):
     meta["nb_frames"] = new_n
     meta["duration"] = new_n / meta["fps"]
     save_meta(outdir, meta)
-    write_viewer(outdir, meta)
     return new_n, at + count
 
 
@@ -525,7 +522,6 @@ def duplicate_frame_left(outdir, at, count):
     meta["nb_frames"] = new_n
     meta["duration"] = new_n / meta["fps"]
     save_meta(outdir, meta)
-    write_viewer(outdir, meta)
     return new_n, at + count
 
 
@@ -595,7 +591,6 @@ def delete_frames_left(outdir, at, count):
     meta["nb_frames"] = new_n
     meta["duration"] = new_n / meta["fps"]
     save_meta(outdir, meta)
-    write_viewer(outdir, meta)
     return new_n, at - actual, actual, (del_start, del_end)
 
 
@@ -636,7 +631,6 @@ def delete_frames_right(outdir, at, count):
     meta["nb_frames"] = new_n
     meta["duration"] = new_n / meta["fps"]
     save_meta(outdir, meta)
-    write_viewer(outdir, meta)
     # frame `at` itself was never moved — only frames after it were removed —
     # so the current position stays exactly where it was, unlike the left
     # variant where everything from `at` onward shifts.
@@ -677,7 +671,6 @@ def duplicate_span(outdir, a, b):
     meta["nb_frames"] = new_n
     meta["duration"] = new_n / meta["fps"]
     save_meta(outdir, meta)
-    write_viewer(outdir, meta)
     return new_n, b + k
 
 
@@ -716,7 +709,6 @@ def delete_span(outdir, a, b):
     meta["nb_frames"] = new_n
     meta["duration"] = new_n / meta["fps"]
     save_meta(outdir, meta)
-    write_viewer(outdir, meta)
     return new_n, max(1, a - 1)
 
 
@@ -784,45 +776,22 @@ def restore_map(outdir, target, log=print):
     meta["duration"] = len(target) / meta["fps"]
     meta["edited"] = target != list(range(1, n_src + 1))
     save_meta(outdir, meta)
-    write_viewer(outdir, meta)
     return len(target)
 
 
-# The second of this module's two per-editor knobs (CACHE is the other).
-# Which player module writes a clip's own page differs by tool: the MP4
-# Splitter uses its own player.py, the Segment and Avatar Editor uses its
-# private _splitter_player.py copy. That single differing import line was
-# half the reason three near-identical copies of this 776-line file existed.
+# NO PLAYER HOOK ANY MORE, and no write_viewer().
 #
-# It stays a dotted NAME rather than an imported module because the import
-# must happen late — inside the call. This module is the layer every player
-# is built ON, so importing one at module level would make frames depend on
-# the thing that depends on it, and neither would load.
-PLAYER = "mp4_splitter.player"
-
-
-def use_player(dotted_name):
-    """Point write_viewer() at this editor's own player module.
-
-    Call once at startup, beside use_cache(). Takes a dotted import path
-    ("segment_avatar_editor._splitter_player"), not a module object, so the
-    import stays late.
-    """
-    global PLAYER
-    PLAYER = dotted_name
-    return PLAYER
-
-
-def write_viewer(outdir, meta):
-    """
-    (Re)write a clip's OWN page from meta.json, using whichever player this
-    process was pointed at — see use_player() above.
-
-    Every extracted clip gets one, including the clips a layered or timeline
-    view is built from: it is what "Open this scene on its own" opens, and it
-    is what a frame edit has to refresh.
-    """
-    import importlib
-    importlib.import_module(PLAYER).write(outdir, meta)
+# Until 2026-09-04 this module had a second per-editor knob beside CACHE:
+# which player module wrote a clip's own page, set with use_player(), and
+# called from nine places as write_viewer(outdir, meta).
+#
+# Every one of those pages is now a static file in an editor's own web/
+# folder, fetched with its data over an API, so there is nothing left to
+# write. The last player that still rendered one — the SAE's private
+# _splitter_player.py — was deleted the same day: nothing in any UI linked
+# to the page it made, and disabling it for a day changed nothing anybody
+# noticed.
+#
+# CACHE is therefore the only piece of state left in this module.
 
 

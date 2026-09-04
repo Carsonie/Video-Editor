@@ -45,11 +45,11 @@ them to split apart the same way Frame Blender/Avatar Editor did
 (2026-09-02). Each new copy started as a literal copy of `shared/serve.py`,
 trimmed to just the routes its own page actually calls — see
 `mp4_splitter/serve.py`'s and `segment_avatar_editor/serve.py`'s own module
-docstrings for exactly what was kept, dropped, and why. One deliberate
-exception: the SAE's "open this scene on its own" link still works, via a
-PRIVATE duplicate of MP4 Splitter's player baked into
-`segment_avatar_editor/_splitter_player.py` — not an import of the real
-`mp4_splitter` package.
+docstrings for exactly what was kept, dropped, and why. The SAE's "open this scene on its own" page is GONE (2026-09-04). It was
+rendered by a private duplicate of MP4 Splitter's player
+(`_splitter_player.py`), kept so the two tools stayed unlinked — but
+nothing in any UI ever linked to the page itself, so it was deleted.
+`/<slug>/base/viewer.html` now 404s, by design.
 
 **`shared/serve.py` still exists, still on port 8842** — it has to: Frame
 Blender and Avatar Editor both import plain functions out of it directly

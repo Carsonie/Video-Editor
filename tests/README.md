@@ -4,9 +4,9 @@ Six of them. Five drive a real server over HTTP against a disposable store
 built from real footage; the sixth has no server in it.
 
 ```bash
-python3 tests/test_editor.py                 # shared/serve.py, port 8842 (old combined) — 167
+python3 tests/test_editor.py                 # shared/serve.py, port 8842 (old combined) — 168
 python3 tests/test_avatar_editor.py          # avatar_editor/serve.py, port 8844          — 165
-python3 tests/test_segment_avatar_editor.py  # segment_avatar_editor/serve.py, port 8846  — 117
+python3 tests/test_segment_avatar_editor.py  # segment_avatar_editor/serve.py, port 8846  — 116
 python3 tests/test_mp4_splitter.py           # mp4_splitter/serve.py, port 8845           — 101
 python3 tests/test_frame_blender.py          # frame_blender/serve.py, port 8843          —  71
 python3 tests/test_editor_base.py            # editor_base/ — pure functions, no server   —  57

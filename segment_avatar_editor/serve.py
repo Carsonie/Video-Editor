@@ -133,7 +133,6 @@ from editor_base import vtt as vtt_mod                      # noqa: E402
 # (_splitter_player.py). The two tools stopped sharing code on 2026-09-02 and
 # that link is kept working by duplication on purpose — Carson's call.
 build_mod.use_cache(CACHE)
-build_mod.use_player("segment_avatar_editor._splitter_player")
 
 # Must match cut_segments.py's ENCODE exactly — this is the same "locked
 # encode standard" every other segment in this project is cut with.

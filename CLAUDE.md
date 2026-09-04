@@ -302,28 +302,23 @@ Write what the player *does now*, not what you edited. `ADDED:` is the form
 even when the change is a fix. A restructure is not an `ADDED:` — commit that
 plainly and leave `VERSION` alone.
 
-### One page is still a Python `.format()` template. One.
+### No page is a Python `.format()` template any more
 
-`segment_avatar_editor/_splitter_player.py` — the private copy of the MP4
-Splitter's single-clip page, kept by duplication on purpose so the two
-tools stay unlinked. Everything else moved to static files in `web/`:
-Avatar Editor and Frame Blender on 2026-08-30, MP4 Splitter and the SAE's
-two pages on 2026-09-04.
+Every page in this repo is a static file in an editor's own `web/` folder,
+fetched with its data over an API. Avatar Editor and Frame Blender moved on
+2026-08-30; MP4 Splitter and the SAE's two pages on 2026-09-04.
 
-In that one file, every CSS and JS brace is doubled `{{ }}`, and two traps
-have both shipped:
+The last one, `segment_avatar_editor/_splitter_player.py`, was **deleted**
+on 2026-09-04 rather than migrated — nothing in any UI linked to the page
+it rendered, and a session with it commented out changed nothing anybody
+noticed. Its whole player hook went too (`use_player()`, `write_viewer()`
+and nine call sites in `editor_base/frames.py`).
 
-- A stray **apostrophe** in a single-quoted JS string kills the whole page
-  silently — every control dies, including Play. Use a backtick literal.
-- `\n` in the source becomes a real newline. Inside a backtick literal that
-  is legal; inside a single-quoted string it is a syntax error. Write
-  `\\n`.
-
-**Always check the generated JavaScript, not just that the Python parses.**
-Each suite's `node --check` step does this. Do not drop it — and note the
-steps are no longer uniform: for the static pages they fetch and parse the
-real `web/*.js` files, because scraping `<script>` out of a page that has
-none hands `node` an empty string and passes while proving nothing.
+**Keep the `node --check` guard in every suite.** It now fetches and parses
+the real `web/*.js` files. Do not "simplify" it back to scraping `<script>`
+out of the served HTML: those pages have none, so it would hand `node` an
+empty string and pass while proving nothing. That exact mistake hid a live
+routing bug for a day.
 
 ### Load order in the static pages is a behaviour contract
 
@@ -354,9 +349,9 @@ actually run, not only against the code they started as a copy of.
 `test_editor_base.py` joined on 2026-09-03 with `editor_base/` itself.
 
 ```bash
-python3 tests/test_editor.py                    # shared/serve.py, port 8842 (old combined) — 167 checks
+python3 tests/test_editor.py                    # shared/serve.py, port 8842 (old combined) — 168 checks
 python3 tests/test_avatar_editor.py             # avatar_editor/serve.py, port 8844          — 165 checks
-python3 tests/test_segment_avatar_editor.py     # segment_avatar_editor/serve.py, port 8846  — 117 checks
+python3 tests/test_segment_avatar_editor.py     # segment_avatar_editor/serve.py, port 8846  — 116 checks
 python3 tests/test_mp4_splitter.py              # mp4_splitter/serve.py, port 8845           — 101 checks
 python3 tests/test_frame_blender.py             # frame_blender/serve.py, port 8843          —  71 checks
 python3 tests/test_editor_base.py               # editor_base/ — no server, pure functions   —  57 checks

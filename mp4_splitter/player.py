@@ -43,23 +43,13 @@ def label():
     return f"{NAME} v{_version()}"
 
 
-def write(outdir, meta):
-    """
-    Called by editor_base.frames.write_viewer() after an extraction or a
-    frame edit. It no longer writes anything, and that is the point.
-
-    It used to render TEMPLATE into <cache>/<slug>/viewer.html — a complete,
-    fully-baked copy of the page, one per clip. Since 2026-09-04 serve.py
-    answers every `/<slug>/viewer.html` from web/index.html instead and
-    ignores whatever file is on disk, so re-rendering would only produce a
-    stale copy nothing reads.
-
-    Leaving it as a no-op rather than deleting it keeps the one call site in
-    editor_base shared with the Segment and Avatar Editor, whose own player
-    has not been migrated yet (that is Step 13).
-
-    `meta` is unused for the same reason: the page reads it back live from
-    /api/clip, so it is always current rather than current as of the last
-    write.
-    """
-    return None
+# NO write() ANY MORE.
+#
+# editor_base.frames.write_viewer() called player.write() after every
+# extraction, and this module's version had already become a no-op on
+# 2026-09-04 when the page moved to web/. The hook itself was removed the
+# same day, once the SAE's _splitter_player.py — the only player still
+# rendering anything — was deleted. Nothing calls into a player now.
+#
+# What is left here is the player's identity, which serve.py's /api/clip
+# hands to the page for its footer.

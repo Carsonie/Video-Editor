@@ -930,11 +930,19 @@ def s_bookends_and_gaps():
     step("bookends and missing tracks — what a join refuses, and what it fills")
     d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns="1,2,3")
     seq_slug = d.get("slug")
-    page = open(os.path.join(CACHE, seq_slug, "viewer.html")).read()
+    # The manifest moved out of the PAGE and into view.json on 2026-09-04,
+    # when the SAE's two pages became static files. This check read
+    # viewer.html until then, and kept passing afterwards only because a
+    # stale page written before the change was still sitting in the cache —
+    # deleting it turned this into a FileNotFoundError. A check that reads a
+    # file nothing writes any more is not a check.
+    view = json.load(open(os.path.join(CACHE, seq_slug, "view.json")))
+    manifest = view.get("manifest", [])
+    check("there is a real manifest", bool(manifest), f"{len(manifest)} scenes")
     check("the manifest marks which scenes are in the script",
-          '"in_script"' in page, "in_script")
+          all("in_script" in m for m in manifest), "in_script")
     check("and which have a narration render",
-          '"has_narration"' in page, "has_narration")
+          all("has_narration" in m for m in manifest), "has_narration")
 
     # A scene with no narration joined to scenes that have one. Without
     # fill_gaps the next scene's narration would start at frame 1.

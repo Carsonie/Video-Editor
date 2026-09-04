@@ -26,7 +26,7 @@ WHY NOT JUST REUSE test_editor.py
     tool's own routes), so this suite is not re-proving that code is
     correct; it is proving the STANDALONE server — its own trimmed
     dispatch table, its own cache dir, its own session log, its own
-    private duplicate of MP4 Splitter's viewer (_splitter_player.py) —
+    the routes it deliberately dropped —
     actually wires together and serves the real thing. Routes the split
     deliberately dropped (the single-clip Open, Handoff, Clear edits,
     Reset editor, Frame Blender's/Avatar Editor's Build/Save MP4/Load) are
@@ -515,16 +515,13 @@ def s_app_js_parses():
       - the layered page and the timeline page are static files in web/,
         so this fetches web/pair.js and web/seq.js and parses the real
         files;
-      - the single-clip page is STILL a Python .format() template, built
-        by _splitter_player.py — the private duplicate of MP4 Splitter's
-        page that Carson asked to keep working without importing the real
-        mp4_splitter package — so that one is still scraped out of the
-        served HTML, where a stray brace or apostrophe kills it silently.
+      - there is no third page. _splitter_player.py rendered one as a
+        Python .format() string until 2026-09-04, when it was deleted.
 
     Scraping <script> out of the two static pages would now find nothing
     and hand `node --check` an empty string: a check that passes while
     proving nothing. That is not hypothetical — it is what hid a real
-    routing bug during this migration (see s_single_clip_page_still_works).
+    routing bug during this migration (see s_deeper_paths_are_not_the_layered_page).
     """
     step("all three of its own pages — does the JavaScript actually run?")
     node = shutil.which("node")
@@ -573,31 +570,11 @@ def s_app_js_parses():
         check(f"{name} loads {want}", want in html)
         check(f"{name} bakes in no view any more", "<script>" not in html)
 
-    # --- the single-clip page: still a Python template, unless disabled ---
-    if splitter_disabled():
-        check("single-clip page: _splitter_player.py is disabled, so there is "
-              "no Python-string page left to parse", True,
-              "nothing in web/ is a .format() template any more")
-    else:
-        with urllib.request.urlopen(f"{SAE_BASE}/{pair_slug}/base/viewer.html",
-                                    timeout=60) as r:
-            html = r.read().decode()
-        parses("single-clip (private splitter duplicate)",
-               "\n".join(re.findall(r"<script>(.*?)</script>", html, re.S)))
-
-
-def splitter_disabled():
-    """Is _splitter_player.py's body commented out (2026-09-04)?
-
-    Two checks below depend on the single-clip page existing. Rather than
-    switch them off — a check that runs and proves nothing is worse than no
-    check — they FLIP while it is disabled, and assert the page is absent
-    instead of present. Whichever way the decision goes, the suite is
-    asserting something true.
-    """
-    sys.path.insert(0, PLAYERS)
-    from segment_avatar_editor import _splitter_player as sp   # noqa: E402
-    return getattr(sp, "DISABLED", False)
+    # There is no third page any more. _splitter_player.py rendered a
+    # single-clip page as a Python .format() string; it was deleted on
+    # 2026-09-04 — nothing in any UI linked to it, and a day with it
+    # disabled changed nothing anybody noticed. Nothing in this repo builds
+    # a page out of a Python string now.
 
 
 def s_api_view():
@@ -647,22 +624,23 @@ def s_api_view():
     eq("an unknown slug is refused, not answered", code, 400)
 
 
-def s_single_clip_page_still_works():
+def s_deeper_paths_are_not_the_layered_page():
     """
-    THE BUG THIS STEP INTRODUCED AND THIS CHECK CATCHES.
+    THE ROUTING BUG STEP 13 INTRODUCED — still worth pinning after the
+    single-clip page was deleted.
 
-    A pair's cache holds three pages, not one: /<slug>/viewer.html (the
-    layered page) and /<slug>/base/viewer.html + /<slug>/overlay/viewer.html
-    — the single-clip pages _splitter_player.py still renders, which is what
-    "open this scene on its own" opens.
+    send_viewer() first matched on path.endswith("/viewer.html"), which
+    swallowed /<slug>/base/viewer.html and /<slug>/overlay/viewer.html too
+    and served the LAYERED page for all three. The suite passed anyway,
+    because its only check on those paths scraped <script> out of the HTML
+    and the static page has none — an empty string parses fine.
 
-    The first version of send_viewer() matched on path.endswith("/viewer
-    .html") and swallowed all three, serving the layered page for every one.
-    The suite passed anyway, because its only check on those pages scraped
-    <script> out of the HTML and the new static page has none — an empty
-    string parses fine. The route now matches exactly two segments.
+    The pages those two paths used to serve are gone (2026-09-04,
+    _splitter_player.py deleted). What must not come back is the route
+    quietly answering a deeper path with the layered page: that is how a
+    404 turns into a page that looks right and is not.
     """
-    step("a pair's base/overlay pages are NOT the layered page")
+    step("a deeper path is a 404, never the layered page")
     doc = json.load(open(os.path.join(fixture.STORE, "sandbox", "script.json")))
     sc = doc["scenes"][-1]
     folder = f"{sc['n']:02d}-{sc['label']}"
@@ -674,55 +652,22 @@ def s_single_clip_page_still_works():
 
     with urllib.request.urlopen(f"{SAE_BASE}/{slug}/viewer.html", timeout=30) as r:
         layered = r.read().decode()
-    check("the layered page is the static one", "/web/pair.js" in layered)
+    check("two segments still give the layered page", "/web/pair.js" in layered)
 
-    if splitter_disabled():
-        # THE ACTUAL TEST OF "is it used": delete the two pages, re-open the
-        # pair so every write path runs again, and prove nothing recreates
-        # them.
-        #
-        # Deleting first is the whole point. The cache outlives the fixture
-        # — it is keyed on the source path, and the fixture store is rebuilt
-        # every run — so pages written by an earlier run are still sitting
-        # there and would be served happily by a server that no longer
-        # writes any. That is a real trap for the manual test too, and it is
-        # written up in _splitter_player.py's own stub.
-        cache = os.path.join(PLAYERS, "cache_segment_avatar_editor", slug)
-        for half in ("base", "overlay"):
-            f = os.path.join(cache, half, "viewer.html")
-            if os.path.isfile(f):
-                os.remove(f)
-            check(f"{half}: cleared any page left by an earlier run",
-                  not os.path.isfile(f))
-
-        get("/api/open-pair",
-            base=f"{fixture.ROOT_REL}/sandbox/{folder}/segment.mp4",
-            overlay=f"{fixture.ROOT_REL}/sandbox/{folder}/avatar.webm")
-
-        for half in ("base", "overlay"):
-            f = os.path.join(cache, half, "viewer.html")
-            check(f"{half}: re-opening the pair did NOT write one back",
-                  not os.path.isfile(f),
-                  "written again" if os.path.isfile(f) else "still absent")
-            try:
-                with urllib.request.urlopen(
-                        f"{SAE_BASE}/{slug}/{half}/viewer.html", timeout=30) as r:
-                    page = r.read().decode()
-                check(f"{half}: and the route does not serve one",
-                      False, f"served {len(page)} bytes")
-            except urllib.error.HTTPError as e:
-                eq(f"{half}: and the route 404s rather than falling through "
-                   f"to the layered page", e.code, 404)
-        return
-
+    cache = os.path.join(PLAYERS, "cache_segment_avatar_editor", slug)
     for half in ("base", "overlay"):
-        with urllib.request.urlopen(f"{SAE_BASE}/{slug}/{half}/viewer.html",
-                                    timeout=60) as r:
-            page = r.read().decode()
-        check(f"{half}: served its OWN single-clip page",
-              "/web/pair.js" not in page and "/web/seq.js" not in page)
-        check(f"{half}: that page carries its own inline script",
-              "<script>" in page, f"{len(page)} bytes")
+        f = os.path.join(cache, half, "viewer.html")
+        check(f"{half}: no page is written for it any more",
+              not os.path.isfile(f),
+              "written" if os.path.isfile(f) else "absent")
+        try:
+            with urllib.request.urlopen(
+                    f"{SAE_BASE}/{slug}/{half}/viewer.html", timeout=30) as r:
+                page = r.read().decode()
+            check(f"{half}: three segments must not serve the layered page",
+                  "/web/pair.js" not in page, f"served {len(page)} bytes")
+        except urllib.error.HTTPError as e:
+            eq(f"{half}: three segments give a 404", e.code, 404)
 
 
 def s_stale_cached_pages():
@@ -776,7 +721,7 @@ FUNCTIONS = [s_static_page, s_list, s_siblings, s_stores, s_open_pair,
              s_mark, s_save, s_save_stale, s_cut, s_vtt, s_line, s_join,
              s_renumber_state, s_renumber_clear, s_split, s_archive,
              s_save_archive, s_dropped_routes_are_gone, s_session_log,
-             s_api_view, s_single_clip_page_still_works,
+             s_api_view, s_deeper_paths_are_not_the_layered_page,
              s_stale_cached_pages, s_app_js_parses,
              s_no_unreachable_handlers]
 

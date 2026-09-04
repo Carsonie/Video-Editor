@@ -101,23 +101,31 @@ the single-clip page is *still* a Python template, so that one is still
 scraped out of the served HTML. Scraping the static pages would find
 nothing and pass on an empty string.
 
-### `_splitter_player.py` is a deliberate duplicate
+### `_splitter_player.py` is gone (2026-09-04)
 
-The SAE's "open this scene on its own" link needs MP4 Splitter's single-
-clip viewer. Rather than import another editor's package — which the
-2026-09-02 split exists to prevent — a copy lives here.
+It rendered the single-clip page at `/<slug>/base/viewer.html` — "open this
+scene on its own" from a pair — as a 1,576-line Python `.format()` string,
+a private duplicate of MP4 Splitter's player kept so the two tools stayed
+unlinked.
 
-It was 99% identical to `mp4_splitter/player.py` — 16 differing lines out
-of ~1,570 — but that comparison is now out of date in a way that matters:
-MP4 Splitter's `player.py` was migrated to static files on 2026-09-04 and
-is 66 lines. **This file is the last Python-string page in the repo**, and
-it no longer duplicates anything.
+It was deleted because **nothing in any UI ever linked to that page**. No
+button, no menu item, no link anywhere in `web/`; the only way to reach it
+was to type the URL. It was commented out in full for a session first, and
+nothing was missed.
 
-De-duplicating it was deliberately deferred rather than skipped; the
-reasons are written up under Step 11a.8 in
-`README-CODE-CLEANUP-PLAN.md`. In short: `editor_base/` may not hold page
-rendering, and folding a player in would re-link two tools the 2026-09-02
-split separated on purpose.
+Deleting it took the whole player hook with it — `use_player()` and
+`write_viewer()` in `editor_base/frames.py`, and nine call sites. Every
+other player's `write()` had already become a no-op when the pages went
+static, so nothing was left to write.
+
+**There is no Python-string page anywhere in this repo now.**
+
+Two paths under a pair's cache therefore 404 rather than serving a page:
+`/<slug>/base/viewer.html` and `/<slug>/overlay/viewer.html`. That is
+deliberate, and `s_deeper_paths_are_not_the_layered_page` pins it — what
+must never come back is the route quietly answering a deeper path with the
+LAYERED page, which is how a 404 turns into a page that looks right and is
+not.
 
 ## ⚠ Routes that were dropped are gone entirely — keep it that way
 

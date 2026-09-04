@@ -106,7 +106,6 @@ from editor_base import vtt as vtt_mod                      # noqa: E402
 # This server extracts into the repo-root cache/ and renders the Segment and
 # Avatar Editor's page, so it points editor_base at both.
 build_mod.use_cache(CACHE)
-build_mod.use_player("segment_avatar_editor._splitter_player")
 
 # Must match cut_segments.py's ENCODE exactly — this is the same "locked
 # encode standard" every other segment in this project is cut with.
@@ -783,8 +782,24 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.api_map(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/marks":
             return self.api_marks(urllib.parse.parse_qs(parsed.query))
+        if parsed.path == "/api/view":
+            return self.api_view(urllib.parse.parse_qs(parsed.query))
+        if parsed.path.startswith("/web/"):
+            return self.send_web(parsed.path[len("/web/"):])
         if parsed.path in ("/", "/browse.html"):
             return self.send_html(BROWSE_HTML)
+        # The layered and timeline pages, served the same way the standalone
+        # Segment and Avatar Editor serves them (2026-09-04). This server
+        # already renders those two views through segment_avatar_editor's
+        # player, so it serves that package's static pages too rather than
+        # keeping a second copy.
+        #
+        # EXACTLY two path segments. A pair's cache also holds
+        # /<slug>/base/viewer.html — the single-clip page — and matching on
+        # endswith() alone would swallow it.
+        bits = parsed.path.strip("/").split("/")
+        if len(bits) == 2 and bits[1] == "viewer.html":
+            return self.send_viewer(bits[0])
         return super().do_GET()
 
     def do_POST(self):
@@ -1298,6 +1313,71 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         meta = json.load(open(os.path.join(outdir, "meta.json")))
         self.send_json({"frame_map": build_mod.get_frame_map(meta),
                          "nb_frames": meta["nb_frames"]})
+
+    def _view_of(self, slug):
+        """This view's recorded data, or None if the slug has no view.json."""
+        if not slug or "/" in slug or "\\" in slug or slug in (".", ".."):
+            return None
+        p = os.path.join(CACHE, slug, sae.VIEW_FILE)
+        if not os.path.isfile(p):
+            return None
+        try:
+            return json.load(open(p))
+        except (OSError, ValueError):
+            return None
+
+    def api_view(self, qs):
+        """What a layered or timeline page needs to draw itself.
+
+        Added 2026-09-04, when those two pages became static files. Until
+        then this server rendered a complete page into the cache and served
+        it as a plain file; now it records view.json and the page fetches
+        it back.
+        """
+        view = self._view_of((qs.get("slug") or [""])[0])
+        if view is None:
+            return self.send_json({"error": "unknown slug"}, 400)
+        self.send_json(view)
+
+    def send_viewer(self, slug):
+        """A view's page — segment_avatar_editor/web/pair.html or seq.html,
+        chosen by view.json.
+
+        A cache written before 2026-09-04 has a fully baked viewer.html and
+        NO view.json, and nothing can rebuild one: the manifest and the two
+        relative paths only ever existed at open time. Those fall through to
+        their own old page, which still works. Re-open the pair or the
+        timeline and the static page takes over.
+        """
+        view = self._view_of(slug)
+        if view is None:
+            return super().do_GET()      # pre-2026-09-04 cache: its own page
+        page = "seq.html" if view.get("kind") == "seq" else "pair.html"
+        return self.send_web(page, "text/html; charset=utf-8")
+
+    def send_web(self, name, ctype=None):
+        """One of segment_avatar_editor/web/'s static files.
+
+        Served from here rather than by pointing the handler's `directory`
+        at web/, because that root is already the frame CACHE. `name` is
+        resolved and then checked to still be inside web/, so a `..` cannot
+        walk out.
+        """
+        root = os.path.join(ROOT, "segment_avatar_editor", "web")
+        path = os.path.realpath(os.path.join(root, name))
+        if not path.startswith(os.path.realpath(root) + os.sep) or not os.path.isfile(path):
+            return self.send_json({"error": f"no such file: {name}"}, 404)
+        if ctype is None:
+            ctype = {".js": "application/javascript", ".css": "text/css",
+                     ".html": "text/html; charset=utf-8"}.get(
+                os.path.splitext(path)[1], "application/octet-stream")
+        body = open(path, "rb").read()
+        self.send_response(200)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
 
     def api_marks(self, qs):
         outdir = resolve_outdir(qs.get("slug", [""])[0], qs.get("which", [None])[0])
