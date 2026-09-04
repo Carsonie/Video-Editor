@@ -573,12 +573,31 @@ def s_app_js_parses():
         check(f"{name} loads {want}", want in html)
         check(f"{name} bakes in no view any more", "<script>" not in html)
 
-    # --- the single-clip page is still a Python template: scrape it ---
-    with urllib.request.urlopen(f"{SAE_BASE}/{pair_slug}/base/viewer.html",
-                                timeout=60) as r:
-        html = r.read().decode()
-    parses("single-clip (private splitter duplicate)",
-           "\n".join(re.findall(r"<script>(.*?)</script>", html, re.S)))
+    # --- the single-clip page: still a Python template, unless disabled ---
+    if splitter_disabled():
+        check("single-clip page: _splitter_player.py is disabled, so there is "
+              "no Python-string page left to parse", True,
+              "nothing in web/ is a .format() template any more")
+    else:
+        with urllib.request.urlopen(f"{SAE_BASE}/{pair_slug}/base/viewer.html",
+                                    timeout=60) as r:
+            html = r.read().decode()
+        parses("single-clip (private splitter duplicate)",
+               "\n".join(re.findall(r"<script>(.*?)</script>", html, re.S)))
+
+
+def splitter_disabled():
+    """Is _splitter_player.py's body commented out (2026-09-04)?
+
+    Two checks below depend on the single-clip page existing. Rather than
+    switch them off — a check that runs and proves nothing is worse than no
+    check — they FLIP while it is disabled, and assert the page is absent
+    instead of present. Whichever way the decision goes, the suite is
+    asserting something true.
+    """
+    sys.path.insert(0, PLAYERS)
+    from segment_avatar_editor import _splitter_player as sp   # noqa: E402
+    return getattr(sp, "DISABLED", False)
 
 
 def s_api_view():
@@ -656,6 +675,45 @@ def s_single_clip_page_still_works():
     with urllib.request.urlopen(f"{SAE_BASE}/{slug}/viewer.html", timeout=30) as r:
         layered = r.read().decode()
     check("the layered page is the static one", "/web/pair.js" in layered)
+
+    if splitter_disabled():
+        # THE ACTUAL TEST OF "is it used": delete the two pages, re-open the
+        # pair so every write path runs again, and prove nothing recreates
+        # them.
+        #
+        # Deleting first is the whole point. The cache outlives the fixture
+        # — it is keyed on the source path, and the fixture store is rebuilt
+        # every run — so pages written by an earlier run are still sitting
+        # there and would be served happily by a server that no longer
+        # writes any. That is a real trap for the manual test too, and it is
+        # written up in _splitter_player.py's own stub.
+        cache = os.path.join(PLAYERS, "cache_segment_avatar_editor", slug)
+        for half in ("base", "overlay"):
+            f = os.path.join(cache, half, "viewer.html")
+            if os.path.isfile(f):
+                os.remove(f)
+            check(f"{half}: cleared any page left by an earlier run",
+                  not os.path.isfile(f))
+
+        get("/api/open-pair",
+            base=f"{fixture.ROOT_REL}/sandbox/{folder}/segment.mp4",
+            overlay=f"{fixture.ROOT_REL}/sandbox/{folder}/avatar.webm")
+
+        for half in ("base", "overlay"):
+            f = os.path.join(cache, half, "viewer.html")
+            check(f"{half}: re-opening the pair did NOT write one back",
+                  not os.path.isfile(f),
+                  "written again" if os.path.isfile(f) else "still absent")
+            try:
+                with urllib.request.urlopen(
+                        f"{SAE_BASE}/{slug}/{half}/viewer.html", timeout=30) as r:
+                    page = r.read().decode()
+                check(f"{half}: and the route does not serve one",
+                      False, f"served {len(page)} bytes")
+            except urllib.error.HTTPError as e:
+                eq(f"{half}: and the route 404s rather than falling through "
+                   f"to the layered page", e.code, 404)
+        return
 
     for half in ("base", "overlay"):
         with urllib.request.urlopen(f"{SAE_BASE}/{slug}/{half}/viewer.html",
