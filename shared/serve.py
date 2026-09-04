@@ -96,6 +96,7 @@ sys.path.insert(0, ROOT)                                    # for the player pac
 # past the shims and imports the real thing.
 from editor_base import frames as build_mod                 # noqa: E402
 from segment_avatar_editor import player as sae             # noqa: E402
+from mp4_splitter import player as mp4_player               # noqa: E402  its NAME for the page footer
 from editor_base import paths as PTH                        # noqa: E402
 # The word count comes from vtt.py rather than being written again here. It is
 # not `line.split()`: a token with no letter or digit is punctuation standing
@@ -784,6 +785,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.api_marks(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/view":
             return self.api_view(urllib.parse.parse_qs(parsed.query))
+        if parsed.path == "/api/clip":
+            return self.api_clip(urllib.parse.parse_qs(parsed.query))
         if parsed.path.startswith("/web/"):
             return self.send_web(parsed.path[len("/web/"):])
         if parsed.path in ("/", "/browse.html"):
@@ -1339,6 +1342,31 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.send_json({"error": "unknown slug"}, 400)
         self.send_json(view)
 
+    def api_clip(self, qs):
+        """What MP4 Splitter's static single-clip page needs to draw itself.
+
+        Added 2026-09-04 alongside send_viewer(): this server offers
+        single-clip Open from its own browse page, and that page is now a
+        static file that fetches its clip rather than having it baked in.
+        Same fourteen fields mp4_splitter/serve.py's own api_clip() returns.
+        """
+        outdir = resolve_outdir((qs.get("slug") or [""])[0], (qs.get("which") or [None])[0])
+        if outdir is None:
+            return self.send_json({"error": "unknown slug"}, 400)
+        meta = json.load(open(os.path.join(outdir, "meta.json")))
+        name = meta.get("source_name", os.path.basename(meta["source"]))
+        self.send_json({
+            "title": name, "source": name, "source_path": meta["source"],
+            "slug": os.path.basename(outdir.rstrip(os.sep)),
+            "nb_frames": meta["nb_frames"], "fps": meta["fps"],
+            "disp_w": meta["disp_w"], "disp_h": meta["disp_h"],
+            "app_w": meta["disp_w"] + 278, "stack_w": meta["disp_w"] + 292,
+            "has_audio": bool(meta.get("has_audio")),
+            "edited_flag": bool(meta.get("edited")),
+            "edited": bool(meta.get("edited", False)),
+            "player_label": mp4_player.label(),
+        })
+
     def send_viewer(self, slug):
         """A view's page — segment_avatar_editor/web/pair.html or seq.html,
         chosen by view.json.
@@ -1350,10 +1378,24 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         timeline and the static page takes over.
         """
         view = self._view_of(slug)
-        if view is None:
-            return super().do_GET()      # pre-2026-09-04 cache: its own page
-        page = "seq.html" if view.get("kind") == "seq" else "pair.html"
-        return self.send_web(page, "text/html; charset=utf-8")
+        if view is not None:
+            page = "seq.html" if view.get("kind") == "seq" else "pair.html"
+            return self.send_web(page, "text/html; charset=utf-8")
+
+        # No view.json. Two very different cases, and the meta decides:
+        #
+        #   a SINGLE CLIP — what /api/open returns, and what this server's
+        #   own browse page opens. Its page is MP4 Splitter's static one,
+        #   served from here the same way the layered and timeline pages
+        #   are. Nothing writes a page into the cache any more, so without
+        #   this the browse page's own "open a clip" button 404s.
+        #
+        #   a PAIR OR TIMELINE cached before 2026-09-04 — nothing can
+        #   rebuild a view.json for it, so it falls through to the fully
+        #   baked page still sitting in its folder.
+        if os.path.isfile(os.path.join(CACHE, slug, "meta.json")):
+            return self.send_web("mp4/index.html", "text/html; charset=utf-8")
+        return super().do_GET()
 
     def send_web(self, name, ctype=None):
         """One of segment_avatar_editor/web/'s static files.
@@ -1363,7 +1405,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         resolved and then checked to still be inside web/, so a `..` cannot
         walk out.
         """
-        root = os.path.join(ROOT, "segment_avatar_editor", "web")
+        pkg = "mp4_splitter" if name.startswith("mp4/") else "segment_avatar_editor"
+        name = name[len("mp4/"):] if name.startswith("mp4/") else name
+        root = os.path.join(ROOT, pkg, "web")
         path = os.path.realpath(os.path.join(root, name))
         if not path.startswith(os.path.realpath(root) + os.sep) or not os.path.isfile(path):
             return self.send_json({"error": f"no such file: {name}"}, 404)
@@ -1372,6 +1416,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                      ".html": "text/html; charset=utf-8"}.get(
                 os.path.splitext(path)[1], "application/octet-stream")
         body = open(path, "rb").read()
+        # MP4 Splitter's page asks for /web/app.js and /web/app.css. On THIS
+        # server /web/ is the SAE's folder, so those two references are
+        # rewritten to the /web/mp4/ prefix that send_web() routes to
+        # mp4_splitter/web/. The file on disk is untouched; only what goes
+        # over the wire from here changes.
+        if pkg == "mp4_splitter" and path.endswith("index.html"):
+            body = body.replace(b'"/web/app.', b'"/web/mp4/app.')
         self.send_response(200)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
