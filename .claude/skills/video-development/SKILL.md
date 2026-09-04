@@ -1,6 +1,6 @@
 ---
 name: video-development
-description: The small hands-on tasks that come up while editing a help video in the browser. FOUR NAMED PHRASES trigger it directly, and they are printed in the Segment and Avatar Editor's own "ASK CLAUDE" box so Carson can read them off the screen: "Capture Still" (take the frame currently on screen, from the right source file, into Sarah's library), "Read Screen" (say which scene, frame, selection and unsaved state his own Chrome tab is showing), and "Which Source" (which of the frame cache, avatar.webm or narration.webm a job should read), and "Open Close Pose" (put Sarah's 3-frame rest pose at the end of a scene, the start of the next, or both, so the cut between them is invisible), and "Push Narrative" / "Pull Narrative" (slide Sarah's whole performance N frames later or earlier inside a scene, picture and voice together, without changing the scene's frame count or length). Also use whenever asked to grab, capture or save a frame, still or pose, to add something to Sarah's library from what is on screen, to say where he is in an editor, or when a task needs a frame out of a scene at full quality. What a still IS and how it is named lives in the sarah-library skill; this one is how to get one.
+description: The small hands-on tasks that come up while editing a help video in the browser. FOUR NAMED PHRASES trigger it directly, and they are printed in the Segment and Avatar Editor's own "ASK CLAUDE" box so Carson can read them off the screen: "Capture Still" (take the frame currently on screen, from the right source file, into Sarah's library), "Read Screen" (say which scene, frame, selection and unsaved state his own Chrome tab is showing), and "Which Source" (which of the frame cache, avatar.webm or narration.webm a job should read), and "Open Close Pose" (put Sarah's 3-frame rest pose at the end of a scene, the start of the next, or both, so the cut between them is invisible), and "Push Narrative" / "Pull Narrative" (slide Sarah's whole performance N frames later or earlier inside a scene, picture and voice together, without changing the scene's frame count or length), and "Inbound Transition" / "Outbound Transition" (replace the frames between a resting pose and a target frame with a blend, so she eases into or out of live footage instead of cutting). Also use whenever asked to grab, capture or save a frame, still or pose, to add something to Sarah's library from what is on screen, to say where he is in an editor, or when a task needs a frame out of a scene at full quality. What a still IS and how it is named lives in the sarah-library skill; this one is how to get one.
 user_invocable: true
 ---
 
@@ -29,6 +29,8 @@ page, under the status bar) so he can read them off the screen:
 | **Open Close Pose** | Sarah's 3-frame rest pose at a scene boundary |
 | **Push Narrative** | slide her performance N frames LATER, same length |
 | **Pull Narrative** | slide her performance N frames EARLIER, same length |
+| **Inbound Transition** | blend a resting pose INTO a target frame |
+| **Outbound Transition** | blend a target frame OUT to a resting pose |
 
 They are named in this file's `description:` too, so they match exactly
 rather than by judgement. **Adding a phrase means three edits, always
@@ -363,3 +365,110 @@ cache before the file.
 ### Archive first
 
 `z_History/<YY-MM-DD>_<what>/avatar.webm` beside the scene, before writing.
+
+---
+
+## "Inbound Transition" / "Outbound Transition" — easing in and out of a pose
+
+Carson's standard, defined 2026-09-04. A cut from a held rest pose straight
+into live footage pops, because the pose is settled and the first live frame
+is already mid-gesture. These two phrases replace the frames between them
+with a blend, so she eases across instead.
+
+- **Inbound Transition** — resting pose → target frame. She comes OUT of the
+  pose and INTO the footage.
+- **Outbound Transition** — target frame → resting pose. The mirror.
+
+### He names three numbers, and they are TIMELINE frames
+
+> "transition from frame 489 to 492, blend into the 493 target frame"
+
+| number | what it is | touched? |
+|---|---|---|
+| **489** | the pose frame the blend starts FROM | no — read only |
+| **490–492** | the frames REPLACED by the blend | **yes** |
+| **493** | the target frame the blend arrives AT | no — read only |
+
+**They are GLOBAL timeline frames, not scene-local.** The editor's `pos`
+reads `timeline 441 / 570`, and 570 is scenes 1 + 2 (482 + 88). A number
+past a scene's own length is the giveaway — scene 2 has 88 frames, so "489"
+cannot be local. Convert before touching anything:
+
+```
+local = global - sum(frames of every scene before it)
+```
+
+Say which scene and which local frames you worked out, so a wrong timeline
+selection is caught before the file is written.
+
+**The frame count never changes.** The blend REPLACES the frames between;
+it does not insert. If the count moves, the operation is wrong. Audio is not
+touched either — nothing moves along the timeline.
+
+### DO NOT CROSSFADE. Move the pixels instead.
+
+Tried and rejected 2026-09-04. A crossfade **mixes** two pictures, so any
+difference in where her head sits shows up as **two faces at once**. On
+scene 2 the pose and the target were 8px apart across, 10px up, and 10px
+different in height — on a 289px head that doubled her eyes and mouth. The
+numbers all passed; the picture was obviously wrong.
+
+Lining the two up first (scale the pose's bbox onto the target's, then mix)
+helps and is still not good enough — the mouths do not land together, so it
+still ghosts.
+
+**What works is `minterpolate`, which MOVES pixels between the two frames
+rather than averaging them.** She stays sharp because every output frame is
+real pixels, shifted:
+
+```bash
+# 6 input frames: the pose 3x, then the target 3x. Two frames alone
+# produce NOTHING — minterpolate needs surrounding frames to find motion,
+# and it silently writes an empty output.
+for i in 1 2 3; do cp pose.png   mi/p00$i.png; done
+for i in 4 5 6; do cp target.png mi/p00$i.png; done
+
+ffmpeg -v error -framerate 25 -i mi/p%03d.png \
+  -vf "minterpolate=fps=100:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1" \
+  -y mi/o%03d.png
+```
+
+`fps=100` from `framerate=25` is 4x, so it puts **3** new frames between each
+pair — exactly what a 3-frame transition needs. For N frames, use
+`fps = 25 * (N+1)`.
+
+It keeps RGBA. **Do not pass `-vsync 0`** — with it the filter emits nothing.
+
+17 frames come out; the 3 you want are the ones whose `getbbox()` is moving
+between the pose's box and the target's. Find them by bbox, do not assume an
+index:
+
+```python
+Image.open(f).getbbox()   # pose (840,853,1128,1152) ... target (832,843,1121,1152)
+```
+
+### Check the two ends BEFORE blending
+
+A blend only looks right if both ends are settled. If the target frame is
+mid-word, the last blend frame is 75% of a mid-word mouth and reads as a
+smear. Measure the mouth on the target and the two frames around it; if it
+is moving, say so and ask for a different target rather than blending into
+it.
+
+Sarah is **not in the same place in every scene.** Scene 1 opens with her
+large and centre-left and morphs her to the corner around frame 270 — a
+corner-shaped measuring box reads 0.00 over the early part and looks like a
+frozen picture when nothing is wrong. Read her actual position first:
+
+```python
+Image.open(frame).getbbox()   # (836, 846, 1130, 1150) = settled in the corner
+```
+
+### Verify
+
+1. Frame count unchanged, still `yuva420p`.
+2. Audio unchanged — same duration, same first audible sample.
+3. The replaced frames step evenly from one end to the other, and the frame
+   after the last blend is the untouched target.
+4. **Look at all five frames in a row** over `#212121`. The measurement says
+   the numbers moved; only the picture says the halo is absent.
