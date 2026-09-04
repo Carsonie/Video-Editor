@@ -619,7 +619,7 @@ in one run leak into the next, and clicking Mark in a browser made
 caches pointing at the deleted fixture were removed. Worth a proper fix —
 the suite should clear its own slugs — but it is not part of this plan.
 
-### Step 13. Segment and Avatar Editor — extract both pages
+### Step 13. Segment and Avatar Editor — extract both pages  ✅ done 2026-09-04
 
 **Task scope:** SAE only. **The biggest step in this plan.** Do it after
 Step 12 so the pattern is proven on the smaller tool first.

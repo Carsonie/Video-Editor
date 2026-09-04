@@ -1,0 +1,495 @@
+/*
+ * Segment and Avatar Editor — the timeline page's styles.
+ *
+ * A plain .css file since 2026-09-04. It used to be a <style> block inside
+ * a Python string in player.py, where every brace had to be doubled to
+ * survive str.format() and no editor could lint or highlight it.
+ *
+ * --box, the stage width, is no longer baked in. timeline.js sets it on the
+ * root element from /api/view before anything is drawn.
+ */
+/* The viewer's border reports WHICH LAYERS ARE TICKED, so it answers "what
+     will + and - touch here" without reading down the list:
+         both ticked    green   --both
+         segment only   blue    --seg
+         overlay only   purple  --over
+         neither        yellow  --none    (nothing will happen)
+     Blue is also the segment tick's own colour, so the border and the checkbox
+     that caused it are never two different colours for the same thing. */
+  :root {  --base:#2ecc40; --over:#a06cff; --active:var(--base);
+          --both:#2ecc40; --seg:#4fc3f7; --none:#e8c249; }
+  body { margin:0; background:#141414; color:#eee;
+         font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+  .wrap { padding:14px; display:flex; gap:16px; align-items:flex-start;
+           justify-content:center; }
+  .left { display:flex; flex-direction:column; gap:10px; align-items:center; }
+  /* SOLO — one track on its own.
+     The checkerboard is not decoration. Sarah is a VP9 clip with a real alpha
+     channel, and the one fault it can carry is a bad EDGE: a black fringe, or
+     a matte flattened somewhere upstream. Against the footage you cannot see
+     it. Against a pattern you can see straight through, you can. */
+  #stage.solo-ov #baseImg { display:none; }
+  #stage.solo-base #overImg { display:none; }
+  #stage.solo-ov {
+    background-color:#1e1e1e;
+    background-image:
+      linear-gradient(45deg,#2c2c2c 25%,transparent 25%,transparent 75%,#2c2c2c 75%),
+      linear-gradient(45deg,#2c2c2c 25%,transparent 25%,transparent 75%,#2c2c2c 75%);
+    background-size:24px 24px;
+    background-position:0 0, 12px 12px;
+  }
+  #soloBtn.on { border-color:#a56cff; color:#dcc9ff; }
+  #stage { position:relative; width:var(--box); height:var(--box);
+            background:#232323; border:2px solid var(--active); border-radius:8px;
+            overflow:hidden; transition:border-color .12s; }
+  #baseImg { position:absolute; left:0; width:var(--box); top:50%;
+              transform:translateY(-50%); }
+  #overImg { position:absolute; left:0; top:0; width:var(--box); height:var(--box); }
+  /* Dim whichever layer is NOT being edited, so the active one is unmistakable. */
+  .dimBase #baseImg { opacity:.35; }
+  .dimOver #overImg { opacity:.35; }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+          justify-content:center; }
+  .bar { width:var(--box); }
+  /* ONE coordinate space for the bar. A native range thumb's CENTRE travels
+     from half-a-thumb in to half-a-thumb short of the end, but the ticks and
+     the scene blocks were laid out across the FULL width -- so a mark and the
+     pointer could only ever agree at the exact middle, and drifted by up to
+     half a thumb at the ends. Clicking a mark left the pointer visibly beside
+     it, and a loop looked out of step with its own boundary.
+     The thumb is given an explicit size here so the inset is a known number
+     rather than whatever the browser picked, and the tick layer and the scene
+     bar are inset by half of it. */
+  :root { --thumb:14px; --halfthumb:7px; }
+  /* margin:0 matters as much as the inset. Chrome gives a range input a
+     default 2px margin, so the slider box sat 2px right of the tick layer and
+     every mark was out by a constant 2px even once the scaling was right. */
+  input[type=range] { -webkit-appearance:none; appearance:none; margin:0;
+                      width:100%; height:var(--thumb); background:transparent;
+                      accent-color:var(--active); }
+  input[type=range]::-webkit-slider-runnable-track {
+      height:6px; border-radius:3px; background:#39424a; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; appearance:none;
+      width:var(--thumb); height:var(--thumb); border-radius:50%;
+      background:var(--active); border:none; margin-top:-4px; }
+  input[type=range]::-moz-range-track { height:6px; border-radius:3px; background:#39424a; }
+  input[type=range]::-moz-range-thumb { width:var(--thumb); height:var(--thumb);
+      border-radius:50%; background:var(--active); border:none; }
+  button { background:#2c3236; color:#eee; border:1px solid #4a5259;
+            border-radius:6px; padding:7px 11px; font-size:14px; cursor:pointer; }
+  button:hover { border-color:var(--active); }
+  button:disabled { opacity:.4; cursor:default; }
+  button.on { background:var(--active); border-color:var(--active); color:#111;
+               font-weight:600; }
+  .tgl { display:flex; gap:0; border:1px solid #4a5259; border-radius:8px;
+          overflow:hidden; }
+  .tgl button { border:0; border-radius:0; padding:8px 16px; }
+  #tBase.on { background:var(--base); color:#111; }
+  #tOver.on { background:var(--over); color:#111; }
+  .meta { font-size:12px; color:#9aa; }
+  .meta b { color:#eee; }
+  #ticks { position:relative; height:12px; margin:0 var(--halfthumb); }
+  .tick { position:absolute; top:0; width:3px; height:12px;
+           background:var(--active); transform:translateX(-50%);
+           border-radius:1px; cursor:pointer; }
+  .tick:hover { filter:brightness(1.4); }
+  .tick::before { content:''; position:absolute; left:-6px; right:-6px;
+                   top:-4px; bottom:-4px; }
+  /* The scene boundaries, drawn ON the timeline. Seeing where a join falls is
+     most of the point of putting several scenes on one bar. */
+  #segbar { position:relative; height:16px; display:flex; gap:1px;
+             margin:0 var(--halfthumb) 2px; }
+  .segblk { height:100%; background:#2a3136; border-radius:2px; font-size:9px;
+             color:#8a949b; overflow:hidden; white-space:nowrap; text-align:center;
+             line-height:16px; cursor:pointer; }
+  .segblk:hover { background:#39434a; color:#dfe4e7; }
+  .segblk.cur { background:#1f5c2e; color:#eaffef; }
+  /* 270 -> 360: the row carries six columns now (tick, number, name,
+     duration, then a lock+count for EACH layer). At 270 the name was
+     ellipsed down to one or two letters, which made the list useless. */
+  /* 360 -> 412: the +/- pair added two more columns (16px each plus a 6px
+     gutter), and at 360 the duration ran into the first lock. */
+  /* Wide enough to hold the control block at the width it already had (666px,
+     widest row 644px). The controls moved here from under the viewer, and the
+     point of moving them was to stop the page growing downwards -- so the
+     column is sized to fit them on one line each, not the other way round.
+     Fixed on purpose: this is a tool for one monitor, not a responsive page. */
+  .right { width:700px; flex:none; background:#1b1f22; border:1px solid #3a4248;
+            border-radius:8px; padding:10px; max-height:94vh;
+            display:flex; flex-direction:column; }
+  /* Only the scene list scrolls. The controls sit under it and must stay put --
+     a Save button that scrolls out of reach is worse than a shorter list. */
+  #sceneList { overflow:auto; flex:1 1 auto; min-height:0; }
+  .right h4 { margin:0 0 8px; font-size:12px; color:#9aa; font-weight:600;
+               text-transform:uppercase; letter-spacing:.04em; text-align:center; }
+  .scene { display:flex; gap:7px; align-items:baseline; padding:5px 6px; overflow:hidden;
+            border-radius:6px; font-size:13px; }
+  .scene .num { color:#8a949b; min-width:18px; text-align:right; }
+  /* min-width:0, not 88px. An 88px floor on the one flexible cell meant that
+     below a certain panel width the row could not shrink at all -- so instead
+     of the name getting shorter, the whole row overflowed and the duration
+     slid under the first checkbox. The name is the only thing here that can
+     lose characters harmlessly, so it is the only thing allowed to. */
+  .scene .lab { flex:1 1 0; min-width:0; color:#dfe4e7; overflow:hidden;
+                text-overflow:ellipsis; white-space:nowrap; }
+  /* Everything after the name holds its size: a number cut in half is worse
+     than a name cut short. */
+  .scene .num, .scene .dur { flex:none; }
+  .scene .dur { color:#8a949b; font-size:12px; }
+  .scene.inseq { background:#1d2a20; }
+  /* Off the timeline, still on the list. Dimmed rather than hidden: the scene
+     exists, it is simply not in this join. */
+  .scene.offseq { opacity:.5; }
+  .scene.offseq:hover { opacity:.85; }
+  .scene.cur { background:#1f5c2e; opacity:1; }
+  .scene .pick { accent-color:#2ecc40; margin:0 2px 0 0; cursor:pointer; flex:none; }
+  .scene .ovv { font-size:10px; padding:0 4px; border:1px solid #444; border-radius:3px; }
+  #rebuildBtn { width:100%; margin-top:8px; font-size:12px; }
+  #rebuildBtn:not(:disabled) { background:#1f5c2e; border-color:#2ecc40; }
+  /* A FIXED height, not a max. It used to be `max-height:300px`, so the panel
+     was as tall as its contents until they passed 300 — and the active row
+     swaps a one-line label for a textarea, which is more than twice as tall.
+     Every scene boundary therefore changed the panel's own height and shoved
+     the page up and down under the playhead. Now the box never moves and the
+     rows scroll inside it.
+
+     Sized for about SEVEN rows: six collapsed at ~29px plus the open one at
+     ~66px, under a 30px heading. */
+  #vtt { width:var(--box); border:1px solid #3a4248; border-radius:8px;
+          background:#1b1f22; height:270px; overflow:hidden;
+          display:flex; flex-direction:column; }
+  #vttHead { flex:none; background:#1b1f22;
+              padding:7px 10px; border-bottom:1px solid #3a4248;
+              font-size:11px; letter-spacing:.05em; text-transform:uppercase;
+              color:#9aa; font-weight:600; }
+  /* `position:relative` so a row's offsetTop is measured against THIS box —
+     the centring maths reads it, and against any other offsetParent it would
+     scroll to the wrong place.
+
+     The padding is three rows deep at each end, which is what lets scene 1 and
+     the last scene sit in the middle like every other one instead of being
+     stuck against an edge. */
+  /* NO `scroll-behavior:smooth`, and `overflow-anchor:none`. Both were fought
+     for and both are load-bearing.
+
+     Smooth SWALLOWED the assignment: scrollTop stayed put at 11 through every
+     scene, so the active row was never centred and simply drifted down the
+     panel until it fell off the bottom. Measured — with `auto` the same
+     assignment lands instantly.
+
+     Scroll anchoring is the other half. The active row wraps and the one being
+     left collapses, so row heights change at every boundary (42px against 94px
+     on ski-demo), and the browser helpfully nudges scrollTop to hold the
+     content still — against a scroll that is trying to move it. */
+  #vttRows { flex:1 1 auto; overflow-y:auto; position:relative;
+              padding-block:87px; overflow-anchor:none; }
+  #vttSum { float:right; text-transform:none; letter-spacing:0; color:#7d868d;
+             font-weight:400; }
+  .vt { display:grid; grid-template-columns:22px 1fr auto; gap:2px 8px;
+         padding:6px 10px; border-bottom:1px solid #262c31; cursor:text;
+         text-align:left; align-items:center; min-height:29px; }
+  .vt:last-child { border-bottom:none; }
+  .vt .vn { color:#8a949b; font-size:12px; text-align:right; }
+  .vt .vl { color:#cfd6da; font-size:14px; overflow:hidden;
+             text-overflow:ellipsis; white-space:nowrap; }
+  /* The ACTIVE line wraps. One-line-with-an-ellipsis is right for the rows you
+     are skimming, and useless for the one being spoken: most of the line is
+     off the end, so the word being highlighted would be hidden more often
+     than not. The panel is a fixed height now, so a taller row scrolls
+     instead of moving the page. */
+  .vt.on .vl { white-space:normal; overflow:visible; line-height:1.45; }
+  /* The word being spoken, near enough. Its position is ESTIMATED from the
+     scene's elapsed time and the voice's measured words-per-second — there are
+     no per-word timings anywhere in this pipeline, and HeyGen does not return
+     any. It is an aid for lining the picture up against the line, not a
+     measurement: a long word and a short one get the same slice. */
+  .vt .wnow { background:#f5e08a; color:#1b1f22; border-radius:3px;
+               padding:0 2px; }
+  .vt .vt3 { font-size:11px; font-variant-numeric:tabular-nums; color:#8b949c;
+              white-space:nowrap; }
+  /* The gap is the number the table exists for: how long she sits frozen with
+     nothing to say. Past the 2.5s threshold vtt.py flags, it turns. */
+  .vt .gapOk { color:#6f9c6f; }
+  .vt .gapBad { color:#e08c60; }
+  .vt .gapNeg { color:#e05c5c; font-weight:600; }
+  .vt textarea { grid-column:2 / span 2; background:#151a1d; color:#dfe4e7;
+                  border:1px solid #333b41; border-radius:5px; padding:5px 7px;
+                  font:inherit; font-size:14px; line-height:1.35; resize:vertical;
+                  width:100%; box-sizing:border-box; display:none; }
+  /* Only the scene under the pointer opens its editor. Every line as a textarea
+     at once is a wall of boxes, and only one of them is the line being watched. */
+  .vt.on { background:#1f262b; }
+  /* Being the scene under the playhead no longer means "being edited". The
+     active row now shows its LINE, so the spoken word can be highlighted in
+     it; the box opens when you click the row, and closes when you click away.
+     A textarea cannot carry a highlight inside it. */
+  .vt.editing .vl { display:none; }
+  .vt.editing textarea { display:block; }
+  .vt.on .vn { color:#dfe4e7; font-weight:600; }
+  .vt textarea:focus { outline:none; border-color:#2ecc40; }
+  .vt.dirty textarea { border-color:#e0c060; }
+  .vt .vtodo { grid-column:2 / span 2; font-size:11px; color:#e08c60; }
+  #status { font-size:12px; color:#e0c060; min-height:16px; white-space:pre-line;
+             text-align:center; max-width:100%; margin-top:8px; }
+  /* The player's own name, at the foot of the page. Three players share this
+     server and look alike at a glance; this is what says which one you are in
+     before you touch a control. */
+  .playerName { margin:22px auto 4px; text-align:center; font-size:12px;
+                letter-spacing:.16em; text-transform:uppercase; color:#6d757b; }
+  /* Matched to the row's buttons so the transport reads as one control set.
+     Lit whenever the rate is not 1x, so an odd speed cannot pass for normal. */
+  /* 34px, not 30: it sits in a row of 34px buttons, and a control four pixels
+     shorter than its neighbours reads as a different kind of thing. */
+  #rateSel { background:#2c3236; color:#eee; border:1px solid #4a5259; border-radius:6px;
+             height:34px; font-size:13px; font-family:inherit; padding:0 6px; cursor:pointer; }
+  #rateSel:hover { background:#373e43; }
+  #rateSel.off1 { background:#1f5c2e; border-color:#2ecc40; color:#fff; }
+  /* Right-hand pair on every scene row: an edit lock, then that segment's
+     frame count. The lock is a SEPARATE control from the tick on the left —
+     that one says "show me this scene", this one says "let me change it". */
+  .edcb { margin:0 0 0 6px; accent-color:var(--seg); flex-shrink:0; cursor:pointer; }
+  /* FIXED width, not min-width: the totals row carries four digits where a
+     scene carries three, and a column that grows to fit its widest cell shunts
+     everything after it out of line. Wide enough for "~2827". */
+  .frames { font-variant-numeric:tabular-nums; font-size:11px; color:#8b949c;
+            width:44px; flex:none; text-align:right; }
+  /* A count read from the file header rather than a real extraction can be one
+     out, so it shows a ~ and is never passed off as exact. */
+  .frames.est { color:#6d757b; font-style:italic; }
+  .scene.locked .lab { opacity:.5; text-decoration:line-through; }
+  /* The overlay pair is tinted to match the purple the overlay layer uses
+     everywhere else, so which lock belongs to which layer is readable without
+     hovering. */
+  .edcb.ov { accent-color:#a06cd5; }
+  .frames.ov { color:#9d86bd; }
+  .frames.ov.est { color:#6f5f87; }
+  .scene.lk-base .lab { opacity:.6; }
+  .scene.lk-both .lab { opacity:.45; text-decoration:line-through; }
+  /* Totals foot the list. Spacers stand in for the three checkbox columns so
+     each total sits under the column it adds up -- a totals row that does not
+     line up with its column is just another number on the page. */
+  .scene.totals { border-top:1px solid #3a4248; margin-top:4px; padding-top:7px;
+                  font-weight:600; color:#cfd6dc; cursor:default; background:none; }
+  .scene.totals .lab { color:#8b949c; font-weight:500; }
+  .scene.totals .frames { color:#a9d8ee; }
+  .scene.totals .frames.ov { color:#c3a9e0; }
+  /* A spacer must reproduce its checkbox's MARGINS as well as its width.
+     Without them the flexible middle column swallowed the 14px difference
+     and every total sat 6px right of the column it was summing. */
+  .cbpad { width:13px; flex:none; }
+  .cbpad.pk { margin-right:2px; }   /* mirrors .pick  */
+  .cbpad.ed { margin-left:6px; }    /* mirrors .edcb  */
+  .cbpad.btn { width:16px; margin-left:6px; }  /* mirrors .rowbtn */
+  /* Row +/- : square, checkbox-sized, sitting in the same rhythm as the two
+     locks they act on. Enabled only on the scene under the playhead, because
+     that is the only scene with a current frame to duplicate. */
+  .rowbtn { width:16px; height:16px; flex:none; margin-left:6px; padding:0;
+            border:1px solid #55606a; border-radius:3px; background:#2c3236;
+            color:#cfd6dc; font:600 12px/1 -apple-system,sans-serif;
+            display:inline-flex; align-items:center; justify-content:center;
+            cursor:pointer; }
+  .rowbtn:hover:not(:disabled) { background:#3a4248; }
+  .rowbtn.plus:not(:disabled)  { border-color:#2ecc40; color:#8ee89b; }
+  .rowbtn.minus:not(:disabled) { border-color:#e05555; color:#f0a0a0; }
+  .rowbtn:disabled { opacity:.25; cursor:default; }
+  /* Four labelled rows. The label is a fixed column so the controls start on
+     the same x in every row and the rows read as a stack, not a pile. */
+  .ctlrow[data-r="3"] button { border-color:#4a5259; }
+  .vsep { width:1px; height:22px; background:#3a4248; margin:0 4px; flex:none; }
+
+  /* A BUTTON THAT IS STILL WORKING.
+     A save re-encodes every track it writes, and the overlays are VP9 with
+     alpha, which is slow: one 470-frame overlay took 43 seconds and a whole
+     set took three and a half minutes. With nothing on screen saying so, a
+     finished-looking button over a run still in flight invites a reload — and
+     a reload part way through leaves the rest unwritten. */
+  button.working { position:relative; color:#cfe6f5; border-color:#2e8ecc;
+                    cursor:progress; }
+  button.working::after { content:''; position:absolute; right:8px;
+                           top:50%; margin-top:-6px; width:11px; height:11px;
+                           border:2px solid rgba(207,230,245,.30);
+                           border-top-color:#cfe6f5; border-radius:50%;
+                           animation:spin .7s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  /* Row 4 states what is selected, so it is read, not clicked. */
+  .ctlrow.report { align-items:flex-start; }
+  /* The player's name, centred and given some weight — it is the page's title. */
+  .playerName { text-align:center; font-size:15px; font-weight:700;
+                letter-spacing:.14em; color:#8b949c; margin:22px auto 6px; }
+  /* One box around the controls, and a box around each row inside it. The
+     rows are four different KINDS of action, and an outline each is what stops
+     "step a frame" and "overwrite a file" reading as one continuous strip. */
+  /* Contrast measured, not eyeballed. The first attempt used #3a4248 and
+     #2f373d, which are 1.69:1 and 1.37:1 against their own fills -- below the
+     ~1.5:1 where an edge stops being visible at all, so the boxes were there
+     in the DOM and invisible on screen. A border needs roughly 3:1 to read. */
+  #ctls { border:1px solid #66727c; border-radius:9px; padding:10px;   /* 3.52:1 */
+          margin-top:10px; background:#171b1e; }
+  .ctlrow { display:flex; align-items:center; gap:7px;
+            border:1px solid #66737d; border-radius:7px;                /* 3.41:1 */
+            padding:7px 9px; background:#1b1f22; }
+  .ctlrow + .ctlrow { margin-top:8px; }
+  /* Pin the line box so a control's HEIGHT comes from the rule, not from
+     whichever glyph it happens to contain: the button holding a diamond was a
+     pixel taller than its plain-text neighbours. */
+  .ctlrow button, .ctlrow #loopLbl, .ctlrow select { line-height:18px; }
+  /* Row 3 writes files, so its box is the one that stands out. */
+  .ctlrow[data-r="3"] { border-color:#8b98a3; }                        /* 5.62:1 */
+  /* The loop control is a toggle in a row of buttons, so it is shaped like
+     one. The checkbox itself still does the work and still takes focus; it is
+     just no longer a bare tick sitting between two buttons. */
+  /* Same box as `button` — padding 7px 11px, 14px text, 1px border, 6px
+     radius — rather than a hand-picked height. A fixed height guessed at 30px
+     against the buttons' 33px, which is exactly the kind of 3px that makes a
+     row look assembled from spare parts. */
+  #loopLbl { display:inline-flex; align-items:center; gap:6px; cursor:pointer;
+             padding:7px 11px; font-size:14px;
+             background:#2c3236; color:#eee;
+             border:1px solid #4a5259; border-radius:6px; }
+  #loopLbl:hover { background:#373e43; }
+  #loopLbl:has(#loopChk:checked) { background:#1f5c2e; border-color:#2ecc40; color:#fff; }
+  #loopLbl:has(#loopChk:focus-visible) { outline:2px solid #7aa7ff; outline-offset:1px; }
+  #loopChk { margin:0; accent-color:#2ecc40; }
+  /* Undo and Save sit at the end of a row, after the two +/- buttons. Same
+     16px box so the row keeps one rhythm. Greyed when the scene has nothing
+     to undo or nothing to save -- which is the same condition. */
+  .histbtn { width:16px; height:16px; flex:none; margin-left:6px; padding:0;
+             border:1px solid #55606a; border-radius:3px; background:#2c3236;
+             color:#cfd6dc; font:600 10px/1 -apple-system,sans-serif;
+             display:inline-flex; align-items:center; justify-content:center;
+             cursor:pointer; }
+  .histbtn:hover:not(:disabled) { background:#3a4248; }
+  .histbtn.undo:not(:disabled) { border-color:#e0a93f; color:#e8c98a; }
+  .histbtn.save:not(:disabled) { border-color:#2e8ecc; color:#8fc9ee; }
+  .histbtn:disabled { opacity:.25; cursor:default; }
+  /* EXCEPT when it is dirty. A scene held by the renumber lock still HAS unsaved
+     work, and fading it to a quarter says the opposite — it looks exactly like a
+     scene with nothing pending. Dimmed enough to read as "not this button", lit
+     enough to read as "there is work here". */
+  .histbtn.save.dirty:disabled { opacity:.7; cursor:not-allowed; }
+  /* PRISTINE vs DIRTY, said in colour rather than only in opacity. A greyed
+     icon reads as "not available"; it does not read as "this scene has three
+     unsaved changes". The amber is the same amber the segment checkboxes use
+     for work in progress, so the two mean one thing across the page. */
+  .histbtn.save { position:relative; }
+  .histbtn.save.dirty { background:#4a3a18; border-color:#e0a93f; color:#ffdc9a;
+                        font-weight:700; }
+  .histbtn.save.dirty:hover { background:#5c4820; }
+  .histbtn.save.dirty::after { content:''; position:absolute; top:-3px; right:-3px;
+                        width:5px; height:5px; border-radius:50%;
+                        background:#e0a93f; }
+  /* Actions that apply to the LIST rather than to one row, kept below the
+     rebuild button and boxed so they read as list-level, not row-level. */
+  #bulk { margin-top:8px; padding-top:8px; border-top:1px solid #3a4248;
+          display:flex; flex-direction:column; gap:6px; }
+  .bulkrow { display:flex; gap:6px; }
+  .bulkrow button { flex:1; }
+  #balanceBtn { width:100%; }
+  /* GREEN when a join or split has left a renumber note outstanding — the one
+     moment this button has a second job to do, and the moment it is easiest to
+     walk away from. It stays enabled the rest of the time: a backup is worth
+     taking whenever, and gating it behind a rare event would put the only
+     revert this data has behind a door. Lives in row 4 now, alongside the
+     other whole-session actions — see that row's own comment. */
+  #backupBtn.pending { border-color:#2ecc40; color:#dff5e2;
+                        box-shadow:0 0 0 1px rgba(46,204,64,.35); }
+  #balanceBtn:not(:disabled) { border-color:#4a8fbf; color:#cfe6f5; }
+  #balNote { font-size:11px; line-height:1.5; color:#8b949c; }
+  #balNote b { color:#dfe4e7; }
+  #balNote .ok { color:#8ee89b; }
+  #balNote .skip { color:#e0a93f; }
+  /* Row 4: two fixed rows of two fixed columns. Its height is pinned so the
+     control block above it cannot move while you scrub. */
+  .ctlrow.report { background:#161a1d; height:52px; align-items:stretch; overflow:hidden; }
+  #rep { display:grid; grid-template-columns:1fr 1fr; grid-auto-rows:22px;
+         align-items:center; column-gap:18px; width:100%;
+         font-size:11px; color:#9aa4ae; font-variant-numeric:tabular-nums; }
+  #rep .rc { display:flex; align-items:baseline; gap:8px; min-width:0; overflow:hidden; }
+  #rep .rk { flex:none; width:58px; color:#6d757b;
+             text-transform:uppercase; letter-spacing:.1em; font-size:9px; }
+  #rep .rv { min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  #rep .rv.seg b { color:#a9d8ee; }
+  #rep .rv.ovl b { color:#c3a9e0; }
+  #rep .sep { color:#6d757b; margin:0 6px; }
+  #rep .off { color:#6d757b; font-style:normal; }
+  /* The scene name is the one thing here that can be any length, so it is the
+     one thing that truncates. */
+  #rep .nm { display:inline-block; max-width:190px; overflow:hidden;
+             text-overflow:ellipsis; white-space:nowrap; vertical-align:bottom; }
+  /* Delayed tooltip. Two seconds is long enough that it never interrupts
+     someone who knows the control, and short enough to answer someone who is
+     hesitating over it. */
+  #tip { position:fixed; z-index:99; max-width:320px; padding:7px 10px;
+         background:#0f1214; color:#dfe4e7; border:1px solid #66727c;
+         border-radius:6px; font-size:12px; line-height:1.45;
+         box-shadow:0 6px 20px rgba(0,0,0,.55); pointer-events:none;
+         opacity:0; transition:opacity .12s ease; }
+  #tip.on { opacity:1; }
+  #tip b { color:#8ee89b; }
+  /* One modal, used for anything that has to be NAMED and confirmed before it
+     happens — join today, split when it lands. */
+  #modal { position:fixed; inset:0; z-index:200; display:none;
+           background:rgba(8,10,12,.72); align-items:center; justify-content:center; }
+  #modal.on { display:flex; }
+  .mbox { width:520px; max-width:92vw; background:#171b1e; color:#dfe4e7;
+          border:1px solid #66727c; border-radius:10px; padding:18px 20px;
+          box-shadow:0 18px 50px rgba(0,0,0,.6); }
+  .mbox h5 { margin:0 0 10px; font-size:15px; font-weight:700; letter-spacing:.02em; }
+  #mBody { font-size:12px; line-height:1.6; color:#9aa4ae; margin-bottom:14px; }
+  #mBody b { color:#dfe4e7; }
+  #mBody .warn { color:#e0a93f; }
+  #mBody ul { margin:8px 0 0; padding-left:18px; }
+  .mlab { display:block; font-size:10px; letter-spacing:.12em; text-transform:uppercase;
+          color:#6d757b; margin-bottom:5px; }
+  #mName { width:100%; box-sizing:border-box; background:#0f1214; color:#dfe4e7;
+           border:1px solid #4a5259; border-radius:6px; padding:8px 10px;
+           font:14px/1.2 ui-monospace,Menlo,monospace; }
+  #mName:focus { outline:2px solid #7aa7ff; outline-offset:1px; }
+  #mErr { min-height:16px; font-size:11px; color:#e05555; margin-top:6px; }
+  .mrow { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+  #mOk { border-color:#2ecc40; color:#cdf3d4; }
+  /* Load's modal, added 2026-08-29. Same #modal.on show/hide toggle and the
+     same .mbox box as the name-input modal above — a second top-level
+     overlay div rather than a second use of #modal, because its body is a
+     picked LIST, not a form, and the two never need to be open together. */
+  #loadModal { position:fixed; inset:0; z-index:200; display:none;
+               background:rgba(8,10,12,.72); align-items:center; justify-content:center; }
+  #loadModal.on { display:flex; }
+  .loadList { display:flex; flex-direction:column; gap:6px; max-height:50vh;
+              overflow-y:auto; margin-bottom:4px; }
+  .loadList button { width:100%; text-align:left; padding:9px 12px; }
+  .loadList button .sub { display:block; font-size:10px; color:#8b949c; margin-top:2px; }
+  .loadList .empty { font-size:12px; color:#8b949c; padding:6px 2px; }
+  #loadErr { min-height:16px; font-size:11px; color:#e05555; margin-top:6px; }
+  #loadBack { display:none; }
+  #loadBack.on { display:inline-block; }
+  /* An action and the tracks it acts on, joined into one control. The border
+     colour is the SAME language the viewer frame and the row ticks already
+     use: green for both tracks, blue for the segment, purple for the overlay.
+     One idea, said the same way everywhere. */
+  /* ONE control, not a button welded to a dropdown. The border belongs to the
+     wrapper and is the only thing that reports which tracks are chosen —
+     there is no state word on the face of it, because the colour already says
+     it in the same language the viewer frame and the row ticks use.
+     The select is invisible over a caret: it still opens the native list with
+     its full labels, it just does not print the current value on the button. */
+  .act { display:inline-flex; align-items:center; background:#2c3236;
+         border:1px solid #4a5259; border-radius:6px; overflow:hidden; }
+  .act > button { border:0; border-radius:0; background:none; color:inherit; }
+  .act .caret { position:relative; display:inline-flex; align-items:center;
+                align-self:stretch; padding:0 8px 0 4px;
+                color:inherit; opacity:.7; cursor:pointer; }
+  /* Drawn, not a text triangle: a glyph renders at whatever weight the font
+     feels like and sits off the optical centre. This one inherits the state
+     colour through currentColor, so it changes with the border for free. */
+  .act .chev { width:10px; height:6px; display:block; }
+  .act .caret:hover .chev { transform:translateY(1px); }
+  @media (prefers-reduced-motion:no-preference) {
+    .act .chev { transition:transform .12s ease; }
+  }
+  .act .caret:hover { opacity:1; }
+  .act .caret select { position:absolute; inset:0; width:100%; height:100%;
+                       opacity:0; cursor:pointer; border:0; }
+  .act[data-trk="both"]    { border-color:var(--both); color:#cdf3d4; }
+  .act[data-trk="base"]    { border-color:var(--seg);  color:#cfe8f7; }
+  .act[data-trk="overlay"] { border-color:var(--over); color:#e4d3f5; }

@@ -509,14 +509,22 @@ def s_session_log():
 
 def s_app_js_parses():
     """
-    Three pages, not two — the pair viewer, the timeline viewer, AND
-    _splitter_player.py's own private duplicate of MP4 Splitter's page
-    (the "open this scene on its own" link Carson asked to keep working
-    without importing the real mp4_splitter package). All three are
-    Python .format() templates, and a stray brace or apostrophe kills the
-    whole page silently — the exact gap test_editor.py's own
-    s_pages_parse() exists to close, checked here for this tool's own
-    three pages specifically.
+    Three pages, and since 2026-09-04 they are no longer the same KIND of
+    thing, which is the point of this step:
+
+      - the layered page and the timeline page are static files in web/,
+        so this fetches web/pair.js and web/seq.js and parses the real
+        files;
+      - the single-clip page is STILL a Python .format() template, built
+        by _splitter_player.py — the private duplicate of MP4 Splitter's
+        page that Carson asked to keep working without importing the real
+        mp4_splitter package — so that one is still scraped out of the
+        served HTML, where a stray brace or apostrophe kills it silently.
+
+    Scraping <script> out of the two static pages would now find nothing
+    and hand `node --check` an empty string: a check that passes while
+    proving nothing. That is not hypothetical — it is what hid a real
+    routing bug during this migration (see s_single_clip_page_still_works).
     """
     step("all three of its own pages — does the JavaScript actually run?")
     node = shutil.which("node")
@@ -524,35 +532,10 @@ def s_app_js_parses():
         check("node is available to parse them", False,
               "install node, or this can never catch a broken page again")
         return
-    doc = json.load(open(os.path.join(fixture.STORE, "sandbox", "script.json")))
-    sc = doc["scenes"][-1]
-    folder = f"{sc['n']:02d}-{sc['label']}"
-    seg = f"{fixture.ROOT_REL}/sandbox/{folder}/segment.mp4"
-    av = f"{fixture.ROOT_REL}/sandbox/{folder}/avatar.webm"
-    pages = {}
-    d, _ = get("/api/open-pair", base=seg, overlay=av)
-    pages["pair viewer"] = f"{d.get('slug')}/viewer.html"
-    ns = ",".join(str(x["n"]) for x in doc["scenes"])
-    d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns=ns)
-    pages["timeline viewer"] = f"{d.get('slug')}/viewer.html"
-    # The single-clip page _splitter_player.py builds — reached by opening
-    # the base half of a pair on its own, the same private-duplicate path
-    # the pair viewer's own "open in splitter" link uses.
-    d, _ = get("/api/open-pair", base=seg, overlay=av)
-    pages["single-clip (private splitter duplicate)"] = f"{d.get('slug')}/base/viewer.html"
 
-    for name, url in pages.items():
-        if not url or url.startswith("None"):
-            check(f"{name}: page built", False, str(url))
-            continue
-        try:
-            with urllib.request.urlopen(f"{SAE_BASE}/{url}", timeout=60) as r:
-                html = r.read().decode()
-        except Exception as e:
-            check(f"{name}: page served", False, str(e)[:60])
-            continue
-        js = "\n".join(re.findall(r"<script>(.*?)</script>", html, re.S))
-        tmp = os.path.join(tempfile.gettempdir(), "sae_check.js")
+    def parses(name, js):
+        safe = re.sub(r"[^A-Za-z0-9]+", "_", name)
+        tmp = os.path.join(tempfile.gettempdir(), f"sae_{safe}_check.js")
         with open(tmp, "w") as fh:
             fh.write(js)
         r = subprocess.run([node, "--check", tmp], capture_output=True, text=True)
@@ -561,6 +544,154 @@ def s_app_js_parses():
         check(f"{name}: its JavaScript parses", r.returncode == 0,
               f"{len(js)} bytes" if r.returncode == 0
               else next((l for l in first if "Error" in l), first[0] if first else ""))
+
+    # --- the two static pages: parse the real files ---
+    for f in ("pair.js", "seq.js"):
+        with urllib.request.urlopen(f"{SAE_BASE}/web/{f}", timeout=30) as r:
+            js = r.read().decode()
+        check(f"web/{f} is really served, and is not empty", len(js) > 5000,
+              f"{len(js)} bytes")
+        parses(f"web/{f}", js)
+
+    # --- and the pages that load them must actually reference them ---
+    doc = json.load(open(os.path.join(fixture.STORE, "sandbox", "script.json")))
+    sc = doc["scenes"][-1]
+    folder = f"{sc['n']:02d}-{sc['label']}"
+    seg = f"{fixture.ROOT_REL}/sandbox/{folder}/segment.mp4"
+    av = f"{fixture.ROOT_REL}/sandbox/{folder}/avatar.webm"
+
+    d, _ = get("/api/open-pair", base=seg, overlay=av)
+    pair_slug = d.get("slug")
+    ns = ",".join(str(x["n"]) for x in doc["scenes"])
+    d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns=ns)
+    seq_slug = d.get("slug")
+
+    for name, slug, want in (("layered page", pair_slug, "/web/pair.js"),
+                             ("timeline page", seq_slug, "/web/seq.js")):
+        with urllib.request.urlopen(f"{SAE_BASE}/{slug}/viewer.html", timeout=30) as r:
+            html = r.read().decode()
+        check(f"{name} loads {want}", want in html)
+        check(f"{name} bakes in no view any more", "<script>" not in html)
+
+    # --- the single-clip page is still a Python template: scrape it ---
+    with urllib.request.urlopen(f"{SAE_BASE}/{pair_slug}/base/viewer.html",
+                                timeout=60) as r:
+        html = r.read().decode()
+    parses("single-clip (private splitter duplicate)",
+           "\n".join(re.findall(r"<script>(.*?)</script>", html, re.S)))
+
+
+def s_api_view():
+    """
+    /api/view IS the contract between serve.py and web/{pair,seq}.js since
+    2026-09-04. One endpoint for both kinds, because the page does not
+    choose which it is — `kind` says so, and send_viewer() has already
+    sent the matching page.
+    """
+    step("/api/view — the pages ship empty and the view arrives over the API")
+    doc = json.load(open(os.path.join(fixture.STORE, "sandbox", "script.json")))
+    sc = doc["scenes"][-1]
+    folder = f"{sc['n']:02d}-{sc['label']}"
+    seg = f"{fixture.ROOT_REL}/sandbox/{folder}/segment.mp4"
+    av = f"{fixture.ROOT_REL}/sandbox/{folder}/avatar.webm"
+
+    d, _ = get("/api/open-pair", base=seg, overlay=av)
+    view, code = get("/api/view", slug=d.get("slug"))
+    eq("a real pair slug is answered", code, 200)
+    eq("it says which kind it is", view.get("kind"), "pair")
+    PAIR = ["player_label", "title", "box", "slug", "base_rel", "overlay_rel",
+            "max_n", "base_n", "over_n", "base_ext", "over_ext", "base_fps",
+            "over_fps", "base_name", "over_name", "base_audio", "over_audio"]
+    missing = [k for k in PAIR if k not in view]
+    check("all seventeen layered fields are present", not missing, missing or "none")
+    eq("max_n is the longer of the two tracks", view.get("max_n"),
+       max(view.get("base_n", 0), view.get("over_n", 0)))
+    check("base_rel is a real relative path — it exists nowhere else on disk",
+          bool(view.get("base_rel")) and view["base_rel"].endswith("segment.mp4"),
+          view.get("base_rel"))
+
+    ns = ",".join(str(x["n"]) for x in doc["scenes"])
+    d, _ = get("/api/open-seq", root=fixture.ROOT_REL, ns=ns)
+    view, code = get("/api/view", slug=d.get("slug"))
+    eq("a real timeline slug is answered", code, 200)
+    eq("it says which kind it is", view.get("kind"), "seq")
+    SEQ = ["player_label", "title", "box", "total", "manifest", "root_rel"]
+    missing = [k for k in SEQ if k not in view]
+    check("all six timeline fields are present", not missing, missing or "none")
+    check("the manifest is a real list of scenes",
+          isinstance(view.get("manifest"), list) and len(view["manifest"]) > 1,
+          len(view.get("manifest") or []))
+    eq("total is the sum of the scenes' frames", view.get("total"),
+       sum(m["base_n"] for m in view["manifest"]))
+
+    _, code = get("/api/view", slug="no-such-slug-at-all")
+    eq("an unknown slug is refused, not answered", code, 400)
+
+
+def s_single_clip_page_still_works():
+    """
+    THE BUG THIS STEP INTRODUCED AND THIS CHECK CATCHES.
+
+    A pair's cache holds three pages, not one: /<slug>/viewer.html (the
+    layered page) and /<slug>/base/viewer.html + /<slug>/overlay/viewer.html
+    — the single-clip pages _splitter_player.py still renders, which is what
+    "open this scene on its own" opens.
+
+    The first version of send_viewer() matched on path.endswith("/viewer
+    .html") and swallowed all three, serving the layered page for every one.
+    The suite passed anyway, because its only check on those pages scraped
+    <script> out of the HTML and the new static page has none — an empty
+    string parses fine. The route now matches exactly two segments.
+    """
+    step("a pair's base/overlay pages are NOT the layered page")
+    doc = json.load(open(os.path.join(fixture.STORE, "sandbox", "script.json")))
+    sc = doc["scenes"][-1]
+    folder = f"{sc['n']:02d}-{sc['label']}"
+    d, _ = get("/api/open-pair",
+               base=f"{fixture.ROOT_REL}/sandbox/{folder}/segment.mp4",
+               overlay=f"{fixture.ROOT_REL}/sandbox/{folder}/avatar.webm")
+    slug = d.get("slug")
+    check("a pair to open", bool(slug), slug)
+
+    with urllib.request.urlopen(f"{SAE_BASE}/{slug}/viewer.html", timeout=30) as r:
+        layered = r.read().decode()
+    check("the layered page is the static one", "/web/pair.js" in layered)
+
+    for half in ("base", "overlay"):
+        with urllib.request.urlopen(f"{SAE_BASE}/{slug}/{half}/viewer.html",
+                                    timeout=60) as r:
+            page = r.read().decode()
+        check(f"{half}: served its OWN single-clip page",
+              "/web/pair.js" not in page and "/web/seq.js" not in page)
+        check(f"{half}: that page carries its own inline script",
+              "<script>" in page, f"{len(page)} bytes")
+
+
+def s_stale_cached_pages():
+    """
+    A cache written before 2026-09-04 has a baked viewer.html and NO
+    view.json, and nothing can rebuild one: the manifest and the two
+    relative paths only ever existed at open time. Those must keep serving
+    their own old page rather than erroring — re-opening the pair is what
+    replaces it.
+    """
+    step("a pre-migration cache still serves its own page")
+    stale = os.path.join(PLAYERS, "cache_segment_avatar_editor",
+                         "pair_stalefixture99")
+    os.makedirs(stale, exist_ok=True)
+    marker = "PRE-MIGRATION-BAKED-PAGE"
+    with open(os.path.join(stale, "viewer.html"), "w") as fh:
+        fh.write(f"<html><body>{marker}</body></html>\n")
+    check("no view.json beside it",
+          not os.path.isfile(os.path.join(stale, "view.json")))
+    try:
+        with urllib.request.urlopen(
+                f"{SAE_BASE}/pair_stalefixture99/viewer.html", timeout=30) as r:
+            page = r.read().decode()
+        check("it still serves its own baked page", marker in page)
+        check("it is not handed the new static page", "/web/pair.js" not in page)
+    finally:
+        shutil.rmtree(stale, ignore_errors=True)
 
 
 def s_no_unreachable_handlers():
@@ -587,7 +718,8 @@ FUNCTIONS = [s_static_page, s_list, s_siblings, s_stores, s_open_pair,
              s_mark, s_save, s_save_stale, s_cut, s_vtt, s_line, s_join,
              s_renumber_state, s_renumber_clear, s_split, s_archive,
              s_save_archive, s_dropped_routes_are_gone, s_session_log,
-             s_app_js_parses,
+             s_api_view, s_single_clip_page_still_works,
+             s_stale_cached_pages, s_app_js_parses,
              s_no_unreachable_handlers]
 
 

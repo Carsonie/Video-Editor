@@ -772,13 +772,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return self.route_get(parsed)
 
     def route_get(self, parsed):
-        # This tool's own routes only — the Splitter-only ones (single-clip
+        # This tool's own routes only. The Splitter-only ones (single-clip
         # Open, Discard edits, Reset editor) were dropped here on
-        # 2026-09-02 when the two split apart. Their handler methods are
-        # still defined further down (harmless, unreachable dead code) —
-        # not deleted, so nothing this tool DOES need risks breaking by a
-        # mis-guessed "unused" removal; only the paths that let you reach
-        # them are gone.
+        # 2026-09-02 when the two tools split apart, and their handler
+        # methods were deleted on 2026-09-03. tests/fixture.py's
+        # dead_handlers() walks this dispatcher transitively and fails the
+        # suite if an unreachable handler reappears.
         if parsed.path == "/api/list":
             return self.api_list(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/stores":
@@ -801,8 +800,25 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.api_map(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/marks":
             return self.api_marks(urllib.parse.parse_qs(parsed.query))
+        if parsed.path == "/api/view":
+            return self.api_view(urllib.parse.parse_qs(parsed.query))
+        if parsed.path.startswith("/web/"):
+            return self.send_web(parsed.path[len("/web/"):])
         if parsed.path in ("/", "/browse.html"):
             return self.send_html(BROWSE_HTML)
+        # EXACTLY /<slug>/viewer.html — two segments, no deeper.
+        #
+        # A pair's cache also holds /<slug>/base/viewer.html and
+        # /<slug>/overlay/viewer.html: the single-clip pages that
+        # _splitter_player.py still renders, which is what "open this scene
+        # on its own" opens. Matching on endswith() alone swallowed those and
+        # served the layered page instead — and the suite did not catch it,
+        # because its check scrapes <script> out of the HTML and the new
+        # static pages have none, so it handed `node --check` an empty
+        # string and passed. Hence the exact shape, and the test below it.
+        bits = parsed.path.strip("/").split("/")
+        if len(bits) == 2 and bits[1] == "viewer.html":
+            return self.send_viewer(bits[0])
         return super().do_GET()
 
     def do_POST(self):
@@ -1291,6 +1307,81 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         meta = json.load(open(os.path.join(outdir, "meta.json")))
         self.send_json({"frame_map": build_mod.get_frame_map(meta),
                          "nb_frames": meta["nb_frames"]})
+
+    def _view_of(self, slug):
+        """This view's recorded data, or None if the slug has no view.json."""
+        if not slug or os.sep in slug or "/" in slug or slug in (".", ".."):
+            return None
+        p = os.path.join(CACHE, slug, sae.VIEW_FILE)
+        if not os.path.isfile(p):
+            return None
+        try:
+            return json.load(open(p))
+        except (OSError, ValueError):
+            return None
+
+    def api_view(self, qs):
+        """
+        Everything a page needs to draw itself — the values that used to be
+        baked into the HTML by player.py's str.format().
+
+        One endpoint for both page kinds, because the page does not choose
+        which one it is: `kind` in the answer says whether this is a layered
+        pair or a timeline, and serve_viewer() has already sent the matching
+        page. This endpoint IS the contract between serve.py and web/*.js.
+        """
+        view = self._view_of((qs.get("slug") or [""])[0])
+        if view is None:
+            return self.send_json({"error": "unknown slug"}, 400)
+        self.send_json(view)
+
+    def send_viewer(self, slug):
+        """
+        A view's page: web/pair.html or web/seq.html, chosen by view.json.
+
+        NOT the viewer.html sitting in the cache folder. Until 2026-09-04
+        write_pair()/write_seq() rendered a complete page into every cache,
+        so old caches still hold one — serving the static page here makes
+        all of them correct at once, with no re-extraction.
+
+        A cache written before the change has a viewer.html and NO
+        view.json, and there is nothing to rebuild one from: the manifest
+        and the two relative paths only ever existed at open time. So those
+        fall through to the old baked page, which still works. Re-open the
+        pair or the timeline and the new page takes over.
+        """
+        view = self._view_of(slug)
+        if view is None:
+            return super().do_GET()      # pre-2026-09-04 cache: its own page
+        page = "seq.html" if view.get("kind") == "seq" else "pair.html"
+        return self.send_web(page, "text/html; charset=utf-8")
+
+    def send_web(self, name, ctype=None):
+        """
+        One of this tool's own static files out of segment_avatar_editor/web/.
+
+        Served from here rather than by pointing the handler's `directory` at
+        web/, because that root is already the frame CACHE — the frames are
+        the bulk of what this server hands out. `name` is resolved and then
+        checked to still be inside web/, so a `..` cannot walk out.
+        """
+        root = os.path.join(HERE, "web")
+        path = os.path.realpath(os.path.join(root, name))
+        if not path.startswith(os.path.realpath(root) + os.sep) or not os.path.isfile(path):
+            return self.send_json({"error": f"no such file: {name}"}, 404)
+        if ctype is None:
+            ctype = {".js": "application/javascript", ".css": "text/css",
+                     ".html": "text/html; charset=utf-8"}.get(
+                os.path.splitext(path)[1], "application/octet-stream")
+        body = open(path, "rb").read()
+        self.send_response(200)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Length", str(len(body)))
+        # These pages are edited while they are open. A cached copy of a .js
+        # is a fix that silently did not apply.
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
 
     def api_marks(self, qs):
         outdir = resolve_outdir(qs.get("slug", [""])[0], qs.get("which", [None])[0])

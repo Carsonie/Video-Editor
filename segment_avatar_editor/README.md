@@ -11,35 +11,95 @@ python3 segment_avatar_editor/serve.py          # http://localhost:8846
 
 Standalone — nothing else needs to be running. Its own process, its own
 port, its own extracted-frame cache (`cache_segment_avatar_editor/`, not
-the shared `cache/`), and its own copies of `frames.py`, `paths.py` and
-`vtt.py`. Split off `shared/serve.py` on 2026-09-02 at Carson's request:
-this tool and MP4 Splitter used to share one process on port 8842, and
-he asked for the two to be genuinely independent, code and all.
+the shared `cache/`), its own routes and its own pages. Split off
+`shared/serve.py` on 2026-09-02 at Carson's request: this tool and MP4
+Splitter used to share one process on port 8842, and he asked for the two
+to be genuinely independent, code and all.
+
+The one thing it does share is `editor_base/` — frame extraction, path
+shapes and the VTT word count, imported rather than copied since
+2026-09-03. Those three files had existed in triplicate. See `CLAUDE.md`,
+"The one exception: editor_base/".
 
 ## What's in here
 
 | | |
 |---|---|
 | `serve.py` | the server and every route. Stateless: each request names what it acts on |
-| `player.py` | **both** pages — see below |
+| `web/pair.html` `.css` `.js` | the layered page, shipped **empty** — see below |
+| `web/seq.html` `.css` `.js` | the timeline page, shipped **empty** |
+| `player.py` | 134 lines: writes each view's `view.json`. No pages in it |
 | `_splitter_player.py` | a private copy of MP4 Splitter's viewer — see below |
-| `frames.py` | frame extraction, the frame map, the edit maths. **A copy** of `shared/frames.py`, not an import |
-| `paths.py` | where a store's folders are. **A copy**, currently byte-identical to `shared/`'s |
-| `vtt.py` | the Video Timing Table — clip length vs. how long the line takes to say |
 | `VERSION` | bumped on every commit that changes what this tool does |
 
-### `player.py` builds two pages, not one
+Frame extraction, path shapes and the VTT word count are in
+`editor_base/`, imported — not copied here.
 
-- **`PAIR_TEMPLATE`** — the layered view: one scene, mp4 underneath,
-  alpha WebM on top, each track independently editable.
-- **`SEQ_TEMPLATE`** — the timeline: several scenes joined, so the
+### Two pages, and they ship empty
+
+- **`web/pair.*`** — the layered view: one scene, mp4 underneath, alpha
+  WebM on top, each track independently editable.
+- **`web/seq.*`** — the timeline: several scenes joined, so the
   *boundaries* can be judged. A scene on its own cannot show the thing
   that most often goes wrong — how one scene joins the next.
 
-They are one file because they edit the same two layers with the same
-tools; only the span differs. At 3,966 lines it is the largest file in
-this repo, and splitting it is Step 13 of
-`README-CODE-CLEANUP-PLAN.md`.
+Two pages rather than one, because they were two templates for a reason:
+they share the tools but not the span. They share nothing but `serve.py`.
+
+**No view is baked into either.** `player.py`'s `write_pair()` and
+`write_seq()` write a small **`view.json`** into the cache folder, and
+the page fetches it back over `GET /api/view?slug=…` before it draws
+anything. One endpoint for both, because the page does not choose which
+kind it is: `kind` in the answer says so, and `send_viewer()` has already
+sent the matching page.
+
+**Why a file and not a rebuild from `meta.json`.** Most of what a view
+needs cannot be recovered afterwards. `base_rel` and `overlay_rel` are
+handed in when a pair is opened; the timeline's `manifest`, mapping every
+global frame to (scene, local frame), is built at open time and exists
+nowhere else. A rebuild would have to guess them, so the open writes them
+down.
+
+### ⚠ Three pages live under one cache folder
+
+A pair's cache holds **three** `viewer.html` paths, not one:
+
+```
+/<slug>/viewer.html            the layered page      (static, web/pair.*)
+/<slug>/base/viewer.html       that scene on its own (_splitter_player.py)
+/<slug>/overlay/viewer.html    the overlay on its own
+```
+
+`serve.py` routes **exactly two path segments** to the static page. The
+first version of that route matched `path.endswith("/viewer.html")` and
+swallowed all three, serving the layered page for every one — and **the
+suite passed**, because its only check on those pages scraped `<script>`
+out of the HTML, and the new static page has none, so it handed
+`node --check` an empty string. `s_single_clip_page_still_works` now
+pins this down; reintroducing the bug fails four checks.
+
+### ⚠ A cache written before 2026-09-04 has no `view.json`
+
+Those still hold a fully baked `viewer.html`, and nothing can rebuild a
+view for them — the manifest and the relative paths only ever existed at
+open time. `send_viewer()` falls through to the old page for those, so
+they keep working. Re-open the pair or the timeline and the new page
+takes over.
+
+### What this replaced
+
+`player.py` was **3,966 lines** — the largest file in this repo — almost
+all of it two `str.format()` strings, `PAIR_TEMPLATE` (733 lines) and
+`SEQ_TEMPLATE` (3,225), each holding a whole page. Every CSS and JS brace
+had to be doubled `{{ }}`, no editor could lint or highlight any of it,
+and a stray apostrophe killed the page at **render** time rather than at
+edit time. It is now 134 lines.
+
+**Keep the `node --check` guard, and note it is no longer uniform.** The
+two static pages are parsed as real files (`/web/pair.js`, `/web/seq.js`);
+the single-clip page is *still* a Python template, so that one is still
+scraped out of the served HTML. Scraping the static pages would find
+nothing and pass on an empty string.
 
 ### `_splitter_player.py` is a deliberate duplicate
 
@@ -47,28 +107,17 @@ The SAE's "open this scene on its own" link needs MP4 Splitter's single-
 clip viewer. Rather than import another editor's package — which the
 2026-09-02 split exists to prevent — a copy lives here.
 
-**It is 99% identical to `mp4_splitter/player.py`: 16 differing lines
-out of ~1,570.** That is a copy, not a divergence, and it is a known
-open question rather than a settled design — Step 10 of the cleanup
-plan is the decision about it. Until that is answered, a fix made in
-one must be considered for the other by hand; nothing enforces it.
+It was 99% identical to `mp4_splitter/player.py` — 16 differing lines out
+of ~1,570 — but that comparison is now out of date in a way that matters:
+MP4 Splitter's `player.py` was migrated to static files on 2026-09-04 and
+is 66 lines. **This file is the last Python-string page in the repo**, and
+it no longer duplicates anything.
 
-## ⚠ The pages are Python strings, not files
-
-Both templates build HTML, CSS and JavaScript as `str.format()` strings.
-Two traps, both already paid for and both in `CLAUDE.md`:
-
-- **Every CSS and JS brace must be doubled** `{{ }}`.
-- **A stray apostrophe in a single-quoted JS string kills the whole page
-  silently.** Use a backtick literal.
-
-**Always check the generated JavaScript, not just that the Python
-parses.** The suite's Step 32 runs `node --check` on all three of this
-tool's pages and is the only thing standing between a broken page and a
-silent ship. Do not drop it.
-
-Avatar Editor and Frame Blender moved off this pattern on 2026-08-30 to
-plain `web/*.js` files; those two are the worked example for Step 13.
+De-duplicating it was deliberately deferred rather than skipped; the
+reasons are written up under Step 11a.8 in
+`README-CODE-CLEANUP-PLAN.md`. In short: `editor_base/` may not hold page
+rendering, and folding a player in would re-link two tools the 2026-09-02
+split separated on purpose.
 
 ## ⚠ Routes that were dropped are gone entirely — keep it that way
 

@@ -1,0 +1,70 @@
+<!--
+  Segment and Avatar Editor — the pair page.
+
+  Static since 2026-09-04. This file ships with NO clip in it: every value
+  that used to be baked in by str.format() now arrives over /api/view, and
+  pair.js fills the page in once that answers. That is why the counters
+  read empty here.
+-->
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Segment and Avatar Editor</title>
+<link rel="stylesheet" href="/web/pair.css">
+<script src="/web/pair.js" defer></script>
+</head><body>
+<div class="wrap">
+ <div class="left">
+  <div class="row">
+    <div class="tgl">
+      <button id="tBase" class="on">● Background &nbsp;<small>mp4</small></button>
+      <button id="tOver">● Overlay &nbsp;<small>webm</small></button>
+    </div>
+    <button id="soloBtn" title="Dim the layer that is not being edited">Solo active</button>
+  </div>
+  <div class="meta" id="who"></div>
+
+  <div id="stage"><img id="baseImg"><img id="overImg"></div>
+  <audio id="audBase" src="base/audio.m4a" preload="auto"></audio>
+  <audio id="audOver" src="overlay/audio.m4a" preload="auto"></audio>
+
+  <div class="bar"><div id="ticks"></div>
+    <input id="slider" type="range" min="1" max="1" value="1" step="1"></div>
+  <div class="meta" id="pos"></div>
+
+  <div class="row">
+    <button id="playBtn" title="Play / pause  (space)">▶ Play</button>
+    <button id="muteBtn" title="Mute / unmute">🔊</button>
+    <select id="rateSel" title="Playback speed. Slow to judge a seam; 2x to skim.">
+      <option value="2">2x</option>
+      <option value="1" selected>1x</option>
+      <option value="0.5">0.5x</option>
+      <option value="0.25">0.25x</option>
+      <option value="0.125">0.125x</option>
+    </select>
+    <button id="p10">◀◀</button><button id="p1">◀</button>
+    <button id="n1">▶</button><button id="n10">▶▶</button>
+    <label class="meta" style="margin-left:4px">
+      <input id="loopChk" type="checkbox" checked> loop</label>
+    <button id="markBtn">◆ Mark / unmark</button>
+    <button id="prevMark">[ prev mark</button><button id="nextMark">next mark ]</button>
+  </div>
+  <div class="row">
+    <button id="addL">+1 ◀ add</button><button id="addR">add ▶ +1</button>
+    <button id="delL">−1 ◀ del</button><button id="delR">del ▶ −1</button>
+    <button id="cutBtn">✂ Cut active</button>
+    <button id="saveBtn">💾 Save active</button>
+  </div>
+  <div id="status"></div>
+ </div>
+ <div class="right">
+   <h4>Scenes</h4>
+   <div id="scopeBar"></div>
+   <div id="verStamp"></div>
+   <label class="vlab" for="verSel">cut</label>
+   <select id="verSel"></select>
+   <div id="sceneList"></div>
+   <button id="seqBtn" disabled>&#9654; Timeline of 0 scenes</button>
+   <div class="vlab" style="margin:4px 0 8px">Tick several to watch how they join.</div>
+   <div id="sceneNote" style="font-size:11px;color:#6d757b;margin-top:8px;line-height:1.5"></div>
+ </div>
+</div>
+  <div class="playerName" id="playerName"></div>

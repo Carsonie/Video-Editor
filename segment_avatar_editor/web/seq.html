@@ -1,0 +1,164 @@
+<!--
+  Segment and Avatar Editor — the seq page.
+
+  Static since 2026-09-04. This file ships with NO clip in it: every value
+  that used to be baked in by str.format() now arrives over /api/view, and
+  seq.js fills the page in once that answers. That is why the counters
+  read empty here.
+-->
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Segment and Avatar Editor</title>
+<link rel="stylesheet" href="/web/seq.css">
+<script src="/web/seq.js" defer></script>
+</head><body>
+<div class="wrap">
+ <div class="left">
+  <div id="stage"><img id="baseImg"><img id="overImg"></div>
+  <div class="bar">
+    <div id="segbar"></div>
+    <div id="ticks"></div>
+    <input id="slider" type="range" min="1" max="1" value="1" step="1" title="The whole timeline, every scene end to end. Drag to scrub, or click anywhere to jump there. The arrow keys step one frame from wherever you land, which is how you find the exact frame something happens on.">
+  </div>
+  <div class="meta" id="pos"></div>
+
+  <!-- The VTT — Video Timing Table, NOT WebVTT subtitles. Sarah's line per
+       scene, what it costs to say, and the gap left over. It sits here because
+       this is the space the controls vacated, and because a line is easiest to
+       judge while looking at the footage it plays over. -->
+  <div id="vtt">
+    <div id="vttHead">VTT <span id="vttSum"></span></div>
+    <div id="vttRows"></div>
+  </div>
+
+  
+ </div>
+ <div class="right">
+   <h4>Time Line Scenes</h4>
+   <div id="sceneList"></div>
+   <button id="rebuildBtn" disabled title="Rebuild the timeline from the ticked scenes. The timeline is a different set of frames afterwards, so this is a navigation, not an edit — nothing you have changed is lost.">Tick at least one scene</button>
+   <div id="bulk">
+     <div class="bulkrow">
+       <button id="selAll" title="Tick every scene in the list. Pair it with Rebuild to put the whole video on one timeline.">Select all</button>
+       <button id="selNone" title="Untick every scene. Then tick just the few you want to compare, and rebuild.">Unselect all</button>
+     </div>
+     <button id="balanceBtn" title="Make each ticked scene's two tracks the same length, by repeating the LAST frame of whichever is shorter. The last frame is the settled end of the shot, so the repeat is invisible. Undoable per scene.">&#8646; Update Frame Imbalance</button>
+     <div id="balNote"></div>
+   </div>
+
+   <!-- Five rows, each answering one question, in the order the work happens:
+        1. where am I    2. what is marked    3. change it
+        4. commit it, or start over    5. what is selected
+        They were one undifferentiated pile before, so "play a bit" and
+        "overwrite a file" sat side by side. Under the viewer until the block
+        moved here, which is why the page used to run off the bottom.
+
+        Row 4 added 2026-08-29: every action here reaches beyond the one scene
+        on screen — Save Timeline and Save all write to sandbox/, Backup
+        Scenes archives and refills the whole thing, Clear All empties this
+        editor session, Load starts a different one. Row 3 stays scoped to
+        the frame under the pointer; this is everything a step up from that. -->
+   <div id="ctls">
+  <div class="ctlrow" data-r="1"><button id="playBtn" title="Play or pause the timeline. Space does the same. Playback starts from wherever the pointer is, so drag it first to watch a particular moment.">&#9654; Play</button>
+    <button id="muteBtn" title="Mute the narration. The picture is unaffected — useful when you are judging motion and the voice is a distraction.">&#128266;</button>
+    <button id="soloBtn" title="Show one track on its own (keyboard: s). AVATAR hides the footage and puts a checkerboard behind Sarah, so her edges are against something you can see through &mdash; that is where a bad alpha shows. FOOTAGE hides her instead. It changes nothing on disk; it is only what you are looking at.">&#9673; Both</button>
+    <select id="rateSel" title="Playback speed. Slow right down to judge a seam: at 25fps a cut is over in 40ms, and 0.125x stretches that to 320ms. Below 0.25x the browser will not play audio, so those speeds are silent.">
+      <option value="2">2x</option>
+      <option value="1" selected>1x</option>
+      <option value="0.5">0.5x</option>
+      <option value="0.25">0.25x</option>
+      <option value="0.125">0.125x</option>
+    </select>
+    <button id="p10" title="Back 10 frames. Hold to scan backwards quickly without losing your place.">&#9664;&#9664;</button>
+    <button id="p1" title="Back one frame. This is the control for finding the exact frame a change happens on.">&#9664;</button>
+    <button id="n1" title="Forward one frame. Step through a transition one frame at a time to see where it really begins.">&#9654;</button>
+    <button id="n10" title="Forward 10 frames. Quicker than dragging when you are a little way from what you want.">&#9654;&#9654;</button>
+    <button id="prevScene" title="Jump to the start of the previous scene. Keyboard: [">&#124;&#9664; scene</button>
+    <button id="nextScene" title="Jump to the start of the next scene. Keyboard: ]">scene &#9654;&#124;</button>
+  </div>
+
+  <div class="ctlrow" data-r="2"><button id="markBtn" title="Mark or unmark this frame (keyboard: m). Marks divide a scene into ZONES — the span between two marks — which is what Loop Zone plays and what + Zone and - Zone act on.">&#9670; Mark / Unmark</button>
+    <button id="prevMark" title="Jump back to the previous mark. Marks show as green ticks on the bar; you can also click a tick directly.">&#91; prev mark</button>
+    <button id="nextMark" title="Jump forward to the next mark. Marks show as green ticks on the bar; you can also click a tick directly.">next mark &#93;</button>
+    <!-- Off by default: opening a timeline and pressing Play should play the
+         timeline once at 1x, not start looping a zone the user has not asked
+         for yet. Loop Zone is a thing you turn ON to study a seam. -->
+    <label id="loopLbl" title="Loop the zone the pointer is inside — the span between the marks either side of it. With no marks it loops the whole scene. Turn this on to watch one seam over and over while you trim it.">
+      <input id="loopChk" type="checkbox" title="Loop the zone the pointer is inside — the span between the marks either side of it. With no marks it loops the whole scene."><span>&#8635; Loop Zone</span></label>
+    <span class="act" id="joinAct">
+      <button id="joinBtn" title="Join every scene on the timeline into ONE new scene. You are asked to name it first and shown exactly what will be merged. Scene numbers are rewritten 1..N afterwards, so from then on scenes must be saved as a set.">Join</button>
+      <span class="caret"><svg class="chev" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><select id="joinTrk" title="Which tracks the join acts on. Both is the normal case and the button turns green for it; pick one track alone and the button takes that track's colour. A track you do not pick is NOT carried into the joined scene.">
+          <option value="both" selected>both</option>
+          <option value="base">segment</option>
+          <option value="overlay">overlay</option>
+        </select></span>
+    </span>
+    <span class="act" id="splitAct">
+      <button id="splitBtn" title="Split the scene under the pointer in two, at the frame on screen. You are asked to name both halves. Every scene is renumbered afterwards, so from then on scenes must be saved as a set.">Split</button>
+      <span class="caret"><svg class="chev" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><select id="splitTrk" title="Which tracks the split acts on. Both is the normal case and the button turns green for it; pick one track alone and the button takes that track's colour. A track you do not pick stays whole and is not carried into either half.">
+          <option value="both" selected>both</option>
+          <option value="base">segment</option>
+          <option value="overlay">overlay</option>
+        </select></span>
+    </span>
+  </div>
+
+  <div class="ctlrow" data-r="3"><button id="addFrame" title="Duplicate the frame on screen, on whichever tracks this scene has ticked. The copy becomes the frame you are looking at. Use it to hold a still moment for longer.">&#65291; Frame</button>
+    <button id="delFrame" title="Delete the frame on screen, on whichever tracks this scene has ticked. The next frame moves into its place, so the timeline appears to step forward.">&#65293; Frame</button>
+    <button id="addZone" title="Repeat the whole marked zone once more, on the ticked tracks. Useful for stretching a settled stretch to fit a longer line of narration.">&#65291; Zone</button>
+    <button id="delZone" title="Remove the whole marked zone from the ticked tracks. Mark either side of what you want gone, then press this.">&#65293; Zone</button>
+    <span class="vsep"></span>
+    <button id="copyFrame" title="Copy the frame on screen. It is remembered by POSITION, not as a picture — pasting it later inserts the very same frame, with no re-encoding. Hold Shift as you click to put the picture on the Mac clipboard as well, for pasting into another app.">⧉ Copy</button>
+    <button id="pasteFrame" disabled title="Paste the copied frame in after the frame on screen, on the ticked tracks. Nothing is copied yet — press Copy first.">⧉ Paste</button>
+  </div>
+
+  <!-- Row 4, added 2026-08-29: the five actions that reach past one scene —
+       three write to sandbox/ in three different amounts (a tracked edit, a
+       tracked edit plus its line, or the whole timeline regardless), one
+       empties this editor session, one starts a different one. Ordered
+       smallest-effect to largest, left to right, ending at Load because
+       loading a different video is the one action here that leaves this
+       session behind entirely. -->
+  <div class="ctlrow" data-r="4">
+    <button id="saveTimelineBtn" title="Write every scene ON THIS TIMELINE that has unsaved edits back over its file in sandbox/. Narrative lines are untouched — Save all covers those too. Each file keeps its previous version in its own scene's z_History/. No whole-set backup is taken and no renumber note is cleared &mdash; Backup Scenes does those.">&#128190; Save Timeline</button>
+    <button id="saveAllBtn" title="Write every scene with unsaved video edits, AND every scene with an unsaved narrative line, back over their files. Same reach as Save Timeline, plus the lines that changed. Untouched scenes and untouched lines are left alone. Each file keeps its previous version in its own scene's z_History/.">&#128221; Save all</button>
+    <button id="backupBtn" title="First copies the current sandbox/ whole into sandbox/1000_archive/ (dated and numbered for today) &mdash; a full snapshot of the generation about to be replaced. Then writes EVERY scene on this timeline back over its file in sandbox/, exactly as configured here right now, whether or not it was marked as edited, LOCKED tracks included, and every narrative line to script.json unconditionally. If a join or split has renumbered the scenes, that note is cleared too &mdash; the only thing left outstanding after one.">&#9707; Backup Scenes</button>
+    <button id="clearAllBtn" title="Empty this editor session: every scene, the narrative table, every mark, lock and undo step. Nothing on sandbox/ is touched &mdash; this only clears what THIS BROWSER TAB is holding, so you can load a different video into a clean editor.">&#128465; Clear All</button>
+    <button id="loadBtn" title="Open a different video in this editor: pick a store, then which of its videos, then its sandbox/ scenes and narrative load in fresh. Anything unsaved in the current session is lost &mdash; Save Timeline or Save all first if you want it kept.">&#128194; Load</button>
+  </div>
+
+  <div class="ctlrow report" data-r="5"><span id="rep"></span>
+  </div>
+  </div>
+
+  <div id="status"></div>
+ </div>
+</div>
+<audio id="audA" preload="auto"></audio>
+<div id="tip"></div>
+<div id="modal"><div class="mbox">
+  <h5 id="mTitle">Name it</h5>
+  <div id="mBody"></div>
+  <label class="mlab" for="mName" title="Lower-case letters, digits and hyphens. This becomes the scene's FOLDER name in sandbox/ and its label in script.json, so it is what every later tool will call this scene.">New scene name</label>
+  <input id="mName" type="text" autocomplete="off" spellcheck="false" title="Lower-case letters, digits and hyphens — no spaces or capitals. It becomes the folder name in sandbox/ and the label in script.json. Enter confirms; Escape cancels.">
+  <div id="mErr"></div>
+  <div class="mrow">
+    <button id="mCancel" title="Close this without changing anything. Nothing has been written yet — a join or split only touches your files once you confirm here.">Cancel</button>
+    <button id="mOk" title="Do it. This writes to disk immediately: folders are created and removed in sandbox/ and script.json is rewritten, all in one go. The previous state is archived to z_History/ first, so it is recoverable but not undoable from the editor.">Confirm</button>
+  </div>
+</div></div>
+
+<!-- Load's own modal, added 2026-08-29: a two-step pick (store, then which of
+     its videos) rather than the single name-input #modal above — different
+     enough in shape that reusing #modal would mean two unrelated bodies
+     fighting for the same markup. Shares .mbox for the box itself, so it
+     still looks like part of the same editor. -->
+<div id="loadModal"><div class="mbox">
+  <h5 id="loadTitle">Load a video</h5>
+  <div id="loadBody"><div id="loadList" class="loadList"></div></div>
+  <div id="loadErr"></div>
+  <div class="mrow">
+    <button id="loadBack" title="Back to the store list.">&#8592; Back</button>
+    <button id="loadCancel" title="Close this without loading anything. The current editor session is unaffected.">Cancel</button>
+  </div>
+</div></div>
+  <div class="playerName" id="playerName"></div>
