@@ -1,0 +1,12 @@
+{
+  "slug": "first-time-ordering",
+  "title": "First Time Ordering",
+  "script": "Hi, I'm Sarah. Learn how to place your first equipment rental order.",
+  "voice": {
+    "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+    "speed": 1.0
+  },
+  "source_video": "videos/first_time_ordering/source/first-time-ordering.mp4",
+  "audio_out": "audio/first-time-ordering.mp3",
+  "final_out": "videos/first_time_ordering/final/first-time-ordering.mp4"
+}

@@ -1,0 +1,46 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "GOLANG",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/backend/cmd/server",
+      "cwd": "${workspaceFolder}/backend",
+      "env": {},
+      "args": [],
+      "showLog": true,
+      "console": "integratedTerminal",
+      "preLaunchTask": ""
+    },
+    {
+      "name": "WEB",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}/frontend",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "serverReadyAction": {
+        "pattern": "Local:.*http://localhost:([0-9]+)",
+        "uriFormat": "http://localhost:%s",
+        "action": "openExternally"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack",
+      "configurations": ["GOLANG", "WEB"],
+      "presentation": {
+        "hidden": false,
+        "group": "",
+        "order": 1
+      },
+      "stopAll": true
+    }
+  ]
+}

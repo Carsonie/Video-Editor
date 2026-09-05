@@ -1,0 +1,610 @@
+[
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "fc2aa33ca89d407fb6d48ffdc9ad42dc",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/77b8d6552c2a424db41420fea6988867/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/77b8d6552c2a424db41420fea6988867/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "f60c26430b794a12aab4e43d9958238f",
+    "image_height": 1080,
+    "image_width": 1920,
+    "name": "Pamela",
+    "preferred_orientation": "landscape",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/7972f430376041f19f7b8dc2625cde33/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/7972f430376041f19f7b8dc2625cde33/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "f1c9f5191d0e4736b84027164c2d4b2e",
+    "image_height": 1080,
+    "image_width": 1920,
+    "name": "Pamela",
+    "preferred_orientation": "landscape",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/cb3b28aa5b6d4312b1d0224c8b1a9eab/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/cb3b28aa5b6d4312b1d0224c8b1a9eab/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "efdfa1fe23aa4284995174e56c4781a0",
+    "image_height": 1080,
+    "image_width": 1920,
+    "name": "Pamela",
+    "preferred_orientation": "landscape",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/5bc36665dc7b455393df48bec76210a9/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/5bc36665dc7b455393df48bec76210a9/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "ef5752d98b3d488b98f38e5e5deff4a7",
+    "image_height": 1080,
+    "image_width": 1920,
+    "name": "Pamela",
+    "preferred_orientation": "landscape",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/5571746fda9a4dfab0e409fcf2e61be4/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/5571746fda9a4dfab0e409fcf2e61be4/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "eae21657ff9142beab555d0d3a23bc52",
+    "image_height": 1080,
+    "image_width": 1920,
+    "name": "Pamela",
+    "preferred_orientation": "landscape",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/cef6a6d081504bc195c1556e6f4daa21/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/cef6a6d081504bc195c1556e6f4daa21/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "d3df3ce9fa5e407c96bd4dec628fa876",
+    "image_height": 1080,
+    "image_width": 1920,
+    "name": "Pamela",
+    "preferred_orientation": "landscape",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/802ff671065c4e1d876a421c274ae831/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/802ff671065c4e1d876a421c274ae831/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "cd095af137f14a0ea063f648ddf4333c",
+    "image_height": 1080,
+    "image_width": 1920,
+    "name": "Pamela",
+    "preferred_orientation": "landscape",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/18bbe5032e1f48da883dec613dcabab6/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/18bbe5032e1f48da883dec613dcabab6/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "b7e8410aeb4647e99c891080c5bf2ded",
+    "image_height": 1080,
+    "image_width": 1920,
+    "name": "Pamela",
+    "preferred_orientation": "landscape",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/0c31380ffd0947d0830f91f714aeb0bc/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/0c31380ffd0947d0830f91f714aeb0bc/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "9da0a33e3b1747f584ea006d6384b53a",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/ab61e769c6884f9c93d8302997b0c20e/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/ab61e769c6884f9c93d8302997b0c20e/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "987a73da44534fdcbcbb7373f3cdbea4",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/a105510ca1554c8ebb7ced03c74b331a/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/a105510ca1554c8ebb7ced03c74b331a/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "979603f1b13f43d38d72d74e8617e41b",
+    "image_height": 1080,
+    "image_width": 1920,
+    "name": "Pamela",
+    "preferred_orientation": "landscape",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/5b0c0627436b431992109708b07a85dc/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/5b0c0627436b431992109708b07a85dc/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "9666149863a84c6183a080b4e19f56c2",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/b460d17e1c43478aa900efd962e07602/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/b460d17e1c43478aa900efd962e07602/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "8e8470426f984f2a8f01df624899ced3",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/204c38e0b65a4b9f8697b81566af0745/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/204c38e0b65a4b9f8697b81566af0745/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "7c5206822a294bc38d7a933a326ba90c",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/1844b2d3397345d4af2e8df7f0a87687/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/1844b2d3397345d4af2e8df7f0a87687/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "7bce24976cb94570b4ba2c25d2fc909b",
+    "image_height": 1080,
+    "image_width": 1920,
+    "name": "Pamela",
+    "preferred_orientation": "landscape",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/c6e23040194a46688b5362915387b907/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/c6e23040194a46688b5362915387b907/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "7a37724105bd48ecaf289af04cf088af",
+    "image_height": 1080,
+    "image_width": 1920,
+    "name": "Pamela",
+    "preferred_orientation": "landscape",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/696c01905c5c416d9d6faf5fce996f67/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/696c01905c5c416d9d6faf5fce996f67/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "77f3a1fff8524c1bb8e83f76ab3f4669",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/be720c0ed0634cb38ff9c655a178ed53/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/be720c0ed0634cb38ff9c655a178ed53/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "7659d41310424faaab2860ec7488cc1c",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/9d95757dd68c420d8ec0665adc0191ee/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/9d95757dd68c420d8ec0665adc0191ee/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "697dca5c9c014d7cbbf36025e96b46a8",
+    "image_height": 1080,
+    "image_width": 1920,
+    "name": "Pamela",
+    "preferred_orientation": "landscape",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/da7be1bb1b8248ba93c20e80e001d166/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/da7be1bb1b8248ba93c20e80e001d166/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "648dd507038e4d269c1a5f9575947113",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/1c3e8f33c82c44219f588aa967497b0d/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/1c3e8f33c82c44219f588aa967497b0d/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "633b674716064a0590aebb4921e6dbc0",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/b262a9c075024bf1b1711237af0fab55/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/b262a9c075024bf1b1711237af0fab55/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "5ed81416d12746a9afaccc460a51743e",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/5fb823cdf13340acb149782a364b332f/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/5fb823cdf13340acb149782a364b332f/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "53a219260eb646a3acc499e2154d43b4",
+    "image_height": 1080,
+    "image_width": 1920,
+    "name": "Pamela",
+    "preferred_orientation": "landscape",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/d4a281ca07a840458b9077e634bf9f42/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/d4a281ca07a840458b9077e634bf9f42/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "4b2a7ec05d614f2ab19e3ab796b97f88",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/5d82e39ded0d44718b36436deaccba44/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/5d82e39ded0d44718b36436deaccba44/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "4a408d5ef8ce4046a03f3c5b8e2e6a9c",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/74439430c8a242958b37cb7327b3bc90/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/74439430c8a242958b37cb7327b3bc90/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "468eabb3326a4d8587ba29d065b1eba7",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/d3e6c72df080433e87b49c70e8243f28/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/d3e6c72df080433e87b49c70e8243f28/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "434c486e1baa49f6983c6896f9e07e79",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/2d519dce7bed4bfba86dfa572d97fb4c/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/2d519dce7bed4bfba86dfa572d97fb4c/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "40d6af725bbd44e3aa47a7f6d88fd0dc",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/5166c83f110c492a9a3e1ddfae18e720/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/5166c83f110c492a9a3e1ddfae18e720/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "3b5186818cdd49f881520a5379e72734",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/4d6f2359d92c456faafe057c76c2dcc5/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/4d6f2359d92c456faafe057c76c2dcc5/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "137adf6454944d3da18aa3064ec45c3b",
+    "image_height": 1920,
+    "image_width": 1080,
+    "name": "Pamela",
+    "preferred_orientation": "portrait",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/564846463e1b4fae9dadd25cb66a75f9/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/564846463e1b4fae9dadd25cb66a75f9/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  },
+  {
+    "avatar_type": "photo_avatar",
+    "default_voice_id": "5c90cf027f8640409263562d8a856353",
+    "gender": "Woman",
+    "group_id": "0484e7d80416443388aa1763f684f019",
+    "id": "11e260a213eb48d0953a8e319b9a8273",
+    "image_height": 1080,
+    "image_width": 1920,
+    "name": "Pamela",
+    "preferred_orientation": "landscape",
+    "preview_image_url": "https://files2.heygen.ai/avatar/v3/f517ea2185074e2d948e64dc6dbb7a49/half/2.2/raw_preview_image.webp",
+    "preview_video_url": "https://resource2.heygen.ai/avatar/v3/f517ea2185074e2d948e64dc6dbb7a49/half/2.2/preview_video_target.mp4",
+    "status": "completed",
+    "supported_api_engines": [
+      "avatar_v",
+      "avatar_iv"
+    ],
+    "tags": []
+  }
+]

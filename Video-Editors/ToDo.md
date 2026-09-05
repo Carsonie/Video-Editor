@@ -245,3 +245,39 @@ is a deliberate human step.
 - ~~P1.1 the five HeyGen docs~~ — 12 documents in `docs/`, plus `Sarah/` (her
   rest-pose standards AND the idle footage holds are filled with). 35
   references rewired; nothing in `PIPELINE.md` dangles
+
+---
+
+## Inherited from `Basic_E2E_Testing`, 2026-09-05
+
+Moved with the `end-customer-help-video-creations` agent, its `agent-tools/`
+folder and `skills/mux/`. Verbatim — **some of it predates the Video-Editor
+split and may already be done here.** Check before acting on any line.
+
+### Agent: end-customer-help-video-creations
+
+The underlying pipeline is proven (one real video already shipped this
+way) — what's left is a few real decisions plus actually running the
+agent for a new video.
+
+- [ ] Decide: is this agent ready to run the real documented workflow for
+  a brand-new video today? Confirm the credit cost and generation-time
+  expectation with the user before starting (real HeyGen credits, 10-20+
+  min generation time isn't unusual for a multi-segment video).
+- [ ] Decide which Mux delivery mechanism to standardize on — the simple
+  approach already live in production vs. the more elaborate, currently
+  unused JWT-private-playback prototype sitting in this repo
+  (`Help_Videos/VSCode_Mux_Ex/`).
+- [ ] Decide which store gets the first real video, and confirm the
+  delivery target (`customers/default/help_videos/` vs. a specific
+  store override) — moot until the Mux decision above is made.
+- [ ] Produce one real, complete help video end-to-end through this agent
+  — open with `Video_Goal.md`'s master prompt, walk the documented steps,
+  verify the final output plays correctly.
+- [ ] Upload that finished video via the existing `mux-video-upload` skill
+  and confirm it's actually visible/playable in the app.
+- [ ] Revisit the screen-capture source once `testing-recorder-manager`
+  exists — swap manual OBS capture for an automated `flow_runner`
+  recording, if that ends up being wanted.
+
+---

@@ -1,0 +1,435 @@
+
+Mux Video Streaming Integration - Complete Onboarding Guide
+Overview
+Mux is a video API platform that handles encoding, hosting, and streaming without infrastructure management. You'll integrate it to play your existing "Knot" video in the application.
+
+Phase 1: Mux Account Setup
+1.1 Create Mux Account
+ Go to mux.com
+ Sign up for a free account (no credit card required for testing)
+ Verify your email and log in to the Mux Dashboard
+
+
+1.2 Create an Environment
+ In the dashboard, create a new environment (e.g., "Development" or "Production")
+ Note: Environments let you separate test/dev from production resources
+ 
+1.3 Generate API Access Token
+ Navigate to Settings → Access Tokens in the dashboard
+ Click "Generate New Token"
+ Configure the token:
+Name: "Backend API Token" (descriptive name)
+Permissions: Select "Mux Video" with Read and Write access
+Environment: Select your environment
+ Click "Generate Token"
+ CRITICAL: Copy both the Token ID and Token Secret immediately
+Mux only shows the secret once and cannot recover it
+Store securely (you'll add these to .env files)
+1.4 Generate Signing Keys (for Secure Playback)
+ Navigate to Settings → Signing Keys
+ Click "Generate New Signing Key"
+ Mux generates a 2048-bit RSA key pair
+ CRITICAL: Copy the Private Key immediately
+Mux only shows this once
+Save it to a file (e.g., mux-private-key.pem)
+ Note the Key ID (you'll need this for JWT signing)
+ Store the private key securely (add to .env later)
+Phase 2: Locate Your Existing Video
+2.1 Find Your Video Asset
+ In the Mux Dashboard, navigate to Video → Assets
+ Locate the "Knot" video you already uploaded
+ Click on the video to view details
+2.2 Get the Playback ID
+ In the asset details, find the Playback IDs section
+ You should see one or more playback IDs:
+Public Playback ID: For unprotected playback (anyone with the link can watch)
+Signed Playback ID: For protected playback (requires JWT token)
+ Copy the Playback ID you want to use
+For testing: Use the public playback ID
+For production: Use the signed playback ID (more secure)
+2.3 Get the Asset ID
+ In the same asset details page, copy the Asset ID (starts with asset_)
+ Note: You'll store this in your database
+2.4 Create a Signed Playback ID (if not exists)
+If you only have a public playback ID but want secure playback:
+
+ You can create a signed playback ID via the dashboard or API
+ In the asset details, click "Create Playback ID"
+ Select "Signed" policy
+ Copy the new signed playback ID
+Phase 3: Backend Integration (Go + SQLite)
+3.1 Update Environment Variables
+Edit backend/.env:
+
+
+# Existing vars...
+MUX_TOKEN_ID=your_token_id_here
+MUX_TOKEN_SECRET=your_token_secret_here
+
+# Signing key for JWT (if using signed playback)
+MUX_SIGNING_KEY_ID=your_key_id_here
+MUX_SIGNING_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----
+...your private key content...
+-----END RSA PRIVATE KEY-----"
+3.2 Install Mux Go SDK
+
+cd backend
+go get github.com/muxinc/mux-go
+3.3 Database Schema Updates
+You already have a videos table in backend/internal/db/schema.go. Ensure it includes:
+
+
+type Video struct {
+    ID                    string    `json:"id"`
+    Name                  string    `json:"name"`
+    MuxAssetID            string    `json:"mux_asset_id"`
+    MuxPlaybackID         string    `json:"mux_playback_id"`        // public or signed
+    MuxSignedPlaybackID   string    `json:"mux_signed_playback_id"` // if using signed
+    Description           string    `json:"description"`
+    Duration              int       `json:"duration"`               // in seconds
+    Status                string    `json:"status"`                 // "ready", "encoding", "error"
+    CreatedAt             time.Time `json:"created_at"`
+    UpdatedAt             time.Time `json:"updated_at"`
+}
+3.4 Seed Database with Existing Video
+Create a migration or manual insert for your Knot video:
+
+
+INSERT INTO videos (id, name, mux_asset_id, mux_playback_id, mux_signed_playback_id, description, duration, status, created_at, updated_at)
+VALUES (
+    'video_knot_001',
+    'Knot Tutorial',
+    'your_asset_id_here',
+    'your_public_playback_id_here',
+    'your_signed_playback_id_here',  -- optional
+    'Instructions for tying the knot',
+    0,  -- update with actual duration if known
+    'ready',
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+);
+3.5 Create Mux Client (backend/internal/mux/client.go)
+
+package mux
+
+import (
+    "github.com/muxinc/mux-go"
+    "os"
+)
+
+type Client struct {
+    client *muxgo.APIClient
+}
+
+func NewClient() *Client {
+    client := muxgo.NewAPIClient(
+        muxgo.NewConfiguration(
+            muxgo.WithBasicAuth(
+                os.Getenv("MUX_TOKEN_ID"),
+                os.Getenv("MUX_TOKEN_SECRET"),
+            ),
+        ),
+    )
+    
+    return &Client{client: client}
+}
+
+// Additional methods for creating assets, checking status, etc.
+3.6 Create JWT Signing for Secure Playback (backend/internal/auth/tokens.go)
+Add JWT signing for Mux playback tokens:
+
+
+package auth
+
+import (
+    "crypto/rsa"
+    "crypto/x509"
+    "encoding/pem"
+    "time"
+    "github.com/golang-jwt/jwt/v5"
+    "os"
+)
+
+type MuxPlaybackClaims struct {
+    jwt.RegisteredClaims
+    // Mux-specific claims
+}
+
+func GenerateMuxPlaybackToken(playbackID string, videoID string) (string, error) {
+    // Parse private key from env
+    keyData := os.Getenv("MUX_SIGNING_PRIVATE_KEY")
+    block, _ := pem.Decode([]byte(keyData))
+    privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+    if err != nil {
+        return "", err
+    }
+    
+    // Create claims
+    claims := MuxPlaybackClaims{
+        RegisteredClaims: jwt.RegisteredClaims{
+            ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour)),
+            IssuedAt:  jwt.NewNumericDate(time.Now()),
+            Subject:   videoID,
+            Audience:  jwt.ClaimStrings{playbackID},
+        },
+    }
+    
+    // Sign token
+    token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+    token.Header["kid"] = os.Getenv("MUX_SIGNING_KEY_ID")
+    
+    return token.SignedString(privateKey)
+}
+3.7 API Endpoints (backend/internal/api/handlers.go)
+Add handlers for video operations:
+
+
+// Get all videos
+func (h *Handler) GetVideos(w http.ResponseWriter, r *http.Request) {
+    videos, err := h.db.GetAllVideos()
+    if err != nil {
+        respondWithError(w, http.StatusInternalServerError, "Failed to fetch videos")
+        return
+    }
+    respondWithJSON(w, http.StatusOK, videos)
+}
+
+// Get single video by ID
+func (h *Handler) GetVideo(w http.ResponseWriter, r *http.Request) {
+    vars := mux.Vars(r)
+    videoID := vars["id"]
+    
+    video, err := h.db.GetVideoByID(videoID)
+    if err != nil {
+        respondWithError(w, http.StatusNotFound, "Video not found")
+        return
+    }
+    respondWithJSON(w, http.StatusOK, video)
+}
+
+// Generate playback token for signed videos
+func (h *Handler) GetPlaybackToken(w http.ResponseWriter, r *http.Request) {
+    vars := mux.Vars(r)
+    videoID := vars["id"]
+    
+    video, err := h.db.GetVideoByID(videoID)
+    if err != nil {
+        respondWithError(w, http.StatusNotFound, "Video not found")
+        return
+    }
+    
+    // Use signed playback ID if available
+    playbackID := video.MuxSignedPlaybackID
+    if playbackID == "" {
+        playbackID = video.MuxPlaybackID
+    }
+    
+    token, err := auth.GenerateMuxPlaybackToken(playbackID, videoID)
+    if err != nil {
+        respondWithError(w, http.StatusInternalServerError, "Failed to generate token")
+        return
+    }
+    
+    respondWithJSON(w, http.StatusOK, map[string]string{
+        "token": token,
+        "playback_id": playbackID,
+        "expires_in": "3600", // 1 hour
+    })
+}
+3.8 Register Routes (backend/cmd/server/main.go)
+
+// Video routes (protected)
+videoRouter := apiRouter.PathPrefix("/videos").Subrouter()
+videoRouter.Use(api.AuthMiddleware(database))
+videoRouter.HandleFunc("", apiHandler.GetVideos).Methods("GET", "OPTIONS")
+videoRouter.HandleFunc("/{id}", apiHandler.GetVideo).Methods("GET", "OPTIONS")
+videoRouter.HandleFunc("/{id}/playback-token", apiHandler.GetPlaybackToken).Methods("POST", "OPTIONS")
+Phase 4: Frontend Integration (React + TypeScript)
+4.1 Install Mux Player React
+
+cd frontend
+npm install @mux/mux-player-react
+4.2 Update API Client (frontend/src/api/client.ts)
+Add methods to fetch video data and playback tokens:
+
+
+export interface Video {
+  id: string;
+  name: string;
+  mux_asset_id: string;
+  mux_playback_id: string;
+  mux_signed_playback_id?: string;
+  description: string;
+  duration: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PlaybackTokenResponse {
+  token: string;
+  playback_id: string;
+  expires_in: string;
+}
+
+export const getVideos = async (): Promise<Video[]> => {
+  const response = await apiClient.get('/videos');
+  return response.data;
+};
+
+export const getVideo = async (id: string): Promise<Video> => {
+  const response = await apiClient.get(`/videos/${id}`);
+  return response.data;
+};
+
+export const getPlaybackToken = async (videoId: string): Promise<PlaybackTokenResponse> => {
+  const response = await apiClient.post(`/videos/${videoId}/playback-token`);
+  return response.data;
+};
+4.3 Update Knot Page (frontend/src/pages/Knot.tsx)
+Replace with Mux Player implementation:
+
+
+import { useState, useEffect } from 'react';
+import { Container, Title, Text, Loader, Center } from '@mantine/core';
+import MuxPlayer from '@mux/mux-player-react';
+import { getVideo, getPlaybackToken } from '../api/client';
+
+export default function Knot() {
+  const [playbackId, setPlaybackId] = useState<string | null>(null);
+  const [playbackToken, setPlaybackToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadVideo = async () => {
+      try {
+        // Fetch the Knot video (assuming it's the first or specific video)
+        const video = await getVideo('video_knot_001'); // Use your actual video ID
+        
+        // Check if it's a signed playback
+        if (video.mux_signed_playback_id) {
+          // Get playback token for signed video
+          const tokenResponse = await getPlaybackToken(video.id);
+          setPlaybackToken(tokenResponse.token);
+          setPlaybackId(video.mux_signed_playback_id);
+        } else {
+          // Use public playback ID
+          setPlaybackId(video.mux_playback_id);
+        }
+        
+        setLoading(false);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load video');
+        setLoading(false);
+      }
+    };
+
+    loadVideo();
+  }, []);
+
+  if (loading) {
+    return (
+      <Center style={{ height: '400px' }}>
+        <Loader size="lg" />
+      </Center>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container>
+        <Title order={2}>Knot Tutorial</Title>
+        <Text color="red" mt="md">{error}</Text>
+      </Container>
+    );
+  }
+
+  return (
+    <Container size="lg">
+      <Title order={2} mb="md">Knot Tutorial</Title>
+      <Text mb="lg">Learn how to tie the perfect knot</Text>
+      
+      {playbackId && (
+        <MuxPlayer
+          playbackId={playbackId}
+          tokens={{ playback: playbackToken || undefined }}
+          metadata={{
+            video_id: 'video_knot_001',
+            video_title: 'Knot Tutorial',
+            viewer_user_id: 'anonymous', // Replace with actual user ID from auth context
+          }}
+          streamType="on-demand"
+          autoPlay={false}
+          style={{ width: '100%', maxWidth: '900px' }}
+        />
+      )}
+    </Container>
+  );
+}
+Phase 5: Testing Workflow
+5.1 Start Backend
+
+cd backend
+export $(cat .env | xargs)
+go run ./cmd/server/main.go
+5.2 Start Frontend
+
+cd frontend
+npm run dev
+5.3 Test Flow
+ Open http://localhost:3000
+ Log in as Sam (Visitor role) - should redirect to /knot
+ Verify video player loads with correct playback ID
+ Verify video plays without errors
+ Log out and log in as Harry (BCP-Admin) - should redirect to /home
+ Navigate to Knot page from header
+ Verify video plays for admin user as well
+5.4 Troubleshooting Checklist
+ Check browser console for errors
+ Verify API credentials in .env are correct
+ Verify playback ID matches what's in Mux dashboard
+ Check network tab for failed API requests
+ Verify CORS is enabled for localhost:3000
+ If using signed playback, verify JWT token is being passed correctly
+Phase 6: Security Considerations
+6.1 Protect API Credentials
+ Never commit .env files to git
+ Add .env to .gitignore
+ Use environment variables in production
+ Rotate tokens periodically
+6.2 Implement Signed Playback (Recommended)
+ Use signed playback IDs for all videos
+ Set token expiration to 1 hour
+ Implement token refresh logic in frontend
+ Log playback token generation for audit
+6.3 Role-Based Video Access
+ Verify user authentication before generating playback tokens
+ Check user role before serving video content
+ Log video access events
+Phase 7: Optional Enhancements
+7.1 Video Upload Feature
+ Install @mux/upchunk for frontend uploads
+ Create upload endpoint in backend
+ Implement Mux webhooks for encoding status
+ Add upload progress indicators
+7.2 Analytics Dashboard
+ Enable Mux Data analytics
+ Display view counts, play rate, buffering metrics
+ Create reports page with video statistics
+7.3 Thumbnail Generation
+ Use Mux thumbnail API
+ Display thumbnails in video lists
+ Add poster images to player
+Resources
+Sources:
+
+Mux Documentation
+Make API Requests
+Secure Video Playback Guide
+Signing JWTs
+Mux Player React API Reference
+Integrate Mux Player
+@mux/mux-player-react on NPM
+Retrieve a Playback ID API
+Video API Overview

@@ -1,0 +1,36 @@
+
+Rules for the Roles.
+
+Visitor
+
+1) Only sees the Login page and cannot click to other pages.
+
+2) After login, user gets routed to the Knot page. Here the use can view the video.
+
+3) This user has no access to the Reports or Home pages.
+
+4) This user can return to the login page and log out of their session.
+
+
+BCP-Admin
+
+1) Again this user only sees the Login page and cannot click to other pages.
+
+2) After login, this user gets routed to the Home page. 
+
+3) This user has access to all functionality on the site.
+
+4) This user can return to the login page and log out of their session.
+
+
+Perfect! I've marked this as Reference Point 1 - the role-based access control implementation is complete and working as expected.
+
+At this point, the application has:
+
+✅ Token-based authentication with server-side sessions
+✅ Role-based permissions (Visitor and BCP-Admin)
+✅ Protected routes that redirect unauthorized users
+✅ Conditional navigation tabs based on user role
+✅ Role-appropriate redirects after login (Visitor → /knot, BCP-Admin → /home)
+✅ Database with users, roles, and sessions tables
+If you need to revert or reference this stable state later, just mention "Reference Point 1" and I'll know exactly where we were.

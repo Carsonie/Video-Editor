@@ -1,0 +1,927 @@
+================================================================================
+               z_slog Real-Time Colored Logger Implementation Guide
+================================================================================
+
+OVERVIEW
+--------
+The z_slog logging system provides:
+- Colored terminal output with emoji icons
+- Real-time file logging to .ansi files
+- Per-user activity tracking with SESSION START/END markers
+- Function entry/exit logging with parameter values
+- Yellow millisecond highlighting in timestamps
+- VSCode integrated terminal support
+- macOS Terminal integration with dark mode
+- Compliance checker tool for verifying logging coverage
+
+================================================================================
+                              QUICK START
+================================================================================
+
+1. Create the z_slog package directory:
+   mkdir -p your-project/z_slog
+
+2. Create three files:
+   - z_slog/icons.go      (Color constants and emoji icons)
+   - z_slog/logger.go     (Main logger with colorHandler)
+   - z_slog/user_logger.go (Per-user session logging)
+
+3. Initialize in main.go:
+   z_slog.InitFromEnv()
+   defer z_slog.Close()
+   defer z_slog.CloseAllUserLogs()
+
+================================================================================
+                         FILE 1: z_slog/icons.go
+================================================================================
+
+package z_slog
+
+// ANSI Color Codes
+const (
+    ColorReset         = "\033[0m"
+    ColorRed           = "\033[31m"
+    ColorGreen         = "\033[32m"
+    ColorYellow        = "\033[33m"
+    ColorBlue          = "\033[34m"
+    ColorMagenta       = "\033[35m"
+    ColorCyan          = "\033[36m"
+    ColorWhite         = "\033[37m"
+    ColorBold          = "\033[1m"
+    ColorGray          = "\033[90m"
+    ColorBrightRed     = "\033[91m"
+    ColorBrightGreen   = "\033[92m"
+    ColorBrightYellow  = "\033[93m"
+    ColorBrightBlue    = "\033[94m"
+    ColorBrightMagenta = "\033[95m"
+    ColorBrightCyan    = "\033[96m"
+    ColorBrightWhite   = "\033[97m"
+    ColorOrange        = "\033[38;5;208m"  // 256-color mode
+    ColorPurple        = "\033[38;5;141m"  // 256-color mode
+)
+
+// Status Icons
+const (
+    IconSuccess   = "checkmark"    // Use actual emoji in real file
+    IconError     = "X"
+    IconWarning   = "warning"
+    IconInfo      = "info"
+    IconDebug     = "magnifying glass"
+    IconArrowR    = "->"
+    IconValues    = "chart"
+    IconReturn    = "return arrow"
+)
+
+// System Icons
+const (
+    IconServer    = "computer"
+    IconDatabase  = "disk"
+    IconNetwork   = "globe"
+    IconAPI       = "plug"
+    IconConfig    = "gear"
+)
+
+// Action Icons
+const (
+    IconStart     = "rocket"
+    IconStop      = "stop sign"
+    IconUpload    = "upload"
+    IconDownload  = "download"
+)
+
+// User & Auth Icons
+const (
+    IconUser      = "person"
+    IconAuth      = "lock"
+    IconToken     = "ticket"
+    IconShield    = "shield"
+)
+
+// Media Icons
+const (
+    IconVideo     = "film"
+)
+
+// Development Icons
+const (
+    IconCode      = "laptop"      // Used by FunctionEntry
+)
+
+// Error Icons
+const (
+    IconCritical  = "siren"
+)
+
+================================================================================
+                         FILE 2: z_slog/logger.go
+================================================================================
+
+package z_slog
+
+import (
+    "context"
+    "encoding/json"
+    "fmt"
+    "io"
+    "log/slog"
+    "os"
+    "path/filepath"
+    "strings"
+    "time"
+)
+
+var (
+    DEBUG   bool
+    logFile *os.File
+)
+
+// colorHandler is a custom slog handler that preserves ANSI color codes
+type colorHandler struct {
+    writer io.Writer
+    level  slog.Level
+}
+
+func (h *colorHandler) Enabled(_ context.Context, level slog.Level) bool {
+    return level >= h.level
+}
+
+func (h *colorHandler) Handle(_ context.Context, r slog.Record) error {
+    buf := make([]byte, 0, 256)
+
+    // Timestamp with yellow milliseconds: t=02-30-45-123 PM
+    buf = append(buf, "t="...)
+    buf = r.Time.AppendFormat(buf, "03-04-05-")
+    buf = append(buf, ColorYellow...)
+    buf = append(buf, fmt.Sprintf("%03d", r.Time.Nanosecond()/1e6)...)
+    buf = append(buf, ColorReset...)
+    buf = append(buf, ' ')
+    buf = r.Time.AppendFormat(buf, "PM")
+    buf = append(buf, ' ')
+
+    // Level with color
+    buf = append(buf, "level="...)
+    levelStr := ""
+    switch r.Level {
+    case slog.LevelDebug:
+        levelStr = ColorCyan + IconDebug + " DEBUG" + ColorReset
+    case slog.LevelInfo:
+        levelStr = ColorBlue + IconInfo + "  INFO " + ColorReset
+    case slog.LevelWarn:
+        levelStr = ColorYellow + IconWarning + "  WARN " + ColorReset
+    case slog.LevelError:
+        levelStr = ColorRed + IconError + " ERROR" + ColorReset
+    default:
+        levelStr = r.Level.String()
+    }
+    buf = append(buf, levelStr...)
+    buf = append(buf, ' ')
+
+    // Message (preserve ANSI codes)
+    buf = append(buf, "msg="...)
+    buf = append(buf, r.Message...)
+
+    // Attributes
+    r.Attrs(func(a slog.Attr) bool {
+        buf = append(buf, ' ')
+        buf = append(buf, a.Key...)
+        buf = append(buf, '=')
+        buf = append(buf, fmt.Sprint(a.Value.Any())...)
+        return true
+    })
+
+    buf = append(buf, '\n')
+    _, err := h.writer.Write(buf)
+
+    if logFile != nil {
+        logFile.Sync()
+    }
+
+    return err
+}
+
+func (h *colorHandler) WithAttrs(attrs []slog.Attr) slog.Handler { return h }
+func (h *colorHandler) WithGroup(name string) slog.Handler      { return h }
+
+// Init initializes the logger with file output
+func Init(debug bool) {
+    DEBUG = debug
+
+    if logFile != nil {
+        logFile.Close()
+    }
+
+    // Create logs directory inside z_slog folder
+    logsDir := "z_slog/logs"
+    if err := os.MkdirAll(logsDir, 0755); err != nil {
+        fmt.Fprintf(os.Stderr, "Failed to create logs directory: %v\n", err)
+    }
+
+    // Timestamped log file: output-YYYY-MM-DD-HH-MM.ansi
+    timestamp := time.Now().Format("2006-01-02-15-04")
+    logFileName := fmt.Sprintf("output-%s.ansi", timestamp)
+    logFilePath := filepath.Join(logsDir, logFileName)
+
+    var err error
+    logFile, err = os.Create(logFilePath)
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Failed to create log file: %v\n", err)
+        logFile = nil
+    }
+
+    level := slog.LevelInfo
+    if debug {
+        level = slog.LevelDebug
+    }
+
+    var writer io.Writer
+    if logFile != nil {
+        writer = io.MultiWriter(os.Stdout, logFile)
+        fmt.Printf("Logging to: %s\n", logFilePath)
+    } else {
+        writer = os.Stdout
+    }
+
+    handler := &colorHandler{writer: writer, level: level}
+    logger := slog.New(handler)
+    slog.SetDefault(logger)
+}
+
+func InitFromEnv() {
+    debugMode := strings.ToLower(os.Getenv("DEBUG_MODE")) == "true"
+    Init(debugMode)
+}
+
+func Close() {
+    if logFile != nil {
+        logFile.Close()
+        logFile = nil
+    }
+}
+
+--------------------------------------------------------------------------------
+                         SEMANTIC LOGGING FUNCTIONS
+--------------------------------------------------------------------------------
+
+func Auth(msg string, args ...any)     { slog.Info(ColorGreen + IconAuth + " " + msg + ColorReset, args...) }
+func Video(msg string, args ...any)    { slog.Info(ColorMagenta + IconVideo + " " + msg + ColorReset, args...) }
+func Token(msg string, args ...any)    { if DEBUG { slog.Debug(ColorCyan + IconToken + " " + msg + ColorReset, args...) } }
+func User(msg string, args ...any)     { slog.Info(ColorYellow + IconUser + " " + msg + ColorReset, args...) }
+func Database(msg string, args ...any) { if DEBUG { slog.Debug(ColorBlue + IconDatabase + " " + msg + ColorReset, args...) } }
+func API(msg string, args ...any)      { slog.Info(ColorCyan + IconAPI + " " + msg + ColorReset, args...) }
+func Upload(msg string, args ...any)   { slog.Info(ColorGreen + IconUpload + " " + msg + ColorReset, args...) }
+func Download(msg string, args ...any) { slog.Info(ColorGreen + IconDownload + " " + msg + ColorReset, args...) }
+func Success(msg string, args ...any)  { slog.Info(ColorGreen + IconSuccess + " " + msg + ColorReset, args...) }
+func Failed(msg string, args ...any)   { slog.Error(ColorRed + IconError + " " + msg + ColorReset, args...) }
+func Warning(msg string, args ...any)  { slog.Warn(ColorYellow + IconWarning + " " + msg + ColorReset, args...) }
+func Debug(msg string, args ...any)    { if DEBUG { slog.Debug(ColorCyan + IconDebug + " " + msg + ColorReset, args...) } }
+func Server(msg string, args ...any)   { slog.Info(ColorBlue + IconServer + " " + msg + ColorReset, args...) }
+func Network(msg string, args ...any)  { slog.Info(ColorCyan + IconNetwork + " " + msg + ColorReset, args...) }
+func Security(msg string, args ...any) { slog.Info(ColorMagenta + IconShield + " " + msg + ColorReset, args...) }
+func Critical(msg string, args ...any) { slog.Error(ColorRed + IconCritical + " " + msg + ColorReset, args...) }
+func Start(msg string, args ...any)    { slog.Info(ColorGreen + IconStart + " " + msg + ColorReset, args...) }
+func Stop(msg string, args ...any)     { slog.Info(ColorRed + IconStop + " " + msg + ColorReset, args...) }
+func Config(msg string, args ...any)   { if DEBUG { slog.Debug(ColorYellow + IconConfig + " " + msg + ColorReset, args...) } }
+func Report(msg string, args ...any)   { slog.Info(ColorBlue + IconReport + " " + msg + ColorReset, args...) }
+
+--------------------------------------------------------------------------------
+                    FUNCTION ENTRY/EXIT LOGGING
+--------------------------------------------------------------------------------
+
+// FunctionEntry logs function entry with cyan color and CODE icon (not INFO icon!)
+func FunctionEntry(functionName string) {
+    slog.Info(ColorCyan + IconCode + " Function " + IconArrowR + " " + functionName + ColorReset)
+}
+
+// Values logs function parameters (cyan names, bright magenta values)
+func Values(params map[string]any) {
+    if len(params) == 0 {
+        return
+    }
+
+    var parts []string
+    for key, value := range params {
+        var valueStr string
+        switch v := value.(type) {
+        case string:
+            valueStr = fmt.Sprintf("\"%s\"", v)
+        case nil:
+            valueStr = "null"
+        case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, bool:
+            valueStr = fmt.Sprintf("%v", v)
+        default:
+            jsonBytes, err := json.MarshalIndent(v, "", "  ")
+            if err != nil {
+                valueStr = fmt.Sprintf("%v", v)
+            } else {
+                valueStr = string(jsonBytes)
+            }
+        }
+        parts = append(parts, fmt.Sprintf("%s%s%s: %s%s%s",
+            ColorCyan, key, ColorReset,
+            ColorBrightMagenta, valueStr, ColorReset))
+    }
+
+    paramsStr := strings.Join(parts, "\n")
+    msg := fmt.Sprintf("%s%s VALUES%s\n%s", ColorMagenta, IconValues, ColorReset, paramsStr)
+    slog.Info(msg)
+}
+
+// ReturnValues logs function return values (purple names, bright green values)
+func ReturnValues(returns map[string]any) {
+    if len(returns) == 0 {
+        return
+    }
+
+    var parts []string
+    for key, value := range returns {
+        var valueStr string
+        switch v := value.(type) {
+        case string:
+            valueStr = fmt.Sprintf("\"%s\"", v)
+        case nil:
+            valueStr = "null"
+        case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, bool:
+            valueStr = fmt.Sprintf("%v", v)
+        default:
+            jsonBytes, err := json.MarshalIndent(v, "", "  ")
+            if err != nil {
+                valueStr = fmt.Sprintf("%v", v)
+            } else {
+                valueStr = string(jsonBytes)
+            }
+        }
+        parts = append(parts, fmt.Sprintf("%s%s%s: %s%s%s",
+            ColorPurple, key, ColorReset,
+            ColorBrightGreen, valueStr, ColorReset))
+    }
+
+    returnsStr := strings.Join(parts, "\n")
+    msg := fmt.Sprintf("%s%s RETURNED%s\n%s", ColorGreen, IconReturn, ColorReset, returnsStr)
+    slog.Info(msg)
+}
+
+================================================================================
+                       FILE 3: z_slog/user_logger.go
+================================================================================
+
+package z_slog
+
+import (
+    "fmt"
+    "os"
+    "path/filepath"
+    "sync"
+    "time"
+)
+
+type UserLogManager struct {
+    mu        sync.RWMutex
+    userFiles map[string]*os.File
+}
+
+var userLogManager = &UserLogManager{
+    userFiles: make(map[string]*os.File),
+}
+
+// StartUserLogging opens a log file for the user on login
+func StartUserLogging(username string) error {
+    FunctionEntry("StartUserLogging")
+    Values(map[string]any{"username": username})
+
+    userLogManager.mu.Lock()
+    defer userLogManager.mu.Unlock()
+
+    // Create user logs directory inside z_slog/logs
+    userLogsDir := filepath.Join("z_slog", "logs", "users")
+    if err := os.MkdirAll(userLogsDir, 0755); err != nil {
+        return fmt.Errorf("failed to create user logs directory: %w", err)
+    }
+
+    // Filename: username-YYYY-MM-DD.ansi
+    date := time.Now().Format("2006-01-02")
+    filename := fmt.Sprintf("%s-%s.ansi", username, date)
+    filePath := filepath.Join(userLogsDir, filename)
+
+    file, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+    if err != nil {
+        return fmt.Errorf("failed to open user log file: %w", err)
+    }
+
+    if oldFile, exists := userLogManager.userFiles[username]; exists {
+        oldFile.Close()
+    }
+
+    userLogManager.userFiles[username] = file
+
+    // Green SESSION START marker
+    sessionStart := fmt.Sprintf("\n%s=== SESSION START ===%s\n", ColorGreen, ColorReset)
+    file.WriteString(sessionStart)
+    file.Sync()
+
+    return nil
+}
+
+// LogUserAction logs a message to the user's log file
+func LogUserAction(username, msg string) {
+    if username == "" {
+        return
+    }
+
+    userLogManager.mu.RLock()
+    file, exists := userLogManager.userFiles[username]
+    userLogManager.mu.RUnlock()
+
+    if !exists {
+        return
+    }
+
+    // Timestamp with yellow milliseconds
+    now := time.Now()
+    timestampBase := now.Format("03-04-05-")
+    milliseconds := fmt.Sprintf("%03d", now.Nanosecond()/1e6)  // CORRECT!
+    ampm := now.Format("PM")
+
+    timestamp := fmt.Sprintf("t=%s%s%s%s %s", timestampBase, ColorYellow, milliseconds, ColorReset, ampm)
+    logLine := fmt.Sprintf("%s %s\n", timestamp, msg)
+    file.WriteString(logLine)
+    file.Sync()
+}
+
+// StopUserLogging closes the user's log file on logout
+func StopUserLogging(username string) {
+    FunctionEntry("StopUserLogging")
+    Values(map[string]any{"username": username})
+
+    userLogManager.mu.Lock()
+    defer userLogManager.mu.Unlock()
+
+    if file, exists := userLogManager.userFiles[username]; exists {
+        // Red SESSION END marker
+        sessionEnd := fmt.Sprintf("%s=== SESSION END ===%s\n\n", ColorRed, ColorReset)
+        file.WriteString(sessionEnd)
+        file.Sync()
+        file.Close()
+        delete(userLogManager.userFiles, username)
+    }
+}
+
+// CloseAllUserLogs closes all user logs on server shutdown
+func CloseAllUserLogs() {
+    userLogManager.mu.Lock()
+    defer userLogManager.mu.Unlock()
+
+    for username, file := range userLogManager.userFiles {
+        sessionEnd := fmt.Sprintf("%s=== SESSION END ===%s\n\n", ColorRed, ColorReset)
+        file.WriteString(sessionEnd)
+        file.Sync()
+        file.Close()
+        delete(userLogManager.userFiles, username)
+    }
+}
+
+================================================================================
+                  USER LOGGING HELPER (internal/api/user_logging.go)
+================================================================================
+
+This is a THIN WRAPPER for HTTP handlers. Helper functions should NOT log themselves.
+
+package api
+
+import (
+    "fmt"
+    "net/http"
+    "your-project/z_slog"
+)
+
+// LogUserAction logs an action to the user's specific log file
+func LogUserAction(r *http.Request, functionName string) {
+    user := GetUserFromContext(r)
+    if user == nil {
+        return
+    }
+    msg := fmt.Sprintf("%s%s Function %s %s%s",
+        z_slog.ColorCyan, z_slog.IconCode, z_slog.IconArrowR, functionName, z_slog.ColorReset)
+    z_slog.LogUserAction(user.Name, msg)
+}
+
+// LogUserActionWithDetails logs an action with additional details
+func LogUserActionWithDetails(r *http.Request, functionName string, details string) {
+    user := GetUserFromContext(r)
+    if user == nil {
+        return
+    }
+    msg := fmt.Sprintf("%s%s Function %s %s | %s%s",
+        z_slog.ColorCyan, z_slog.IconCode, z_slog.IconArrowR, functionName, details, z_slog.ColorReset)
+    z_slog.LogUserAction(user.Name, msg)
+}
+
+================================================================================
+                    BEST PRACTICES: WHAT TO LOG
+================================================================================
+
+DO LOG (Business Logic Functions):
+----------------------------------
+func (h *Handler) CreateVideo(w http.ResponseWriter, r *http.Request) {
+    z_slog.FunctionEntry("CreateVideo")
+    z_slog.Values(map[string]any{"name": req.Name, "url": req.URL})
+    // ... business logic ...
+    z_slog.ReturnValues(map[string]any{"status": 201, "videoID": video.ID})
+}
+
+DO NOT LOG (Infrastructure/Helper Functions):
+---------------------------------------------
+func respondWithJSON(w http.ResponseWriter, status int, data interface{}) {
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(status)
+    if err := json.NewEncoder(w).Encode(data); err != nil {
+        z_slog.Failed("Error encoding JSON response", "error", err)
+    }
+}
+
+SUMMARY TABLE:
++-------------------------------------------+-----------+-------------------------+
+| Function Type                             | Log?      | Reason                  |
++-------------------------------------------+-----------+-------------------------+
+| HTTP Handlers (Login, CreateVideo, etc.)  | YES       | Business logic          |
+| Database queries                          | DEBUG only| Low-level operations    |
+| respondWithJSON, respondWithError         | NO        | Called every request    |
+| LogUserAction helpers                     | NO        | Just forwards to z_slog |
+| Middleware (logging, CORS)                | YES       | Request/response summary|
++-------------------------------------------+-----------+-------------------------+
+
+================================================================================
+                   COMPLIANCE CHECKER TOOL (IMPORTANT!)
+================================================================================
+
+The compliance checker verifies that all Go functions have proper z_slog logging.
+It scans all .go files and reports which functions are missing FunctionEntry and
+ReturnValues calls.
+
+FILE: z_slog/runners/update_logger.go
+-------------------------------------
+
+Run with: go run z_slog/runners/update_logger.go
+
+Or add to Makefile:
+    compliance:
+        @go run z_slog/runners/update_logger.go
+
+The checker scans three sections:
+- BACKEND: internal/** directories
+- FRONTEND: frontend/** directories (shows "n/a" - Go logger is backend only)
+- ROOT: cmd/server and z_slog directories
+
+--------------------------------------------------------------------------------
+                    INFRASTRUCTURE FUNCTIONS (EXCLUDED)
+--------------------------------------------------------------------------------
+
+These functions are intentionally excluded from compliance checking because they
+are infrastructure/helper code that should NOT have FunctionEntry/ReturnValues:
+
+LOGGER INFRASTRUCTURE (z_slog package):
+    - Enabled, Handle, WithAttrs, WithGroup (colorHandler methods)
+    - Init, InitFromEnv, Close (logger lifecycle)
+    - Debug, Info, Warn, Error, etc. (semantic logging functions)
+    - FunctionEntry, Values, ReturnValues (the logging functions themselves!)
+    - Auth, Video, Token, User, Database, API, Upload, Download
+    - Success, Failed, Warning, Server, Network, Security
+    - Critical, Start, Stop, Config, Report
+    - StartUserLogging, LogUserAction, StopUserLogging, CloseAllUserLogs
+
+API INFRASTRUCTURE (internal/api package):
+    - respondWithJSON, respondWithError (response helpers)
+    - LogUserAction, LogUserActionWithDetails (thin wrappers)
+
+HTTP MIDDLEWARE INTERNALS:
+    - WriteHeader (responseWrapper method)
+
+ANONYMOUS FUNCTIONS:
+    - http.HandlerFunc closures inside middleware
+    - Callback functions passed to other functions
+
+Total: ~45 infrastructure functions excluded from compliance checks.
+
+--------------------------------------------------------------------------------
+                    SAMPLE COMPLIANCE CHECKER OUTPUT
+--------------------------------------------------------------------------------
+
+When all functions are compliant:
+
++----------------------------------+
+|     LOGGING COMPLIANCE           |
++----------------------------------+
+| BACKEND                          |
+|   FunctionEntry: 52/52           |
+|   ReturnValues:  52/52           |
++----------------------------------+
+| FRONTEND (frontend n/a)          |
+|   FunctionEntry: 0/22            |
+|   ReturnValues:  0/22            |
++----------------------------------+
+| ROOT                             |
+|   FunctionEntry: 12/12           |
+|   ReturnValues:  12/12           |
++----------------------------------+
+
+When functions are missing logging:
+
++----------------------------------+
+|     LOGGING COMPLIANCE           |
++----------------------------------+
+| BACKEND                          |
+|   FunctionEntry: 50/52           |
+|   ReturnValues:  48/52           |
++----------------------------------+
+
+Missing FunctionEntry:
+  internal/api/handlers.go: CreateVideo
+  internal/api/handlers.go: DeleteVideo
+
+Missing ReturnValues:
+  internal/api/handlers.go: CreateVideo
+  internal/api/handlers.go: DeleteVideo
+  internal/mux/client.go: GetAsset
+  internal/mux/client.go: ListAssets
+
+================================================================================
+                        VSCODE LAUNCH CONFIGURATION
+================================================================================
+
+Create .vscode/launch.json for colored terminal output:
+
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "GOLANG",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/backend/cmd/server",
+      "cwd": "${workspaceFolder}/backend",
+      "env": {},
+      "args": [],
+      "showLog": true,
+      "console": "integratedTerminal",    <-- REQUIRED for colors!
+      "preLaunchTask": ""
+    },
+    {
+      "name": "WEB",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}/frontend",
+      "console": "integratedTerminal"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack",
+      "configurations": ["GOLANG", "WEB"],
+      "stopAll": true
+    }
+  ]
+}
+
+================================================================================
+                            MAKEFILE (macOS)
+================================================================================
+
+Create Makefile in project root for easy launching with dark Terminal:
+
+.PHONY: kill-ports launch-logger launch-backend tail-logs compliance help
+
+kill-ports:
+    @lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+    @lsof -ti:8080 | xargs kill -9 2>/dev/null || true
+
+launch-logger: kill-ports
+    @cd frontend && npm run dev > /dev/null 2>&1 &
+    @cd "$(CURDIR)/backend" && go run ./cmd/server > /dev/null 2>&1 &
+    @sleep 3
+    @LATEST=$$(ls -t "$(CURDIR)/backend/z_slog/logs"/output-*.ansi 2>/dev/null | head -1); \
+    if [ -n "$$LATEST" ]; then \
+        osascript \
+            -e "tell application \"Terminal\"" \
+            -e "do script \"tail -f \\\"$$LATEST\\\"\"" \
+            -e "set currentTab to selected tab of front window" \
+            -e "set number of columns of currentTab to 140" \
+            -e "set number of rows of currentTab to 65" \
+            -e "set current settings of currentTab to settings set \"Pro\"" \
+            -e "activate" \
+            -e "end tell"; \
+        open http://localhost:3000; \
+    fi
+
+launch-backend:
+    @cd backend && go run ./cmd/server
+
+tail-logs:
+    @LATEST=$$(ls -t backend/z_slog/logs/output-*.ansi 2>/dev/null | head -1); \
+    if [ -n "$$LATEST" ]; then tail -f "$$LATEST"; fi
+
+compliance:
+    @go run z_slog/runners/update_logger.go
+
+================================================================================
+                           MAIN.GO INTEGRATION
+================================================================================
+
+package main
+
+import (
+    "fmt"
+    "log"
+    "net/http"
+    "os"
+
+    "github.com/gorilla/mux"
+    "github.com/joho/godotenv"
+    "your-project/internal/api"
+    "your-project/z_slog"
+)
+
+func main() {
+    // Initialize z_slog logger FIRST
+    z_slog.InitFromEnv()
+    defer z_slog.Close()
+    defer z_slog.CloseAllUserLogs()
+
+    z_slog.FunctionEntry("main")
+
+    if err := godotenv.Load(); err != nil {
+        log.Println("Warning: .env file not found")
+    }
+
+    serverPort := getEnv("SERVER_PORT", "8080")
+
+    z_slog.Start("Application starting")
+    z_slog.Config("Configuration loaded", "port", serverPort)
+
+    router := mux.NewRouter()
+
+    addr := fmt.Sprintf(":%s", serverPort)
+    z_slog.Server(fmt.Sprintf("Server listening on http://localhost%s", addr))
+
+    if err := http.ListenAndServe(addr, router); err != nil {
+        z_slog.Critical(fmt.Sprintf("Server failed: %v", err))
+    }
+}
+
+================================================================================
+                         DIRECTORY STRUCTURE
+================================================================================
+
+your-project/
++-- z_slog/
+|   +-- icons.go              (Color constants and emoji icons)
+|   +-- logger.go             (Main logger with colorHandler)
+|   +-- user_logger.go        (Per-user session logging)
+|   +-- runners/              (Development tools)
+|   |   +-- update_logger.go  (Compliance checker tool)
+|   +-- logs/                 (Auto-created)
+|       +-- output-2026-01-29-14-30.ansi
+|       +-- users/
+|           +-- Sam-2026-01-29.ansi
+|           +-- Admin-2026-01-29.ansi
++-- backend/
+|   +-- cmd/server/main.go
+|   +-- internal/api/
+|       +-- handlers.go
+|       +-- middleware.go
+|       +-- user_logging.go   (Thin wrapper for HTTP context)
++-- .vscode/
+|   +-- launch.json           (VSCode debug config)
++-- Makefile                  (macOS Terminal launcher + compliance)
++-- .gitignore                (Add: z_slog/logs/)
+
+================================================================================
+                           VIEWING LOG FILES
+================================================================================
+
+View latest main log with colors:
+    less -R z_slog/logs/$(ls -t z_slog/logs/output-*.ansi | head -1)
+
+View specific user's log:
+    less -R z_slog/logs/users/Sam-2026-01-29.ansi
+
+Tail logs in real-time:
+    tail -f z_slog/logs/output-2026-01-29-14-30.ansi
+
+Search logs:
+    grep -i "error" z_slog/logs/output-*.ansi
+    grep "Function -> CreateVideo" z_slog/logs/output-*.ansi
+
+================================================================================
+                          COLOR PALETTE REFERENCE
+================================================================================
+
++---------------+---------+-------------+------+-------------------------+
+| Function      | Color   | ANSI Code   | Icon | Usage                   |
++---------------+---------+-------------+------+-------------------------+
+| Debug         | Cyan    | \033[36m    | mag  | Debug messages          |
+| Info          | Blue    | \033[34m    | info | General information     |
+| Warn          | Yellow  | \033[33m    | warn | Warnings                |
+| Error         | Red     | \033[31m    | X    | Errors                  |
+| FunctionEntry | Cyan    | \033[36m    | code | Function entry          |
+| Values        | Magenta | \033[35m    | chart| Parameter values        |
+| ReturnValues  | Green   | \033[32m    | ret  | Return values           |
+| Auth          | Green   | \033[32m    | lock | Authentication          |
+| Video         | Magenta | \033[35m    | film | Video processing        |
+| Upload        | Green   | \033[32m    | up   | Upload operations       |
+| Success       | Green   | \033[32m    | check| Success messages        |
+| Failed        | Red     | \033[31m    | X    | Failure messages        |
+| Critical      | Red     | \033[31m    | siren| Critical errors         |
+| Start         | Green   | \033[32m    | rocket| Startup operations     |
+| Stop          | Red     | \033[31m    | stop | Shutdown operations     |
+| Server        | Blue    | \033[34m    | comp | Server lifecycle        |
+| Database      | Blue    | \033[34m    | disk | Database operations     |
+| API           | Cyan    | \033[36m    | plug | API requests            |
+| User          | Yellow  | \033[33m    | person| User operations        |
++---------------+---------+-------------+------+-------------------------+
+
+================================================================================
+                      CRITICAL BUG FIX: MILLISECONDS
+================================================================================
+
+IMPORTANT: Go's time.Format("000") does NOT extract milliseconds!
+
+WRONG - Always outputs "000":
+    milliseconds := now.Format("000")
+
+CORRECT - Extracts actual milliseconds (0-999):
+    milliseconds := fmt.Sprintf("%03d", now.Nanosecond()/1e6)
+
+================================================================================
+                            TROUBLESHOOTING
+================================================================================
+
++--------------------------------+---------------------------------------------+
+| Issue                          | Solution                                    |
++--------------------------------+---------------------------------------------+
+| Colors not showing in terminal | Use "less -R" instead of "less"             |
++--------------------------------+---------------------------------------------+
+| Colors not showing in VSCode   | Add "console": "integratedTerminal"         |
++--------------------------------+---------------------------------------------+
+| Milliseconds showing "000"     | Use fmt.Sprintf("%03d", now.Nanosecond()/1e6)|
++--------------------------------+---------------------------------------------+
+| User logs not created          | Ensure StartUserLogging() called on login   |
++--------------------------------+---------------------------------------------+
+| SESSION END not appearing      | Ensure StopUserLogging() called on logout   |
++--------------------------------+---------------------------------------------+
+| Quoted ANSI codes in output    | Use custom colorHandler, not slog.TextHandler|
++--------------------------------+---------------------------------------------+
+| Logs not flushing in real-time | Ensure file.Sync() is called after writes   |
++--------------------------------+---------------------------------------------+
+| Duplicate icons in output      | FunctionEntry uses code icon, not info icon |
++--------------------------------+---------------------------------------------+
+| Too much noise in logs         | Don't log infrastructure functions          |
++--------------------------------+---------------------------------------------+
+| Compliance checker shows errors| Add missing FunctionEntry/ReturnValues      |
++--------------------------------+---------------------------------------------+
+| Function wrongly flagged       | Add to infrastructureFunctions exclusion map|
++--------------------------------+---------------------------------------------+
+
+================================================================================
+                           .GITIGNORE ADDITION
+================================================================================
+
+# Log files
+z_slog/logs/
+*.ansi
+
+================================================================================
+                         ENVIRONMENT VARIABLES
+================================================================================
+
+Enable debug logging:
+    export DEBUG_MODE=true
+
+Disable debug logging (default):
+    export DEBUG_MODE=false
+
+================================================================================
+                       PORTING TO NEW PROJECTS
+================================================================================
+
+QUICK CHECKLIST:
+----------------
+[ ] Copy z_slog/ package to target project
+[ ] Update import paths in your code
+[ ] Initialize logger in main.go: z_slog.InitFromEnv() + defer z_slog.Close()
+[ ] Add defer z_slog.CloseAllUserLogs() if using user logging
+[ ] Replace log.Printf() with z_slog functions
+[ ] Add z_slog.FunctionEntry() to all business logic functions
+[ ] Add z_slog.ReturnValues() before all return statements
+[ ] Copy z_slog/runners/update_logger.go for compliance checking
+[ ] Update infrastructureFunctions map for your project's helpers
+[ ] Add .vscode/launch.json with "console": "integratedTerminal"
+[ ] Add z_slog/logs/ to .gitignore
+[ ] Add compliance target to Makefile
+
+================================================================================
+                                  END
+================================================================================
+
+Last Updated: 2026-01-30

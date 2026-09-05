@@ -1,0 +1,70 @@
+USER-SPECIFIC LOGGING - SETUP COMPLETE
+=====================================
+
+✅ IMPLEMENTATION COMPLETE
+
+What was added:
+---------------
+1. User logging manager (z_slog/user_logger.go)
+   - Manages per-user log files
+   - Creates logs in: backend/logs/users/
+   - File format: <username>-YYYY-MM-DD.log
+
+2. User action logging helpers (internal/api/user_logging.go)
+   - LogUserAction(r, functionName)
+   - LogUserActionWithDetails(r, functionName, details)
+
+3. Updated all handler functions to log user actions:
+   - ListVideos
+   - GetVideo (with video ID)
+   - CreateVideo
+   - CreateDirectUpload
+   - CompleteDirectUpload (with upload ID)
+   - CreatePlaybackToken (with video ID)
+   - GetVideoStatus (with video ID)
+
+4. Login/Logout integration:
+   - Login: Starts user logging session
+   - Logout: Stops user logging session
+   - Server shutdown: Closes all open user logs
+
+How to test:
+------------
+1. Start the server:
+   cd backend
+   go run ./cmd/server/main.go
+
+2. Login as admin:
+   curl -X POST http://localhost:8080/api/auth/login \
+     -H "Content-Type: application/json" \
+     -d '{"name":"admin","password":"admin123"}'
+
+3. Copy the token from the response
+
+4. Make authenticated requests:
+   curl -X GET http://localhost:8080/api/videos \
+     -H "Authorization: Bearer YOUR_TOKEN_HERE"
+
+5. Check the log file:
+   cat backend/logs/users/admin-2026-01-23.log
+
+Expected log file content:
+--------------------------
+=== SESSION START: 2026-01-23 HH:MM:SS ===
+[2026-01-23 HH:MM:SS.mmm] ℹ️  Inside → ListVideos
+[2026-01-23 HH:MM:SS.mmm] ℹ️  Inside → GetVideo | videoID=video_123
+[2026-01-23 HH:MM:SS.mmm] ℹ️  Inside → CreatePlaybackToken | videoID=video_123
+=== SESSION END: 2026-01-23 HH:MM:SS ===
+
+Files modified:
+---------------
+✓ backend/z_slog/user_logger.go (NEW)
+✓ backend/internal/api/user_logging.go (NEW)
+✓ backend/internal/api/handlers.go (UPDATED)
+✓ backend/cmd/server/main.go (UPDATED)
+
+Build status:
+-------------
+✅ Successfully compiled with no errors
+
+Ready to test!

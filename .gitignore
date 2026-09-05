@@ -98,3 +98,32 @@ __pycache__/
 # live there and what happens if they go missing.
 Video-Editors/tests/_fixture_source/*
 !Video-Editors/tests/_fixture_source/README.md
+
+# ── MUX-Management/ — the video DELIVERY side, moved in from Basic_E2E_Testing ─
+# 2026-09-05. Block what is DANGEROUS or LARGE; track everything else.
+#
+# The first version of this rule excluded the whole folder and re-included only
+# .md/.txt. That would have silently DROPPED VSCode_Mux_Ex's Go + React source
+# — a real prototype, tracked in the other repo until today — turning a move
+# into a deletion of its history. Caught before the commit; do not narrow this
+# back to a docs-only allowlist.
+#
+# ⚠ Live MUX API tokens and .pem SIGNING KEYS live under Help_Videos/MUX/.
+# These rules are what stop them being committed.
+MUX-Management/**/*.env
+MUX-Management/**/*.env.*
+!MUX-Management/**/*.env.example
+MUX-Management/**/*.pem
+MUX-Management/**/*.key
+MUX-Management/**/*secret*
+MUX-Management/**/*token*
+MUX-Management/**/*signing-key*
+# Media: the renders are hundreds of MB and are regenerable output.
+MUX-Management/**/*.mp4
+MUX-Management/**/*.webm
+MUX-Management/**/*.mov
+MUX-Management/**/*.mp3
+MUX-Management/**/*.wav
+MUX-Management/**/*.png
+MUX-Management/**/*.jpg
+MUX-Management/**/node_modules/

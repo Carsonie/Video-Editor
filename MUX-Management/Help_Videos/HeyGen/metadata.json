@@ -1,0 +1,24 @@
+{
+  "videos": {
+    "first-time-ordering": {
+      "title": "First Time Ordering",
+      "script_version": 1,
+      "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+      "stages": {
+        "voiceover": {
+          "status": "done",
+          "audio": "audio/first-time-ordering.mp3",
+          "updated": "2026-06-22"
+        },
+        "combine": {
+          "status": "pending",
+          "final": null,
+          "updated": null
+        }
+      },
+      "duration": 4.3363265306122445,
+      "created": "2026-06-22",
+      "last_updated": "2026-06-22"
+    }
+  }
+}

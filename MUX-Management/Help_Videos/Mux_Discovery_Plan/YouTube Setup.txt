@@ -1,0 +1,30 @@
+YouTube Setup.
+
+I want to play videos on my website. 
+
+I will create the videos and then upload them to a service were I can have users login to my website and view them my clicking a link.
+
+The general public should not have access to these videos.
+
+Who can provide me with this service? Can you offer some service providers for this and give a competitive comparison between them?
+
+=================================
+
+1) Video hosting & streaming:  My website has an backend golang auth context and holds tokens for user role positions and access. I need to add the video service providers auth tokens in the context of the users login role.
+
+2) User volume: User volume will be very low. Maybe 50 views per day?
+
+3) Videos will be under 1 minute in duration 
+I will create them and then edit them over time, so incrementally uploaded 
+Just on demand, as the needs them as a tutorial.
+
+4) Features & customization: Analytics (view counts, watch time, etc.), if available.
+Customize the video player appearance to match your site's branding, if available.
+Add the features like video chapters, subtitles, or transcripts, if available.
+I do care about DRM (Digital Rights Management) to prevent downloading/piracy, yes.
+
+5) Integration preference: Using Mantine. Player is working on my site.
+
+6) Budget constraints: No budget constraints, I want the best suited service for my users.
+
+

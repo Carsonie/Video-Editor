@@ -16,6 +16,21 @@ folders — and receives finished videos.
 
 ---
 
+## Inbound: MUX hosting is coming here, and has NOT arrived
+
+Carson, 2026-09-05. MUX is the video DELIVERY service, so it belongs with the
+video work — same reasoning that moved the editors here on 2026-08-28. It is
+still sitting in `Basic_E2E_Testing/Help_Videos/` and is tracked there as
+`ToDo.md` P1.2.
+
+**Do not build against it here until it lands.** If you find MUX code or
+config in this repo before then, it arrived out of process — say so rather
+than assuming the move happened.
+
+When it does move, `Help_Videos/MUX/` carries live API tokens and `.pem`
+signing keys. **Check `.gitignore` covers them BEFORE they land**, move
+rather than copy, and never read or print their contents.
+
 ## The root is TWO folders, and every command runs from `Video-Editors/`
 
 Restructured 2026-09-04, because Carson works in the customer files far more

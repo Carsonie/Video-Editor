@@ -1,0 +1,12 @@
+mux-signing-key*
+backend/z_slog/logs/*
+
+# Secrets & keys
+backend/.env
+frontend/.env
+backend/private_key.pem
+backend/public_key.pem
+
+# Build output & local data
+backend/main
+backend/videos.db

@@ -1,0 +1,438 @@
+================================================================================
+VIDEO_CREATION.txt — the happy path for one help video
+Written 2026-08-22.  Proven on: ski-demo / 01-first-time-ordering.
+================================================================================
+
+Read this top to bottom the first time. After that, step 0 and the command list
+are all you need.
+
+Every command below assumes you are in the repo root:
+    /Users/carsonkramer/Rentify/Basic_E2E_Testing
+
+Two variables steer everything. Set them once per video:
+
+    STORE="Rentify Demos Corp/ski-demo"
+    VIDEO="01-first-time-ordering"
+
+A store that has NOT been restructured yet has no videos/ folder. Use VIDEO=.
+to reach its old help-videos/final/ instead. See HELP_VIDEO_MIGRATION.md.
+
+
+================================================================================
+STEP 0 — THE THREE RULES
+================================================================================
+
+1. RECORDING IS ALWAYS LOCALHOST. NO EXCEPTIONS.
+
+   targets.json resolves ski-demo, canoe-demo and bike-demo to
+   https://<store>.rentify.app, type "remote". A recorded run launched without
+   a BASE_URL override places a REAL ORDER ON PRODUCTION.
+
+   Every recording in raw_mp4/ is named "..._dev_..." because it was
+   overridden. The default is the dangerous one, not the safe one.
+
+   Bring the dev servers up pointed at the store first:
+       node Local_Host/manage-servers.js store <slug>
+       node Local_Host/manage-servers.js start
+
+   A mock checkout on localhost is CORRECT, not a misconfiguration.
+
+2. THE SCRIPT LIVES IN ONE PLACE.
+
+   <video>/video/script.json is the source of truth for every line. Edit it
+   there. Never retype a line into a chat message or a doc — that is how copy
+   drifts from what actually got rendered.
+
+3. ONLY ONE STEP COSTS MONEY.
+
+   Step 6, the HeyGen render. Everything before it is free and everything
+   after it is local ffmpeg. If you are unsure, stop before step 6.
+
+
+================================================================================
+WHO DOES WHAT
+================================================================================
+
+Colours come from the Colourizer (a VS Code extension). Open this file in VS
+Code and the tags below are coloured. In a plain terminal they are still
+readable as text — the tag carries the meaning, the colour only speeds it up.
+
+    [YOU]      blue         Carson
+    [CLAUDE]   yellow       Claude
+    [A#3]      deep teal    3_testing-runner-manager
+    [A#5]      teal         5_testing-recorder-manager
+    [A#6]      light teal   6_end-customer-help-video-creations
+
+--------------------------------------------------------------------------------
+[YOU] — the judgement calls
+--------------------------------------------------------------------------------
+
+    Cutting the segments.                                       (step 2)
+    Writing the script lines.                                   (step 3)
+    Trimming and growing SEGMENTS   — the GREEN +/- frame editor. (steps 5, 8)
+    Trimming and growing the AVATAR — the PURPLE +/- frame editor. (step 8)
+
+Every one of these is a taste decision. Where a cut lands, how a sentence
+reads, how long a screen should sit there — no tool knows. The editor shows
+GREEN for the mp4 layer and PURPLE for the WebM layer precisely so you always
+know which of the two you are trimming.
+
+--------------------------------------------------------------------------------
+[CLAUDE] — managing the agents
+--------------------------------------------------------------------------------
+
+    Choosing which agent runs, and when.
+    Handing it a complete brief — never a half-filled one.
+    Checking what came back before it goes downstream.
+    Keeping the tools, this guide, and the runbooks true.
+
+Claude does not make the calls listed under [YOU]. Claude sets up the work
+either side of them.
+
+--------------------------------------------------------------------------------
+[A#3] [A#5] [A#6] — the agents
+--------------------------------------------------------------------------------
+
+    [A#3]  runs the E2E flow that becomes the footage           (step 1)
+    [A#5]  drives OBS and saves the recording                   (step 1)
+    [A#6]  owns the video pipeline tools                        (steps 4, 6, 7, 9, 10)
+
+An agent is given one job and reports back. It does not decide scope.
+
+
+================================================================================
+THE PATH — ELEVEN STEPS
+================================================================================
+
+--------------------------------------------------------------------------------
+STEP 1 — RECORD THE FLOW   [A#3] [A#5]
+--------------------------------------------------------------------------------
+
+OBS captures a real E2E test run against localhost. Agent 5
+(5_testing-recorder-manager) drives this.
+
+Output lands in:
+    Customers/<STORE>/help-videos/raw_mp4/
+
+    25 fps. Not 30. The switch was 2026-08-19.
+    Real Retina pixels — lib/obs.ts sets scale 1. SetVideoSettings overrides
+    the OBS profile on every run, so that file is the only place it matters.
+
+The run holds/pauses on each step so a segment is long enough for its line.
+That is lib/recordHold.ts, and it is why the raw footage is usable at all.
+
+
+--------------------------------------------------------------------------------
+STEP 2 — CUT THE RECORDING INTO SEGMENTS   [YOU]
+--------------------------------------------------------------------------------
+
+    python3 .claude/agent-tools/6_end-customer-help-video-creations/cut_segments.py \
+        "Customers/$STORE/help-videos/videos/$VIDEO"
+
+One slice of footage per scene. Boundaries come from the flow log's own action
+stamps, SNAPPED FORWARD to the first settled frame — a raw stamp lands while
+the page is still moving, by anywhere from +0.26s to +3.15s.
+
+Or cut by eye in the editor:
+
+    make editor
+
+Cuts land in <video>/sandbox/_cuts/ as Num_N-vV-segment.mp4.
+Move them into <video>/sandbox/<NN-label>/segment.mp4.
+
+TERMS, and they matter:
+    A SEGMENT is a slice of footage with no voice.
+    A SCENE is one segment plus its narration line.
+    No file is a scene. A scene is a row in script.json.
+
+
+--------------------------------------------------------------------------------
+STEP 3 — WRITE THE SCRIPT   [YOU]
+--------------------------------------------------------------------------------
+
+Edit <video>/video/script.json. One entry per scene:
+
+    { "n": 1, "label": "login-and-code", "line": "Enter your email, and ..." }
+
+Proofread it now. The words are spoken EXACTLY as written, and a typo costs
+another render.
+
+
+--------------------------------------------------------------------------------
+STEP 4 — CHECK THE TIMING  (free — never skip this)   [A#6]
+--------------------------------------------------------------------------------
+
+    make vtt STORE="$STORE" VIDEO="$VIDEO"
+
+Prints, per scene: how long the clip runs, how long the line takes to say, and
+THE GAP between them.
+
+Speech is estimated at the voice's MEASURED rate — 3.44 words/sec for Derya.
+An earlier guess of 2.70 understated every line by 25% and hid a third of the
+dead air. Re-derive it if the voice or its speed changes.
+
+    A POSITIVE gap is dead air — Sarah waiting with nothing to say.
+    A NEGATIVE gap is the defect that ships silently — she is still talking
+    after the picture has moved on.
+
+This costs nothing. Run it before you spend money, not after.
+
+Target: gap of about +1.2s per scene. That is what keeps ski-demo under 120s.
+
+
+--------------------------------------------------------------------------------
+STEP 5 — ADJUST THE SEGMENTS TO FIT THE LINES   [YOU]
+--------------------------------------------------------------------------------
+
+    make scenes STORE="$STORE" VIDEO="$VIDEO"
+
+Opens the frame editor on scene 1 with the whole scene list beside it.
+
+    Tick several scenes and press "Timeline of N scenes" to watch how they
+    JOIN. A hard cut or a jumping pose lives at a boundary, and one scene on
+    its own has no boundaries in it.
+
+    +1 / -1 add and delete frames — the GREEN +/- frame editor, because the
+    segment is the mp4 layer. A held frame is a real still, looped at the
+    source fps — never slowed footage.
+
+    Save overwrites the segment. The old one is archived to z_History/ first.
+
+Go back to step 4 and re-check. Repeat until no gap is negative.
+
+
+--------------------------------------------------------------------------------
+STEP 6 — RENDER SARAH, ONE PASS  ***THIS COSTS MONEY***   [A#6]
+--------------------------------------------------------------------------------
+
+First, free — compose the script and see the price:
+
+    make onepass-script STORE="$STORE" VIDEO="$VIDEO"
+
+It joins every line with an SSML <break>, writes onepass/onepass-script.txt,
+and prints the estimate. ski-demo came out:
+
+    speech      ~84.3s
+    breaks       22.0s   (11 x 2.0s)
+    RENDER      ~106.3s  ~$5.21     (actual: 103.97s, $5.15)
+
+Then, paid:
+
+    make onepass-render STORE="$STORE" VIDEO="$VIDEO"
+
+Takes about 7 minutes for 100 seconds. Lands in:
+    <video>/onepass/narration-onepass-vN.webm
+
+WHY ONE PASS AND NOT TWELVE
+    Rendering scene by scene gives Sarah no run-up into a sentence and no
+    run-out of one. Every clip starts cold and ends cold, and ski-demo has
+    eleven joins.
+
+    Measured on a real render: during a break she keeps breathing and shifting
+    (motion 0.083 vs 0.191 while speaking) and she STARTS MOVING AGAIN ABOUT A
+    SECOND BEFORE HER VOICE RETURNS. That anticipation cannot be bought at any
+    price from per-scene renders.
+
+    It is also not more expensive. One pass measured $0.049/sec. Short
+    per-scene clips cost $0.21-0.34 each for 3-6 seconds — $0.07-0.12/sec.
+    There is a floor per render, so many small renders are the wasteful option.
+
+BREAK LENGTH
+    Default 2.0s, change with BRK=2.5.
+    The break is SLACK YOU CUT AWAY, not a measurement you must get right.
+    Make it generous. You trim it back in step 8.
+
+
+--------------------------------------------------------------------------------
+STEP 7 — SPLIT IT BACK INTO PER-SCENE CLIPS  (free)   [A#6]
+--------------------------------------------------------------------------------
+
+    make onepass-split STORE="$STORE" VIDEO="$VIDEO" DRY=1     # look first
+    make onepass-split STORE="$STORE" VIDEO="$VIDEO"           # write
+
+Finds the silences, keeps the N-1 LARGEST, and cuts at the MIDDLE of each — so
+one piece keeps her lead-out and the next keeps her lead-in.
+
+Writes <video>/sandbox/<NN-label>/narration.webm, archiving any existing one
+to that folder's z_History/.
+
+WHY "THE N-1 LARGEST" AND NOT A THRESHOLD
+    Because the count is KNOWN. Twelve sentences have eleven breaks, and that
+    is far better information than any dB-and-seconds guess.
+
+    A fixed 1.5s cutoff was tried first and MISSED TWO REAL BREAKS on
+    ski-demo — they came back at 1.33s and 0.94s because Sarah trailed off
+    quickly into them. A 0.94s thinking-pause inside a line was the same
+    length. No single number separates those.
+
+    It also merges silences less than 0.25s apart: one real 1.78s pause came
+    back as 0.84s + 0.94s because a click split it in two, and both halves then
+    failed a threshold the whole would have passed.
+
+READ THE MARGIN LINE
+    "smallest kept 1.33s · largest dropped 0.00s · margin infx"
+
+    That is your confidence. If the margin is under 1.3x the tool warns you:
+    a pause inside a line is nearly as long as a real break, so check the
+    boundaries by eye or re-render with a bigger BRK.
+
+If the boundaries are wrong, split by hand in the editor instead — open the
+onepass .webm, mark the break midpoints, Cut. Markers show PURPLE on a .webm
+and green on an .mp4, so you always know which kind of file you are cutting.
+
+
+--------------------------------------------------------------------------------
+STEP 8 — TRIM EACH CLIP TO ITS SEGMENT  (free — this is the real work)   [YOU]
+--------------------------------------------------------------------------------
+
+Every split piece carries silence at both ends. That is by design, and it
+means most clips now OVERRUN their segment. On ski-demo, straight after the
+split:
+
+      #  scene                       segment  narration     gap
+      1  login-and-code                7.94s      8.56s   -0.62s
+      2  dashboard-new-order           3.54s      4.96s   -1.42s
+      3  add-a-person-and-myself       6.42s      6.24s   +0.18s
+      4  catalogue-search              9.94s     10.60s   -0.66s
+      5  dates-and-review             18.42s     17.72s   +0.70s
+      6  requirements                 14.62s     16.12s   -1.50s
+      7  checkout-pay-with-stripe      7.02s      8.24s   -1.22s
+      8  payment-card                  4.10s      5.20s   -1.10s
+      9  order-complete                7.30s      7.16s   +0.14s
+     10  order-history                 8.22s      8.68s   -0.46s
+     11  logout-menu                   5.02s      5.76s   -0.74s
+     12  signed-out                    6.02s      4.92s   +1.11s
+
+    8 of 12 overran. Expect that. It is not a fault.
+
+You have two levers, and you will use both:
+
+    TRIM THE NARRATION — the PURPLE +/- frame editor. Open the clip, delete
+    leading and trailing silent frames. This is the usual fix. Purple because
+    it is the WebM layer.
+
+    LENGTHEN THE SEGMENT — the GREEN +/- frame editor. Hold a frame or two.
+    Use this where the footage genuinely needs longer on screen.
+
+    make editor
+
+Aim for narration slightly SHORTER than its segment. Positive gap, small.
+Re-check with step 4 until nothing is negative.
+
+
+--------------------------------------------------------------------------------
+STEP 9 — BUILD THE CORNER AVATAR CLIPS  (free)   [A#6]
+--------------------------------------------------------------------------------
+
+    make overlays STORE="$STORE" VIDEO="$VIDEO"
+
+Crops Sarah head-and-shoulders and composites her into the lower-right corner
+on a transparent canvas — one clip per scene, versioned as a new
+sarah_clips/scene_overlays/vN/ set.
+
+RUN THIS AFTER ANY NARRATION CHANGE. Without a fresh set the editor lays ONE
+clip over every scene, so scene 5's footage plays scene 12's voice.
+
+The manifest records each line's SHA and WHICH LAYER the clip came from
+(sandbox / dev / flat). A sandbox override reaching a build is invisible in
+the picture — that field is the only way to see it.
+
+
+--------------------------------------------------------------------------------
+STEP 10 — ASSEMBLE THE FINAL VIDEO  (free)   [A#6]
+--------------------------------------------------------------------------------
+
+    python3 .claude/agent-tools/6_end-customer-help-video-creations/assemble_video.py \
+        "Customers/$STORE/help-videos/videos/$VIDEO"
+
+Two tracks joined by one overlay:
+    FRONT — transparent Sarah, carrying ALL the audio
+    BACK  — opaque screen recording, silent
+
+Plus the bookends: her full-screen opening, and her closing where she returns
+to the same pose she started in. Those are built from existing footage, not
+from a paid render.
+
+Output: <video>/video/FINAL_video.mp4  (--out to rename)
+
+
+--------------------------------------------------------------------------------
+STEP 11 — VERIFY   [YOU] [CLAUDE]
+--------------------------------------------------------------------------------
+
+    Length under 120 seconds.       ski-demo runs ~112s. Little room.
+    Resolution 1152x1152, 25 fps.
+    Watch every JOIN — use the editor timeline, tick all scenes.
+    Watch her MOUTH against the words on at least two scenes.
+    No black box where Sarah should be. That means alpha was lost somewhere.
+
+
+================================================================================
+THE COMMAND LIST
+================================================================================
+
+    [A#6]  make vtt                 timing table                        free
+    make scenes              open the editor on scene 1          free
+    make editor              open the editor, browse by hand     free
+    make onepass-script      compose the script + price it       free
+    make onepass-render      ONE HeyGen render                   COSTS MONEY
+    make onepass-split       cut it into per-scene clips         free
+    make overlays            rebuild the corner avatar clips     free
+    make sandbox-sync        refill sandbox/ from dev/ (the undo)
+    make videos              list this store's videos
+
+All take STORE= and VIDEO=.
+
+
+================================================================================
+TRAPS — every one of these has actually happened
+================================================================================
+
+ALPHA IS LOST SILENTLY, IN THREE PLACES AT ONCE.
+    A .webm must be DECODED with "-c:v libvpx-vp9" BEFORE -i, ENCODED as VP9
+    yuva420p with -auto-alt-ref 0, and WRITTEN as .webm. Miss any one and you
+    get Sarah on a black rectangle with a zero exit code.
+    Worse: the CONCAT step re-decodes too. Miss it there and the file still
+    reports yuva420p — the alpha plane is just 100% opaque. Reading the pixel
+    format will tell you it is fine. Measure the plane instead.
+
+A MISSING FOLDER DOES NOT ERROR.
+    It reads as "no files", which looks like an empty store. Never hardcode
+    segments/ or scenes/. Ask paths.py, which resolves sandbox -> dev -> flat
+    per FILE, not per store.
+
+THE SANDBOX OUTRANKS EVERYTHING.
+    The editor reads and writes sandbox/ ONLY. dev/ is the safe copy. A
+    forgotten sandbox override silently enters a build and is invisible in the
+    output. "make sandbox-sync" is the undo — it OVERWRITES, which is the point.
+
+STALE NARRATION ADOPTS ITSELF.
+    render_narration.py skips a clip that already exists. After a script
+    rewrite that once nearly shipped 11 clips from the previous script,
+    shifted by one from scene 6 onward. Duration checks gave FALSE OKs.
+    The line_sha1 in the overlay manifest is what catches this.
+
+RECORDINGS ARE NOT SCENES.
+    raw_mp4/ is shared across all of a store's videos. Everything else —
+    dev/, sandbox/, script, outputs — is per video, under videos/<NN-slug>/.
+
+THE VIDEO AGENT REWRITES YOUR SCRIPT.
+    Never use POST /v3/video-agents for narration. POST /v3/videos speaks the
+    words verbatim. This is written in three places because someone was bitten.
+
+HEYGEN CANNOT COMPOSITE FOR US, AND THE ONE PLACE IT CAN IS DYING.
+    v2 (/v2/video/generate) does support avatar-over-video with circle layout,
+    scale and offset. It is removed 2026-10-31 and v3 has none of it.
+    Do not build on it. ffmpeg is the durable part.
+
+
+================================================================================
+WHAT IS STILL UNFINISHED
+================================================================================
+
+    - Step 8 is manual. A "trim to fit" mode could do the obvious part.
+    - Only ski-demo is restructured. canoe-demo, bike-demo and alpine-sports
+      are still flat, 30 fps and un-held. They need re-recording, not just
+      migrating.
+    - DELIVERY IS BLOCKED. Rentify_v10 has no way to serve a help video at all
+      (ToDo_Rentify_v10.md V3). Videos can be built. They cannot be shipped.

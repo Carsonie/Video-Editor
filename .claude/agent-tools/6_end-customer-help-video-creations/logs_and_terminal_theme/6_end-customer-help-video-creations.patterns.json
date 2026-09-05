@@ -1,0 +1,83 @@
+{
+  "patterns": [
+    {
+      "pattern": "HeyGen credit(s)?",
+      "color": "yellow",
+      "fontWeight": "bold"
+    },
+    {
+      "pattern": "\\bverbatim\\b",
+      "color": "green"
+    },
+    {
+      "pattern": "AI-scripted|Video Agent",
+      "color": "orange",
+      "fontWeight": "bold"
+    },
+    {
+      "pattern": "\\bv2\\b.*deprecated|deprecated.*\\bv2\\b|404",
+      "color": "red",
+      "fontWeight": "bold"
+    },
+    {
+      "pattern": "\\bMux\\b",
+      "color": "blue"
+    },
+    {
+      "pattern": "PII|boxblur",
+      "color": "purple"
+    },
+    {
+      "pattern": "final/",
+      "color": "green",
+      "fontWeight": "bold"
+    },
+    {
+      "pattern": "Step \\d+:.*",
+      "color": "blue",
+      "fontWeight": "bold"
+    },
+    {
+      "pattern": "Run Summary",
+      "color": "blue",
+      "fontWeight": "bold"
+    },
+    {
+      "pattern": "\u2705.*",
+      "color": "green",
+      "fontWeight": "bold"
+    },
+    {
+      "pattern": "\u2713",
+      "color": "green",
+      "fontWeight": "bold"
+    },
+    {
+      "pattern": "\u274c.*",
+      "color": "red",
+      "fontWeight": "bold"
+    },
+    {
+      "pattern": "\\bERROR\\b",
+      "color": "red",
+      "fontWeight": "bold"
+    },
+    {
+      "pattern": "\u26a0\ufe0f.*",
+      "color": "orange",
+      "fontWeight": "bold"
+    },
+    {
+      "pattern": "\u25b6",
+      "color": "cyan"
+    },
+    {
+      "pattern": "\u21b3|\u21b2",
+      "color": "purple"
+    },
+    {
+      "pattern": "^(Agent Run|Agent|Customer|Log):",
+      "color": "gray"
+    }
+  ]
+}

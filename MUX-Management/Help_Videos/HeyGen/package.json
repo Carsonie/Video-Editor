@@ -1,0 +1,22 @@
+{
+  "name": "rentify-help-video-automation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Rentify help video pipeline — HeyGen voiceover + OBS capture, combined locally.",
+  "type": "commonjs",
+  "scripts": {
+    "voices": "ts-node scripts/lib/list-voices.ts",
+    "voiceover": "ts-node scripts/1-generate-voiceover.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "fluent-ffmpeg": "^2.1.3",
+    "puppeteer": "^24.0.0"
+  },
+  "devDependencies": {
+    "@types/fluent-ffmpeg": "^2.1.27",
+    "@types/node": "^22.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.0"
+  }
+}

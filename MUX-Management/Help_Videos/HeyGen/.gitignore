@@ -1,0 +1,29 @@
+# dependencies
+node_modules/
+
+# python bytecode cache
+__pycache__/
+*.pyc
+
+# build output
+dist/
+
+# secrets
+.env.local
+.env
+
+# generated media (large; regenerated from config + OBS captures)
+# media is namespaced per video: videos/<slug>/{source,final,temp}/...
+audio/*.mp3
+videos/**/*.mp4
+videos/**/*.webm
+videos/**/*.png
+
+# regenerable HeyGen avatar-look previews (re-fetch via get_all_avatar_images.py)
+avatars/**/*.webp
+
+# superseded draft history — kept on disk, not versioned
+_archive/
+
+# os
+.DS_Store

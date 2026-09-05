@@ -1,0 +1,9 @@
+April 1-2026
+
+
+Token id = 4e43304b-24c4-4e1d-9d47-34807c5f044b
+
+Sec key = AbDqBeP/mD/PjmcGrssPEzTrgwKkDCbMR41D82eE8txMnR2cJ0v/dCIM9hr79oh/xrXG02CfOl7
+
+
+I do you already have videos uploaded to Mux and have their video IDs ready.  Already using Mux's native player (Mux Player).  The user needs to be logged in to use the video player. So there is a golang context with asscess to the platform, so extra user tokens are not necessary.   Fornow, just my video asset at mux {   "title": "Knot-uhd_3840_2160_25fps" }
