@@ -1,0 +1,100 @@
+
+Editor Session:  2026-09-02T09:09:23
+Player:          Segment and Avatar Editor v56
+Server:          http://localhost:8842
+
+09:12:09  Open clip      raw_mp4                    ski-demo_owner-one-item_dev_21-14-57_v7.mp4  url=ski-demo_owner-one-item_dev_21-14-57_v7_6720d3ad/viewer.html
+09:12:57  Open clip      raw_mp4                    ski-demo_owner-one-item_dev_21-16-46_v8.mp4  url=ski-demo_owner-one-item_dev_21-16-46_v8_932e69de/viewer.html
+
+Editor Session:  2026-09-02T09:50:51
+Player:          Segment and Avatar Editor v56
+Server:          http://localhost:8842
+
+09:56:19  FB: Load store                            path=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+09:56:32  FB: Load video _Editor_Test               root=_Editor_Test
+09:56:40  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+09:56:53  Save scene     segment_22137e5c             nb_frames=40  duration_s=1.6
+09:56:54  Undo           segment_22137e5c             nb_frames=15
+09:58:55  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+
+Editor Session:  2026-09-02T10:23:54
+Player:          Segment and Avatar Editor v56
+Server:          http://localhost:8842
+
+10:25:41  Open clip      raw_mp4                    ski-demo_owner-one-item_dev_21-16-46_v8.mp4  url=ski-demo_owner-one-item_dev_21-16-46_v8_932e69de/viewer.html
+
+Editor Session:  2026-09-02T10:44:37
+Player:          MP4 Splitter v8
+Server:          http://localhost:8845
+
+10:44:48  Open clip      01-intro-and-login         segment.mp4  url=segment_9f51189b/viewer.html
+
+Editor Session:  2026-09-02T10:45:55
+Player:          MP4 Splitter v8
+Server:          http://localhost:8845
+
+10:45:56  Open clip      01-intro-and-login         segment.mp4  url=segment_9f51189b/viewer.html
+10:46:25  Open clip      01-alpha-scene             segment.mp4  url=segment_22137e5c/viewer.html
+10:46:25  Mark           segment_22137e5c           frame=10 on=True
+10:46:25  Mark           segment_22137e5c           frame=20 on=True
+10:46:25  Cut scene      segment_22137e5c             count=3  version=1
+10:46:33  + Frame        segment_22137e5c           at=5 count=2 side=right  nb_frames=42
+10:46:35  Save scene     segment_22137e5c             nb_frames=42  duration_s=1.68
+
+Editor Session:  2026-09-02T10:50:24
+Player:          Segment and Avatar Editor v56
+Server:          http://localhost:8846
+
+10:50:46  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+10:51:23  Mark           segment_22137e5c           frame=15 on=True
+10:51:24  Save scene     segment_22137e5c             nb_frames=40  duration_s=1.6
+10:53:10  Undo           segment_22137e5c             REFUSED: source no longer exists: /Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+10:53:46  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+10:53:47  + Frame        segment_22137e5c           at=5 count=3 side=right  nb_frames=43
+10:53:48  Undo           segment_22137e5c             nb_frames=40
+10:53:54  Join           _Editor_Test/sandbox       ns=[1, 2] label=alpha-bravo-joined tracks=['segment', 'avatar']  REFUSED: scene 1 has no segment in sandbox
+
+Editor Session:  2026-09-02T10:57:41
+Player:          MP4 Splitter v8
+Server:          http://localhost:8845
+
+
+Editor Session:  2026-09-02T10:57:46
+Player:          Segment and Avatar Editor v56
+Server:          http://localhost:8846
+
+11:02:49  Open clip      raw_mp4                    ski-demo_owner-one-item_dev_21-14-57_v7.mp4  url=ski-demo_owner-one-item_dev_21-14-57_v7_6720d3ad/viewer.html
+
+Editor Session:  2026-09-02T11:13:02
+Player:          MP4 Splitter v9
+Server:          http://localhost:8845
+
+
+Editor Session:  2026-09-02T11:13:07
+Player:          Segment and Avatar Editor v57
+Server:          http://localhost:8846
+
+11:13:45  Open clip      01-alpha-scene             segment.mp4  url=segment_22137e5c/viewer.html
+11:13:59  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+11:20:50  Open clip      raw_mp4                    ski-demo_owner-one-item_dev_21-16-46_v8.mp4  url=ski-demo_owner-one-item_dev_21-16-46_v8_932e69de/viewer.html
+
+Editor Session:  2026-09-02T11:35:39
+Player:          Segment and Avatar Editor v58
+Server:          http://localhost:8846
+
+11:37:08  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11
+11:37:54  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11
+11:40:41  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+
+Editor Session:  2026-09-02T12:18:32
+Player:          MP4 Splitter v10
+Server:          http://localhost:8845
+
+
+Editor Session:  2026-09-02T12:18:36
+Player:          Segment and Avatar Editor v59
+Server:          http://localhost:8846
+
+12:39:50  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+12:47:50  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+14:12:17  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering

@@ -1,0 +1,982 @@
+
+Editor Session:  2026-08-26T11:51:50
+Player:          Segment and Avatar Editor v29
+Server:          http://localhost:8860
+
+11:52:45  Open clip      raw_mp4                    ski-demo_owner-one-item_dev_19-17-45_v5.mp4  url=ski-demo_owner-one-item_dev_19-17-45_v5_e0a88b58/viewer.html
+11:52:46  Open layered                              base=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering/sandbox/01-login-and-code/segment.mp4  url=pair_80c5a92382/viewer.html  slug=pair_80c5a92382
+11:52:49  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+11:54:56  Open clip      raw_mp4                    ski-demo_owner-one-item_dev_19-17-45_v5.mp4  url=ski-demo_owner-one-item_dev_19-17-45_v5_e0a88b58/viewer.html
+12:54:14  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+12:56:37  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=0,1
+12:57:50  Join           Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=[0, 1] label=opening-with-login tracks=['segment', 'avatar']  REFUSED: not scenes in the script: [0]
+13:00:53  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=0,1,2  url=seq_9e07e03d50/viewer.html  slug=seq_9e07e03d50
+
+Editor Session:  2026-08-26T13:01:36
+Player:          Segment and Avatar Editor v30
+Server:          http://localhost:8860
+
+13:01:40  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=0,1,2  url=seq_9e07e03d50/viewer.html  slug=seq_9e07e03d50
+13:05:30  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+13:05:45  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=0,1
+
+Editor Session:  2026-08-26T13:15:34
+Player:          Segment and Avatar Editor v30
+Server:          http://localhost:8860
+
+13:15:42  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2  url=seq_51af94f4c5/viewer.html  slug=seq_51af94f4c5
+13:15:42  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2  url=seq_51af94f4c5/viewer.html  slug=seq_51af94f4c5
+13:17:11  Join           Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=[1, 2] label=opening-with-login tracks=['segment', 'avatar']  REFUSED: some of those scenes have a narration and some do not — join would silently drop it
+
+Editor Session:  2026-08-26T13:29:19
+Player:          Segment and Avatar Editor v31
+Server:          http://localhost:8860
+
+13:29:37  Join           _GapTest/videos/01-run     ns=[1, 2] label=joined tracks=['segment', 'avatar']  REFUSED: scene(s) 1 have no narration and the others do. Joining as-is would move every later narration forward. Send fill_gaps to hold that time open with a transparent silent clip instead.
+13:29:45  Join           _GapTest/videos/01-run     ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=[]
+
+Editor Session:  2026-08-26T13:30:49
+Player:          Segment and Avatar Editor v31
+Server:          http://localhost:8860
+
+13:31:01  Join           _GapTest/videos/01-run     ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=[]
+13:32:23  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2  url=seq_51af94f4c5/viewer.html  slug=seq_51af94f4c5
+13:34:58  Join           Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=[1, 2] label=opening-with-login tracks=['segment', 'avatar']  joined=[1, 2]  label=opening-with-login  renamed=['02-dashboard-new-order', '03-add-a-person-and-myself', '04-catalogue-search', '05-dates-and-review', '06-requirements', '07-checkout-pay-with-stripe', '08-payment-card', '09-order-complete', '10-order-history', '11-logout-and-signed-out']
+13:35:06  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1
+
+Editor Session:  2026-08-26T13:49:05
+Player:          Segment and Avatar Editor v32
+Server:          http://localhost:8860
+
+13:49:09  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2  url=seq_51af94f4c5/viewer.html  slug=seq_51af94f4c5
+13:51:47  - Zone         segment_7b72bbbc           a=286 b=286  nb_frames=482
+13:53:31  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2  url=seq_51af94f4c5/viewer.html  slug=seq_51af94f4c5
+13:53:56  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1
+13:58:28  Open layered                              base=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering/sandbox/01-opening-with-login/segment.mp4  url=pair_20fb8de9c2/viewer.html  slug=pair_20fb8de9c2
+13:58:38  + Frame        pair_20fb8de9c2            at=284 count=1 side=right  nb_frames=440
+13:59:36  Save scene     pair_20fb8de9c2              nb_frames=440  duration_s=17.64
+14:01:44  - Zone         segment_7b72bbbc           a=287 b=287  nb_frames=481
+14:03:45  + Frame        avatar_155a8939            at=39 count=1 side=right  nb_frames=440
+14:04:04  + Frame        avatar_155a8939            at=41 count=1 side=right  nb_frames=441
+14:04:49  - Zone         segment_7b72bbbc           a=1 b=1  nb_frames=480
+14:04:49  - Zone         avatar_155a8939            a=1 b=1  nb_frames=440
+14:04:51  - Zone         segment_7b72bbbc           a=1 b=1  nb_frames=479
+14:04:51  - Zone         avatar_155a8939            a=1 b=1  nb_frames=439
+14:04:52  - Zone         segment_7b72bbbc           a=1 b=1  nb_frames=478
+14:04:52  - Zone         avatar_155a8939            a=1 b=1  nb_frames=438
+14:04:52  - Zone         segment_7b72bbbc           a=1 b=1  nb_frames=477
+14:04:52  - Zone         avatar_155a8939            a=1 b=1  nb_frames=437
+14:04:53  - Zone         segment_7b72bbbc           a=1 b=1  nb_frames=476
+14:04:53  - Zone         avatar_155a8939            a=1 b=1  nb_frames=436
+14:04:53  - Zone         segment_7b72bbbc           a=1 b=1  nb_frames=475
+14:04:53  - Zone         avatar_155a8939            a=1 b=1  nb_frames=435
+14:04:53  - Zone         segment_7b72bbbc           a=1 b=1  nb_frames=474
+14:04:53  - Zone         avatar_155a8939            a=1 b=1  nb_frames=434
+14:04:55  - Zone         segment_7b72bbbc           a=1 b=1  nb_frames=473
+14:04:55  - Zone         avatar_155a8939            a=1 b=1  nb_frames=433
+14:04:56  - Zone         segment_7b72bbbc           a=1 b=1  nb_frames=472
+14:04:56  - Zone         avatar_155a8939            a=1 b=1  nb_frames=432
+14:04:57  - Zone         segment_7b72bbbc           a=1 b=1  nb_frames=471
+14:04:57  - Zone         avatar_155a8939            a=1 b=1  nb_frames=431
+14:04:57  - Zone         segment_7b72bbbc           a=1 b=1  nb_frames=470
+14:04:57  - Zone         avatar_155a8939            a=1 b=1  nb_frames=430
+14:04:58  - Zone         segment_7b72bbbc           a=1 b=1  nb_frames=469
+14:04:58  - Zone         avatar_155a8939            a=1 b=1  nb_frames=429
+14:05:50  Undo           segment_7b72bbbc             nb_frames=470
+14:05:51  Undo           segment_7b72bbbc             nb_frames=470
+14:05:53  Undo           segment_7b72bbbc             nb_frames=470
+14:05:55  Undo           avatar_155a8939              REFUSED: map refers to frames outside 1..216: [217, 218, 219, 220, 221]
+14:05:56  Undo           segment_7b72bbbc             nb_frames=470
+14:05:57  Undo           avatar_155a8939              REFUSED: map refers to frames outside 1..381: [382, 383, 384, 385, 386]
+14:05:59  Undo           avatar_155a8939              REFUSED: [Errno 66] Directory not empty: '/Users/carsonkramer/Rentify/Video-Editor/cache/avatar_155a8939/frames'
+14:05:59  Undo           avatar_155a8939              REFUSED: map refers to frames outside 1..204: [205, 206, 207, 208, 209]
+
+Editor Session:  2026-08-26T14:08:24
+Player:          Segment and Avatar Editor v32
+Server:          http://localhost:8860
+
+14:08:43  Open layered                              base=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering/sandbox/01-opening-with-login/segment.mp4  url=pair_20fb8de9c2/viewer.html  slug=pair_20fb8de9c2
+14:08:44  Undo           pair_20fb8de9c2              REFUSED: map refers to frames outside 1..440: [441, 442, 443, 444, 445]
+14:08:57  Open layered                              base=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering/sandbox/01-opening-with-login/segment.mp4  url=pair_20fb8de9c2/viewer.html  slug=pair_20fb8de9c2
+14:08:57  + Frame        pair_20fb8de9c2            at=10 count=1 side=right  nb_frames=441
+14:08:57  + Frame        pair_20fb8de9c2            at=10 count=1 side=right  nb_frames=442
+14:08:57  + Frame        pair_20fb8de9c2            at=10 count=1 side=right  nb_frames=443
+14:08:57  + Frame        pair_20fb8de9c2            at=10 count=1 side=right  nb_frames=444
+14:08:57  + Frame        pair_20fb8de9c2            at=10 count=1 side=right  nb_frames=445
+14:08:57  + Frame        pair_20fb8de9c2            at=10 count=1 side=right  nb_frames=446
+14:09:09  Open layered                              base=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering/sandbox/01-opening-with-login/segment.mp4  url=pair_20fb8de9c2/viewer.html  slug=pair_20fb8de9c2
+14:09:12  Undo           pair_20fb8de9c2              nb_frames=440
+14:13:12  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2  url=seq_51af94f4c5/viewer.html  slug=seq_51af94f4c5
+14:14:34  - Zone         segment_7b72bbbc           a=286 b=286  nb_frames=482
+14:14:36  - Zone         segment_7b72bbbc           a=286 b=286  nb_frames=481
+14:14:42  - Zone         segment_7b72bbbc           a=286 b=286  nb_frames=480
+14:15:16  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1
+
+Editor Session:  2026-08-26T14:27:19
+Player:          Segment and Avatar Editor v33
+Server:          http://localhost:8860
+
+
+Editor Session:  2026-08-26T14:28:46
+Player:          Segment and Avatar Editor v33
+Server:          http://localhost:8860
+
+14:28:51  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2  url=seq_51af94f4c5/viewer.html  slug=seq_51af94f4c5
+14:29:08  + Frame        segment_7b72bbbc           at=40 count=1 side=right  nb_frames=481
+14:29:08  + Frame        avatar_155a8939            at=40 count=1 side=right  nb_frames=441
+14:29:11  Undo           segment_7b72bbbc             nb_frames=480
+14:29:14  Undo           avatar_155a8939              nb_frames=440
+
+Editor Session:  2026-08-26T14:30:48
+Player:          Segment and Avatar Editor v34
+Server:          http://localhost:8860
+
+14:30:53  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2  url=seq_51af94f4c5/viewer.html  slug=seq_51af94f4c5
+14:31:13  + Frame        segment_7b72bbbc           at=40 count=1 side=right  nb_frames=481
+14:31:13  + Frame        avatar_155a8939            at=40 count=1 side=right  nb_frames=441
+14:31:26  Undo           segment_7b72bbbc             nb_frames=480
+14:31:29  Undo           avatar_155a8939              nb_frames=440
+14:35:44  - Zone         segment_7b72bbbc           a=1 b=1  nb_frames=479
+14:35:44  - Zone         avatar_155a8939            a=1 b=1  nb_frames=439
+
+Editor Session:  2026-08-26T14:38:20
+Player:          Segment and Avatar Editor v35
+Server:          http://localhost:8860
+
+14:38:25  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2  url=seq_51af94f4c5/viewer.html  slug=seq_51af94f4c5
+14:38:41  + Frame        segment_7b72bbbc           at=40 count=1 side=right  nb_frames=480
+14:38:41  + Frame        avatar_155a8939            at=40 count=1 side=right  nb_frames=440
+14:38:44  Undo           segment_7b72bbbc             nb_frames=479
+14:38:48  Undo           avatar_155a8939              nb_frames=439
+14:40:22  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2  url=seq_51af94f4c5/viewer.html  slug=seq_51af94f4c5
+14:40:41  - Zone         segment_7b72bbbc           a=1 b=1  nb_frames=478
+14:40:41  - Zone         avatar_155a8939            a=1 b=1  nb_frames=438
+14:43:18  + Frame        segment_7b72bbbc           at=40 count=1 side=right  nb_frames=479
+14:43:18  + Frame        avatar_155a8939            at=40 count=1 side=right  nb_frames=439
+
+Editor Session:  2026-08-26T14:44:03
+Player:          Segment and Avatar Editor v36
+Server:          http://localhost:8860
+
+14:44:08  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2  url=seq_51af94f4c5/viewer.html  slug=seq_51af94f4c5
+14:44:24  + Frame        segment_7b72bbbc           at=40 count=1 side=right  nb_frames=480
+14:44:24  + Frame        avatar_155a8939            at=40 count=1 side=right  nb_frames=440
+14:44:27  Undo           segment_7b72bbbc             nb_frames=479
+14:44:31  Undo           avatar_155a8939              nb_frames=439
+14:48:20  - Zone         segment_7b72bbbc           a=1 b=1  nb_frames=478
+14:48:20  - Zone         avatar_155a8939            a=1 b=1  nb_frames=438
+
+Editor Session:  2026-08-26T15:08:41
+Player:          Segment and Avatar Editor v37
+Server:          http://localhost:8860
+
+15:08:46  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+15:09:16  + Frame        segment_cf85c03a           at=5 count=1 side=right  nb_frames=89
+15:09:16  + Frame        avatar_09985a1c            at=5 count=1 side=right  nb_frames=73
+15:09:28  + Frame        segment_2f32e472           at=5 count=1 side=right  nb_frames=161
+15:09:28  + Frame        avatar_7564d72a            at=5 count=1 side=right  nb_frames=112
+15:09:31  Undo           segment_cf85c03a             nb_frames=88
+15:09:31  Undo           avatar_09985a1c              nb_frames=72
+15:09:54  Save scene     segment_2f32e472             nb_frames=161  duration_s=6.56
+15:10:04  Save scene     avatar_7564d72a              nb_frames=112  duration_s=4.48
+15:11:09  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+15:12:13  - Zone         segment_7b72bbbc           a=1 b=1  nb_frames=477
+15:12:14  - Zone         avatar_155a8939            a=1 b=1  nb_frames=437
+15:12:38  - Zone         segment_2f32e472           a=161 b=161  nb_frames=160
+15:12:39  - Zone         avatar_7564d72a            a=112 b=112  nb_frames=111
+15:13:25  Save scene     segment_7b72bbbc             nb_frames=477  duration_s=19.08
+15:13:44  Undo           segment_2f32e472             nb_frames=161
+15:13:45  Undo           avatar_7564d72a              nb_frames=112
+15:14:10  Save scene     avatar_155a8939              nb_frames=437  duration_s=17.523
+15:17:03  + Frame        segment_cf85c03a           at=5 count=1 side=right  nb_frames=89
+15:17:03  + Frame        avatar_09985a1c            at=5 count=1 side=right  nb_frames=73
+15:17:08  Undo           segment_cf85c03a             nb_frames=88
+15:17:08  Undo           avatar_09985a1c              nb_frames=72
+15:20:03  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+15:20:17  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1
+15:21:35  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=1  line=Hi, I'm Sarah. Let me show you how to place your first order with us at Ski Demo rentals. Enter your email, and we'll send you a 4 digit verification code you can enter here to sign in. This will also create your account.
+15:51:07  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=1  line=Hi, I'm Sarah. Let me show you how to place your first order with us at Ski Demo rentals. Let's get started. Enter your email, and we'll send you a 4 digit verification code you can enter here to sign in. This will also create your account.
+15:51:07  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=5  line=Select your rental starting date, and then your return date. For a one day rental, select the same day twice. You will see the start and end date, as well as the number of rental days you have chosen in the status bar. Review your order, taking a moment to check that your rental dates and the prices are correct.
+15:51:07  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=10  line=You can always find your rental in your order history. And your current settings will be saved for your next visit.
+16:03:34  - Zone         segment_7b72bbbc           a=257 b=257  nb_frames=476
+16:03:50  - Zone         segment_7b72bbbc           a=257 b=257  nb_frames=475
+16:03:51  - Zone         segment_7b72bbbc           a=257 b=257  nb_frames=474
+16:03:51  - Zone         segment_7b72bbbc           a=257 b=257  nb_frames=473
+16:03:59  - Zone         segment_7b72bbbc           a=257 b=257  nb_frames=472
+16:04:00  - Zone         segment_7b72bbbc           a=257 b=257  nb_frames=471
+16:04:00  - Zone         segment_7b72bbbc           a=257 b=257  nb_frames=470
+16:04:00  - Zone         segment_7b72bbbc           a=257 b=257  nb_frames=469
+16:04:06  - Zone         segment_7b72bbbc           a=257 b=257  nb_frames=468
+16:04:09  - Zone         segment_7b72bbbc           a=257 b=257  nb_frames=467
+16:04:18  - Zone         segment_7b72bbbc           a=257 b=257  nb_frames=466
+16:10:58  Undo           segment_7b72bbbc             nb_frames=467
+16:11:02  Undo           segment_7b72bbbc             nb_frames=468
+16:11:03  Undo           segment_7b72bbbc             nb_frames=468
+16:11:04  Undo           segment_7b72bbbc             nb_frames=470
+16:11:05  Undo           segment_7b72bbbc             nb_frames=470
+16:11:06  Undo           segment_7b72bbbc             nb_frames=472
+16:11:07  Undo           segment_7b72bbbc             nb_frames=472
+16:11:08  Undo           segment_7b72bbbc             nb_frames=472
+16:11:10  Undo           segment_7b72bbbc             nb_frames=475
+16:11:11  Undo           segment_7b72bbbc             nb_frames=476
+
+Editor Session:  2026-08-26T16:14:07
+Player:          Segment and Avatar Editor v38
+Server:          http://localhost:8860
+
+16:14:12  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+
+Editor Session:  2026-08-26T16:15:20
+Player:          Segment and Avatar Editor v38
+Server:          http://localhost:8860
+
+16:15:24  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+16:15:43  - Zone         segment_7b72bbbc           a=200 b=200  nb_frames=475
+16:15:43  - Zone         avatar_155a8939            a=200 b=200  nb_frames=436
+16:20:01  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+16:20:12  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1
+
+Editor Session:  2026-08-26T16:23:30
+Player:          Segment and Avatar Editor v38
+Server:          http://localhost:8860
+
+16:23:38  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+16:24:01  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1
+21:18:31  - Zone         segment_7b72bbbc           a=286 b=286  nb_frames=482
+21:18:59  - Zone         segment_7b72bbbc           a=287 b=287  nb_frames=481
+21:19:03  - Zone         segment_7b72bbbc           a=286 b=286  nb_frames=480
+21:20:19  + Frame        segment_7b72bbbc           at=427 count=1 side=right  nb_frames=481
+21:20:22  + Frame        segment_7b72bbbc           at=428 count=1 side=right  nb_frames=482
+21:20:29  + Frame        segment_7b72bbbc           at=429 count=1 side=right  nb_frames=483
+21:21:34  + Frame        segment_7b72bbbc           at=434 count=1 side=right  nb_frames=484
+21:21:37  + Frame        segment_7b72bbbc           at=435 count=1 side=right  nb_frames=485
+21:21:39  + Frame        segment_7b72bbbc           at=436 count=1 side=right  nb_frames=486
+21:21:40  + Frame        segment_7b72bbbc           at=437 count=1 side=right  nb_frames=487
+21:21:42  + Frame        segment_7b72bbbc           at=438 count=1 side=right  nb_frames=488
+21:21:43  + Frame        segment_7b72bbbc           at=439 count=1 side=right  nb_frames=489
+21:21:45  + Frame        segment_7b72bbbc           at=440 count=1 side=right  nb_frames=490
+21:21:46  + Frame        segment_7b72bbbc           at=441 count=1 side=right  nb_frames=491
+21:21:47  + Frame        segment_7b72bbbc           at=442 count=1 side=right  nb_frames=492
+21:21:49  + Frame        segment_7b72bbbc           at=443 count=1 side=right  nb_frames=493
+21:21:54  + Frame        segment_7b72bbbc           at=444 count=1 side=right  nb_frames=494
+21:21:56  + Frame        segment_7b72bbbc           at=445 count=1 side=right  nb_frames=495
+21:21:58  + Frame        segment_7b72bbbc           at=446 count=1 side=right  nb_frames=496
+21:22:00  + Frame        segment_7b72bbbc           at=447 count=1 side=right  nb_frames=497
+21:22:01  + Frame        segment_7b72bbbc           at=448 count=1 side=right  nb_frames=498
+21:22:03  + Frame        segment_7b72bbbc           at=449 count=1 side=right  nb_frames=499
+21:22:08  + Frame        segment_7b72bbbc           at=450 count=1 side=right  nb_frames=500
+21:22:35  - Zone         segment_7b72bbbc           a=492 b=492  nb_frames=499
+21:22:36  - Zone         segment_7b72bbbc           a=492 b=492  nb_frames=498
+21:22:36  - Zone         segment_7b72bbbc           a=492 b=492  nb_frames=497
+21:22:37  - Zone         segment_7b72bbbc           a=492 b=492  nb_frames=496
+21:22:37  - Zone         segment_7b72bbbc           a=492 b=492  nb_frames=495
+21:22:38  - Zone         segment_7b72bbbc           a=492 b=492  nb_frames=494
+21:22:43  - Zone         segment_7b72bbbc           a=492 b=492  nb_frames=493
+21:23:03  - Zone         segment_7b72bbbc           a=482 b=482  nb_frames=492
+21:23:04  - Zone         segment_7b72bbbc           a=482 b=482  nb_frames=491
+21:23:05  - Zone         segment_7b72bbbc           a=482 b=482  nb_frames=490
+21:23:05  - Zone         segment_7b72bbbc           a=482 b=482  nb_frames=489
+21:23:07  - Zone         segment_7b72bbbc           a=482 b=482  nb_frames=488
+21:23:08  - Zone         segment_7b72bbbc           a=482 b=482  nb_frames=487
+21:23:08  - Zone         segment_7b72bbbc           a=482 b=482  nb_frames=486
+21:23:09  - Zone         segment_7b72bbbc           a=482 b=482  nb_frames=485
+21:23:10  - Zone         segment_7b72bbbc           a=482 b=482  nb_frames=484
+21:23:11  - Zone         segment_7b72bbbc           a=482 b=482  nb_frames=483
+21:24:23  - Zone         segment_7b72bbbc           a=468 b=468  nb_frames=482
+21:24:23  - Zone         avatar_155a8939            a=468 b=468  REFUSED: span 468..468 is outside 1..440
+21:24:24  - Zone         segment_7b72bbbc           a=468 b=468  nb_frames=481
+21:24:24  - Zone         avatar_155a8939            a=468 b=468  REFUSED: span 468..468 is outside 1..440
+21:24:25  - Zone         segment_7b72bbbc           a=468 b=468  nb_frames=480
+21:24:25  - Zone         avatar_155a8939            a=468 b=468  REFUSED: span 468..468 is outside 1..440
+21:24:26  - Zone         segment_7b72bbbc           a=468 b=468  nb_frames=479
+21:24:26  - Zone         avatar_155a8939            a=468 b=468  REFUSED: span 468..468 is outside 1..440
+21:24:27  - Zone         segment_7b72bbbc           a=468 b=468  nb_frames=478
+21:24:27  - Zone         avatar_155a8939            a=468 b=468  REFUSED: span 468..468 is outside 1..440
+21:24:28  - Zone         segment_7b72bbbc           a=468 b=468  nb_frames=477
+21:24:28  - Zone         avatar_155a8939            a=468 b=468  REFUSED: span 468..468 is outside 1..440
+21:24:29  - Zone         segment_7b72bbbc           a=468 b=468  nb_frames=476
+21:24:29  - Zone         avatar_155a8939            a=468 b=468  REFUSED: span 468..468 is outside 1..440
+21:24:30  - Zone         segment_7b72bbbc           a=468 b=468  nb_frames=475
+21:24:30  - Zone         avatar_155a8939            a=468 b=468  REFUSED: span 468..468 is outside 1..440
+21:24:31  - Zone         segment_7b72bbbc           a=468 b=468  nb_frames=474
+21:24:31  - Zone         avatar_155a8939            a=468 b=468  REFUSED: span 468..468 is outside 1..440
+21:24:32  - Zone         segment_7b72bbbc           a=468 b=468  nb_frames=473
+21:24:32  - Zone         avatar_155a8939            a=468 b=468  REFUSED: span 468..468 is outside 1..440
+21:24:36  - Zone         segment_7b72bbbc           a=468 b=468  nb_frames=472
+21:24:36  - Zone         avatar_155a8939            a=468 b=468  REFUSED: span 468..468 is outside 1..440
+21:24:38  - Zone         segment_7b72bbbc           a=468 b=468  nb_frames=471
+21:24:38  - Zone         avatar_155a8939            a=468 b=468  REFUSED: span 468..468 is outside 1..440
+21:24:39  - Zone         segment_7b72bbbc           a=468 b=468  nb_frames=470
+21:24:39  - Zone         avatar_155a8939            a=468 b=468  REFUSED: span 468..468 is outside 1..440
+21:25:50  + Frame        segment_7b72bbbc           at=384 count=1 side=right  nb_frames=471
+21:25:50  + Frame        avatar_155a8939            at=384 count=1 side=right  nb_frames=441
+21:26:04  + Frame        segment_7b72bbbc           at=385 count=1 side=right  nb_frames=472
+21:26:04  + Frame        avatar_155a8939            at=385 count=1 side=right  nb_frames=442
+21:26:05  + Frame        segment_7b72bbbc           at=386 count=1 side=right  nb_frames=473
+21:26:05  + Frame        avatar_155a8939            at=386 count=1 side=right  nb_frames=443
+21:26:05  + Frame        segment_7b72bbbc           at=387 count=1 side=right  nb_frames=474
+21:26:05  + Frame        avatar_155a8939            at=387 count=1 side=right  nb_frames=444
+21:26:06  + Frame        segment_7b72bbbc           at=388 count=1 side=right  nb_frames=475
+21:26:06  + Frame        avatar_155a8939            at=388 count=1 side=right  nb_frames=445
+21:26:07  + Frame        segment_7b72bbbc           at=389 count=1 side=right  nb_frames=476
+21:26:07  + Frame        avatar_155a8939            at=389 count=1 side=right  nb_frames=446
+21:26:07  + Frame        segment_7b72bbbc           at=390 count=1 side=right  nb_frames=477
+21:26:07  + Frame        avatar_155a8939            at=390 count=1 side=right  nb_frames=447
+21:26:08  + Frame        segment_7b72bbbc           at=391 count=1 side=right  nb_frames=478
+21:26:08  + Frame        avatar_155a8939            at=391 count=1 side=right  nb_frames=448
+21:26:09  + Frame        segment_7b72bbbc           at=392 count=1 side=right  nb_frames=479
+21:26:09  + Frame        avatar_155a8939            at=392 count=1 side=right  nb_frames=449
+21:26:09  + Frame        segment_7b72bbbc           at=393 count=1 side=right  nb_frames=480
+21:26:09  + Frame        avatar_155a8939            at=393 count=1 side=right  nb_frames=450
+21:26:10  + Frame        segment_7b72bbbc           at=394 count=1 side=right  nb_frames=481
+21:26:10  + Frame        avatar_155a8939            at=394 count=1 side=right  nb_frames=451
+21:26:11  + Frame        segment_7b72bbbc           at=395 count=1 side=right  nb_frames=482
+21:26:11  + Frame        avatar_155a8939            at=395 count=1 side=right  nb_frames=452
+21:26:11  + Frame        segment_7b72bbbc           at=396 count=1 side=right  nb_frames=483
+21:26:11  + Frame        avatar_155a8939            at=396 count=1 side=right  nb_frames=453
+21:26:12  + Frame        segment_7b72bbbc           at=397 count=1 side=right  nb_frames=484
+21:26:12  + Frame        avatar_155a8939            at=397 count=1 side=right  nb_frames=454
+21:26:20  + Frame        segment_7b72bbbc           at=398 count=1 side=right  nb_frames=485
+21:26:20  + Frame        avatar_155a8939            at=398 count=1 side=right  nb_frames=455
+21:26:22  + Frame        segment_7b72bbbc           at=399 count=1 side=right  nb_frames=486
+21:26:22  + Frame        avatar_155a8939            at=399 count=1 side=right  nb_frames=456
+21:26:29  + Frame        segment_7b72bbbc           at=400 count=1 side=right  nb_frames=487
+21:26:29  + Frame        avatar_155a8939            at=400 count=1 side=right  nb_frames=457
+21:26:30  + Frame        segment_7b72bbbc           at=401 count=1 side=right  nb_frames=488
+21:26:30  + Frame        avatar_155a8939            at=401 count=1 side=right  nb_frames=458
+21:26:30  + Frame        segment_7b72bbbc           at=402 count=1 side=right  nb_frames=489
+21:26:30  + Frame        avatar_155a8939            at=402 count=1 side=right  nb_frames=459
+21:26:31  + Frame        segment_7b72bbbc           at=403 count=1 side=right  nb_frames=490
+21:26:31  + Frame        avatar_155a8939            at=403 count=1 side=right  nb_frames=460
+21:26:31  + Frame        segment_7b72bbbc           at=404 count=1 side=right  nb_frames=491
+21:26:31  + Frame        avatar_155a8939            at=404 count=1 side=right  nb_frames=461
+21:26:32  + Frame        segment_7b72bbbc           at=405 count=1 side=right  nb_frames=492
+21:26:32  + Frame        avatar_155a8939            at=405 count=1 side=right  nb_frames=462
+21:26:32  + Frame        segment_7b72bbbc           at=406 count=1 side=right  nb_frames=493
+21:26:32  + Frame        avatar_155a8939            at=406 count=1 side=right  nb_frames=463
+21:26:33  + Frame        segment_7b72bbbc           at=407 count=1 side=right  nb_frames=494
+21:26:33  + Frame        avatar_155a8939            at=407 count=1 side=right  nb_frames=464
+21:26:33  + Frame        segment_7b72bbbc           at=408 count=1 side=right  nb_frames=495
+21:26:33  + Frame        avatar_155a8939            at=408 count=1 side=right  nb_frames=465
+21:26:33  + Frame        segment_7b72bbbc           at=409 count=1 side=right  nb_frames=496
+21:26:33  + Frame        avatar_155a8939            at=409 count=1 side=right  nb_frames=466
+21:26:34  + Frame        segment_7b72bbbc           at=410 count=1 side=right  nb_frames=497
+21:26:34  + Frame        avatar_155a8939            at=410 count=1 side=right  nb_frames=467
+21:26:34  + Frame        segment_7b72bbbc           at=411 count=1 side=right  nb_frames=498
+21:26:34  + Frame        avatar_155a8939            at=411 count=1 side=right  nb_frames=468
+21:26:53  + Frame        segment_7b72bbbc           at=435 count=1 side=right  nb_frames=499
+21:26:53  + Frame        avatar_155a8939            at=435 count=1 side=right  nb_frames=469
+21:26:54  + Frame        segment_7b72bbbc           at=436 count=1 side=right  nb_frames=500
+21:26:54  + Frame        avatar_155a8939            at=436 count=1 side=right  nb_frames=470
+21:26:56  + Frame        segment_7b72bbbc           at=437 count=1 side=right  nb_frames=501
+21:26:56  + Frame        avatar_155a8939            at=437 count=1 side=right  nb_frames=471
+21:26:56  + Frame        segment_7b72bbbc           at=438 count=1 side=right  nb_frames=502
+21:26:56  + Frame        avatar_155a8939            at=438 count=1 side=right  nb_frames=472
+21:26:57  + Frame        segment_7b72bbbc           at=439 count=1 side=right  nb_frames=503
+21:26:57  + Frame        avatar_155a8939            at=439 count=1 side=right  nb_frames=473
+21:26:57  + Frame        segment_7b72bbbc           at=440 count=1 side=right  nb_frames=504
+21:26:57  + Frame        avatar_155a8939            at=440 count=1 side=right  nb_frames=474
+21:26:58  + Frame        segment_7b72bbbc           at=441 count=1 side=right  nb_frames=505
+21:26:58  + Frame        avatar_155a8939            at=441 count=1 side=right  nb_frames=475
+21:26:58  + Frame        segment_7b72bbbc           at=442 count=1 side=right  nb_frames=506
+21:26:58  + Frame        avatar_155a8939            at=442 count=1 side=right  nb_frames=476
+21:27:33  Undo           segment_7b72bbbc             nb_frames=505
+21:27:35  Undo           segment_7b72bbbc             nb_frames=505
+21:27:37  Undo           segment_7b72bbbc             nb_frames=505
+21:27:37  Undo           avatar_155a8939              nb_frames=475
+21:27:38  Undo           segment_7b72bbbc             nb_frames=505
+21:27:40  Undo           segment_7b72bbbc             nb_frames=505
+21:27:41  Undo           avatar_155a8939              nb_frames=475
+21:27:42  Undo           segment_7b72bbbc             nb_frames=505
+21:27:44  Undo           segment_7b72bbbc             nb_frames=505
+21:27:45  Undo           avatar_155a8939              nb_frames=475
+21:27:45  Undo           segment_7b72bbbc             nb_frames=505
+21:27:47  Undo           segment_7b72bbbc             nb_frames=503
+21:27:49  Undo           segment_7b72bbbc             nb_frames=503
+21:27:49  Undo           avatar_155a8939              nb_frames=475
+21:27:50  Undo           segment_7b72bbbc             nb_frames=502
+21:27:52  Undo           segment_7b72bbbc             nb_frames=502
+21:27:53  Undo           avatar_155a8939              nb_frames=475
+21:27:55  Undo           segment_7b72bbbc             nb_frames=502
+21:27:56  Undo           segment_7b72bbbc             nb_frames=501
+21:27:57  Undo           avatar_155a8939              nb_frames=475
+21:27:59  Undo           segment_7b72bbbc             nb_frames=501
+21:28:00  Undo           avatar_155a8939              nb_frames=475
+21:28:02  Undo           segment_7b72bbbc             nb_frames=500
+21:28:04  Undo           avatar_155a8939              nb_frames=475
+21:28:06  Undo           segment_7b72bbbc             nb_frames=500
+21:28:07  Undo           avatar_155a8939              nb_frames=473
+21:28:11  Undo           avatar_155a8939              nb_frames=473
+21:28:14  Undo           avatar_155a8939              nb_frames=472
+21:28:17  Undo           avatar_155a8939              nb_frames=472
+21:28:21  Undo           avatar_155a8939              nb_frames=472
+21:28:24  Undo           avatar_155a8939              nb_frames=471
+21:28:27  Undo           avatar_155a8939              nb_frames=471
+21:28:31  Undo           avatar_155a8939              nb_frames=470
+21:28:34  Undo           avatar_155a8939              nb_frames=470
+21:29:07  Undo           segment_7b72bbbc             nb_frames=488
+21:29:10  Undo           segment_7b72bbbc             nb_frames=488
+21:29:11  Undo           avatar_155a8939              nb_frames=458
+21:29:14  Undo           segment_7b72bbbc             nb_frames=487
+21:29:14  Undo           avatar_155a8939              nb_frames=458
+21:29:18  Undo           segment_7b72bbbc             nb_frames=486
+21:29:18  Undo           avatar_155a8939              nb_frames=457
+21:29:21  Undo           avatar_155a8939              nb_frames=456
+21:29:22  Undo           segment_7b72bbbc             nb_frames=485
+21:29:24  Undo           segment_7b72bbbc             nb_frames=484
+21:29:25  Undo           avatar_155a8939              nb_frames=455
+21:29:29  Undo           avatar_155a8939              nb_frames=454
+21:30:01  Undo           segment_7b72bbbc             nb_frames=482
+21:30:03  Undo           segment_7b72bbbc             nb_frames=482
+21:30:04  Undo           avatar_155a8939              nb_frames=452
+21:30:05  Undo           segment_7b72bbbc             nb_frames=482
+21:30:07  Undo           segment_7b72bbbc             nb_frames=482
+21:30:08  Undo           avatar_155a8939              nb_frames=452
+21:30:11  Undo           avatar_155a8939              nb_frames=452
+21:30:14  Undo           segment_7b72bbbc             nb_frames=479
+21:30:15  Undo           avatar_155a8939              nb_frames=452
+21:30:18  Undo           avatar_155a8939              nb_frames=449
+21:30:20  Undo           segment_7b72bbbc             nb_frames=477
+21:30:23  Undo           segment_7b72bbbc             nb_frames=477
+21:30:24  Undo           avatar_155a8939              nb_frames=447
+21:30:24  Undo           segment_7b72bbbc             nb_frames=477
+21:30:26  Undo           segment_7b72bbbc             nb_frames=477
+21:30:28  Undo           avatar_155a8939              nb_frames=447
+21:30:28  Undo           segment_7b72bbbc             nb_frames=477
+21:30:30  Undo           segment_7b72bbbc             nb_frames=476
+21:30:31  Undo           segment_7b72bbbc             nb_frames=476
+21:30:32  Undo           avatar_155a8939              nb_frames=447
+21:30:34  Undo           segment_7b72bbbc             nb_frames=474
+21:30:35  Undo           avatar_155a8939              nb_frames=447
+21:30:36  Undo           segment_7b72bbbc             nb_frames=474
+21:30:38  Undo           avatar_155a8939              nb_frames=447
+21:30:42  Undo           avatar_155a8939              nb_frames=446
+21:30:43  Undo           segment_7b72bbbc             nb_frames=472
+21:30:45  Undo           avatar_155a8939              nb_frames=446
+21:30:48  Undo           avatar_155a8939              nb_frames=444
+21:30:50  Undo           segment_7b72bbbc             nb_frames=471
+21:30:52  Undo           avatar_155a8939              nb_frames=444
+21:30:52  Undo           segment_7b72bbbc             nb_frames=471
+21:30:55  Undo           avatar_155a8939              nb_frames=442
+21:31:01  Undo           segment_7b72bbbc             nb_frames=475
+21:32:08  - Zone         segment_7b72bbbc           a=467 b=467  nb_frames=474
+21:32:08  - Zone         avatar_155a8939            a=467 b=467  REFUSED: span 467..467 is outside 1..442
+21:32:10  - Zone         segment_7b72bbbc           a=467 b=467  nb_frames=473
+21:32:10  - Zone         avatar_155a8939            a=467 b=467  REFUSED: span 467..467 is outside 1..442
+21:32:11  - Zone         segment_7b72bbbc           a=467 b=467  nb_frames=472
+21:32:11  - Zone         avatar_155a8939            a=467 b=467  REFUSED: span 467..467 is outside 1..442
+21:32:12  - Zone         segment_7b72bbbc           a=467 b=467  nb_frames=471
+21:32:12  - Zone         avatar_155a8939            a=467 b=467  REFUSED: span 467..467 is outside 1..442
+21:32:12  - Zone         segment_7b72bbbc           a=467 b=467  nb_frames=470
+21:32:12  - Zone         avatar_155a8939            a=467 b=467  REFUSED: span 467..467 is outside 1..442
+21:32:14  - Zone         segment_7b72bbbc           a=467 b=467  nb_frames=469
+21:32:14  - Zone         avatar_155a8939            a=467 b=467  REFUSED: span 467..467 is outside 1..442
+21:32:15  - Zone         segment_7b72bbbc           a=467 b=467  nb_frames=468
+21:32:15  - Zone         avatar_155a8939            a=467 b=467  REFUSED: span 467..467 is outside 1..442
+21:33:25  + Frame        segment_7b72bbbc           at=382 count=1 side=right  nb_frames=469
+21:33:26  + Frame        segment_7b72bbbc           at=383 count=1 side=right  nb_frames=470
+21:33:28  + Frame        segment_7b72bbbc           at=384 count=1 side=right  nb_frames=471
+21:33:29  + Frame        segment_7b72bbbc           at=385 count=1 side=right  nb_frames=472
+21:33:30  + Frame        segment_7b72bbbc           at=386 count=1 side=right  nb_frames=473
+21:33:31  + Frame        segment_7b72bbbc           at=387 count=1 side=right  nb_frames=474
+21:33:32  + Frame        segment_7b72bbbc           at=388 count=1 side=right  nb_frames=475
+21:33:33  + Frame        segment_7b72bbbc           at=389 count=1 side=right  nb_frames=476
+21:33:34  + Frame        segment_7b72bbbc           at=390 count=1 side=right  nb_frames=477
+21:33:35  + Frame        segment_7b72bbbc           at=391 count=1 side=right  nb_frames=478
+21:33:37  + Frame        segment_7b72bbbc           at=392 count=1 side=right  nb_frames=479
+21:33:38  + Frame        segment_7b72bbbc           at=393 count=1 side=right  nb_frames=480
+21:34:05  + Frame        segment_7b72bbbc           at=447 count=1 side=right  nb_frames=481
+21:34:07  + Frame        segment_7b72bbbc           at=448 count=1 side=right  nb_frames=482
+21:34:09  + Frame        segment_7b72bbbc           at=449 count=1 side=right  nb_frames=483
+21:34:11  + Frame        segment_7b72bbbc           at=450 count=1 side=right  nb_frames=484
+21:34:12  + Frame        segment_7b72bbbc           at=451 count=1 side=right  nb_frames=485
+21:34:13  + Frame        segment_7b72bbbc           at=452 count=1 side=right  nb_frames=486
+21:34:14  + Frame        segment_7b72bbbc           at=453 count=1 side=right  nb_frames=487
+21:34:14  + Frame        segment_7b72bbbc           at=454 count=1 side=right  nb_frames=488
+21:34:15  + Frame        segment_7b72bbbc           at=455 count=1 side=right  nb_frames=489
+21:34:16  + Frame        segment_7b72bbbc           at=456 count=1 side=right  nb_frames=490
+21:34:50  - Zone         segment_7b72bbbc           a=490 b=490  nb_frames=489
+21:34:50  - Zone         avatar_155a8939            a=490 b=490  REFUSED: span 490..490 is outside 1..442
+21:34:51  - Zone         segment_7b72bbbc           a=489 b=489  nb_frames=488
+21:34:51  - Zone         avatar_155a8939            a=489 b=489  REFUSED: span 489..489 is outside 1..442
+21:34:54  - Zone         segment_7b72bbbc           a=488 b=488  nb_frames=487
+21:34:54  - Zone         avatar_155a8939            a=488 b=488  REFUSED: span 488..488 is outside 1..442
+21:35:04  - Zone         segment_7b72bbbc           a=487 b=487  nb_frames=486
+21:35:04  - Zone         avatar_155a8939            a=487 b=487  REFUSED: span 487..487 is outside 1..442
+21:35:06  - Zone         segment_7b72bbbc           a=486 b=486  nb_frames=485
+21:35:06  - Zone         avatar_155a8939            a=486 b=486  REFUSED: span 486..486 is outside 1..442
+21:35:07  - Zone         segment_7b72bbbc           a=485 b=485  nb_frames=484
+21:35:07  - Zone         avatar_155a8939            a=485 b=485  REFUSED: span 485..485 is outside 1..442
+21:35:08  - Zone         segment_7b72bbbc           a=484 b=484  nb_frames=483
+21:35:08  - Zone         avatar_155a8939            a=484 b=484  REFUSED: span 484..484 is outside 1..442
+21:35:10  - Zone         segment_7b72bbbc           a=483 b=483  nb_frames=482
+21:35:10  - Zone         avatar_155a8939            a=483 b=483  REFUSED: span 483..483 is outside 1..442
+21:35:11  - Zone         segment_7b72bbbc           a=482 b=482  nb_frames=481
+21:35:11  - Zone         avatar_155a8939            a=482 b=482  REFUSED: span 482..482 is outside 1..442
+21:35:13  - Zone         segment_7b72bbbc           a=481 b=481  nb_frames=480
+21:35:13  - Zone         avatar_155a8939            a=481 b=481  REFUSED: span 481..481 is outside 1..442
+21:35:39  - Zone         segment_7b72bbbc           a=475 b=475  nb_frames=479
+21:35:39  - Zone         avatar_155a8939            a=475 b=475  REFUSED: span 475..475 is outside 1..442
+21:35:40  - Zone         segment_7b72bbbc           a=475 b=475  nb_frames=478
+21:35:40  - Zone         avatar_155a8939            a=475 b=475  REFUSED: span 475..475 is outside 1..442
+21:35:41  - Zone         segment_7b72bbbc           a=475 b=475  nb_frames=477
+21:35:41  - Zone         avatar_155a8939            a=475 b=475  REFUSED: span 475..475 is outside 1..442
+21:35:43  - Zone         segment_7b72bbbc           a=475 b=475  nb_frames=476
+21:35:43  - Zone         avatar_155a8939            a=475 b=475  REFUSED: span 475..475 is outside 1..442
+21:35:44  - Zone         segment_7b72bbbc           a=475 b=475  nb_frames=475
+21:35:44  - Zone         avatar_155a8939            a=475 b=475  REFUSED: span 475..475 is outside 1..442
+21:35:44  - Zone         segment_7b72bbbc           a=475 b=475  nb_frames=474
+21:35:44  - Zone         avatar_155a8939            a=475 b=475  REFUSED: span 475..475 is outside 1..442
+21:35:59  - Zone         segment_7b72bbbc           a=474 b=474  nb_frames=473
+21:35:59  - Zone         avatar_155a8939            a=474 b=474  REFUSED: span 474..474 is outside 1..442
+21:36:12  + Frame        segment_7b72bbbc           at=473 count=1 side=right  nb_frames=474
+21:36:12  + Frame        avatar_155a8939            at=473 count=1 side=right  REFUSED: frame 473 is outside 1..442
+21:36:24  - Zone         segment_7b72bbbc           a=474 b=474  nb_frames=473
+21:36:24  - Zone         avatar_155a8939            a=474 b=474  REFUSED: span 474..474 is outside 1..442
+21:38:17  + Frame        segment_7b72bbbc           at=286 count=1 side=right  nb_frames=474
+21:38:29  + Frame        segment_7b72bbbc           at=287 count=1 side=right  nb_frames=475
+21:38:29  + Frame        segment_7b72bbbc           at=288 count=1 side=right  nb_frames=476
+21:38:30  + Frame        segment_7b72bbbc           at=289 count=1 side=right  nb_frames=477
+21:38:31  + Frame        segment_7b72bbbc           at=290 count=1 side=right  nb_frames=478
+21:38:32  + Frame        segment_7b72bbbc           at=291 count=1 side=right  nb_frames=479
+21:38:33  + Frame        segment_7b72bbbc           at=292 count=1 side=right  nb_frames=480
+21:38:34  + Frame        segment_7b72bbbc           at=293 count=1 side=right  nb_frames=481
+21:38:35  + Frame        segment_7b72bbbc           at=294 count=1 side=right  nb_frames=482
+21:38:36  + Frame        segment_7b72bbbc           at=295 count=1 side=right  nb_frames=483
+21:38:37  + Frame        segment_7b72bbbc           at=296 count=1 side=right  nb_frames=484
+21:38:39  + Frame        segment_7b72bbbc           at=297 count=1 side=right  nb_frames=485
+21:38:40  + Frame        segment_7b72bbbc           at=298 count=1 side=right  nb_frames=486
+21:38:41  + Frame        segment_7b72bbbc           at=299 count=1 side=right  nb_frames=487
+21:38:43  + Frame        segment_7b72bbbc           at=300 count=1 side=right  nb_frames=488
+21:38:44  + Frame        segment_7b72bbbc           at=301 count=1 side=right  nb_frames=489
+21:38:49  + Frame        segment_7b72bbbc           at=302 count=1 side=right  nb_frames=490
+21:39:49  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=489
+21:39:50  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=488
+21:39:52  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=487
+21:39:53  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=486
+21:39:54  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=485
+21:39:56  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=484
+21:39:57  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=483
+21:39:58  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=482
+21:39:59  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=481
+21:40:00  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=480
+21:40:01  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=479
+21:40:01  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=478
+21:40:02  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=477
+21:40:02  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=476
+21:40:02  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=475
+21:40:03  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=474
+21:40:04  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=473
+21:40:05  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=472
+21:40:05  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=471
+21:40:06  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=470
+21:40:07  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=469
+21:40:07  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=468
+21:40:08  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=467
+21:40:08  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=466
+21:40:09  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=465
+21:40:09  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=464
+21:40:10  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=463
+21:40:11  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=462
+21:40:11  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=461
+21:40:12  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=460
+21:40:14  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=459
+21:40:15  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=458
+21:40:15  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=457
+21:40:16  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=456
+21:40:17  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=455
+21:40:19  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=454
+21:40:20  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=453
+21:40:20  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=452
+21:40:21  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=451
+21:40:22  - Zone         segment_7b72bbbc           a=243 b=243  nb_frames=450
+21:41:07  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=449
+21:41:08  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=448
+21:41:08  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=447
+21:41:09  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=446
+21:41:10  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=445
+21:41:11  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=444
+21:41:11  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=443
+21:41:12  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=442
+21:41:13  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=441
+21:41:14  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=440
+21:41:15  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=439
+21:41:16  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=438
+21:41:17  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=437
+21:41:18  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=436
+21:41:19  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=435
+21:41:20  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=434
+21:41:21  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=433
+21:41:22  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=432
+21:41:26  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=431
+21:41:27  - Zone         segment_7b72bbbc           a=188 b=188  nb_frames=430
+21:42:09  + Frame        segment_7b72bbbc           at=430 count=1 side=right  nb_frames=431
+21:42:10  + Frame        segment_7b72bbbc           at=431 count=1 side=right  nb_frames=432
+21:42:12  + Frame        segment_7b72bbbc           at=432 count=1 side=right  nb_frames=433
+21:42:13  + Frame        segment_7b72bbbc           at=433 count=1 side=right  nb_frames=434
+21:42:14  + Frame        segment_7b72bbbc           at=434 count=1 side=right  nb_frames=435
+21:42:14  + Frame        segment_7b72bbbc           at=435 count=1 side=right  nb_frames=436
+21:42:15  + Frame        segment_7b72bbbc           at=436 count=1 side=right  nb_frames=437
+21:42:15  + Frame        segment_7b72bbbc           at=437 count=1 side=right  nb_frames=438
+21:42:16  + Frame        segment_7b72bbbc           at=438 count=1 side=right  nb_frames=439
+21:42:16  + Frame        segment_7b72bbbc           at=439 count=1 side=right  nb_frames=440
+21:42:16  + Frame        segment_7b72bbbc           at=440 count=1 side=right  nb_frames=441
+21:42:17  + Frame        segment_7b72bbbc           at=441 count=1 side=right  nb_frames=442
+21:42:17  + Frame        segment_7b72bbbc           at=442 count=1 side=right  nb_frames=443
+21:42:18  + Frame        segment_7b72bbbc           at=443 count=1 side=right  nb_frames=444
+21:42:19  + Frame        segment_7b72bbbc           at=444 count=1 side=right  nb_frames=445
+21:42:19  + Frame        segment_7b72bbbc           at=445 count=1 side=right  nb_frames=446
+21:42:19  + Frame        segment_7b72bbbc           at=446 count=1 side=right  nb_frames=447
+21:42:23  + Frame        segment_7b72bbbc           at=447 count=1 side=right  nb_frames=448
+21:42:24  + Frame        segment_7b72bbbc           at=448 count=1 side=right  nb_frames=449
+21:42:24  + Frame        segment_7b72bbbc           at=449 count=1 side=right  nb_frames=450
+21:42:24  + Frame        segment_7b72bbbc           at=450 count=1 side=right  nb_frames=451
+21:42:25  + Frame        segment_7b72bbbc           at=451 count=1 side=right  nb_frames=452
+21:42:25  + Frame        segment_7b72bbbc           at=452 count=1 side=right  nb_frames=453
+21:42:26  + Frame        segment_7b72bbbc           at=453 count=1 side=right  nb_frames=454
+21:42:26  + Frame        segment_7b72bbbc           at=454 count=1 side=right  nb_frames=455
+21:42:27  + Frame        segment_7b72bbbc           at=455 count=1 side=right  nb_frames=456
+21:42:27  + Frame        segment_7b72bbbc           at=456 count=1 side=right  nb_frames=457
+21:42:28  + Frame        segment_7b72bbbc           at=457 count=1 side=right  nb_frames=458
+21:42:30  + Frame        segment_7b72bbbc           at=458 count=1 side=right  nb_frames=459
+21:42:31  + Frame        segment_7b72bbbc           at=459 count=1 side=right  nb_frames=460
+21:42:31  + Frame        segment_7b72bbbc           at=460 count=1 side=right  nb_frames=461
+21:42:32  + Frame        segment_7b72bbbc           at=461 count=1 side=right  nb_frames=462
+21:42:32  + Frame        segment_7b72bbbc           at=462 count=1 side=right  nb_frames=463
+21:42:32  + Frame        segment_7b72bbbc           at=463 count=1 side=right  nb_frames=464
+21:42:33  + Frame        segment_7b72bbbc           at=464 count=1 side=right  nb_frames=465
+21:42:34  + Frame        segment_7b72bbbc           at=465 count=1 side=right  nb_frames=466
+21:42:35  + Frame        segment_7b72bbbc           at=466 count=1 side=right  nb_frames=467
+21:42:36  + Frame        segment_7b72bbbc           at=467 count=1 side=right  nb_frames=468
+21:42:36  + Frame        segment_7b72bbbc           at=468 count=1 side=right  nb_frames=469
+21:42:37  + Frame        segment_7b72bbbc           at=469 count=1 side=right  nb_frames=470
+21:42:38  + Frame        segment_7b72bbbc           at=470 count=1 side=right  nb_frames=471
+21:42:38  + Frame        segment_7b72bbbc           at=471 count=1 side=right  nb_frames=472
+21:42:38  + Frame        segment_7b72bbbc           at=472 count=1 side=right  nb_frames=473
+21:42:39  + Frame        segment_7b72bbbc           at=473 count=1 side=right  nb_frames=474
+21:42:39  + Frame        segment_7b72bbbc           at=474 count=1 side=right  nb_frames=475
+21:42:40  + Frame        segment_7b72bbbc           at=475 count=1 side=right  nb_frames=476
+21:42:40  + Frame        segment_7b72bbbc           at=476 count=1 side=right  nb_frames=477
+21:42:41  + Frame        segment_7b72bbbc           at=477 count=1 side=right  nb_frames=478
+21:42:43  + Frame        segment_7b72bbbc           at=478 count=1 side=right  nb_frames=479
+21:42:43  + Frame        segment_7b72bbbc           at=479 count=1 side=right  nb_frames=480
+21:42:44  + Frame        segment_7b72bbbc           at=480 count=1 side=right  nb_frames=481
+21:42:44  + Frame        segment_7b72bbbc           at=481 count=1 side=right  nb_frames=482
+21:42:45  + Frame        segment_7b72bbbc           at=482 count=1 side=right  nb_frames=483
+21:43:34  + Frame        segment_7b72bbbc           at=389 count=1 side=right  nb_frames=484
+21:43:36  + Frame        segment_7b72bbbc           at=390 count=1 side=right  nb_frames=485
+21:43:37  + Frame        segment_7b72bbbc           at=391 count=1 side=right  nb_frames=486
+21:43:38  + Frame        segment_7b72bbbc           at=392 count=1 side=right  nb_frames=487
+21:43:40  + Frame        segment_7b72bbbc           at=393 count=1 side=right  nb_frames=488
+21:43:41  + Frame        segment_7b72bbbc           at=394 count=1 side=right  nb_frames=489
+21:43:42  + Frame        segment_7b72bbbc           at=395 count=1 side=right  nb_frames=490
+21:43:44  + Frame        segment_7b72bbbc           at=396 count=1 side=right  nb_frames=491
+21:43:45  + Frame        segment_7b72bbbc           at=397 count=1 side=right  nb_frames=492
+21:43:47  + Frame        segment_7b72bbbc           at=398 count=1 side=right  nb_frames=493
+21:44:06  + Frame        segment_7b72bbbc           at=401 count=1 side=right  nb_frames=494
+21:44:07  + Frame        segment_7b72bbbc           at=402 count=1 side=right  nb_frames=495
+21:44:08  + Frame        segment_7b72bbbc           at=403 count=1 side=right  nb_frames=496
+21:44:09  + Frame        segment_7b72bbbc           at=404 count=1 side=right  nb_frames=497
+21:44:10  + Frame        segment_7b72bbbc           at=405 count=1 side=right  nb_frames=498
+21:44:11  + Frame        segment_7b72bbbc           at=406 count=1 side=right  nb_frames=499
+21:44:11  + Frame        segment_7b72bbbc           at=407 count=1 side=right  nb_frames=500
+21:44:12  + Frame        segment_7b72bbbc           at=408 count=1 side=right  nb_frames=501
+21:44:13  + Frame        segment_7b72bbbc           at=409 count=1 side=right  nb_frames=502
+21:44:15  + Frame        segment_7b72bbbc           at=410 count=1 side=right  nb_frames=503
+21:44:28  + Frame        segment_7b72bbbc           at=412 count=1 side=right  nb_frames=504
+21:44:29  + Frame        segment_7b72bbbc           at=413 count=1 side=right  nb_frames=505
+21:44:30  + Frame        segment_7b72bbbc           at=414 count=1 side=right  nb_frames=506
+21:44:31  + Frame        segment_7b72bbbc           at=415 count=1 side=right  nb_frames=507
+21:44:32  + Frame        segment_7b72bbbc           at=416 count=1 side=right  nb_frames=508
+21:44:33  + Frame        segment_7b72bbbc           at=417 count=1 side=right  nb_frames=509
+21:44:34  + Frame        segment_7b72bbbc           at=418 count=1 side=right  nb_frames=510
+21:44:43  + Frame        segment_7b72bbbc           at=421 count=1 side=right  nb_frames=511
+21:44:44  + Frame        segment_7b72bbbc           at=422 count=1 side=right  nb_frames=512
+21:44:45  + Frame        segment_7b72bbbc           at=423 count=1 side=right  nb_frames=513
+21:44:57  + Frame        segment_7b72bbbc           at=425 count=1 side=right  nb_frames=514
+21:44:58  + Frame        segment_7b72bbbc           at=426 count=1 side=right  nb_frames=515
+21:44:59  + Frame        segment_7b72bbbc           at=427 count=1 side=right  nb_frames=516
+21:45:00  + Frame        segment_7b72bbbc           at=428 count=1 side=right  nb_frames=517
+21:45:02  + Frame        segment_7b72bbbc           at=429 count=1 side=right  nb_frames=518
+21:45:08  + Frame        segment_7b72bbbc           at=431 count=1 side=right  nb_frames=519
+21:45:09  + Frame        segment_7b72bbbc           at=432 count=1 side=right  nb_frames=520
+21:45:10  + Frame        segment_7b72bbbc           at=433 count=1 side=right  nb_frames=521
+21:45:11  + Frame        segment_7b72bbbc           at=434 count=1 side=right  nb_frames=522
+21:45:12  + Frame        segment_7b72bbbc           at=435 count=1 side=right  nb_frames=523
+21:45:13  + Frame        segment_7b72bbbc           at=436 count=1 side=right  nb_frames=524
+21:45:14  + Frame        segment_7b72bbbc           at=437 count=1 side=right  nb_frames=525
+21:45:42  + Frame        segment_7b72bbbc           at=443 count=1 side=right  nb_frames=526
+21:45:43  + Frame        segment_7b72bbbc           at=444 count=1 side=right  nb_frames=527
+21:45:44  + Frame        segment_7b72bbbc           at=445 count=1 side=right  nb_frames=528
+21:45:45  + Frame        segment_7b72bbbc           at=446 count=1 side=right  nb_frames=529
+21:45:46  + Frame        segment_7b72bbbc           at=447 count=1 side=right  nb_frames=530
+21:47:31  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=529
+21:47:31  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:32  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=528
+21:47:32  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:33  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=527
+21:47:33  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:34  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=526
+21:47:34  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:35  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=525
+21:47:35  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:36  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=524
+21:47:36  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:36  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=523
+21:47:36  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:37  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=522
+21:47:37  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:38  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=521
+21:47:38  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:38  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=520
+21:47:39  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:39  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=519
+21:47:39  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:39  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=518
+21:47:39  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:40  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=517
+21:47:40  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:40  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=516
+21:47:40  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:41  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=515
+21:47:41  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:41  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=514
+21:47:41  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:42  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=513
+21:47:42  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:43  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=512
+21:47:43  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:43  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=511
+21:47:43  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:43  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=510
+21:47:43  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:44  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=509
+21:47:44  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:45  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=508
+21:47:45  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:45  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=507
+21:47:45  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:45  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=506
+21:47:45  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:46  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=505
+21:47:46  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:46  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=504
+21:47:46  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:46  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=503
+21:47:46  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:47  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=502
+21:47:47  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:48  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=501
+21:47:48  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:48  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=500
+21:47:48  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:48  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=499
+21:47:48  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:49  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=498
+21:47:49  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:49  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=497
+21:47:49  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:50  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=496
+21:47:50  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:50  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=495
+21:47:50  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:51  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=494
+21:47:51  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:51  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=493
+21:47:51  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:52  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=492
+21:47:52  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:53  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=491
+21:47:53  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:54  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=490
+21:47:54  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:54  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=489
+21:47:54  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:57  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=488
+21:47:57  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:57  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=487
+21:47:57  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:58  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=486
+21:47:58  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:59  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=485
+21:47:59  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:47:59  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=484
+21:47:59  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:48:00  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=483
+21:48:00  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:48:03  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=482
+21:48:03  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:48:06  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=481
+21:48:06  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:48:13  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=480
+21:48:13  - Zone         avatar_155a8939            a=478 b=478  REFUSED: span 478..478 is outside 1..442
+21:48:55  Save scene     segment_7b72bbbc             nb_frames=480  duration_s=19.2
+
+Editor Session:  2026-08-26T21:55:41
+Player:          Segment and Avatar Editor v39
+Server:          http://localhost:8860
+
+21:55:46  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+21:56:14  Paste frame    segment_7b72bbbc           from=50 at=400  nb_frames=481
+21:56:14  Paste frame    avatar_155a8939            from=50 at=400  nb_frames=443
+21:56:34  Undo           segment_7b72bbbc             nb_frames=480
+21:56:37  Undo           avatar_155a8939              nb_frames=442
+21:56:47  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+21:58:29  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1
+22:00:03  Paste frame    segment_7b72bbbc           from=285 at=480  nb_frames=481
+22:00:03  Paste frame    avatar_155a8939            from=285 at=480  REFUSED: target frame 480 is outside 1..442
+22:00:18  Paste frame    segment_7b72bbbc           from=285 at=480  nb_frames=482
+22:00:18  Paste frame    avatar_155a8939            from=285 at=480  REFUSED: target frame 480 is outside 1..442
+22:00:27  Paste frame    segment_7b72bbbc           from=285 at=477  nb_frames=483
+22:00:27  Paste frame    avatar_155a8939            from=285 at=477  REFUSED: target frame 477 is outside 1..442
+22:00:34  Paste frame    segment_7b72bbbc           from=285 at=477  nb_frames=484
+22:00:34  Paste frame    avatar_155a8939            from=285 at=477  REFUSED: target frame 477 is outside 1..442
+22:03:34  Discard edits  segment_7b72bbbc             nb_frames=480
+22:03:36  Discard edits  avatar_155a8939              nb_frames=440
+
+Editor Session:  2026-08-26T22:04:33
+Player:          Segment and Avatar Editor v40
+Server:          http://localhost:8860
+
+22:04:40  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+
+Editor Session:  2026-08-26T22:04:55
+Player:          Segment and Avatar Editor v40
+Server:          http://localhost:8860
+
+22:05:00  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+22:05:06  Paste frame    segment_7b72bbbc           from=286 at=475  nb_frames=481
+22:05:06  Paste frame    avatar_155a8939            from=286 at=475  REFUSED: target frame 475 is outside 1..440
+22:05:45  Paste frame    segment_7b72bbbc           from=286 at=440  nb_frames=482
+22:05:46  Paste frame    avatar_155a8939            from=286 at=440  nb_frames=441
+22:07:57  Save scene     segment_7b72bbbc             nb_frames=482  duration_s=19.28
+22:08:42  Save scene     avatar_155a8939              nb_frames=441  duration_s=17.683
+
+Editor Session:  2026-08-26T22:14:25
+Player:          Segment and Avatar Editor v40
+Server:          http://localhost:8860
+
+22:14:33  Discard edits  avatar_155a8939              nb_frames=441
+22:14:42  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+22:15:16  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1
+22:16:55  - Zone         segment_7b72bbbc           a=441 b=441  nb_frames=481
+22:17:19  - Zone         segment_7b72bbbc           a=443 b=443  nb_frames=480
+22:18:00  + Frame        avatar_155a8939            at=441 count=1 side=right  nb_frames=442
+22:18:01  + Frame        avatar_155a8939            at=442 count=1 side=right  nb_frames=443
+22:18:02  + Frame        avatar_155a8939            at=443 count=1 side=right  nb_frames=444
+22:18:02  + Frame        avatar_155a8939            at=444 count=1 side=right  nb_frames=445
+22:18:03  + Frame        avatar_155a8939            at=445 count=1 side=right  nb_frames=446
+22:18:04  + Frame        avatar_155a8939            at=446 count=1 side=right  nb_frames=447
+22:18:04  + Frame        avatar_155a8939            at=447 count=1 side=right  nb_frames=448
+22:18:05  + Frame        avatar_155a8939            at=448 count=1 side=right  nb_frames=449
+22:18:05  + Frame        avatar_155a8939            at=449 count=1 side=right  nb_frames=450
+22:18:06  + Frame        avatar_155a8939            at=450 count=1 side=right  nb_frames=451
+22:18:07  + Frame        avatar_155a8939            at=451 count=1 side=right  nb_frames=452
+22:18:07  + Frame        avatar_155a8939            at=452 count=1 side=right  nb_frames=453
+22:18:08  + Frame        avatar_155a8939            at=453 count=1 side=right  nb_frames=454
+22:18:08  + Frame        avatar_155a8939            at=454 count=1 side=right  nb_frames=455
+22:18:09  + Frame        avatar_155a8939            at=455 count=1 side=right  nb_frames=456
+22:18:09  + Frame        avatar_155a8939            at=456 count=1 side=right  nb_frames=457
+22:18:09  + Frame        avatar_155a8939            at=457 count=1 side=right  nb_frames=458
+22:18:11  + Frame        avatar_155a8939            at=458 count=1 side=right  nb_frames=459
+22:18:11  + Frame        avatar_155a8939            at=459 count=1 side=right  nb_frames=460
+22:18:12  + Frame        avatar_155a8939            at=460 count=1 side=right  nb_frames=461
+22:18:12  + Frame        avatar_155a8939            at=461 count=1 side=right  nb_frames=462
+22:18:12  + Frame        avatar_155a8939            at=462 count=1 side=right  nb_frames=463
+22:18:12  + Frame        avatar_155a8939            at=463 count=1 side=right  nb_frames=464
+22:18:13  + Frame        avatar_155a8939            at=464 count=1 side=right  nb_frames=465
+22:18:13  + Frame        avatar_155a8939            at=465 count=1 side=right  nb_frames=466
+22:18:14  + Frame        avatar_155a8939            at=466 count=1 side=right  nb_frames=467
+22:18:14  + Frame        avatar_155a8939            at=467 count=1 side=right  nb_frames=468
+22:18:15  + Frame        avatar_155a8939            at=468 count=1 side=right  nb_frames=469
+22:18:16  + Frame        avatar_155a8939            at=469 count=1 side=right  nb_frames=470
+22:18:17  + Frame        avatar_155a8939            at=470 count=1 side=right  nb_frames=471
+22:18:17  + Frame        avatar_155a8939            at=471 count=1 side=right  nb_frames=472
+22:18:17  + Frame        avatar_155a8939            at=472 count=1 side=right  nb_frames=473
+22:18:18  + Frame        avatar_155a8939            at=473 count=1 side=right  nb_frames=474
+22:18:19  + Frame        avatar_155a8939            at=474 count=1 side=right  nb_frames=475
+22:18:19  + Frame        avatar_155a8939            at=475 count=1 side=right  nb_frames=476
+22:18:21  + Frame        avatar_155a8939            at=476 count=1 side=right  nb_frames=477
+22:18:22  + Frame        avatar_155a8939            at=477 count=1 side=right  nb_frames=478
+22:18:22  + Frame        avatar_155a8939            at=478 count=1 side=right  nb_frames=479
+22:18:23  + Frame        avatar_155a8939            at=479 count=1 side=right  nb_frames=480
+22:18:24  + Frame        avatar_155a8939            at=480 count=1 side=right  nb_frames=481
+22:18:40  + Frame        avatar_155a8939            at=480 count=1 side=right  nb_frames=482
+22:18:46  - Zone         avatar_155a8939            a=480 b=480  nb_frames=481
+22:18:48  - Zone         avatar_155a8939            a=480 b=480  nb_frames=480
+22:20:10  - Zone         segment_7b72bbbc           a=475 b=475  nb_frames=479
+22:20:10  - Zone         avatar_155a8939            a=475 b=475  nb_frames=479
+22:20:35  Save scene     segment_7b72bbbc             nb_frames=479  duration_s=19.16
+22:21:13  - Zone         segment_7b72bbbc           a=479 b=479  nb_frames=478
+22:21:22  Save scene     avatar_155a8939              nb_frames=479  duration_s=19.2
+22:21:22  - Zone         avatar_155a8939            a=479 b=479  nb_frames=478
+22:21:28  - Zone         segment_7b72bbbc           a=478 b=478  nb_frames=477
+22:21:28  - Zone         avatar_155a8939            a=478 b=478  nb_frames=477
+22:21:33  - Zone         segment_7b72bbbc           a=477 b=477  nb_frames=476
+22:21:33  - Zone         avatar_155a8939            a=477 b=477  nb_frames=476
+22:21:41  Undo           segment_7b72bbbc             nb_frames=477
+22:21:44  Undo           avatar_155a8939              nb_frames=477
+22:23:56  + Frame        avatar_155a8939            at=441 count=1 side=right  nb_frames=478
+22:23:58  + Frame        avatar_155a8939            at=442 count=1 side=right  nb_frames=479
+22:23:58  + Frame        avatar_155a8939            at=443 count=1 side=right  nb_frames=480
+22:23:59  + Frame        avatar_155a8939            at=444 count=1 side=right  nb_frames=481
+22:23:59  + Frame        avatar_155a8939            at=445 count=1 side=right  nb_frames=482
+22:24:00  + Frame        avatar_155a8939            at=446 count=1 side=right  nb_frames=483
+22:24:00  + Frame        avatar_155a8939            at=447 count=1 side=right  nb_frames=484
+22:24:01  + Frame        avatar_155a8939            at=448 count=1 side=right  nb_frames=485
+22:24:01  + Frame        avatar_155a8939            at=449 count=1 side=right  nb_frames=486
+22:24:01  + Frame        avatar_155a8939            at=450 count=1 side=right  nb_frames=487
+22:24:02  + Frame        avatar_155a8939            at=451 count=1 side=right  nb_frames=488
+22:24:02  + Frame        avatar_155a8939            at=452 count=1 side=right  nb_frames=489
+22:24:02  + Frame        avatar_155a8939            at=453 count=1 side=right  nb_frames=490
+22:24:03  + Frame        avatar_155a8939            at=454 count=1 side=right  nb_frames=491
+22:24:03  + Frame        avatar_155a8939            at=455 count=1 side=right  nb_frames=492
+22:24:03  + Frame        avatar_155a8939            at=456 count=1 side=right  nb_frames=493
+22:24:04  + Frame        avatar_155a8939            at=457 count=1 side=right  nb_frames=494
+22:24:04  + Frame        avatar_155a8939            at=458 count=1 side=right  nb_frames=495
+22:24:05  + Frame        avatar_155a8939            at=459 count=1 side=right  nb_frames=496
+22:24:05  + Frame        avatar_155a8939            at=460 count=1 side=right  nb_frames=497
+22:24:06  + Frame        avatar_155a8939            at=461 count=1 side=right  nb_frames=498
+22:24:06  + Frame        avatar_155a8939            at=462 count=1 side=right  nb_frames=499
+22:24:06  + Frame        avatar_155a8939            at=463 count=1 side=right  nb_frames=500
+22:24:07  + Frame        avatar_155a8939            at=464 count=1 side=right  nb_frames=501
+22:24:07  + Frame        avatar_155a8939            at=465 count=1 side=right  nb_frames=502
+22:24:07  + Frame        avatar_155a8939            at=466 count=1 side=right  nb_frames=503
+22:24:08  + Frame        avatar_155a8939            at=467 count=1 side=right  nb_frames=504
+22:24:09  + Frame        avatar_155a8939            at=468 count=1 side=right  nb_frames=505
+22:24:09  + Frame        avatar_155a8939            at=469 count=1 side=right  nb_frames=506
+22:24:14  - Zone         avatar_155a8939            a=470 b=470  nb_frames=505
+22:24:14  - Zone         avatar_155a8939            a=470 b=470  nb_frames=504
+22:24:15  - Zone         avatar_155a8939            a=470 b=470  nb_frames=503
+22:24:15  - Zone         avatar_155a8939            a=470 b=470  nb_frames=502
+22:24:16  - Zone         avatar_155a8939            a=470 b=470  nb_frames=501
+22:24:16  - Zone         avatar_155a8939            a=470 b=470  nb_frames=500
+22:24:17  - Zone         avatar_155a8939            a=470 b=470  nb_frames=499
+22:24:17  - Zone         avatar_155a8939            a=470 b=470  nb_frames=498
+22:24:17  - Zone         avatar_155a8939            a=470 b=470  nb_frames=497
+22:24:17  - Zone         avatar_155a8939            a=470 b=470  nb_frames=496
+22:24:18  - Zone         avatar_155a8939            a=470 b=470  nb_frames=495
+22:24:18  - Zone         avatar_155a8939            a=470 b=470  nb_frames=494
+22:24:18  - Zone         avatar_155a8939            a=470 b=470  nb_frames=493
+22:24:19  - Zone         avatar_155a8939            a=470 b=470  nb_frames=492
+22:24:19  - Zone         avatar_155a8939            a=470 b=470  nb_frames=491
+22:24:19  - Zone         avatar_155a8939            a=470 b=470  nb_frames=490
+22:24:20  - Zone         avatar_155a8939            a=470 b=470  nb_frames=489
+22:24:20  - Zone         avatar_155a8939            a=470 b=470  nb_frames=488
+22:24:21  - Zone         avatar_155a8939            a=470 b=470  nb_frames=487
+22:24:23  - Zone         avatar_155a8939            a=470 b=470  nb_frames=486
+22:24:24  - Zone         avatar_155a8939            a=470 b=470  nb_frames=485
+22:24:35  - Zone         avatar_155a8939            a=470 b=470  nb_frames=484
+22:24:35  - Zone         avatar_155a8939            a=470 b=470  nb_frames=483
+22:26:13  Save scene     avatar_155a8939              nb_frames=483  duration_s=19.36
+22:27:10  + Frame        segment_7b72bbbc           at=477 count=1 side=right  nb_frames=478
+22:27:11  + Frame        segment_7b72bbbc           at=478 count=1 side=right  nb_frames=479
+22:27:12  + Frame        segment_7b72bbbc           at=479 count=1 side=right  nb_frames=480
+22:27:13  + Frame        segment_7b72bbbc           at=480 count=1 side=right  nb_frames=481
+22:27:14  + Frame        segment_7b72bbbc           at=481 count=1 side=right  nb_frames=482
+22:27:14  + Frame        segment_7b72bbbc           at=482 count=1 side=right  nb_frames=483
+22:27:21  Save scene     segment_7b72bbbc             nb_frames=483  duration_s=19.32
+22:28:09  - Zone         segment_7b72bbbc           a=483 b=483  nb_frames=482
+22:28:09  - Zone         avatar_155a8939            a=483 b=483  nb_frames=482
+22:28:16  Save scene     segment_7b72bbbc             nb_frames=482  duration_s=19.28
+22:28:41  Save scene     avatar_155a8939              nb_frames=482  duration_s=19.32

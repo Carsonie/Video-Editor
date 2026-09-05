@@ -1,0 +1,15 @@
+editor_base Test Report
+Run:         2026-09-04T17:55:05
+Log:         editor_base_17_55_05.log
+
+Tests run:   57
+Passed:      57
+Failed:      0
+Result:      PASS
+
+Steps:
+  PASS  Step 1: editor_base is pure — no routes, no handlers, no HTTP
+  PASS  Step 2: frames.CACHE — the one piece of state, and it is reachable
+  PASS  Step 3: the pure functions, against real footage
+  PASS  Step 4: paths — the filename shapes every editor agrees on
+  PASS  Step 5: no editor keeps its own copy of what this package owns

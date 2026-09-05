@@ -1,0 +1,34 @@
+avatar_editor Test Report
+Run:         2026-09-04T00:56:32
+Log:         avatar_editor_00_56_32.log
+
+Tests run:   146
+Passed:      144
+Failed:      2
+Result:      FAIL
+
+Steps:
+  PASS  Step 1: Build the test store
+  PASS  Step 2: the page ships EMPTY — no scene baked into the HTML
+  PASS  Step 3: web/*.js — does the JavaScript actually parse, alone and together?
+  PASS  Step 4: structure — the players' own elements and their isolation
+  PASS  Step 5: Working Clips — the panel, saving into it, and replacing from it
+  PASS  Step 6: the common library panel exists and is wired through, not bolted on
+  PASS  Step 7: tooltips — every control says what it does, after 3 seconds
+  PASS  Step 8: stateless — a call that names no pair is refused, even right after opening one
+  PASS  Step 9: /api/stores + /api/load_video — the two-step Load
+  PASS  Step 10: /api/load_store — Avatar Editor's Load, proxied to /api/siblings
+  FAIL  Step 11: /api/save_scene — proxied to /api/save, refusal included
+  PASS  Step 12: /api/libs_list — ski-demo's own sarah_clips/, its loose leftovers
+  PASS  Step 13: Sarah's common library — /api/libs_list?source=common
+  PASS  Step 14: source=common resolves against Sarah/, never against Customers/
+  PASS  Step 15: source=common media — the real bytes, not just metadata
+  PASS  Step 16: sarah_clips/libs/'s 7 folder names line up with Sarah/'s own
+  PASS  Step 17: /api/lib_frames — a real .webm clip
+  PASS  Step 18: /api/lib_frames — a still image gets a one-frame cache entry
+  PASS  Step 19: no handler is defined that the dispatcher cannot reach
+  PASS  Step 20: its own cache — cache_avatar_editor/, not the shared cache/
+
+Failures:
+  - a normal save proxies through as 200   got 409, want 200
+  - with the real save result   {'error': 'stale', 'message': 'segment.mp4 changed on disk since this was loaded here — probably saved from another tab or tool. Reload it to see the new version, or save again with force to overwrite it anyway.'}

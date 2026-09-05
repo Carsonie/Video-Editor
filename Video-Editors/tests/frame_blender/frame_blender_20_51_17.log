@@ -1,0 +1,77 @@
+Frame Blender Test:  2026-09-03T20:51:03
+Store:               _Editor_Test  (built, used, deleted)
+Main editor:         http://localhost:8851
+Frame Blender:       http://localhost:8852
+
+  Step 1: Build the test store
+     ✓ 01-alpha-scene   segment=40 avatar=30 narration=35
+     ✓ 02-bravo-scene   segment=32 avatar=32 narration=28
+     ✓ 03-charlie-scene   segment=25 avatar=18 narration=22
+
+  Step 2: the page ships EMPTY — no scene baked into the HTML
+     ✓ says nothing is loaded   ok
+     ✓ no base_slug baked in
+     ✓ no over_slug baked in
+     ✓ no 01-opening-with-login baked in
+     ✓ /web/app.js served   200
+     ✓ /web/app.js content-type   application/javascript
+     ✓ /web/app.js is no-store   no-store
+     ✓ /web/app.css served   200
+     ✓ /web/app.css content-type   text/css
+
+  Step 3: web/app.js — does the JavaScript actually parse?
+     ✓ app.js parses   35796 bytes
+
+  Step 4: stateless — a call that names no pair is refused, even right after opening one
+     ✓ /build_clip refuses without a pair   400
+     ✓ /build_clip says why   {'error': 'base is required'}
+     ✓ /api/save_mp4 refuses without a pair   400
+     ✓ /api/save_mp4 says why   {'error': 'base is required'}
+
+  Step 5: /api/stores + /api/load_video — the two-step Load
+     ✓ stores answers 200   200
+     ✓ lists the real stores   ['Alpine Sports Blue Mountains/alpine-sports', 'Rentify Demos Corp/bike-demo', 'Rentify Demos Corp/canoe-demo', 'Rentify Demos Corp/ski-demo']
+     ✓ each store names its video folders
+     ✓ load_video answers 200   200
+     ✓ returns the video's scenes   11
+     ✓ 1000_archive is NOT among them   ['', '', '', '', '', '', '', '', '', '', '']
+     ✓ script.json comes back with them   Rentify Demos Corp/bike-demo/help-videos/videos/01-first-time-ordering/sandbox/script.json
+     ✓ a missing root is refused   400
+     ✓ a folder with no sandbox/ is refused   400
+
+  Step 6: /api/load_store — Frame Blender's Load, proxied to /api/siblings
+     ✓ 200   200
+     ✓ finds all three fixture scenes   3
+     ✓ row 1 exists
+     ✓ carries a real base_slug (for Save)   segment_22137e5c
+     ✓ scene 1 starts pristine   False
+     ✓ missing path is refused, not a crash   400
+
+  Step 7: /api/save_scene — proxied to /api/save, refusal included
+     ✓ a normal save proxies through as 200   200
+     ✓ with the real save result   {'path': '/Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/01-alpha-scene/segment.mp4', 'archived_to': '/Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/01-alpha-scene/z_History/20260903-205115/segment.mp4', 'duration_s': 1.6, 'nb_frames': 40, 'frames_written': 40, 'frames_expected': 40, 'warning': None}
+     ✓ the conflict comes through as 409, not swallowed   409
+     ✓ with the same error the direct endpoint gives   stale
+     ✓ force proxies through too   200
+
+  Step 8: /build_clip — the real one-pass picture+voice build
+     ✓ open_pair answers 200   200
+     ✓ and returns both cache slugs   {'label': '01-login', 'base_slug': 'segment_2932db46', 'over_slug': 'avatar_7e33ad6f', 'base_n': 174, 'over_n': 142, 'max_n': 174, 'base_ext': '.jpg', 'over_ext': '.png', 'base_rel': 'Rentify Demos Corp/bike-demo/help-videos/videos/01-first-time-ordering/sandbox/01-login/segment.mp4', 'over_rel': 'Rentify Demos Corp/bike-demo/help-videos/videos/01-first-time-ordering/sandbox/01-login/avatar.webm'}
+     ✓ 200   200
+     ✓ built exactly the frame count asked for   10
+     ✓ names a real file   /_previews/preview_10.mp4
+     ✓ an over-large request is clamped, not a crash   (200, {'url': '/_previews/preview_142.mp4', 'frames': 142})
+
+  Step 9: /api/save_mp4 — versioned copy into sandbox_mp4_scenes/, and it actually increments
+     ✓ save 1: 200   200
+     ✓ save 2: 200   200
+     ✓ save 3: 200   200
+     ✓ three saves, three different filenames   ['Rentify Demos Corp/bike-demo/help-videos/videos/01-first-time-ordering/video/sandbox_mp4_scenes/26-9-3_v1.mp4', 'Rentify Demos Corp/bike-demo/help-videos/videos/01-first-time-ordering/video/sandbox_mp4_scenes/26-9-3_v2.mp4', 'Rentify Demos Corp/bike-demo/help-videos/videos/01-first-time-ordering/video/sandbox_mp4_scenes/26-9-3_v3.mp4']
+     ✓ all three actually exist on disk   ['Rentify Demos Corp/bike-demo/help-videos/videos/01-first-time-ordering/video/sandbox_mp4_scenes/26-9-3_v1.mp4', 'Rentify Demos Corp/bike-demo/help-videos/videos/01-first-time-ordering/video/sandbox_mp4_scenes/26-9-3_v2.mp4', 'Rentify Demos Corp/bike-demo/help-videos/videos/01-first-time-ordering/video/sandbox_mp4_scenes/26-9-3_v3.mp4']
+     ✓ a frame count nothing was built for is refused, not silently wrong   400
+
+  Step 10: no handler is defined that the dispatcher cannot reach
+     ✓ unreachable handlers   []
+
+  Checks:  50/50 passed
+  Result:  PASS

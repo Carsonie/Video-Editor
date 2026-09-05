@@ -1,0 +1,31 @@
+avatar_editor Test Report
+Run:         2026-09-04T01:21:03
+Log:         avatar_editor_01_21_03.log
+
+Tests run:   165
+Passed:      165
+Failed:      0
+Result:      PASS
+
+Steps:
+  PASS  Step 1: Build the test store
+  PASS  Step 2: the page ships EMPTY — no scene baked into the HTML
+  PASS  Step 3: web/*.js — does the JavaScript actually parse, alone and together?
+  PASS  Step 4: load order — no file reads a name declared in a later one
+  PASS  Step 5: structure — the players' own elements and their isolation
+  PASS  Step 6: Working Clips — the panel, saving into it, and replacing from it
+  PASS  Step 7: the common library panel exists and is wired through, not bolted on
+  PASS  Step 8: tooltips — every control says what it does, after 3 seconds
+  PASS  Step 9: stateless — a call that names no pair is refused, even right after opening one
+  PASS  Step 10: /api/stores + /api/load_video — the two-step Load
+  PASS  Step 11: /api/load_store — Avatar Editor's Load, proxied to /api/siblings
+  PASS  Step 12: /api/save_scene — proxied to /api/save, refusal included
+  PASS  Step 13: /api/libs_list — ski-demo's own sarah_clips/, its loose leftovers
+  PASS  Step 14: Sarah's common library — /api/libs_list?source=common
+  PASS  Step 15: source=common resolves against Sarah/, never against Customers/
+  PASS  Step 16: source=common media — the real bytes, not just metadata
+  PASS  Step 17: sarah_clips/libs/'s 7 folder names line up with Sarah/'s own
+  PASS  Step 18: /api/lib_frames — a real .webm clip
+  PASS  Step 19: /api/lib_frames — a still image gets a one-frame cache entry
+  PASS  Step 20: no handler is defined that the dispatcher cannot reach
+  PASS  Step 21: its own cache — cache_avatar_editor/, not the shared cache/

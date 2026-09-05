@@ -1,0 +1,60 @@
+
+Editor Session:  2026-08-30T11:58:17
+Player:          Segment and Avatar Editor v55
+Server:          http://localhost:8842
+
+11:58:32  Open clip      01-login                   segment.mp4  url=segment_2932db46/viewer.html
+11:58:39  Save scene     segment_2932db46             nb_frames=174  duration_s=6.96
+11:58:50  Open clip      01-login                   segment.mp4  url=segment_2932db46/viewer.html
+11:58:50  Save scene     segment_2932db46             REFUSED: stale
+11:58:57  Save scene     segment_2932db46             nb_frames=174  duration_s=6.96
+
+Editor Session:  2026-08-30T12:17:20
+Player:          Segment and Avatar Editor v56
+Server:          http://localhost:8842
+
+12:20:53  Save scene     segment_2932db46             nb_frames=174  duration_s=6.96
+12:20:53  Save scene     segment_2932db46             REFUSED: stale
+12:20:54  Save scene     segment_2932db46             nb_frames=174  duration_s=6.96
+
+Editor Session:  2026-08-30T12:26:37
+Player:          Segment and Avatar Editor v56
+Server:          http://localhost:8842
+
+12:27:10  + Frame        segment_2932db46           at=1 count=1 side=right  nb_frames=175
+12:27:24  Save scene     segment_2932db46             nb_frames=175  duration_s=7.0
+
+Editor Session:  2026-08-30T12:46:14
+Player:          Segment and Avatar Editor v56
+Server:          http://localhost:8842
+
+12:46:16  FB: Load store                            path=Rentify Demos Corp/bike-demo/help-videos/videos/01-first-time-ordering/sandbox/01-login/segment.mp4
+13:26:09  FB: Build clip                            n=482  url=/_previews/preview_482.mp4
+14:51:48  FB: Load store                            path=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering/sandbox/01-opening-with-login/segment.mp4
+15:11:22  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+15:13:50  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+15:22:14  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+15:22:35  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+15:42:42  FB: Build clip                            n=482  url=/_previews/preview_482.mp4
+15:42:52  FB: Build clip                            n=482  url=/_previews/preview_482.mp4
+15:43:19  FB: Build clip                            n=482  url=/_previews/preview_482.mp4
+15:53:16  FB: Build clip                            n=482  url=/_previews/preview_482.mp4
+15:57:00  FB: Build clip                            n=482  url=/_previews/preview_482.mp4
+15:57:03  FB: Build clip                            n=482  url=/_previews/preview_482.mp4
+15:57:29  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+15:57:44  FB: Build clip                            n=482  url=/_previews/preview_482.mp4
+15:58:16  FB: Save MP4                              n=482
+16:15:53  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=0,1,2,3,4,5,6,7,8,9,10,11,99
+17:02:44  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+17:08:36  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+17:08:54  FB: Build clip                            n=482  url=/_previews/preview_482.mp4
+17:09:04  FB: Save MP4                              n=482
+17:11:21  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11
+17:11:40  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2
+17:13:40  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+17:13:56  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1
+19:03:50  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+19:33:11  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+20:22:57  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+20:49:43  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+20:50:53  FB: Load video Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering

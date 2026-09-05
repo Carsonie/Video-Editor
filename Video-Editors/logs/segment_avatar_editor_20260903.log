@@ -1,0 +1,971 @@
+
+Editor Session:  2026-09-03T00:30:51
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+00:30:53  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+00:30:53  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+00:30:53  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+00:30:53  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+00:30:53  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+00:30:53  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+00:30:53  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+00:30:53  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+00:30:53  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+00:30:53  Undo           pair_2dee7b8d14              nb_frames=40
+00:30:53  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+00:30:54  Undo           pair_2dee7b8d14              nb_frames=40
+00:30:54  Unmark all     pair_2dee7b8d14
+00:30:54  Mark           pair_2dee7b8d14            frame=5 on=True
+00:30:54  Mark           pair_2dee7b8d14            frame=20 on=True
+00:30:54  Mark           pair_2dee7b8d14            frame=5 on=False
+00:30:54  Unmark all     pair_2dee7b8d14
+00:30:54  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+00:30:55  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+00:30:55  Save scene     pair_2dee7b8d14              REFUSED: stale
+00:30:56  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+00:30:56  Unmark all     pair_2dee7b8d14
+00:30:56  Mark           pair_2dee7b8d14            frame=15 on=True
+00:30:56  Mark           pair_2dee7b8d14            frame=30 on=True
+00:30:56  Cut scene      pair_2dee7b8d14              count=3  version=1
+00:30:56  Unmark all     pair_2dee7b8d14
+00:30:56  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+00:30:56  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+00:30:56  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+00:30:56  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+00:30:57  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+00:30:57  Lift lock      _Editor_Test
+00:30:57  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+00:31:05  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+00:31:05  Archive        _Editor_Test               folder=sandbox
+00:31:05  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+00:31:05  Save All archive _Editor_Test               root=_Editor_Test
+00:31:05  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+00:31:05  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+00:31:06  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+00:31:06  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T09:08:30
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+09:08:32  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+09:08:32  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+09:08:32  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+09:08:32  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+09:08:32  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+09:08:32  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+09:08:32  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+09:08:32  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+09:08:32  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+09:08:32  Undo           pair_2dee7b8d14              nb_frames=40
+09:08:32  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+09:08:33  Undo           pair_2dee7b8d14              nb_frames=40
+09:08:33  Unmark all     pair_2dee7b8d14
+09:08:33  Mark           pair_2dee7b8d14            frame=5 on=True
+09:08:33  Mark           pair_2dee7b8d14            frame=20 on=True
+09:08:33  Mark           pair_2dee7b8d14            frame=5 on=False
+09:08:33  Unmark all     pair_2dee7b8d14
+09:08:33  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+09:08:34  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+09:08:34  Save scene     pair_2dee7b8d14              REFUSED: stale
+09:08:35  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+09:08:35  Unmark all     pair_2dee7b8d14
+09:08:35  Mark           pair_2dee7b8d14            frame=15 on=True
+09:08:35  Mark           pair_2dee7b8d14            frame=30 on=True
+09:08:36  Cut scene      pair_2dee7b8d14              count=3  version=1
+09:08:36  Unmark all     pair_2dee7b8d14
+09:08:36  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+09:08:36  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+09:08:36  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+09:08:36  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+09:08:36  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+09:08:36  Lift lock      _Editor_Test
+09:08:36  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+09:08:44  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+09:08:44  Archive        _Editor_Test               folder=sandbox
+09:08:44  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+09:08:44  Save All archive _Editor_Test               root=_Editor_Test
+09:08:44  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+09:08:44  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+09:08:45  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+09:08:45  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T09:36:48
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+09:36:50  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+09:36:50  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+09:36:50  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+09:36:50  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+09:36:50  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+09:36:50  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+09:36:50  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+09:36:50  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+09:36:50  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+09:36:50  Undo           pair_2dee7b8d14              nb_frames=40
+09:36:50  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+09:36:51  Undo           pair_2dee7b8d14              nb_frames=40
+09:36:51  Unmark all     pair_2dee7b8d14
+09:36:51  Mark           pair_2dee7b8d14            frame=5 on=True
+09:36:51  Mark           pair_2dee7b8d14            frame=20 on=True
+09:36:51  Mark           pair_2dee7b8d14            frame=5 on=False
+09:36:51  Unmark all     pair_2dee7b8d14
+09:36:51  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+09:36:52  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+09:36:52  Save scene     pair_2dee7b8d14              REFUSED: stale
+09:36:53  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+09:36:53  Unmark all     pair_2dee7b8d14
+09:36:53  Mark           pair_2dee7b8d14            frame=15 on=True
+09:36:53  Mark           pair_2dee7b8d14            frame=30 on=True
+09:36:54  Cut scene      pair_2dee7b8d14              count=3  version=1
+09:36:54  Unmark all     pair_2dee7b8d14
+09:36:54  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+09:36:54  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+09:36:54  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+09:36:54  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+09:36:54  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+09:36:54  Lift lock      _Editor_Test
+09:36:54  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+09:37:02  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+09:37:02  Archive        _Editor_Test               folder=sandbox
+09:37:02  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+09:37:02  Save All archive _Editor_Test               root=_Editor_Test
+09:37:02  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+09:37:02  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+09:37:03  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+09:37:03  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T09:41:01
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+09:41:03  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+09:41:03  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+09:41:03  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+09:41:03  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+09:41:03  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+09:41:03  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+09:41:03  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+09:41:03  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+09:41:03  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+09:41:03  Undo           pair_2dee7b8d14              nb_frames=40
+09:41:03  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+09:41:03  Undo           pair_2dee7b8d14              nb_frames=40
+09:41:03  Unmark all     pair_2dee7b8d14
+09:41:03  Mark           pair_2dee7b8d14            frame=5 on=True
+09:41:03  Mark           pair_2dee7b8d14            frame=20 on=True
+09:41:03  Mark           pair_2dee7b8d14            frame=5 on=False
+09:41:03  Unmark all     pair_2dee7b8d14
+09:41:04  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+09:41:05  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+09:41:05  Save scene     pair_2dee7b8d14              REFUSED: stale
+09:41:06  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+09:41:06  Unmark all     pair_2dee7b8d14
+09:41:06  Mark           pair_2dee7b8d14            frame=15 on=True
+09:41:06  Mark           pair_2dee7b8d14            frame=30 on=True
+09:41:06  Cut scene      pair_2dee7b8d14              count=3  version=1
+09:41:06  Unmark all     pair_2dee7b8d14
+09:41:06  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+09:41:06  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+09:41:06  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+09:41:06  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+09:41:07  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+09:41:07  Lift lock      _Editor_Test
+09:41:07  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+09:41:15  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+09:41:15  Archive        _Editor_Test               folder=sandbox
+09:41:15  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+09:41:15  Save All archive _Editor_Test               root=_Editor_Test
+09:41:15  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+09:41:15  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+09:41:16  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+09:41:16  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T09:58:03
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8846
+
+
+Editor Session:  2026-09-03T10:07:39
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+10:07:41  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+10:07:41  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+10:07:41  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+10:07:41  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+10:07:41  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+10:07:41  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+10:07:41  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+10:07:41  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+10:07:41  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+10:07:41  Undo           pair_2dee7b8d14              nb_frames=40
+10:07:41  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+10:07:42  Undo           pair_2dee7b8d14              nb_frames=40
+10:07:42  Unmark all     pair_2dee7b8d14
+10:07:42  Mark           pair_2dee7b8d14            frame=5 on=True
+10:07:42  Mark           pair_2dee7b8d14            frame=20 on=True
+10:07:42  Mark           pair_2dee7b8d14            frame=5 on=False
+10:07:42  Unmark all     pair_2dee7b8d14
+10:07:42  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+10:07:43  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+10:07:43  Save scene     pair_2dee7b8d14              REFUSED: stale
+10:07:44  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+10:07:44  Unmark all     pair_2dee7b8d14
+10:07:44  Mark           pair_2dee7b8d14            frame=15 on=True
+10:07:44  Mark           pair_2dee7b8d14            frame=30 on=True
+10:07:45  Cut scene      pair_2dee7b8d14              count=3  version=1
+10:07:45  Unmark all     pair_2dee7b8d14
+10:07:45  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+10:07:45  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+10:07:45  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+10:07:45  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+10:07:45  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+10:07:45  Lift lock      _Editor_Test
+10:07:45  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+10:07:53  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+10:07:53  Archive        _Editor_Test               folder=sandbox
+10:07:53  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+10:07:53  Save All archive _Editor_Test               root=_Editor_Test
+10:07:53  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+10:07:54  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+10:07:55  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+10:07:55  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T11:12:46
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+11:12:49  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+11:12:49  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+11:12:49  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+11:12:49  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+11:12:49  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+11:12:49  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+11:12:49  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+11:12:49  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+11:12:49  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+11:12:49  Undo           pair_2dee7b8d14              nb_frames=40
+11:12:49  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+11:12:49  Undo           pair_2dee7b8d14              nb_frames=40
+11:12:49  Unmark all     pair_2dee7b8d14
+11:12:49  Mark           pair_2dee7b8d14            frame=5 on=True
+11:12:49  Mark           pair_2dee7b8d14            frame=20 on=True
+11:12:49  Mark           pair_2dee7b8d14            frame=5 on=False
+11:12:49  Unmark all     pair_2dee7b8d14
+11:12:50  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+11:12:51  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+11:12:51  Save scene     pair_2dee7b8d14              REFUSED: stale
+11:12:52  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+11:12:52  Unmark all     pair_2dee7b8d14
+11:12:52  Mark           pair_2dee7b8d14            frame=15 on=True
+11:12:52  Mark           pair_2dee7b8d14            frame=30 on=True
+11:12:52  Cut scene      pair_2dee7b8d14              count=3  version=1
+11:12:52  Unmark all     pair_2dee7b8d14
+11:12:52  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+11:12:52  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+11:12:52  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+11:12:52  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+11:12:53  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+11:12:53  Lift lock      _Editor_Test
+11:12:53  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+11:13:01  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+11:13:01  Archive        _Editor_Test               folder=sandbox
+11:13:01  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+11:13:01  Save All archive _Editor_Test               root=_Editor_Test
+11:13:01  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+11:13:01  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+11:13:02  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+11:13:02  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T11:26:36
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+11:26:38  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+11:26:38  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+11:26:38  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+11:26:38  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+11:26:38  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+11:26:38  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+11:26:38  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+11:26:38  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+11:26:38  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+11:26:38  Undo           pair_2dee7b8d14              nb_frames=40
+11:26:38  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+11:26:38  Undo           pair_2dee7b8d14              nb_frames=40
+11:26:38  Unmark all     pair_2dee7b8d14
+11:26:38  Mark           pair_2dee7b8d14            frame=5 on=True
+11:26:38  Mark           pair_2dee7b8d14            frame=20 on=True
+11:26:38  Mark           pair_2dee7b8d14            frame=5 on=False
+11:26:38  Unmark all     pair_2dee7b8d14
+11:26:39  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+11:26:40  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+11:26:40  Save scene     pair_2dee7b8d14              REFUSED: stale
+11:26:41  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+11:26:41  Unmark all     pair_2dee7b8d14
+11:26:41  Mark           pair_2dee7b8d14            frame=15 on=True
+11:26:41  Mark           pair_2dee7b8d14            frame=30 on=True
+11:26:41  Cut scene      pair_2dee7b8d14              count=3  version=1
+11:26:41  Unmark all     pair_2dee7b8d14
+11:26:41  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+11:26:41  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+11:26:41  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+11:26:41  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+11:26:42  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+11:26:42  Lift lock      _Editor_Test
+11:26:42  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+11:26:49  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+11:26:50  Archive        _Editor_Test               folder=sandbox
+11:26:50  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+11:26:50  Save All archive _Editor_Test               root=_Editor_Test
+11:26:50  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+11:26:50  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+11:26:51  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+11:26:51  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T11:32:52
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+11:32:54  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+11:32:54  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+11:32:54  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+11:32:54  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+11:32:54  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+11:32:54  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+11:32:54  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+11:32:54  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+11:32:54  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+11:32:55  Undo           pair_2dee7b8d14              nb_frames=40
+11:32:55  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+11:32:55  Undo           pair_2dee7b8d14              nb_frames=40
+11:32:55  Unmark all     pair_2dee7b8d14
+11:32:55  Mark           pair_2dee7b8d14            frame=5 on=True
+11:32:55  Mark           pair_2dee7b8d14            frame=20 on=True
+11:32:55  Mark           pair_2dee7b8d14            frame=5 on=False
+11:32:55  Unmark all     pair_2dee7b8d14
+11:32:55  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+11:32:56  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+11:32:57  Save scene     pair_2dee7b8d14              REFUSED: stale
+11:32:57  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+11:32:57  Unmark all     pair_2dee7b8d14
+11:32:57  Mark           pair_2dee7b8d14            frame=15 on=True
+11:32:57  Mark           pair_2dee7b8d14            frame=30 on=True
+11:32:58  Cut scene      pair_2dee7b8d14              count=3  version=1
+11:32:58  Unmark all     pair_2dee7b8d14
+11:32:58  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+11:32:58  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+11:32:58  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+11:32:58  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+11:32:58  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+11:32:58  Lift lock      _Editor_Test
+11:32:58  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+11:33:06  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+11:33:06  Archive        _Editor_Test               folder=sandbox
+11:33:06  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+11:33:06  Save All archive _Editor_Test               root=_Editor_Test
+11:33:06  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+11:33:07  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+11:33:08  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+11:33:08  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T12:11:05
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+12:11:07  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+12:11:07  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+12:11:07  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+12:11:07  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+12:11:07  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+12:11:07  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+12:11:07  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+12:11:07  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+12:11:07  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+12:11:07  Undo           pair_2dee7b8d14              nb_frames=40
+12:11:07  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+12:11:08  Undo           pair_2dee7b8d14              nb_frames=40
+12:11:08  Unmark all     pair_2dee7b8d14
+12:11:08  Mark           pair_2dee7b8d14            frame=5 on=True
+12:11:08  Mark           pair_2dee7b8d14            frame=20 on=True
+12:11:08  Mark           pair_2dee7b8d14            frame=5 on=False
+12:11:08  Unmark all     pair_2dee7b8d14
+12:11:08  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+12:11:09  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+12:11:09  Save scene     pair_2dee7b8d14              REFUSED: stale
+12:11:10  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+12:11:10  Unmark all     pair_2dee7b8d14
+12:11:10  Mark           pair_2dee7b8d14            frame=15 on=True
+12:11:10  Mark           pair_2dee7b8d14            frame=30 on=True
+12:11:11  Cut scene      pair_2dee7b8d14              count=3  version=1
+12:11:11  Unmark all     pair_2dee7b8d14
+12:11:11  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+12:11:11  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+12:11:11  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+12:11:11  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+12:11:11  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+12:11:11  Lift lock      _Editor_Test
+12:11:11  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+12:11:19  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+12:11:19  Archive        _Editor_Test               folder=sandbox
+12:11:19  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+12:11:19  Save All archive _Editor_Test               root=_Editor_Test
+12:11:19  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+12:11:20  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+12:11:21  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+12:11:21  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T12:20:57
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+12:20:59  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+12:20:59  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+12:20:59  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+12:20:59  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+12:20:59  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+12:20:59  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+12:20:59  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+12:20:59  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+12:20:59  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+12:20:59  Undo           pair_2dee7b8d14              nb_frames=40
+12:20:59  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+12:21:00  Undo           pair_2dee7b8d14              nb_frames=40
+12:21:00  Unmark all     pair_2dee7b8d14
+12:21:00  Mark           pair_2dee7b8d14            frame=5 on=True
+12:21:00  Mark           pair_2dee7b8d14            frame=20 on=True
+12:21:00  Mark           pair_2dee7b8d14            frame=5 on=False
+12:21:00  Unmark all     pair_2dee7b8d14
+12:21:00  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+12:21:01  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+12:21:01  Save scene     pair_2dee7b8d14              REFUSED: stale
+12:21:02  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+12:21:02  Unmark all     pair_2dee7b8d14
+12:21:02  Mark           pair_2dee7b8d14            frame=15 on=True
+12:21:02  Mark           pair_2dee7b8d14            frame=30 on=True
+12:21:03  Cut scene      pair_2dee7b8d14              count=3  version=1
+12:21:03  Unmark all     pair_2dee7b8d14
+12:21:03  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+12:21:03  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+12:21:03  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+12:21:03  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+12:21:03  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+12:21:03  Lift lock      _Editor_Test
+12:21:03  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+12:21:11  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+12:21:11  Archive        _Editor_Test               folder=sandbox
+12:21:11  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+12:21:11  Save All archive _Editor_Test               root=_Editor_Test
+12:21:11  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+12:21:11  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+12:21:12  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+12:21:12  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T12:40:32
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+12:40:34  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+12:40:34  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+12:40:34  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+12:40:34  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+12:40:34  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+12:40:34  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+12:40:34  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+12:40:34  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+12:40:34  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+12:40:35  Undo           pair_2dee7b8d14              nb_frames=40
+12:40:35  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+12:40:35  Undo           pair_2dee7b8d14              nb_frames=40
+12:40:35  Unmark all     pair_2dee7b8d14
+12:40:35  Mark           pair_2dee7b8d14            frame=5 on=True
+12:40:35  Mark           pair_2dee7b8d14            frame=20 on=True
+12:40:35  Mark           pair_2dee7b8d14            frame=5 on=False
+12:40:35  Unmark all     pair_2dee7b8d14
+12:40:35  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+12:40:36  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+12:40:36  Save scene     pair_2dee7b8d14              REFUSED: stale
+12:40:37  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+12:40:37  Unmark all     pair_2dee7b8d14
+12:40:37  Mark           pair_2dee7b8d14            frame=15 on=True
+12:40:37  Mark           pair_2dee7b8d14            frame=30 on=True
+12:40:38  Cut scene      pair_2dee7b8d14              count=3  version=1
+12:40:38  Unmark all     pair_2dee7b8d14
+12:40:38  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+12:40:38  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+12:40:38  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+12:40:38  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+12:40:38  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+12:40:38  Lift lock      _Editor_Test
+12:40:38  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+12:40:46  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+12:40:46  Archive        _Editor_Test               folder=sandbox
+12:40:46  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+12:40:46  Save All archive _Editor_Test               root=_Editor_Test
+12:40:46  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+12:40:47  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+12:40:48  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+12:40:48  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T12:52:18
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+12:52:20  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+12:52:20  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+12:52:20  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+12:52:20  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+12:52:20  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+12:52:20  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+12:52:20  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+12:52:20  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+12:52:20  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+12:52:21  Undo           pair_2dee7b8d14              nb_frames=40
+12:52:21  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+12:52:21  Undo           pair_2dee7b8d14              nb_frames=40
+12:52:21  Unmark all     pair_2dee7b8d14
+12:52:21  Mark           pair_2dee7b8d14            frame=5 on=True
+12:52:21  Mark           pair_2dee7b8d14            frame=20 on=True
+12:52:21  Mark           pair_2dee7b8d14            frame=5 on=False
+12:52:21  Unmark all     pair_2dee7b8d14
+12:52:21  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+12:52:23  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+12:52:23  Save scene     pair_2dee7b8d14              REFUSED: stale
+12:52:23  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+12:52:23  Unmark all     pair_2dee7b8d14
+12:52:23  Mark           pair_2dee7b8d14            frame=15 on=True
+12:52:23  Mark           pair_2dee7b8d14            frame=30 on=True
+12:52:24  Cut scene      pair_2dee7b8d14              count=3  version=1
+12:52:24  Unmark all     pair_2dee7b8d14
+12:52:24  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+12:52:24  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+12:52:24  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+12:52:24  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+12:52:24  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+12:52:25  Lift lock      _Editor_Test
+12:52:25  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+12:52:32  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+12:52:32  Archive        _Editor_Test               folder=sandbox
+12:52:32  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+12:52:32  Save All archive _Editor_Test               root=_Editor_Test
+12:52:32  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+12:52:33  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+12:52:34  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+12:52:34  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T12:54:41
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+12:54:43  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+12:54:43  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+12:54:43  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+12:54:43  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+12:54:43  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+12:54:43  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+12:54:43  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+12:54:43  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+12:54:43  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+12:54:44  Undo           pair_2dee7b8d14              nb_frames=40
+12:54:44  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+12:54:44  Undo           pair_2dee7b8d14              nb_frames=40
+12:54:44  Unmark all     pair_2dee7b8d14
+12:54:44  Mark           pair_2dee7b8d14            frame=5 on=True
+12:54:44  Mark           pair_2dee7b8d14            frame=20 on=True
+12:54:44  Mark           pair_2dee7b8d14            frame=5 on=False
+12:54:44  Unmark all     pair_2dee7b8d14
+12:54:44  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+12:54:45  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+12:54:46  Save scene     pair_2dee7b8d14              REFUSED: stale
+12:54:46  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+12:54:46  Unmark all     pair_2dee7b8d14
+12:54:46  Mark           pair_2dee7b8d14            frame=15 on=True
+12:54:46  Mark           pair_2dee7b8d14            frame=30 on=True
+12:54:47  Cut scene      pair_2dee7b8d14              count=3  version=1
+12:54:47  Unmark all     pair_2dee7b8d14
+12:54:47  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+12:54:47  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+12:54:47  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+12:54:47  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+12:54:47  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+12:54:47  Lift lock      _Editor_Test
+12:54:47  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+12:54:55  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+12:54:55  Archive        _Editor_Test               folder=sandbox
+12:54:55  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+12:54:55  Save All archive _Editor_Test               root=_Editor_Test
+12:54:55  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+12:54:56  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+12:54:57  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+12:54:57  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T19:27:11
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+19:27:13  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+19:27:13  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+19:27:13  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+19:27:13  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+19:27:13  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+19:27:13  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+19:27:13  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+19:27:13  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+19:27:13  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+19:27:13  Undo           pair_2dee7b8d14              nb_frames=40
+19:27:13  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+19:27:14  Undo           pair_2dee7b8d14              nb_frames=40
+19:27:14  Unmark all     pair_2dee7b8d14
+19:27:14  Mark           pair_2dee7b8d14            frame=5 on=True
+19:27:14  Mark           pair_2dee7b8d14            frame=20 on=True
+19:27:14  Mark           pair_2dee7b8d14            frame=5 on=False
+19:27:14  Unmark all     pair_2dee7b8d14
+19:27:14  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+19:27:15  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+19:27:15  Save scene     pair_2dee7b8d14              REFUSED: stale
+19:27:16  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+19:27:16  Unmark all     pair_2dee7b8d14
+19:27:16  Mark           pair_2dee7b8d14            frame=15 on=True
+19:27:16  Mark           pair_2dee7b8d14            frame=30 on=True
+19:27:17  Cut scene      pair_2dee7b8d14              count=3  version=1
+19:27:17  Unmark all     pair_2dee7b8d14
+19:27:17  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+19:27:17  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+19:27:17  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+19:27:17  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+19:27:17  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+19:27:17  Lift lock      _Editor_Test
+19:27:17  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+19:27:25  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+19:27:25  Archive        _Editor_Test               folder=sandbox
+19:27:25  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+19:27:25  Save All archive _Editor_Test               root=_Editor_Test
+19:27:25  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+19:27:26  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+19:27:27  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+19:27:27  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T19:49:20
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+19:49:23  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+19:49:23  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+19:49:23  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+19:49:23  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+19:49:23  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+19:49:23  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+19:49:23  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+19:49:23  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+19:49:23  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+19:49:23  Undo           pair_2dee7b8d14              nb_frames=40
+19:49:23  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+19:49:23  Undo           pair_2dee7b8d14              nb_frames=40
+19:49:23  Unmark all     pair_2dee7b8d14
+19:49:23  Mark           pair_2dee7b8d14            frame=5 on=True
+19:49:23  Mark           pair_2dee7b8d14            frame=20 on=True
+19:49:23  Mark           pair_2dee7b8d14            frame=5 on=False
+19:49:23  Unmark all     pair_2dee7b8d14
+19:49:23  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+19:49:25  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+19:49:25  Save scene     pair_2dee7b8d14              REFUSED: stale
+19:49:26  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+19:49:26  Unmark all     pair_2dee7b8d14
+19:49:26  Mark           pair_2dee7b8d14            frame=15 on=True
+19:49:26  Mark           pair_2dee7b8d14            frame=30 on=True
+19:49:26  Cut scene      pair_2dee7b8d14              count=3  version=1
+19:49:26  Unmark all     pair_2dee7b8d14
+19:49:26  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+19:49:26  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+19:49:26  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+19:49:26  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+19:49:27  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+19:49:27  Lift lock      _Editor_Test
+19:49:27  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+19:49:35  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+19:49:35  Archive        _Editor_Test               folder=sandbox
+19:49:35  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+19:49:35  Save All archive _Editor_Test               root=_Editor_Test
+19:49:35  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+19:49:35  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+19:49:36  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+19:49:36  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T20:33:21
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+20:33:23  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+20:33:23  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+20:33:23  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+20:33:23  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+20:33:23  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+20:33:23  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+20:33:23  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+20:33:23  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+20:33:23  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+20:33:23  Undo           pair_2dee7b8d14              nb_frames=40
+20:33:23  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+20:33:24  Undo           pair_2dee7b8d14              nb_frames=40
+20:33:24  Unmark all     pair_2dee7b8d14
+20:33:24  Mark           pair_2dee7b8d14            frame=5 on=True
+20:33:24  Mark           pair_2dee7b8d14            frame=20 on=True
+20:33:24  Mark           pair_2dee7b8d14            frame=5 on=False
+20:33:24  Unmark all     pair_2dee7b8d14
+20:33:24  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+20:33:25  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+20:33:25  Save scene     pair_2dee7b8d14              REFUSED: stale
+20:33:26  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+20:33:26  Unmark all     pair_2dee7b8d14
+20:33:26  Mark           pair_2dee7b8d14            frame=15 on=True
+20:33:26  Mark           pair_2dee7b8d14            frame=30 on=True
+20:33:27  Cut scene      pair_2dee7b8d14              count=3  version=1
+20:33:27  Unmark all     pair_2dee7b8d14
+20:33:27  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+20:33:27  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+20:33:27  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+20:33:27  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+20:33:27  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+20:33:27  Lift lock      _Editor_Test
+20:33:27  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+20:33:35  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+20:33:35  Archive        _Editor_Test               folder=sandbox
+20:33:35  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+20:33:35  Save All archive _Editor_Test               root=_Editor_Test
+20:33:35  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+20:33:36  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+20:33:37  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+20:33:37  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T20:35:31
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+20:35:34  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+20:35:34  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+20:35:34  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+20:35:34  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+20:35:34  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+20:35:34  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+20:35:34  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+20:35:34  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+20:35:34  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+20:35:34  Undo           pair_2dee7b8d14              nb_frames=40
+20:35:34  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+20:35:34  Undo           pair_2dee7b8d14              nb_frames=40
+20:35:34  Unmark all     pair_2dee7b8d14
+20:35:34  Mark           pair_2dee7b8d14            frame=5 on=True
+20:35:34  Mark           pair_2dee7b8d14            frame=20 on=True
+20:35:34  Mark           pair_2dee7b8d14            frame=5 on=False
+20:35:34  Unmark all     pair_2dee7b8d14
+20:35:34  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+20:35:36  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+20:35:36  Save scene     pair_2dee7b8d14              REFUSED: stale
+20:35:37  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+20:35:37  Unmark all     pair_2dee7b8d14
+20:35:37  Mark           pair_2dee7b8d14            frame=15 on=True
+20:35:37  Mark           pair_2dee7b8d14            frame=30 on=True
+20:35:37  Cut scene      pair_2dee7b8d14              count=3  version=1
+20:35:37  Unmark all     pair_2dee7b8d14
+20:35:37  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+20:35:37  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+20:35:37  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+20:35:37  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+20:35:37  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+20:35:38  Lift lock      _Editor_Test
+20:35:38  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+20:35:45  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+20:35:46  Archive        _Editor_Test               folder=sandbox
+20:35:46  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+20:35:46  Save All archive _Editor_Test               root=_Editor_Test
+20:35:46  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+20:35:46  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+20:35:47  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+20:35:47  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T20:41:32
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+20:41:35  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+20:41:35  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+20:41:35  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+20:41:35  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+20:41:35  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+20:41:35  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+20:41:35  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+20:41:35  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+20:41:35  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+20:41:35  Undo           pair_2dee7b8d14              nb_frames=40
+20:41:35  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+20:41:35  Undo           pair_2dee7b8d14              nb_frames=40
+20:41:35  Unmark all     pair_2dee7b8d14
+20:41:35  Mark           pair_2dee7b8d14            frame=5 on=True
+20:41:35  Mark           pair_2dee7b8d14            frame=20 on=True
+20:41:35  Mark           pair_2dee7b8d14            frame=5 on=False
+20:41:35  Unmark all     pair_2dee7b8d14
+20:41:35  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+20:41:37  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+20:41:37  Save scene     pair_2dee7b8d14              REFUSED: stale
+20:41:38  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+20:41:38  Unmark all     pair_2dee7b8d14
+20:41:38  Mark           pair_2dee7b8d14            frame=15 on=True
+20:41:38  Mark           pair_2dee7b8d14            frame=30 on=True
+20:41:38  Cut scene      pair_2dee7b8d14              count=3  version=1
+20:41:38  Unmark all     pair_2dee7b8d14
+20:41:38  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+20:41:38  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+20:41:38  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+20:41:38  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+20:41:38  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+20:41:39  Lift lock      _Editor_Test
+20:41:39  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+20:41:46  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+20:41:47  Archive        _Editor_Test               folder=sandbox
+20:41:47  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+20:41:47  Save All archive _Editor_Test               root=_Editor_Test
+20:41:47  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+20:41:47  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+20:41:48  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+20:41:48  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T20:43:22
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+20:43:24  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+20:43:24  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+20:43:24  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+20:43:24  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+20:43:24  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+20:43:24  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+20:43:24  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+20:43:24  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+20:43:24  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+20:43:24  Undo           pair_2dee7b8d14              nb_frames=40
+20:43:24  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+20:43:25  Undo           pair_2dee7b8d14              nb_frames=40
+20:43:25  Unmark all     pair_2dee7b8d14
+20:43:25  Mark           pair_2dee7b8d14            frame=5 on=True
+20:43:25  Mark           pair_2dee7b8d14            frame=20 on=True
+20:43:25  Mark           pair_2dee7b8d14            frame=5 on=False
+20:43:25  Unmark all     pair_2dee7b8d14
+20:43:25  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+20:43:26  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+20:43:26  Save scene     pair_2dee7b8d14              REFUSED: stale
+20:43:27  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+20:43:27  Unmark all     pair_2dee7b8d14
+20:43:27  Mark           pair_2dee7b8d14            frame=15 on=True
+20:43:27  Mark           pair_2dee7b8d14            frame=30 on=True
+20:43:27  Cut scene      pair_2dee7b8d14              count=3  version=1
+20:43:27  Unmark all     pair_2dee7b8d14
+20:43:27  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+20:43:27  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+20:43:27  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+20:43:27  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+20:43:28  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+20:43:28  Lift lock      _Editor_Test
+20:43:28  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+20:43:36  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+20:43:36  Archive        _Editor_Test               folder=sandbox
+20:43:36  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+20:43:36  Save All archive _Editor_Test               root=_Editor_Test
+20:43:36  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+20:43:36  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+20:43:37  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+20:43:37  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T20:51:41
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+20:51:43  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+20:51:43  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+20:51:43  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+20:51:43  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+20:51:44  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+20:51:44  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+20:51:44  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+20:51:44  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+20:51:44  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+20:51:44  Undo           pair_2dee7b8d14              nb_frames=40
+20:51:44  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+20:51:44  Undo           pair_2dee7b8d14              nb_frames=40
+20:51:44  Unmark all     pair_2dee7b8d14
+20:51:44  Mark           pair_2dee7b8d14            frame=5 on=True
+20:51:44  Mark           pair_2dee7b8d14            frame=20 on=True
+20:51:44  Mark           pair_2dee7b8d14            frame=5 on=False
+20:51:44  Unmark all     pair_2dee7b8d14
+20:51:44  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+20:51:46  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+20:51:46  Save scene     pair_2dee7b8d14              REFUSED: stale
+20:51:46  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+20:51:46  Unmark all     pair_2dee7b8d14
+20:51:46  Mark           pair_2dee7b8d14            frame=15 on=True
+20:51:46  Mark           pair_2dee7b8d14            frame=30 on=True
+20:51:47  Cut scene      pair_2dee7b8d14              count=3  version=1
+20:51:47  Unmark all     pair_2dee7b8d14
+20:51:47  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+20:51:47  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+20:51:47  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+20:51:47  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+20:51:47  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+20:51:48  Lift lock      _Editor_Test
+20:51:48  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+20:51:55  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+20:51:56  Archive        _Editor_Test               folder=sandbox
+20:51:56  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+20:51:56  Save All archive _Editor_Test               root=_Editor_Test
+20:51:56  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+20:51:56  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+20:51:57  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+20:51:57  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+
+Editor Session:  2026-09-03T20:55:01
+Player:          Segment and Avatar Editor v60
+Server:          http://localhost:8856
+
+20:55:03  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4  url=pair_2dee7b8d14/viewer.html  slug=pair_2dee7b8d14
+20:55:03  Open layered                              base=_Editor_Test/sandbox/01-alpha-scene/segment.mp4
+20:55:03  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+20:55:03  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+20:55:03  + Frame        pair_2dee7b8d14            at=10 count=1 side=right  nb_frames=41
+20:55:03  + Frame        pair_2dee7b8d14            at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+20:55:03  - Frame        pair_2dee7b8d14            at=10 count=1 side=left  nb_frames=40
+20:55:03  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+20:55:03  - Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=40
+20:55:04  Undo           pair_2dee7b8d14              nb_frames=40
+20:55:04  Paste frame    pair_2dee7b8d14            from=5 at=20  nb_frames=41
+20:55:04  Undo           pair_2dee7b8d14              nb_frames=40
+20:55:04  Unmark all     pair_2dee7b8d14
+20:55:04  Mark           pair_2dee7b8d14            frame=5 on=True
+20:55:04  Mark           pair_2dee7b8d14            frame=20 on=True
+20:55:04  Mark           pair_2dee7b8d14            frame=5 on=False
+20:55:04  Unmark all     pair_2dee7b8d14
+20:55:04  + Zone         pair_2dee7b8d14            a=5 b=9  nb_frames=45
+20:55:05  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+20:55:05  Save scene     pair_2dee7b8d14              REFUSED: stale
+20:55:06  Save scene     pair_2dee7b8d14              nb_frames=45  duration_s=1.8
+20:55:06  Unmark all     pair_2dee7b8d14
+20:55:06  Mark           pair_2dee7b8d14            frame=15 on=True
+20:55:06  Mark           pair_2dee7b8d14            frame=30 on=True
+20:55:07  Cut scene      pair_2dee7b8d14              count=3  version=1
+20:55:07  Unmark all     pair_2dee7b8d14
+20:55:07  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+20:55:07  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+20:55:07  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+20:55:07  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+20:55:07  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+20:55:07  Lift lock      _Editor_Test
+20:55:07  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+20:55:15  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+20:55:15  Archive        _Editor_Test               folder=sandbox
+20:55:15  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+20:55:15  Save All archive _Editor_Test               root=_Editor_Test
+20:55:15  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+20:55:16  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b
+20:55:17  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+20:55:17  Open layered                              base=_Editor_Test/sandbox/03-charlie-scene/segment.mp4  url=pair_849701e26b/viewer.html  slug=pair_849701e26b

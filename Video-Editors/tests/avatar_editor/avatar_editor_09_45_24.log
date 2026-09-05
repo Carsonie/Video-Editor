@@ -1,0 +1,214 @@
+Avatar Editor Test:  2026-09-04T09:44:50
+Store:               _Editor_Test  (built, used, deleted)
+Main editor:         http://localhost:8851
+Avatar Editor:       http://localhost:8852
+
+  Step 1: Build the test store
+     ✓ 01-alpha-scene   segment=40 avatar=30 narration=35
+     ✓ 02-bravo-scene   segment=32 avatar=32 narration=28
+     ✓ 03-charlie-scene   segment=25 avatar=18 narration=22
+
+  Step 2: the page ships EMPTY — no scene baked into the HTML
+     ✓ says nothing is loaded   ok
+     ✓ no base_slug baked in
+     ✓ no over_slug baked in
+     ✓ no 01-opening-with-login baked in
+     ✓ every script the page needs is named   all nine
+     ✓ they are named in the required order   ['frame-player.js', 'gap-state.js', 'library.js', 'clip-gap-builder.js', 'gap-menu.js', 'wire.js', 'working-clips.js', 'tooltips.js', 'app.js']
+     ✓ gap-builder.js is gone (it was split)   404
+     ✓ tooltips.js is on the page   16070
+     ✓ /web/frame-player.js served   200
+     ✓ /web/frame-player.js content-type   application/javascript
+     ✓ /web/frame-player.js is no-store   no-store
+     ✓ /web/gap-state.js served   200
+     ✓ /web/gap-state.js content-type   application/javascript
+     ✓ /web/gap-state.js is no-store   no-store
+     ✓ /web/library.js served   200
+     ✓ /web/library.js content-type   application/javascript
+     ✓ /web/library.js is no-store   no-store
+     ✓ /web/clip-gap-builder.js served   200
+     ✓ /web/clip-gap-builder.js content-type   application/javascript
+     ✓ /web/clip-gap-builder.js is no-store   no-store
+     ✓ /web/gap-menu.js served   200
+     ✓ /web/gap-menu.js content-type   application/javascript
+     ✓ /web/gap-menu.js is no-store   no-store
+     ✓ /web/wire.js served   200
+     ✓ /web/wire.js content-type   application/javascript
+     ✓ /web/wire.js is no-store   no-store
+     ✓ /web/working-clips.js served   200
+     ✓ /web/working-clips.js content-type   application/javascript
+     ✓ /web/working-clips.js is no-store   no-store
+     ✓ /web/tooltips.js served   200
+     ✓ /web/tooltips.js content-type   application/javascript
+     ✓ /web/tooltips.js is no-store   no-store
+     ✓ /web/app.js served   200
+     ✓ /web/app.js content-type   application/javascript
+     ✓ /web/app.js is no-store   no-store
+     ✓ /web/app.css served   200
+     ✓ /web/app.css content-type   text/css
+
+  Step 3: web/*.js — does the JavaScript actually parse, alone and together?
+     ✓ frame-player.js parses   26047 bytes
+     ✓ gap-state.js parses   8392 bytes
+     ✓ library.js parses   11138 bytes
+     ✓ clip-gap-builder.js parses   15801 bytes
+     ✓ gap-menu.js parses   19608 bytes
+     ✓ wire.js parses   2039 bytes
+     ✓ working-clips.js parses   13507 bytes
+     ✓ tooltips.js parses   5329 bytes
+     ✓ app.js parses   22660 bytes
+     ✓ all nine together (load order) parses   124529 bytes
+
+  Step 4: load order — no file reads a name declared in a later one
+     ✓ the files really were read   79 names
+     ✓ no file reads a later file's declaration at load time   none
+
+  Step 5: structure — the players' own elements and their isolation
+     ✓ the page carries fsPlayer
+     ✓ the page carries fsVideo
+     ✓ the page carries fsName
+     ✓ the page carries fsRate
+     ✓ the page carries gbPlayer
+     ✓ the page carries gbVideo
+     ✓ the page carries gbName
+     ✓ the page carries gbRate
+     ✓ the page carries soundBitPlayer
+     ✓ the page carries soundBitVideo
+     ✓ fsVideo is the voice only, never a second viewer
+     ✓ gbVideo is the voice only, never a second viewer
+     ✓ only the Frame Selector moves the Frame Selector's viewer
+     ✓ only the Clip-Gap Builder moves the Clip-Gap Builder's viewer
+     ✓ the engine itself knows nothing about frames
+
+  Step 6: Working Clips — the panel, saving into it, and replacing from it
+     ✓ the page carries wcGroups
+     ✓ the page carries wcStatus
+     ✓ the page carries gmSaveTarget
+     ✓ the page carries gmReplaceSelected
+     ✓ the page carries gmAudioClearAll
+     ✓ the panel reuses the library's own classes, not a second layout
+     ✓ Save to: is itself the button
+     ✓ ...and there is no second Save button
+     ✓ ...offers idle
+     ✓ ...offers sound_bits
+     ✓ ...offers transitions
+     ✓ the name is asked for in the page's own modal, never window.prompt
+     ✓ Audio Menu's Clear All unticks nothing
+
+  Step 7: the common library panel exists and is wired through, not bolted on
+     ✓ the page carries libGroupsCommon
+     ✓ the page carries libStatusCommon
+     ✓ the page carries libHeaderStore
+     ✓ the page carries libHeaderVideo
+     ✓ it is a real second panel, not a rename of the store's own
+     ✓ libSpinner exists and starts hidden
+     ✓ libSpinnerCommon exists and starts hidden
+     ✓ no static 'sarah_clips/libs' heading left
+     ✓ the common panel's h3 is just Sarah
+
+  Step 8: tooltips — every control says what it does, after 3 seconds
+     ✓ no control in the page is left without a description   24 controls, all described
+     ✓ ...and there are really that many controls to describe   24
+     ✓ the dropdown borrows its row's description
+
+  Step 9: stateless — a call that names no pair is refused, even right after opening one
+     ✓ /api/libs_list refuses without a pair   400
+     ✓ /api/libs_list says why   {'error': 'base is required'}
+
+  Step 10: /api/stores + /api/load_video — the two-step Load
+     ✓ stores answers 200   200
+     ✓ lists the real stores   ['Alpine Sports Blue Mountains/alpine-sports', 'Rentify Demos Corp/bike-demo', 'Rentify Demos Corp/canoe-demo', 'Rentify Demos Corp/ski-demo']
+     ✓ each store names its video folders
+     ✓ load_video answers 200   200
+     ✓ returns the video's scenes   11
+     ✓ 1000_archive is NOT among them   ['', '', '', '', '', '', '', '', '', '', '']
+     ✓ script.json comes back with them   Rentify Demos Corp/bike-demo/help-videos/videos/01-first-time-ordering/sandbox/script.json
+     ✓ a missing root is refused   400
+     ✓ a folder with no sandbox/ is refused   400
+
+  Step 11: /api/load_store — Avatar Editor's Load, proxied to /api/siblings
+     ✓ 200   200
+     ✓ finds all three fixture scenes   3
+     ✓ row 1 exists
+     ✓ carries a real base_slug (for Save)   segment_22137e5c
+     ✓ scene 1 starts pristine   False
+     ✓ missing path is refused, not a crash   400
+
+  Step 12: /api/save_scene — proxied to /api/save, refusal included
+     ✓ a normal save proxies through as 200   200
+     ✓ with the real save result   {'path': '/Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/01-alpha-scene/segment.mp4', 'archived_to': '/Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/01-alpha-scene/z_History/20260904-094502/segment.mp4', 'duration_s': 1.6, 'nb_frames': 40, 'frames_written': 40, 'frames_expected': 40, 'warning': None}
+     ✓ the conflict comes through as 409, not swallowed   409
+     ✓ with the same error the direct endpoint gives   stale
+     ✓ force proxies through too   200
+
+  Step 13: /api/libs_list — ski-demo's own sarah_clips/, its loose leftovers
+     ✓ 200   200
+     ✓ root points at sarah_clips/ itself, not .../libs   Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering/sarah_clips
+     ✓ exactly one group: the loose files   1
+     ✓ ...named plainly   sarah_clips
+     ✓ finds the real loose files   13
+     ✓ every file has a real, resolvable path   [{'name': 'CLOSING.mp4', 'size': 543669, 'path': 'Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering/sarah_clips/CLOSING.mp4', 'source': 'store', 'has_audio': True, 'dur': 3.38}]
+     ✓ every entry is tagged source='store'   [{'name': 'CLOSING.mp4', 'size': 543669, 'path': 'Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering/sarah_clips/CLOSING.mp4', 'source': 'store', 'has_audio': True, 'dur': 3.38}]
+     ✓ a real leftover clip shows up   ['CLOSING.mp4', 'OPENING.mp4', 'README.md', 'TEST_2026-08-29_scene1-new-line-text_old-audio.mp4', 'TRACK_front_sarah.webm', 'sarah-bridge-alpha.webm', 'sarah-bridge-corner-320-alpha.webm', 'sarah-bridge-transition-to-corner.webm', 'sarah-idle-alpha.webm', 'sarah-idle-corner-320-alpha.webm', 'sarah-intro-1152-alpha.webm', 'sarah-intro-alpha.webm', 'sarah-scene-12-CORNER-preview-alpha.webm']
+     ✓ z_history/ is never browsed — it's the archive, not a source   {'sarah-bridge-transition-to-corner.webm', 'sarah-intro-1152-alpha.webm', 'TRACK_front_sarah.webm', 'sarah-bridge-alpha.webm', 'CLOSING.mp4', 'sarah-bridge-corner-320-alpha.webm', 'OPENING.mp4', 'README.md', 'sarah-scene-12-CORNER-preview-alpha.webm', 'sarah-idle-alpha.webm', 'sarah-intro-alpha.webm', 'TEST_2026-08-29_scene1-new-line-text_old-audio.mp4', 'sarah-idle-corner-320-alpha.webm'}
+     ✓ ...and it's genuinely still there, just out of the browse   /Users/carsonkramer/Rentify/Video-Editor/Customers/Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering/sarah_clips/z_history
+     ✓ ...with the archived library's real files still in it   ['/Users/carsonkramer/Rentify/Video-Editor/Customers/Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering/sarah_clips/z_history/20260903-112319/libs']
+
+  Step 14: Sarah's common library — /api/libs_list?source=common
+     ✓ 200   200
+     ✓ root is Sarah   Sarah
+     ✓ finds real files   32
+     ✓ every entry is tagged source='common'   [{'name': 'OPENING.mp4', 'size': 1228570, 'path': 'openings/OPENING.mp4', 'source': 'common', 'has_audio': True, 'dur': 11.4}]
+     ✓ its path is real, resolved against Sarah/ — not Customers/   stills/sarah-rest-pose-corner-300-alpha.png
+     ✓ same 7-folder taxonomy as the store's own library   {'openings': 3, 'gap-fillers': 0, 'idle': 4, 'stills': 6, 'transitions': 3, 'sound_bits': 11, 'closings': 5}
+     ✓ sound_bits are flat, not nested — the folder walk is one level deep   11
+
+  Step 15: source=common resolves against Sarah/, never against Customers/
+     ✓ 200   200
+     ✓ kind is still   still
+     ✓ ...a path escaping Sarah/ is refused, not resolved   400
+     ✓ ...and Sarah/'s own paths are foreign to the store root   400
+
+  Step 16: source=common media — the real bytes, not just metadata
+     ✓ 200   200
+     ✓ real bytes came back
+
+  Step 17: sarah_clips/libs/'s 7 folder names line up with Sarah/'s own
+     ✓ LIBS_GROUP_ORDER is defined
+     ✓ exactly 7 folders   ['openings', 'gap-fillers', 'idle', 'stills', 'transitions', 'sound_bits', 'closings']
+     ✓ the same 7 names as Sarah/ itself   ['closings', 'gap-fillers', 'idle', 'openings', 'sound_bits', 'stills', 'transitions']
+     ✓ 200   200
+     ✓ groups come back in LIBS_GROUP_ORDER's order   ['sarah_clips']
+
+  Step 18: /api/lib_frames — a real .webm clip
+     ✓ 200   200
+     ✓ kind is clip   clip
+     ✓ has a real, multi-frame count   250
+     ✓ names a real cache slug   sarah-idle-10s-alpha_2dd3990a
+     ✓ frames are alpha PNGs, like any overlay track   .png
+     ✓ frame 1 is really servable at that URL   200
+     ✓ a missing path is refused   400
+     ✓ a path that isn't a real file is refused, not a crash   400
+
+  Step 19: /api/lib_frames — a still image gets a one-frame cache entry
+     ✓ 200   200
+     ✓ kind is still   still
+     ✓ exactly one frame   1
+     ✓ keeps its own PNG extension   .png
+     ✓ that one frame is really servable   200
+     ✓ asking again still answers 200   200
+     ✓ same slug both times   sarah-rest-pose-corner-300-alpha_c8a17cb5
+
+  Step 20: no handler is defined that the dispatcher cannot reach
+     ✓ unreachable handlers   []
+
+  Step 21: its own cache — cache_avatar_editor/, not the shared cache/
+     ✓ a pair opened   200
+     ✓ it reported a slug   segment_2932db46
+     ✓ the frames landed in cache_avatar_editor/   /Users/carsonkramer/Rentify/Video-Editor/cache_avatar_editor/segment_2932db46
+     ✓ serve.py's CACHE is this tool's own   cache_avatar_editor
+     ✓ editor_base will extract into that same folder   /Users/carsonkramer/Rentify/Video-Editor/cache_avatar_editor
+     ✓ shared/serve.py's borrowed helpers look in that folder too   /Users/carsonkramer/Rentify/Video-Editor/cache_avatar_editor
+
+  Checks:  165/165 passed
+  Result:  PASS

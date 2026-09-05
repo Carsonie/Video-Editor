@@ -1,0 +1,175 @@
+
+Editor Session:  2026-09-02T14:21:35
+Player:          MP4 Splitter v10
+Server:          http://localhost:8845
+
+14:22:13  Open clip      01-intro-and-login         segment.mp4  url=segment_9f51189b/viewer.html
+
+Editor Session:  2026-09-02T14:28:09
+Player:          MP4 Splitter v10
+Server:          http://localhost:8855
+
+14:28:10  Open clip      01-alpha-scene             segment.mp4  url=segment_22137e5c/viewer.html
+14:28:10  Open clip      outside                    x.mp4  REFUSED: not a video under Customers/: ../outside/x.mp4
+14:28:10  + Frame        segment_22137e5c           at=10 count=1 side=right  nb_frames=41
+14:28:10  + Frame        segment_22137e5c           at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+14:28:10  + Frame        ../escape                  at=1 count=1  REFUSED: unknown slug
+14:28:10  - Frame        segment_22137e5c           at=10 count=1 side=left  nb_frames=40
+14:28:10  Undo           segment_22137e5c             nb_frames=40
+14:28:10  Unmark all     segment_22137e5c
+14:28:10  Mark           segment_22137e5c           frame=5 on=True
+14:28:10  Mark           segment_22137e5c           frame=20 on=True
+14:28:10  Mark           segment_22137e5c           frame=5 on=False
+14:28:10  Unmark all     segment_22137e5c
+14:28:10  + Frame        segment_22137e5c           at=10 count=5 side=right  nb_frames=45
+14:28:12  Save scene     segment_22137e5c             nb_frames=45  duration_s=1.8
+14:28:12  Save scene     segment_22137e5c             REFUSED: stale
+14:28:13  Save scene     segment_22137e5c             nb_frames=45  duration_s=1.8
+14:28:13  Discard edits  segment_22137e5c             nb_frames=45
+14:28:13  Unmark all     segment_22137e5c
+14:28:13  Mark           segment_22137e5c           frame=15 on=True
+14:28:13  Mark           segment_22137e5c           frame=30 on=True
+14:28:14  Cut scene      segment_22137e5c             count=3  version=1
+14:28:14  Cut scene      segment_22137e5c             count=3  version=2
+14:28:14  Unmark all     segment_22137e5c
+14:28:14  Cut scene      segment_22137e5c             REFUSED: no break points marked yet
+14:28:14  Reset editor   segment_22137e5c
+14:28:15  Open clip      03-charlie-scene           segment.mp4  url=segment_c6ecc4e2/viewer.html
+14:28:15  Hand off       segment_c6ecc4e2           version=1 names=['a']  REFUSED: nothing has been cut yet
+14:28:15  Mark           segment_c6ecc4e2           frame=10 on=True
+14:28:15  Cut scene      segment_c6ecc4e2             count=2  version=1
+14:28:15  Hand off       segment_c6ecc4e2           version=1 names=['one', 'two']  REFUSED: this clip is not inside a store's videos/<name>/ folder, so there is no video for these scenes to belong to. Cutting still works; the pieces are in /Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/03-charlie-scene/dev/_cuts.
+14:28:15  Hand off       segment_c6ecc4e2           version=1 names=['one']  REFUSED: this clip is not inside a store's videos/<name>/ folder, so there is no video for these scenes to belong to. Cutting still works; the pieces are in /Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/03-charlie-scene/dev/_cuts.
+14:28:15  Hand off       ../escape                  version=1 names=['a']  REFUSED: unknown slug
+14:28:15  Archive        _Editor_Test               folder=sandbox
+14:28:15  Archive        _Editor_Test               folder=sandbox
+14:28:15  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+14:28:15  Open clip      02-bravo-scene             segment.mp4  url=segment_bad6fd89/viewer.html
+
+Editor Session:  2026-09-02T14:28:29
+Player:          MP4 Splitter v10
+Server:          http://localhost:8855
+
+14:28:30  Open clip      01-alpha-scene             segment.mp4  url=segment_22137e5c/viewer.html
+14:28:30  Open clip      outside                    x.mp4  REFUSED: not a video under Customers/: ../outside/x.mp4
+14:28:30  + Frame        segment_22137e5c           at=10 count=1 side=right  nb_frames=41
+14:28:30  + Frame        segment_22137e5c           at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+14:28:30  + Frame        ../escape                  at=1 count=1  REFUSED: unknown slug
+14:28:30  - Frame        segment_22137e5c           at=10 count=1 side=left  nb_frames=40
+14:28:30  Undo           segment_22137e5c             nb_frames=40
+14:28:30  Unmark all     segment_22137e5c
+14:28:30  Mark           segment_22137e5c           frame=5 on=True
+14:28:30  Mark           segment_22137e5c           frame=20 on=True
+14:28:30  Mark           segment_22137e5c           frame=5 on=False
+14:28:30  Unmark all     segment_22137e5c
+14:28:30  + Frame        segment_22137e5c           at=10 count=5 side=right  nb_frames=45
+14:28:32  Save scene     segment_22137e5c             nb_frames=45  duration_s=1.8
+14:28:32  Save scene     segment_22137e5c             REFUSED: stale
+14:28:33  Save scene     segment_22137e5c             nb_frames=45  duration_s=1.8
+14:28:33  Discard edits  segment_22137e5c             nb_frames=45
+14:28:33  Unmark all     segment_22137e5c
+14:28:33  Mark           segment_22137e5c           frame=15 on=True
+14:28:33  Mark           segment_22137e5c           frame=30 on=True
+14:28:34  Cut scene      segment_22137e5c             count=3  version=1
+14:28:35  Cut scene      segment_22137e5c             count=3  version=2
+14:28:35  Unmark all     segment_22137e5c
+14:28:35  Cut scene      segment_22137e5c             REFUSED: no break points marked yet
+14:28:35  Reset editor   segment_22137e5c
+14:28:35  Open clip      03-charlie-scene           segment.mp4  url=segment_c6ecc4e2/viewer.html
+14:28:35  Hand off       segment_c6ecc4e2           version=1 names=['a']  REFUSED: nothing has been cut yet
+14:28:35  Mark           segment_c6ecc4e2           frame=10 on=True
+14:28:35  Cut scene      segment_c6ecc4e2             count=2  version=1
+14:28:35  Hand off       segment_c6ecc4e2           version=1 names=['one', 'two']  REFUSED: this clip is not inside a store's videos/<name>/ folder, so there is no video for these scenes to belong to. Cutting still works; the pieces are in /Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/03-charlie-scene/dev/_cuts.
+14:28:35  Hand off       segment_c6ecc4e2           version=1 names=['one']  REFUSED: this clip is not inside a store's videos/<name>/ folder, so there is no video for these scenes to belong to. Cutting still works; the pieces are in /Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/03-charlie-scene/dev/_cuts.
+14:28:35  Hand off       ../escape                  version=1 names=['a']  REFUSED: unknown slug
+14:28:35  Archive        _Editor_Test               folder=sandbox
+14:28:35  Archive        _Editor_Test               folder=sandbox
+14:28:35  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+14:28:36  Open clip      02-bravo-scene             segment.mp4  url=segment_bad6fd89/viewer.html
+
+Editor Session:  2026-09-02T14:29:28
+Player:          MP4 Splitter v10
+Server:          http://localhost:8855
+
+14:29:28  Open clip      01-alpha-scene             segment.mp4  url=segment_22137e5c/viewer.html
+14:29:28  Open clip      outside                    x.mp4  REFUSED: not a video under Customers/: ../outside/x.mp4
+14:29:28  + Frame        segment_22137e5c           at=10 count=1 side=right  nb_frames=41
+14:29:28  + Frame        segment_22137e5c           at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+14:29:28  + Frame        ../escape                  at=1 count=1  REFUSED: unknown slug
+14:29:28  - Frame        segment_22137e5c           at=10 count=1 side=left  nb_frames=40
+14:29:29  Undo           segment_22137e5c             nb_frames=40
+14:29:29  Unmark all     segment_22137e5c
+14:29:29  Mark           segment_22137e5c           frame=5 on=True
+14:29:29  Mark           segment_22137e5c           frame=20 on=True
+14:29:29  Mark           segment_22137e5c           frame=5 on=False
+14:29:29  Unmark all     segment_22137e5c
+14:29:29  + Frame        segment_22137e5c           at=10 count=5 side=right  nb_frames=45
+14:29:31  Save scene     segment_22137e5c             nb_frames=45  duration_s=1.8
+14:29:31  Save scene     segment_22137e5c             REFUSED: stale
+14:29:31  Save scene     segment_22137e5c             nb_frames=45  duration_s=1.8
+14:29:32  Discard edits  segment_22137e5c             nb_frames=45
+14:29:32  Unmark all     segment_22137e5c
+14:29:32  Mark           segment_22137e5c           frame=15 on=True
+14:29:32  Mark           segment_22137e5c           frame=30 on=True
+14:29:32  Cut scene      segment_22137e5c             count=3  version=1
+14:29:33  Cut scene      segment_22137e5c             count=3  version=2
+14:29:33  Unmark all     segment_22137e5c
+14:29:33  Cut scene      segment_22137e5c             REFUSED: no break points marked yet
+14:29:33  Reset editor   segment_22137e5c
+14:29:33  Open clip      03-charlie-scene           segment.mp4  url=segment_c6ecc4e2/viewer.html
+14:29:33  Hand off       segment_c6ecc4e2           version=1 names=['a']  REFUSED: nothing has been cut yet
+14:29:33  Mark           segment_c6ecc4e2           frame=10 on=True
+14:29:34  Cut scene      segment_c6ecc4e2             count=2  version=1
+14:29:34  Hand off       segment_c6ecc4e2           version=1 names=['one', 'two']  REFUSED: this clip is not inside a store's videos/<name>/ folder, so there is no video for these scenes to belong to. Cutting still works; the pieces are in /Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/03-charlie-scene/dev/_cuts.
+14:29:34  Hand off       segment_c6ecc4e2           version=1 names=['one']  REFUSED: this clip is not inside a store's videos/<name>/ folder, so there is no video for these scenes to belong to. Cutting still works; the pieces are in /Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/03-charlie-scene/dev/_cuts.
+14:29:34  Hand off       ../escape                  version=1 names=['a']  REFUSED: unknown slug
+14:29:34  Archive        _Editor_Test               folder=sandbox
+14:29:34  Archive        _Editor_Test               folder=sandbox
+14:29:34  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+14:29:34  Open clip      02-bravo-scene             segment.mp4  url=segment_bad6fd89/viewer.html
+
+Editor Session:  2026-09-02T14:34:51
+Player:          MP4 Splitter v10
+Server:          http://localhost:8855
+
+14:34:51  Open clip      01-alpha-scene             segment.mp4  url=segment_22137e5c/viewer.html
+14:34:51  Open clip      outside                    x.mp4  REFUSED: not a video under Customers/: ../outside/x.mp4
+14:34:51  + Frame        segment_22137e5c           at=10 count=1 side=right  nb_frames=41
+14:34:51  + Frame        segment_22137e5c           at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+14:34:51  + Frame        ../escape                  at=1 count=1  REFUSED: unknown slug
+14:34:51  - Frame        segment_22137e5c           at=10 count=1 side=left  nb_frames=40
+14:34:51  Undo           segment_22137e5c             nb_frames=40
+14:34:51  Unmark all     segment_22137e5c
+14:34:51  Mark           segment_22137e5c           frame=5 on=True
+14:34:51  Mark           segment_22137e5c           frame=20 on=True
+14:34:51  Mark           segment_22137e5c           frame=5 on=False
+14:34:51  Unmark all     segment_22137e5c
+14:34:52  + Frame        segment_22137e5c           at=10 count=5 side=right  nb_frames=45
+14:34:53  Save scene     segment_22137e5c             nb_frames=45  duration_s=1.8
+14:34:53  Save scene     segment_22137e5c             REFUSED: stale
+14:34:54  Save scene     segment_22137e5c             nb_frames=45  duration_s=1.8
+14:34:54  Discard edits  segment_22137e5c             nb_frames=45
+14:34:54  Unmark all     segment_22137e5c
+14:34:54  Mark           segment_22137e5c           frame=15 on=True
+14:34:54  Mark           segment_22137e5c           frame=30 on=True
+14:34:55  Cut scene      segment_22137e5c             count=3  version=1
+14:34:56  Cut scene      segment_22137e5c             count=3  version=2
+14:34:56  Unmark all     segment_22137e5c
+14:34:56  Cut scene      segment_22137e5c             REFUSED: no break points marked yet
+14:34:56  Reset editor   segment_22137e5c
+14:34:56  Open clip      03-charlie-scene           segment.mp4  url=segment_c6ecc4e2/viewer.html
+14:34:56  Hand off       segment_c6ecc4e2           version=1 names=['a']  REFUSED: nothing has been cut yet
+14:34:56  Mark           segment_c6ecc4e2           frame=10 on=True
+14:34:56  Cut scene      segment_c6ecc4e2             count=2  version=1
+14:34:56  Hand off       segment_c6ecc4e2           version=1 names=['one', 'two']  REFUSED: this clip is not inside a store's videos/<name>/ folder, so there is no video for these scenes to belong to. Cutting still works; the pieces are in /Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/03-charlie-scene/dev/_cuts.
+14:34:56  Hand off       segment_c6ecc4e2           version=1 names=['one']  REFUSED: this clip is not inside a store's videos/<name>/ folder, so there is no video for these scenes to belong to. Cutting still works; the pieces are in /Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/03-charlie-scene/dev/_cuts.
+14:34:56  Hand off       ../escape                  version=1 names=['a']  REFUSED: unknown slug
+14:34:56  Archive        _Editor_Test               folder=sandbox
+14:34:56  Archive        _Editor_Test               folder=sandbox
+14:34:56  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+14:34:57  Open clip      02-bravo-scene             segment.mp4  url=segment_bad6fd89/viewer.html
+
+Editor Session:  2026-09-02T19:49:31
+Player:          MP4 Splitter v11
+Server:          http://localhost:8845
+

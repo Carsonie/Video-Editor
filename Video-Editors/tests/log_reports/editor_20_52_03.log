@@ -1,0 +1,299 @@
+Editor Test:  2026-09-03T20:52:03
+Player:       Segment and Avatar Editor v60
+Backend:      Python — shared/serve.py
+Endpoints:    31 of 31 exercised
+Store:        _Editor_Test  (built, used, deleted)
+Target:       local → http://localhost:8850
+Log:          editor_20_52_03.log
+
+  Step 1: Build the test store
+     ✓ 01-alpha-scene   segment=40 avatar=30 narration=35
+     ✓ 02-bravo-scene   segment=32 avatar=32 narration=28
+     ✓ 03-charlie-scene   segment=25 avatar=18 narration=22
+
+  Step 2: /api/list — browse the store's folders
+     ✓ lists the three scene folders   3
+     ✓ refuses a path outside Customers/   400
+
+  Step 3: /api/siblings — find a scene's other tracks
+     ✓ finds all three scenes   3
+     ✓ pairs the segment with its avatar   scope=sandbox
+     ✓ reports a real base_slug   segment_22137e5c
+     ✓ scene 1 has not been edited yet   False
+
+  Step 4: /api/open — open one clip
+     ✓ built a viewer page   segment_22137e5c
+     ✓ refuses a path outside Customers/   400
+
+  Step 5: /api/frames/map — read the frame map
+     ✓ 40 entries, one per source frame   40
+     ✓ starts as an identity map   1..40
+
+  Step 6: /api/open-pair — the layered view
+     ✓ segment under avatar, both extracted   pair_2dee7b8d14
+
+  Step 7: /api/open-pair-go — and its redirect
+     ✓ redirects to the page it built   302
+
+  Step 8: /api/open-seq — the timeline
+     ✓ three scenes on one timeline   [1, 2, 3]
+     ✓ none missing   []
+
+  Step 9: /api/open-seq-go — and its redirect
+     ✓ redirects to the page it built   302
+
+  Step 10: /api/frames/dup — ＋ Frame
+     ✓ one more frame   41
+     ✓ the new frame repeats frame 10   10
+     ✓ nothing before the insert moved
+     ✓ inserting on the left also adds one   42
+     ✓ refuses a side that is neither left nor right   400
+     ✓ refuses a slug with a separator   400
+
+  Step 11: /api/frames/del — − Frame
+     ✓ two frames gone   40
+     ✓ it removed the two to the LEFT of frame 10, not frame 10   [7, 10, 10]
+     ✓ and reports how many it actually took   2
+     ✓ clamped at the start — nothing before frame 1 to take   0
+     ✓ side=right takes the one after instead   39
+     ✓ put back to 40 for the steps that follow   40
+
+  Step 12: /api/frames/dup-span — ＋ Zone, and Update Frame Imbalance
+     ✓ a 5-frame zone repeated   45
+
+  Step 13: /api/frames/del-span — − Zone
+     ✓ the zone removed again   40
+
+  Step 14: /api/frames/restore — Undo
+     ✓ an edit to undo   43
+     ✓ restore puts the exact map back   40 frames
+
+  Step 15: /api/mark — Mark / Unmark
+     ✓ two marks set   [5, 20]
+     ✓ unmarking removes just that one   [20]
+
+  Step 16: /api/marks — read the marks back
+     ✓ lists what is marked   [20]
+     ✓ refuses a slug with a separator   400
+
+  Step 17: /api/clear-marks — Unmark all
+     ✓ none left   []
+
+  Step 18: /api/save — 💾 Save scene
+     ✓ the file starts at 40 frames   40
+     ✓ no frame-count warning
+     ✓ the FILE now has exactly 45 frames   45
+     ✓ archived the previous file   segment.mp4
+
+  Step 19: /api/save — refuses when the file changed elsewhere first
+     ✓ refused with 409   409
+     ✓ named as a stale conflict   stale
+     ✓ says why, so a caller can act on it   segment.mp4 changed on disk since this was loaded here — probably saved from another tab or tool. Reload it to see the new version, or save again with force to overwrite it anyway.
+     ✓ force overrides the refusal   {'path': '/Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/01-alpha-scene/segment.mp4', 'archived_to': '/Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/01-alpha-scene/z_History/20260903-205217/segment.mp4', 'duration_s': 1.8, 'nb_frames': 45, 'frames_written': 45, 'frames_expected': 45, 'warning': None}
+
+  Step 20: /api/clear-edits — discard the cache's edits
+     ✓ cache re-reads the saved 45-frame file   45
+
+  Step 21: /api/cut — ✂ Cut scene
+     ✓ two break points make three segments   3
+     ✓ written as version 1   1
+     ✓ wrote them to disk   /Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/01-alpha-scene/dev/_cuts
+     ✓ the marks survive the cut   [15, 30]
+     ✓ cutting again keeps the first attempt and bumps the version   2
+     ✓ with no marks at all it refuses   400
+
+  Step 22: /api/reset-editor — reset
+     ✓ returns cleanly   {"ok": true}
+
+  Step 23: /api/vtt — the timing table
+     ✓ one row per script scene   3
+     ✓ the voice's measured words-per-second   3.44
+     ✓ counts the spoken words of scene 1   7
+     ✓ refuses a path outside Customers/   400
+
+  Step 24: /api/line — edit a line in the VTT
+     ✓ the new text comes back   A replacement line for the first scene.
+     ✓ written to script.json   A replacement line for the first scene.
+     ✓ archived the script first
+     ✓ writing the same text is a no-op
+     ✓ whitespace is tidied   spaced out
+     ✓ refuses a scene that is not in the script   400
+
+  Step 25: /api/join — Join, every track
+     ✓ refuses fewer than two scenes   400
+     ✓ refuses a name that is not a slug   400
+     ✓ succeeded
+     ✓ segment is the two lengths added   77
+     ✓ avatar is the two lengths added   62
+     ✓ narration travelled with the avatar   63
+     ✓ two scenes left   2
+     ✓ the third scene was renumbered to 2   (2, 'charlie-scene')
+     ✓ its FOLDER was renamed to match   02-charlie-scene
+     ✓ archived what it consumed   ['join-20260903-205219']
+
+  Step 26: /api/renumber-state — the save-as-a-set lock
+     ✓ set by the join, and survives a reload
+     ✓ and says which scene moved where   [{'from': 3, 'to': 2}]
+
+  Step 27: /api/renumber-clear — lift the lock
+     ✓ cleared once the set is written
+
+  Step 28: /api/split — Split, every track
+     ✓ refuses two halves with the same name   400
+     ✓ refuses a frame past the shorter track   400
+     ✓ leaves NO archive for a split that never ran   []
+     ✓ succeeded
+     ✓ segment head   20
+     ✓ segment tail   57
+     ✓ avatar head   20
+     ✓ avatar tail   42
+     ✓ narration head   20
+     ✓ narration tail   43
+     ✓ three scenes again   3
+     ✓ the line stayed with the first half
+     ✓ the second half is left empty for a human
+     ✓ archived what it cut   ['split-20260903-205221']
+
+  Step 29: /api/clip — the clip's own facts, for a front end that was not generated
+     ✓ only the Go backend serves this — nothing to check here   the Python players generate their pages instead
+
+  Step 30: /api/frames/paste — copy a frame, put it somewhere else
+     ✓ one more frame   26
+     ✓ the pasted frame carries frame 5's SOURCE number   5
+     ✓ the frame it was pasted after is untouched   20
+     ✓ everything after it shifted right by one   21
+     ✓ and the frame it was copied FROM still stands
+     ✓ refuses a target past the end   400
+     ✓ refuses a source past the end   400
+     ✓ refuses a slug with a separator   400
+     ✓ put back for the steps that follow   25
+
+  Step 31: alpha survives a rebuild — the bug that made the avatar vanish
+     ✓ an alpha clip opened   avatar_031b00a2
+     ✓ extracted as PNG, with alpha   .png
+     ✓ and the flag is recorded   True
+     ✓ clear-edits keeps it PNG   .png
+     ✓ clear-edits keeps the alpha flag   True
+     ✓ a SAVE keeps it PNG too   .png
+     ✓ a save keeps the alpha flag   True
+     ✓ and the written file still has real alpha   yuva420p
+
+  Step 32: /api/frames/restore — refuses without destroying anything
+     ✓ an impossible map is refused   400
+     ✓ and the cache is untouched   25
+     ✓ byte for byte, the same map
+     ✓ an empty map is refused   400
+
+  Step 33: one writer per cache folder — six edits at once stay consistent
+     ✓ all six succeeded   []
+     ✓ the count is exactly six more   31
+     ✓ and the files on disk agree   31
+     ✓ put back   25
+
+  Step 34: /api/handoff — the MP4 Splitter's deposit into dev
+     ✓ a live clip to hand off from   segment_c6ecc4e2
+     ✓ refuses before anything has been cut   400
+     ✓ saying so plainly   nothing has been cut yet
+     ✓ two pieces to hand over   2
+     ✓ refuses a clip that is not inside a video folder   400
+     ✓ and it is the guard refusing, not a stale slug or a missing cut   this clip is not inside a store's videos/<name>/ folder, so there is n
+     ✓ refuses when the names do not match the segments   400
+     ✓ refuses a slug with a separator   400
+
+  Step 35: /api/archive — a folder's generation archive
+     ✓ dry run says what it WOULD move, before anyone agrees to it   ['01-head', '02-tail', '03-charlie-scene', 'script.json']
+     ✓ and names the destination it would use   True
+     ✓ nothing moved by a dry run
+     ✓ sandbox is COPIED, not moved — the scenes stay put   moved=False
+     ✓ every scene folder is still there   4 kept
+     ✓ and the snapshot holds the same folders   ['01-head', '02-tail', '03-charlie-scene', 'script.json']
+     ✓ a second archive the same day is v_2, not a clash   2026-09-03-v_2
+     ✓ refuses a folder that is not dev or sandbox   400
+     ✓ refuses a path outside Customers/   400
+
+  Step 36: /api/save-archive — Backup Scenes' whole-generation snapshot
+     ✓ dry run says what it WOULD archive, before anyone agrees to it   ['01-head', '02-tail', '03-charlie-scene', 'script.json']
+     ✓ and names the narrative script alongside the scene folders   ['01-head', '02-tail', '03-charlie-scene', 'script.json']
+     ✓ into sandbox/1000_archive/, not sandbox/z_History/   True
+     ✓ nothing moved by a dry run
+     ✓ archived somewhere real   /Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/1000_archive/26-9-3_v1
+     ✓ sandbox is COPIED, not moved — the scenes stay put   3 kept
+     ✓ the snapshot holds the same scene folders   ['01-head', '02-tail', '03-charlie-scene']
+     ✓ PLUS the narrative script, copied in beside them   /Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/1000_archive/26-9-3_v1
+     ✓ a second archive the same day is _v2, not a clash   26-9-3_v2
+     ✓ refuses a path outside Customers/   400
+
+  Step 37: /api/stores — every store with a video ready to load, for Load
+     ✓ answers 200   200
+     ✓ a list of stores comes back   [{'business': 'Alpine Sports Blue Mountains', 'store': 'alpi
+     ✓ the fixture's folder is not mistaken for a business — wrong depth, correctly excluded   ['Alpine Sports Blue Mountains', 'Rentify Demos Corp', 'Rentify Demos Corp', 'Rentify Demos Corp']
+     ✓ each store names its business   {'business': 'Alpine Sports Blue Mountains', 'store': 'alpine-sports', 'videos': [{'name': '01-first-time-ordering', 'root': 'Alpine Sports Blue Mountains/alpine-sports/help-videos/videos/01-first-time-ordering', 'scenes': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'has_sandbox': True}]}
+     ✓ and its own store name   {'business': 'Alpine Sports Blue Mountains', 'store': 'alpine-sports', 'videos': [{'name': '01-first-time-ordering', 'root': 'Alpine Sports Blue Mountains/alpine-sports/help-videos/videos/01-first-time-ordering', 'scenes': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'has_sandbox': True}]}
+     ✓ and lists at least one video   [{'name': '01-first-time-ordering', 'root': 'Alpine Sports Blue Mountains/alpine-sports/help-videos/videos/01-first-time-ordering', 'scenes': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'has_sandbox': True}]
+     ✓ each video names its scene numbers   {'name': '01-first-time-ordering', 'root': 'Alpine Sports Blue Mountains/alpine-sports/help-videos/videos/01-first-time-ordering', 'scenes': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'has_sandbox': True}
+     ✓ and a root path Load can hand straight to open-seq-go   {'name': '01-first-time-ordering', 'root': 'Alpine Sports Blue Mountains/alpine-sports/help-videos/videos/01-first-time-ordering', 'scenes': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'has_sandbox': True}
+     ✓ and whether sandbox/ has been built yet   {'name': '01-first-time-ordering', 'root': 'Alpine Sports Blue Mountains/alpine-sports/help-videos/videos/01-first-time-ordering', 'scenes': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'has_sandbox': True}
+
+  Step 38: bookends and missing tracks — what a join refuses, and what it fills
+     ✓ the manifest marks which scenes are in the script   in_script
+     ✓ and which have a narration render   has_narration
+     ✓ scene 1 is 01-head, and it has a narration to remove   01-head
+     ✓ refuses a mixed narration without being told to fill   400
+     ✓ and names the track   narration
+     ✓ and the scene missing it   [1]
+     ✓ with fill_gaps it joins
+     ✓ and says what it filled   [1]
+     ✓ the filler is as long as the scene that had none   20
+     ✓ so the narration is the filler plus the one that existed   63 frames, filler was 20
+
+  Step 39: both players' pages — does the JavaScript actually run?
+     ✓ MP4 Splitter: its JavaScript parses   46561 bytes
+     ✓ Segment and Avatar Editor (layered): its JavaScript parses   25534 bytes
+     ✓ Segment and Avatar Editor (timeline): its JavaScript parses   121327 bytes
+
+  ✅ Step 1: Build the test store
+  ✅ Step 2: /api/list — browse the store's folders
+  ✅ Step 3: /api/siblings — find a scene's other tracks
+  ✅ Step 4: /api/open — open one clip
+  ✅ Step 5: /api/frames/map — read the frame map
+  ✅ Step 6: /api/open-pair — the layered view
+  ✅ Step 7: /api/open-pair-go — and its redirect
+  ✅ Step 8: /api/open-seq — the timeline
+  ✅ Step 9: /api/open-seq-go — and its redirect
+  ✅ Step 10: /api/frames/dup — ＋ Frame
+  ✅ Step 11: /api/frames/del — − Frame
+  ✅ Step 12: /api/frames/dup-span — ＋ Zone, and Update Frame Imbalance
+  ✅ Step 13: /api/frames/del-span — − Zone
+  ✅ Step 14: /api/frames/restore — Undo
+  ✅ Step 15: /api/mark — Mark / Unmark
+  ✅ Step 16: /api/marks — read the marks back
+  ✅ Step 17: /api/clear-marks — Unmark all
+  ✅ Step 18: /api/save — 💾 Save scene
+  ✅ Step 19: /api/save — refuses when the file changed elsewhere first
+  ✅ Step 20: /api/clear-edits — discard the cache's edits
+  ✅ Step 21: /api/cut — ✂ Cut scene
+  ✅ Step 22: /api/reset-editor — reset
+  ✅ Step 23: /api/vtt — the timing table
+  ✅ Step 24: /api/line — edit a line in the VTT
+  ✅ Step 25: /api/join — Join, every track
+  ✅ Step 26: /api/renumber-state — the save-as-a-set lock
+  ✅ Step 27: /api/renumber-clear — lift the lock
+  ✅ Step 28: /api/split — Split, every track
+  ✅ Step 29: /api/clip — the clip's own facts, for a front end that was not generated
+  ✅ Step 30: /api/frames/paste — copy a frame, put it somewhere else
+  ✅ Step 31: alpha survives a rebuild — the bug that made the avatar vanish
+  ✅ Step 32: /api/frames/restore — refuses without destroying anything
+  ✅ Step 33: one writer per cache folder — six edits at once stay consistent
+  ✅ Step 34: /api/handoff — the MP4 Splitter's deposit into dev
+  ✅ Step 35: /api/archive — a folder's generation archive
+  ✅ Step 36: /api/save-archive — Backup Scenes' whole-generation snapshot
+  ✅ Step 37: /api/stores — every store with a video ready to load, for Load
+  ✅ Step 38: bookends and missing tracks — what a join refuses, and what it fills
+  ✅ Step 39: both players' pages — does the JavaScript actually run?
+
+  Endpoints:  31/31 exercised
+  Steps:        38 + the store build
+  Checks:     167/167 passed
+  Elapsed:    32s
+  Result:     PASS
+  Log:        editor_20_52_03.log

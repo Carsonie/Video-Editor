@@ -1,0 +1,21 @@
+frame_blender Test Report
+Run:         2026-09-04T13:12:25
+Log:         frame_blender_13_12_25.log
+
+Tests run:   71
+Passed:      71
+Failed:      0
+Result:      PASS
+
+Steps:
+  PASS  Step 1: Build the test store
+  PASS  Step 2: the page ships EMPTY — no scene baked into the HTML
+  PASS  Step 3: web/*.js — does the JavaScript parse, alone and together?
+  PASS  Step 4: load order — no file reads a name declared in a later one
+  PASS  Step 5: stateless — a call that names no pair is refused, even right after opening one
+  PASS  Step 6: /api/stores + /api/load_video — the two-step Load
+  PASS  Step 7: /api/load_store — Frame Blender's Load, proxied to /api/siblings
+  PASS  Step 8: /api/save_scene — proxied to /api/save, refusal included
+  PASS  Step 9: /build_clip — the real one-pass picture+voice build
+  PASS  Step 10: /api/save_mp4 — versioned copy into sandbox_mp4_scenes/, and it actually increments
+  PASS  Step 11: no handler is defined that the dispatcher cannot reach

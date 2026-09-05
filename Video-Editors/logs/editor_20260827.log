@@ -1,0 +1,318 @@
+
+Editor Session:  2026-08-27T00:08:40
+Player:          Segment and Avatar Editor v40
+Server:          http://localhost:8870  (Go)
+
+00:09:39  Open clip      01-login-and-code          segment-v6.mp4  url=segment-v6_50661520/viewer.html
+00:10:25  Mark           segment-v6_50661520        frame=1 on=true
+00:10:25  Mark           segment-v6_50661520        frame=1 on=true
+00:11:15  Open clip      01-alpha-scene             segment.mp4  url=segment_22137e5c/viewer.html
+00:11:18  Mark           segment_22137e5c           frame=10 on=true
+00:11:19  Mark           segment_22137e5c           frame=21 on=true
+00:11:30  + Frame        segment_22137e5c           at=21 count=10 side=right  nb_frames=50
+00:11:42  Undo           segment_22137e5c             nb_frames=40
+00:12:24  Open clip      01-alpha-scene             segment.mp4  url=segment_22137e5c/viewer.html
+00:12:28  Mark           segment_22137e5c           frame=15 on=true
+00:12:35  Cut scene      segment_22137e5c             count=4  version=1
+00:12:50  Hand off       segment_22137e5c           version=1 names=[one two three four]  REFUSED: this clip is not inside a store's videos/<name>/ folder, so there is no video for these scenes to belong to. Cutting still works; the pieces are in /Users/carsonkramer/Rentify/Video-Editor/Customers/_Editor_Test/sandbox/01-alpha-scene/dev/_cuts
+02:52:08  Open timeline  _Editor_Test               root=_Editor_Test ns=  REFUSED: no scenes selected
+02:52:08  Open timeline  _Editor_Test               root=_Editor_Test ns=  REFUSED: no scenes selected
+02:52:10  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+02:52:34  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+02:52:34  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+02:52:41  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+02:52:41  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+02:53:15  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+02:53:15  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+
+Editor Session:  2026-08-27T02:54:03
+Player:          Segment and Avatar Editor v40
+Server:          http://localhost:8870  (Go)
+
+02:54:05  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+02:54:15  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+02:54:15  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+02:54:21  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+02:54:21  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+02:54:52  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+02:54:59  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+02:54:59  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+02:55:33  + Frame        segment_bad6fd89           at=6 count=1 side=right  nb_frames=33
+02:55:33  + Frame        avatar_2879d410            at=6 count=1 side=right  nb_frames=33
+02:55:46  Undo           segment_bad6fd89             nb_frames=32
+02:55:46  Undo           avatar_2879d410              nb_frames=32
+02:56:13  + Frame        avatar_b60d36de            at=30 count=10 side=right  nb_frames=40
+02:56:13  + Frame        avatar_031b00a2            at=18 count=7 side=right  nb_frames=25
+02:56:37  Join           _Editor_Test               ns=[1 2 3] label=joined-up tracks=[segment avatar]  joined=[1 2 3]  label=joined-up  renamed=[]
+02:56:38  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_08eb551d93/viewer.html  slug=seq_08eb551d93
+02:56:38  Open timeline  _Editor_Test               root=_Editor_Test ns=1  url=seq_08eb551d93/viewer.html  slug=seq_08eb551d93
+02:57:28  Open timeline  _Editor_Test               root=_Editor_Test ns=1  url=seq_08eb551d93/viewer.html  slug=seq_08eb551d93
+02:58:03  Split          _Editor_Test               n=1 at=41 labels=[head-half tail-half] tracks=[segment avatar]  split=1  labels=[head-half tail-half]  renamed=[02-tail-half]
+02:58:04  Open timeline  _Editor_Test               root=_Editor_Test ns=1  url=seq_08eb551d93/viewer.html  slug=seq_08eb551d93
+02:58:04  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2  url=seq_b7aa80790a/viewer.html  slug=seq_b7aa80790a
+
+Editor Session:  2026-08-27T08:10:28
+Player:          Segment and Avatar Editor v40
+Server:          http://localhost:8870  (Go)
+
+08:10:57  Open clip      raw_mp4                    ski-demo_owner-one-item_dev_21-16-46_v8.mp4  url=ski-demo_owner-one-item_dev_21-16-46_v8_932e69de/viewer.html
+08:17:09  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+08:17:17  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+08:17:17  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+08:18:10  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+08:18:10  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+
+Editor Session:  2026-08-27T09:01:06
+Player:          Segment and Avatar Editor v40
+Server:          http://localhost:8842
+
+09:01:46  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+09:08:54  + Frame        avatar_09985a1c            at=72 count=16 side=right  nb_frames=88
+09:08:54  + Frame        avatar_7564d72a            at=112 count=49 side=right  nb_frames=161
+09:08:54  + Frame        avatar_574c7220            at=229 count=19 side=right  nb_frames=248
+09:08:54  + Frame        avatar_1fdcfb9e            at=433 count=27 side=right  nb_frames=460
+09:08:54  + Frame        avatar_5455ddd6            at=356 count=9 side=right  nb_frames=365
+09:08:54  + Frame        avatar_06686c97            at=151 count=24 side=right  nb_frames=175
+09:08:54  + Frame        avatar_e2fe0abf            at=80 count=22 side=right  nb_frames=102
+09:08:54  + Frame        avatar_c461c7ec            at=151 count=31 side=right  nb_frames=182
+09:08:54  + Frame        avatar_731604c4            at=177 count=28 side=right  nb_frames=205
+09:08:54  + Frame        avatar_497cef24            at=200 count=75 side=right  nb_frames=275
+
+Editor Session:  2026-08-27T10:28:45
+Player:          Segment and Avatar Editor v41
+Server:          http://localhost:8842
+
+10:28:48  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+10:29:55  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+10:29:55  Archive        Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering folder=sandbox
+
+Editor Session:  2026-08-27T10:31:33
+Player:          Segment and Avatar Editor v41
+Server:          http://localhost:8842
+
+10:31:36  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+
+Editor Session:  2026-08-27T10:52:50
+Player:          Segment and Avatar Editor v42
+Server:          http://localhost:8842
+
+10:52:53  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+
+Editor Session:  2026-08-27T10:57:51
+Player:          Segment and Avatar Editor v43
+Server:          http://localhost:8842
+
+10:57:54  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+
+Editor Session:  2026-08-27T11:01:28
+Player:          Segment and Avatar Editor v43
+Server:          http://localhost:8842
+
+11:01:31  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+11:01:59  Archive        Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering folder=sandbox
+11:02:11  Archive        Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering folder=sandbox
+11:02:11  Lift lock      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+
+Editor Session:  2026-08-27T11:13:49
+Player:          Segment and Avatar Editor v44
+Server:          http://localhost:8842
+
+11:13:52  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+
+Editor Session:  2026-08-27T11:21:15
+Player:          Segment and Avatar Editor v45
+Server:          http://localhost:8842
+
+11:21:18  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+
+Editor Session:  2026-08-27T11:23:48
+Player:          Segment and Avatar Editor v46
+Server:          http://localhost:8842
+
+11:23:51  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+
+Editor Session:  2026-08-27T11:30:18
+Player:          Segment and Avatar Editor v46
+Server:          http://localhost:8842
+
+11:30:21  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5  url=seq_6b1ada2cb2/viewer.html  slug=seq_6b1ada2cb2
+
+Editor Session:  2026-08-27T11:30:46
+Player:          Segment and Avatar Editor v47
+Server:          http://localhost:8842
+
+11:30:50  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+11:35:02  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=1  line=Hi, I'm Sarah. Let me show you how to place your first order with us at Ski Demo rentals. Let's get started. Here are the steps to create your first rental. Enter your email, and we'll send you a 4 digit verification code you can enter here to sign in. This will also create your account.
+11:35:40  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=1  line=Hi, I'm Sarah. Let me show you how to place your first order with us at Ski Demo rentals. Let's get started. Here are the steps to create your first ski rental. Enter your email, and we'll send you a 4 digit verification code you can enter here to sign in. This will also create your account.
+11:37:24  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=1  line=Hi, I'm Sarah. Let me show you how to place your first order with us at Ski Demo rentals. Let's get started. Here are the steps to completing your first ski rental. Enter your email, and we'll send you a 4 digit verification code you can enter here to sign in. This will also create your account.
+11:38:08  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=1  line=Hi, I'm Sarah. Let me show you how to place your first order with us at Ski Demo rentals. Let's get started. Here are the steps to completing your first ski rental. Enter your email, and we'll send you a 4 digit verification code you can enter here to sign in and create your account.
+
+Editor Session:  2026-08-27T11:42:24
+Player:          Segment and Avatar Editor v47
+Server:          http://localhost:8842
+
+11:42:27  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3  url=seq_c601d49153/viewer.html  slug=seq_c601d49153
+
+Editor Session:  2026-08-27T11:43:02
+Player:          Segment and Avatar Editor v48
+Server:          http://localhost:8842
+
+11:43:06  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+
+Editor Session:  2026-08-27T11:48:04
+Player:          Segment and Avatar Editor v49
+Server:          http://localhost:8842
+
+11:48:07  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+11:49:31  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11,99
+
+Editor Session:  2026-08-27T12:00:26
+Player:          Segment and Avatar Editor v50
+Server:          http://localhost:8842
+
+12:00:29  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+12:03:06  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11,99
+12:15:51  Mark           segment_c48f902a           frame=259 on=True
+12:16:16  Mark           segment_c48f902a           frame=334 on=True
+12:17:25  + Frame        segment_c48f902a           at=314 count=1 side=right  nb_frames=461
+12:17:25  + Frame        avatar_1fdcfb9e            at=314 count=1 side=right  nb_frames=461
+12:17:34  + Frame        segment_c48f902a           at=315 count=1 side=right  nb_frames=462
+12:17:34  + Frame        avatar_1fdcfb9e            at=315 count=1 side=right  nb_frames=462
+12:17:40  + Frame        segment_c48f902a           at=316 count=1 side=right  nb_frames=463
+12:17:40  + Frame        avatar_1fdcfb9e            at=316 count=1 side=right  nb_frames=463
+12:18:32  + Frame        segment_c48f902a           at=310 count=1 side=right  nb_frames=464
+12:18:32  + Frame        avatar_1fdcfb9e            at=310 count=1 side=right  nb_frames=464
+12:18:34  + Frame        segment_c48f902a           at=311 count=1 side=right  nb_frames=465
+12:18:34  + Frame        avatar_1fdcfb9e            at=311 count=1 side=right  nb_frames=465
+12:18:37  + Frame        segment_c48f902a           at=312 count=1 side=right  nb_frames=466
+12:18:37  + Frame        avatar_1fdcfb9e            at=312 count=1 side=right  nb_frames=466
+12:19:17  + Frame        segment_c48f902a           at=311 count=1 side=right  nb_frames=467
+12:19:17  + Frame        avatar_1fdcfb9e            at=311 count=1 side=right  nb_frames=467
+12:19:27  + Frame        segment_c48f902a           at=312 count=1 side=right  nb_frames=468
+12:19:27  + Frame        avatar_1fdcfb9e            at=312 count=1 side=right  nb_frames=468
+12:19:28  + Frame        segment_c48f902a           at=313 count=1 side=right  nb_frames=469
+12:19:28  + Frame        avatar_1fdcfb9e            at=313 count=1 side=right  nb_frames=469
+12:19:28  + Frame        segment_c48f902a           at=314 count=1 side=right  nb_frames=470
+12:19:28  + Frame        avatar_1fdcfb9e            at=314 count=1 side=right  nb_frames=470
+12:21:31  Mark           segment_c48f902a           frame=259 on=False
+12:21:40  Mark           segment_c48f902a           frame=185 on=True
+12:22:04  Mark           segment_c48f902a           frame=344 on=False
+12:22:19  Mark           segment_61c06cbe           frame=81 on=True
+12:22:57  Mark           segment_61c06cbe           frame=81 on=False
+12:23:40  Mark           segment_c48f902a           frame=185 on=False
+12:25:25  Mark           segment_1429512a           frame=218 on=True
+12:25:44  Mark           segment_ec84b4ad           frame=84 on=True
+12:26:06  Mark           segment_1429512a           frame=218 on=False
+12:26:09  Mark           segment_1429512a           frame=1 on=True
+
+Editor Session:  2026-08-27T12:36:38
+Player:          Segment and Avatar Editor v51
+Server:          http://localhost:8842
+
+12:36:41  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+12:42:06  Save scene     avatar_09985a1c              nb_frames=88  duration_s=3.52
+12:42:19  Save scene     avatar_7564d72a              nb_frames=161  duration_s=6.44
+12:42:41  Save scene     avatar_574c7220              nb_frames=248  duration_s=9.92
+12:42:47  Save scene     segment_c48f902a             nb_frames=470  duration_s=18.96
+12:43:30  Save scene     avatar_1fdcfb9e              nb_frames=470  duration_s=18.8
+12:44:02  Save scene     avatar_5455ddd6              nb_frames=365  duration_s=14.6
+12:44:18  Save scene     avatar_06686c97              nb_frames=175  duration_s=7.0
+12:44:26  Save scene     avatar_e2fe0abf              nb_frames=102  duration_s=4.08
+12:44:42  Save scene     avatar_c461c7ec              nb_frames=182  duration_s=7.28
+12:45:00  Save scene     avatar_731604c4              nb_frames=205  duration_s=8.2
+12:45:23  Save scene     avatar_497cef24              nb_frames=275  duration_s=11.0
+12:57:57  Archive        Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering folder=sandbox
+12:57:59  Archive        Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering folder=sandbox
+13:00:39  Archive        Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering folder=sandbox
+13:00:39  Archive        Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering folder=sandbox
+13:00:39  Lift lock      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+
+Editor Session:  2026-08-27T13:01:38
+Player:          Segment and Avatar Editor v52
+Server:          http://localhost:8842
+
+13:01:42  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+
+Editor Session:  2026-08-27T13:16:05
+Player:          Segment and Avatar Editor v52
+Server:          http://localhost:8842
+
+13:16:48  Archive        Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering folder=sandbox
+13:16:50  Archive        Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering folder=sandbox
+14:14:39  Archive        Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering folder=sandbox
+14:14:43  Archive        Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering folder=sandbox
+
+Editor Session:  2026-08-27T16:01:27
+Player:          Segment and Avatar Editor v53
+Server:          http://localhost:8842
+
+16:01:30  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+
+Editor Session:  2026-08-27T16:01:59
+Player:          Segment and Avatar Editor v53
+Server:          http://localhost:8842
+
+16:02:02  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+
+Editor Session:  2026-08-27T16:04:42
+Player:          Segment and Avatar Editor v54
+Server:          http://localhost:8842
+
+16:04:45  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+
+Editor Session:  2026-08-27T16:05:51
+Player:          Segment and Avatar Editor v54
+Server:          http://localhost:8842
+
+16:05:54  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+
+Editor Session:  2026-08-27T16:09:35
+Player:          Segment and Avatar Editor v55
+Server:          http://localhost:8842
+
+16:09:38  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+
+Editor Session:  2026-08-27T16:09:56
+Player:          Segment and Avatar Editor v55
+Server:          http://localhost:8842
+
+16:09:59  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+
+Editor Session:  2026-08-27T16:10:19
+Player:          Segment and Avatar Editor v55
+Server:          http://localhost:8842
+
+16:10:22  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+
+Editor Session:  2026-08-27T16:10:52
+Player:          Segment and Avatar Editor v55
+Server:          http://localhost:8842
+
+16:10:55  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+16:13:48  Mark           segment_1429512a           frame=1 on=False
+
+Editor Session:  2026-08-27T21:52:43
+Player:          Segment and Avatar Editor v55
+Server:          http://localhost:8842
+
+21:52:45  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+21:53:55  Archive        Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering folder=sandbox
+21:54:02  Archive        Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering folder=sandbox
+
+Editor Session:  2026-08-27T22:38:24
+Player:          Segment and Avatar Editor v55
+Server:          http://localhost:8842
+
+22:38:27  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  url=seq_f6dc262a8c/viewer.html  slug=seq_f6dc262a8c
+22:39:08  Save scene     avatar_155a8939              nb_frames=482  duration_s=19.28
+22:39:13  Save scene     avatar_09985a1c              nb_frames=88  duration_s=3.52
+22:39:20  Save scene     avatar_7564d72a              nb_frames=161  duration_s=6.44
+22:39:32  Save scene     avatar_574c7220              nb_frames=248  duration_s=9.92
+22:39:54  Save scene     avatar_1fdcfb9e              nb_frames=470  duration_s=18.8
+22:40:12  Save scene     avatar_5455ddd6              nb_frames=365  duration_s=14.6
+22:40:21  Save scene     avatar_06686c97              nb_frames=175  duration_s=7.0
+22:40:26  Save scene     avatar_e2fe0abf              nb_frames=102  duration_s=4.08
+22:40:35  Save scene     avatar_c461c7ec              nb_frames=182  duration_s=7.28
+22:40:45  Save scene     avatar_731604c4              nb_frames=205  duration_s=8.2
+22:40:57  Save scene     avatar_497cef24              nb_frames=275  duration_s=11.0
+22:41:25  Save scene     avatar_09985a1c              nb_frames=88  duration_s=3.52

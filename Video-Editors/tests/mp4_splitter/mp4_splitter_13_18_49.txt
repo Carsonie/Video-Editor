@@ -1,0 +1,33 @@
+mp4_splitter Test Report
+Run:         2026-09-04T13:18:49
+Log:         mp4_splitter_13_18_49.log
+
+Tests run:   102
+Passed:      102
+Failed:      0
+Result:      PASS
+
+Steps:
+  PASS  Step 1: Build the test store
+  PASS  Step 2: the landing page — clean title, no scene baked in
+  PASS  Step 3: /api/list — browse the store's folders
+  PASS  Step 4: /api/open — open one clip
+  PASS  Step 5: its own cache — cache/mp4-splitter/, not the shared cache/
+  PASS  Step 6: /api/frames/map — read the frame map
+  PASS  Step 7: /api/frames/dup — ＋ Frame
+  PASS  Step 8: /api/frames/del — − Frame
+  PASS  Step 9: /api/frames/restore — Undo
+  PASS  Step 10: /api/mark, /api/marks, /api/clear-marks — Mark / Unmark / Unmark all
+  PASS  Step 11: /api/save — 💾 Save scene
+  PASS  Step 12: /api/save — refuses when the file changed elsewhere first
+  PASS  Step 13: /api/clear-edits — discard the cache's edits
+  PASS  Step 14: /api/cut — ✂ Cut scene
+  PASS  Step 15: /api/reset-editor — reset
+  PASS  Step 16: /api/handoff — the deposit into dev
+  PASS  Step 17: /api/archive — a folder's generation archive
+  PASS  Step 18: routes this split deliberately dropped — confirmed gone, not just unused
+  PASS  Step 19: its own dedicated session log
+  PASS  Step 20: /api/clip — the page ships empty and the clip arrives over the API
+  PASS  Step 21: a stale viewer.html on disk is ignored, not served
+  PASS  Step 22: the pages' JavaScript — does it actually parse?
+  PASS  Step 23: no handler is defined that the dispatcher cannot reach

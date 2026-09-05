@@ -1,0 +1,23 @@
+editor_base Test Report
+Run:         2026-09-03T22:03:22
+Log:         editor_base_22_03_22.log
+
+Tests run:   41
+Passed:      35
+Failed:      6
+Result:      FAIL
+
+Steps:
+  PASS  Step 1: editor_base is pure — no routes, no handlers, no HTTP
+  PASS  Step 2: frames.CACHE — the one piece of state, and it is reachable
+  PASS  Step 3: the pure functions, against real footage
+  PASS  Step 4: paths — the filename shapes every editor agrees on
+  FAIL  Step 5: no editor keeps its own copy of what this package owns
+
+Failures:
+  - mp4_splitter/paths.py is gone   still there
+  - mp4_splitter/frames.py is gone   still there
+  - segment_avatar_editor/paths.py is gone   still there
+  - segment_avatar_editor/frames.py is gone   still there
+  - shared/paths.py is gone   still there
+  - shared/frames.py is gone   still there

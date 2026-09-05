@@ -1,0 +1,31 @@
+avatar_editor Test Report
+Run:         2026-09-03T12:51:24
+Log:         avatar_editor_12_51_24.log
+
+Tests run:   210
+Passed:      210
+Failed:      0
+Result:      PASS
+
+Steps:
+  PASS  Step 1: Build the test store
+  PASS  Step 2: the page ships EMPTY — no scene baked into the HTML
+  PASS  Step 3: web/*.js — does the JavaScript actually parse, alone and together?
+  PASS  Step 4: Audio Menu — the OriginalAudio stack is wired to the checkboxes
+  PASS  Step 5: each panel's Play button drives its OWN player, not a shared one
+  PASS  Step 6: Working Clips — the panel, saving into it, and replacing from it
+  PASS  Step 7: the common library panel exists and is wired through, not bolted on
+  PASS  Step 8: the store panel's header names the store and video, not the folder
+  PASS  Step 9: the common panel's title, and both panels' loading spinners
+  PASS  Step 10: tooltips — every control says what it does, after 3 seconds
+  PASS  Step 11: stateless — a call that names no pair is refused, even right after opening one
+  PASS  Step 12: /api/stores + /api/load_video — the two-step Load
+  PASS  Step 13: /api/load_store — Avatar Editor's Load, proxied to /api/siblings
+  PASS  Step 14: /api/save_scene — proxied to /api/save, refusal included
+  PASS  Step 15: /api/libs_list — ski-demo's own sarah_clips/, its loose leftovers
+  PASS  Step 16: Sarah's common library — /api/libs_list?source=common
+  PASS  Step 17: source=common resolves against Sarah/, never against Customers/
+  PASS  Step 18: source=common media — the real bytes, not just metadata
+  PASS  Step 19: sarah_clips/libs/'s 7 folder names line up with Sarah/'s own
+  PASS  Step 20: /api/lib_frames — a real .webm clip
+  PASS  Step 21: /api/lib_frames — a still image gets a one-frame cache entry

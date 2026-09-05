@@ -1,0 +1,45 @@
+segment_avatar_editor Test Report
+Run:         2026-09-04T13:22:47
+Log:         segment_avatar_editor_13_22_47.log
+
+Tests run:   107
+Passed:      107
+Failed:      0
+Result:      PASS
+
+Steps:
+  PASS  Step 1: Build the test store
+  PASS  Step 2: the landing page — clean title, sandbox scenes only
+  PASS  Step 3: /api/list — browse the store's folders
+  PASS  Step 4: /api/siblings — find a scene's other tracks
+  PASS  Step 5: /api/stores — every store with a video ready to load, sandbox only
+  PASS  Step 6: a scene's own base slug, off a timeline
+  PASS  Step 7: /api/open-seq — the timeline
+  PASS  Step 8: /api/open-seq-go — and its redirect
+  PASS  Step 9: its own cache — cache/segment-avatar-editor/, not the shared cache/
+  PASS  Step 10: /api/frames/map — read the frame map (base half of the pair)
+  PASS  Step 11: /api/frames/dup — ＋ Frame
+  PASS  Step 12: /api/frames/del — − Frame
+  PASS  Step 13: /api/frames/dup-span — ＋ Zone, and Update Frame Imbalance
+  PASS  Step 14: /api/frames/del-span — − Zone
+  PASS  Step 15: /api/frames/restore — Undo
+  PASS  Step 16: /api/frames/paste — copy a frame, put it somewhere else
+  PASS  Step 17: /api/mark, /api/marks, /api/clear-marks — Mark / Unmark / Unmark all
+  PASS  Step 18: /api/save — 💾 Save scene
+  PASS  Step 19: /api/save — refuses when the file changed elsewhere first
+  PASS  Step 20: /api/cut — ✂ Cut scene
+  PASS  Step 21: /api/vtt — the timing table
+  PASS  Step 22: /api/line — edit a line in the VTT
+  PASS  Step 23: /api/join — Join, every track
+  PASS  Step 24: /api/renumber-state — the save-as-a-set lock
+  PASS  Step 25: /api/renumber-clear — lift the lock
+  PASS  Step 26: /api/split — Split, every track
+  PASS  Step 27: /api/archive — a folder's generation archive
+  PASS  Step 28: /api/save-archive — Backup Scenes' whole-generation snapshot
+  PASS  Step 29: routes this split deliberately dropped — confirmed gone, not just unused
+  PASS  Step 30: its own dedicated session log
+  PASS  Step 31: /api/view — the pages ship empty and the view arrives over the API
+  PASS  Step 32: a deeper path is a 404, never the layered page
+  PASS  Step 33: a pre-migration cache still serves its own page
+  PASS  Step 34: all three of its own pages — does the JavaScript actually run?
+  PASS  Step 35: no handler is defined that the dispatcher cannot reach

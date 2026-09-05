@@ -1,0 +1,146 @@
+
+Editor Session:  2026-08-29T09:49:45
+Player:          Segment and Avatar Editor v55
+Server:          http://localhost:8842
+
+
+Editor Session:  2026-08-29T10:01:30
+Player:          Segment and Avatar Editor v55
+Server:          http://localhost:8842
+
+
+Editor Session:  2026-08-29T10:41:58
+Player:          Segment and Avatar Editor v55
+Server:          http://localhost:8842
+
+10:42:06  Save All archive Customers/Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Customers/Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering  REFUSED: not a folder under Customers/: Customers/Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+10:42:20  Save All archive Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+10:44:19  Open timeline                               REFUSED: no scenes selected
+10:44:50  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11
+10:44:57  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11
+10:45:50  Save All archive Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+10:45:51  Save scene     segment_7b72bbbc             nb_frames=482  duration_s=19.28
+10:46:15  Save scene     avatar_155a8939              nb_frames=482  duration_s=19.28
+10:46:16  Save scene     segment_cf85c03a             nb_frames=88  duration_s=3.52
+10:46:20  Save scene     avatar_09985a1c              nb_frames=88  duration_s=3.52
+10:46:22  Save scene     segment_2f32e472             nb_frames=161  duration_s=6.44
+10:46:29  Save scene     avatar_7564d72a              nb_frames=161  duration_s=6.44
+10:46:41  Save scene     avatar_574c7220              nb_frames=248  duration_s=9.92
+10:46:45  Save scene     segment_c48f902a             nb_frames=470  duration_s=18.8
+10:47:07  Save scene     avatar_1fdcfb9e              nb_frames=470  duration_s=18.8
+10:47:10  Save scene     segment_61c06cbe             nb_frames=365  duration_s=14.6
+10:47:26  Save scene     avatar_5455ddd6              nb_frames=365  duration_s=14.6
+10:47:28  Save scene     segment_5d56f71a             nb_frames=175  duration_s=7.0
+10:47:36  Save scene     avatar_06686c97              nb_frames=175  duration_s=7.0
+10:47:38  Save scene     segment_0d4e532f             nb_frames=102  duration_s=4.08
+10:47:42  Save scene     avatar_e2fe0abf              nb_frames=102  duration_s=4.08
+10:47:44  Save scene     segment_6e4d6bf0             nb_frames=182  duration_s=7.28
+10:47:52  Save scene     avatar_c461c7ec              nb_frames=182  duration_s=7.28
+10:47:54  Save scene     segment_0872a4bd             nb_frames=205  duration_s=8.2
+10:48:03  Save scene     avatar_731604c4              nb_frames=205  duration_s=8.2
+10:48:05  Save scene     segment_1429512a             nb_frames=275  duration_s=11.0
+10:48:16  Save scene     avatar_497cef24              nb_frames=275  duration_s=11.0
+10:48:16  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=1  line=Enter your email, and we'll send you a 4 digit verification code you can enter here to sign in and create your account.
+10:48:16  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=2  line=From your dashboard, tap New Order to begin.
+10:48:16  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=3  line=We need to add a person to the order. You can add yourself, or invite a party member.
+10:48:16  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=4  line=To search for a rental item, first select a collection. The collections hold groups of like or similar items, that can come with variants, such as different sizes or colours.
+10:48:16  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=5  line=Select your rental starting date, and then your return date. For a one day rental, select the same day twice. You will see the start and end date, as well as the number of rental days you have chosen in the status bar. Review your order, taking a moment to check that your rental dates and the prices are correct.
+10:48:16  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=6  line=Please answer some questions for us here, so we can expedite the preparation of your rental items. Then when you arrive at the store to pick up your items, you are getting the fastest possible service. Also review and agree to our rental terms and agreements.
+10:48:16  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=7  line=Review your total, then continue to payment. Take a moment to check your rental dates and the price are correct.
+10:48:16  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=8  line=Enter your credit card details to complete your rental order.
+10:48:16  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=9  line=That's it — your order is complete. Your invoice is ready, and your items will be waiting for you at the store.
+10:48:16  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=10  line=You can always find your rental in your order history. And your current settings will be saved for your next visit.
+10:48:16  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=11  line=You can now logout, using our dropdown menu in the top right corner. Thank you for renting with Ski Demo. We hope you have a great time on the slopes!
+
+Editor Session:  2026-08-29T10:53:01
+Player:          Segment and Avatar Editor v55
+Server:          http://localhost:8842
+
+10:54:30  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5  REFUSED: scene 4: ffmpeg extraction failed:
+[image2 @ 0xb50c17980] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 188 >= 186
+    Last message repeated 2 times
+[mjpeg @ 0xb4f800000] Invalid pts (186) <= last (186)
+[image2 @ 0xb50c17980] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 188 >= 186
+[mjpeg @ 0xb4f801880] Invalid pts (186) <= last (187)
+[image2 @ 0xb50c17980] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 188 >= 186
+[mjpeg @ 0xb4f801180] Invalid pts (186) <= last (188)
+[image2 @ 0xb50c17980] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 188 >= 186
+[mjpeg @ 0xb4f800700] Invalid pts (186) <= last (186)
+[image2 @ 0xb50c17980] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 188 >= 186
+[vost#0:0/mjpeg @ 0xb50c80000] [enc:mjpeg @ 0xb510242a0] Error submitting video frame to the encoder
+[vost#0:0/mjpeg @ 0xb50c80000] [enc:mjpeg @ 0xb510242a0] Error encoding a frame: Invalid argument
+[vost#0:0/mjpeg @ 0xb50c80000] Task finished with error code: -22 (Invalid argument)
+[vost#0:0/mjpeg @ 0xb50c80000] Terminating thread with return code -22 (Invalid argument)
+[mjpeg @ 0xb4f800e00] Invalid pts (186) <= last (186)
+10:54:34  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5  REFUSED: scene 4: ffmpeg extraction failed:
+[image2 @ 0x892c1b980] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 188 >= 186
+    Last message repeated 3 times
+[mjpeg @ 0x891800700] Invalid pts (186) <= last (186)
+[image2 @ 0x892c1b980] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 188 >= 186
+[mjpeg @ 0x891800380] Invalid pts (186) <= last (187)
+[image2 @ 0x892c1b980] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 188 >= 186
+[mjpeg @ 0x891800a80] Invalid pts (186) <= last (188)
+[image2 @ 0x892c1b980] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 188 >= 186
+[vost#0:0/mjpeg @ 0x892c30000] [enc:mjpeg @ 0x892c142a0] Error submitting video frame to the encoder
+[vost#0:0/mjpeg @ 0x892c30000] [enc:mjpeg @ 0x892c142a0] Error encoding a frame: Invalid argument
+[vost#0:0/mjpeg @ 0x892c30000] Task finished with error code: -22 (Invalid argument)
+[vost#0:0/mjpeg @ 0x892c30000] Terminating thread with return code -22 (Invalid argument)
+[mjpeg @ 0x891800e00] Invalid pts (186) <= last (186)
+10:54:35  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5  REFUSED: scene 4: ffmpeg extraction failed:
+[mjpeg @ 0xa78ca8700] Invalid pts (186) <= last (188)
+[mjpeg @ 0xa78ca9500] Invalid pts (186) <= last (186)
+[vost#0:0/mjpeg @ 0xa78c58000] [enc:mjpeg @ 0xa790242a0] Error submitting video frame to the encoder
+[vost#0:0/mjpeg @ 0xa78c58000] [enc:mjpeg @ 0xa790242a0] Error encoding a frame: Invalid argument
+[vost#0:0/mjpeg @ 0xa78c58000] Task finished with error code: -22 (Invalid argument)
+[vost#0:0/mjpeg @ 0xa78c58000] Terminating thread with return code -22 (Invalid argument)
+10:54:37  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5  REFUSED: scene 4: ffmpeg extraction failed:
+[mjpeg @ 0x757801c00] Invalid pts (186) <= last (186)
+[image2 @ 0x758c1f980] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 188 >= 186
+    Last message repeated 1 times
+[vost#0:0/mjpeg @ 0x758c34000] [enc:mjpeg @ 0x758c182a0] Error submitting video frame to the encoder
+[vost#0:0/mjpeg @ 0x758c34000] [enc:mjpeg @ 0x758c182a0] Error encoding a frame: Invalid argument
+[vost#0:0/mjpeg @ 0x758c34000] Task finished with error code: -22 (Invalid argument)
+[vost#0:0/mjpeg @ 0x758c34000] Terminating thread with return code -22 (Invalid argument)
+10:55:51  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5  REFUSED: scene 4: ffmpeg extraction failed:
+[mjpeg @ 0xc0accca80] Invalid pts (186) <= last (186)
+[image2 @ 0xc0ac17980] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 188 >= 186
+    Last message repeated 1 times
+[mjpeg @ 0xc0accd180] Invalid pts (186) <= last (186)
+[vost#0:0/mjpeg @ 0xc0ac7c000] [enc:mjpeg @ 0xc0b0242a0] Error submitting video frame to the encoder
+[vost#0:0/mjpeg @ 0xc0ac7c000] [enc:mjpeg @ 0xc0b0242a0] Error encoding a frame: Invalid argument
+[vost#0:0/mjpeg @ 0xc0ac7c000] Task finished with error code: -22 (Invalid argument)
+[vost#0:0/mjpeg @ 0xc0ac7c000] Terminating thread with return code -22 (Invalid argument)
+
+Editor Session:  2026-08-29T11:53:21
+Player:          Segment and Avatar Editor v55
+Server:          http://localhost:8842
+
+11:53:27  Save All archive Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+11:53:33  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11  REFUSED: scene 4: ffmpeg extraction failed:
+[mjpeg @ 0x82d104e00] Invalid pts (186) <= last (186)
+[image2 @ 0x82cc1b980] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 188 >= 186
+    Last message repeated 2 times
+[vost#0:0/mjpeg @ 0x82d0d4000] [enc:mjpeg @ 0x82cc142a0] Error submitting video frame to the encoder
+[vost#0:0/mjpeg @ 0x82d0d4000] [enc:mjpeg @ 0x82cc142a0] Error encoding a frame: Invalid argument
+[vost#0:0/mjpeg @ 0x82d0d4000] Task finished with error code: -22 (Invalid argument)
+[vost#0:0/mjpeg @ 0x82d0d4000] Terminating thread with return code -22 (Invalid argument)
+11:54:07  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11
+11:55:04  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11
+11:55:31  Open timeline  Rentify Demos Corp/canoe-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/canoe-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10
+11:55:59  Save All archive Rentify Demos Corp/canoe-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/canoe-demo/help-videos/videos/01-first-time-ordering
+11:56:14  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11
+12:06:07  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11
+12:09:03  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11
+12:14:24  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1
+12:40:02  Edit line      Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering n=1  line=Hi, I'm Sarah. Let me show you how to place your first order with us at Ski Demo rentals. Let's get started. Here are the steps to completing your first ski rental. Enter your email, and we'll send you a 4 digit verification code you can enter here to sign in. This will also create your account.
+
+Editor Session:  2026-08-29T12:52:40
+Player:          Segment and Avatar Editor v55
+Server:          http://localhost:8842
+
+12:52:50  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2,3,4,5,6,7,8,9,10,11
+12:53:07  Save All archive Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering
+13:43:19  Mark           segment_7b72bbbc           frame=90 on=True
+13:43:57  Open timeline  Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering root=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering ns=1,2
+15:06:05  Mark           segment_7b72bbbc           frame=90 on=False
+15:13:21  Open layered                              base=Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering/sandbox/01-opening-with-login/segment.mp4  url=pair_20fb8de9c2/viewer.html  slug=pair_20fb8de9c2
