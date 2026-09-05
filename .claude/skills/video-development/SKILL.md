@@ -9,6 +9,10 @@ user_invocable: true
 Small jobs done *while looking at an editor*, as opposed to running the
 pipeline. Each one below has already cost time once.
 
+**Paths and commands here run from `Video-Editors/`** — the repo root was
+split on 2026-09-04 into `Customers/` and `Video-Editors/`. A `sandbox/...`
+or `Customers/...` path is the exception: those live under `../Customers/`.
+
 **This skill is the HOW. The WHAT lives elsewhere — do not restate it here:**
 
 - **`sarah-library`** — what a still is, the three-file set, the naming, the
@@ -121,7 +125,7 @@ Three files hold "the same" frame and only ONE is right.
 
 | source | size | frame-aligned? | use it? |
 |---|---|---|---|
-| `cache/<editor>/<slug>/frames/frame_NNNNN.png` | 750px canvas, she is ~191×198 | yes | **no** — too small, a 300px still would be upscaled |
+| `Video-Editors/cache/<editor>/<slug>/frames/frame_NNNNN.png` | 750px canvas, she is ~191×198 | yes | **no** — too small, a 300px still would be upscaled |
 | `sandbox/<scene>/avatar.webm` | 1152×1152, she is ~294×304 | **yes** | **YES** — near 1:1 for a 300px corner still |
 | `sandbox/<scene>/narration.webm` | 1920×1080, full-body seated | **NO** | **no** — see below |
 

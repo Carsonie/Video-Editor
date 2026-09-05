@@ -16,6 +16,40 @@ folders — and receives finished videos.
 
 ---
 
+## The root is TWO folders, and every command runs from `Video-Editors/`
+
+Restructured 2026-09-04, because Carson works in the customer files far more
+than in the tools and the two were interleaved at the root.
+
+```
+Video-Editor/
+├── Customers/       the videos — this is the work
+└── Video-Editors/   the code: the editors, build/, tests/, shared/,
+                     editor_base/, Sarah/, cache/, PIPELINE.md, Makefile
+```
+
+`.git`, `.gitignore`, `.claude/` and this file **stay at the root and have
+to.** A skill only registers at `.claude/skills/<folder>/SKILL.md` relative
+to the PROJECT root — move `.claude/` down and every skill here goes
+invisible with no error at all. `.gitignore`'s `Customers/**` rules are
+root-relative too, and `core.hooksPath` is `.githooks`.
+
+**So: `cd Video-Editors` first.** Every `python3 build/...`,
+`python3 tests/...`, `python3 shared/...` and `make` in this file, in
+`PIPELINE.md` and in the skills is written from there, and none of them
+work from the root. Paths written as `shared/serve.py` or `cache/` mean
+`Video-Editors/shared/serve.py` and `Video-Editors/cache/`.
+
+**A path starting `Customers/` is the exception** — that folder did NOT
+move, so from `Video-Editors/` it is `../Customers`.
+
+The editors themselves needed no change: `shared/serve.py`'s
+`find_repo_root()` walks UP until it finds a folder holding `Customers/`,
+so one level deeper resolves the same. `tests/fixture.py` counted levels
+instead and every suite died at once; it walks up now too.
+
+---
+
 ## When Carson asks for a "vtt" / "VTT"
 
 Read **`.claude/skills/vtt/SKILL.md`** first, every time. It is the source of
@@ -221,8 +255,8 @@ the editors that would have nothing to open. See `ToDo.md` P3.5.
 without limit. Trim it:
 
 ```bash
-python3 build/trim_history.py "Customers"           # shows, deletes nothing
-python3 build/trim_history.py "Customers" --apply   # keeps the 3 newest
+python3 build/trim_history.py "../Customers"           # shows, deletes nothing
+python3 build/trim_history.py "../Customers" --apply   # keeps the 3 newest
 ```
 
 It removes every `z_History` nested inside another one first — a backup does not

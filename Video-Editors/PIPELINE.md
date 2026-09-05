@@ -1,5 +1,13 @@
 # PIPELINE — how a help video gets made
 
+> **Run everything below from `Video-Editors/`.** The root was split on
+> 2026-09-04 into `Customers/` and `Video-Editors/`; every `python3 build/...`
+> and `python3 shared/...` here is written from inside the latter. A path
+> starting `Customers/` is the exception — that folder did not move, so from
+> here it is `../Customers`. See the repo's `CLAUDE.md`.
+
+
+
 **Four stores, six E2E scenarios each — 24 help videos.** Video 01,
 *First Time Ordering*, is built for all four stores and released for three
 of them; videos 02–06 have not been started for any. Every one of them
@@ -314,8 +322,8 @@ working state would add its full size again, permanently. **`z_History` is the
 only undo there is** — which is also why it grows without limit.
 
 ```bash
-python3 build/trim_history.py "Customers"           # shows, deletes nothing
-python3 build/trim_history.py "Customers" --apply   # keeps the 3 newest
+python3 build/trim_history.py "../Customers"           # shows, deletes nothing
+python3 build/trim_history.py "../Customers" --apply   # keeps the 3 newest
 ```
 
 It deletes every `z_History` nested inside another one first: a backup does not

@@ -1,6 +1,6 @@
 ---
 name: vtt
-description: Print a help video's Video Timing Table — per scene, how long the demo footage runs, how long Sarah's line takes to say, and the gap between them. Use when checking a store's video timing before or after a build, or when asked to "show the vtt" for a video.
+description: A help video's Video Timing Table — per scene, how long the demo footage runs, how long Sarah's line takes to say, and the gap between them. THE VOICE COMMAND "Show me the VTT" (also "show the vtt", "vtt for <store>") means BUILD THE HTML TABLE AND OPEN IT IN A NEW CHROME TAB — not a chat table, not the CLI output. Use whenever that phrase is said or typed, when checking a store's video timing before or after a build, or when asked about dead air, gaps, speech length or scene frame counts.
 user_invocable: true
 ---
 
@@ -10,7 +10,7 @@ Not to be confused with WebVTT (`.vtt` subtitles). Different thing entirely.
 
 The tool lives in this repo:
 
-    shared/vtt.py
+    editor_base/vtt.py       (run it as `python3 -m editor_base.vtt`)
 
 ## What it does
 
@@ -22,9 +22,15 @@ until someone actually watches the finished video.
 ## Running it
 
 ```bash
-cd ~/Rentify/Video-Editor
-python3 shared/vtt.py "Customers/<Business>/<store>/help-videos/videos/<NN-slug>"
+cd ~/Rentify/Video-Editor/Video-Editors
+python3 -m editor_base.vtt "<video folder>"
 ```
+
+⚠ **Not `python3 shared/vtt.py`.** That path still exists but is a re-export
+shim with no command line left in it — it runs, prints NOTHING, and exits 0,
+which reads exactly like a video with no scenes. Corrected 2026-09-04 after
+it silently did nothing. `-m` is required: run `editor_base/vtt.py` by path
+and it cannot import its own package.
 
 (For a store still on the old flat layout, point it at `help-videos/final`
 instead.)
@@ -55,13 +61,64 @@ large enough to read as a stall (see the `sae-video-building` skill's "closing
 hold" and "held frame" notes for what counts as normal versus worth a second
 look).
 
-## "Show me the vtt" means THIS table, by default
+## 🔊 VOICE COMMAND — "Show me the VTT"
 
-When asked to "show the vtt" for a video, show the **combined table**
-below (timing + frame counts + a narrative row under every scene) — not
-`vtt.py`'s plain CLI output. The CLI output is still what feeds it (see
-"Running it" above), but it is a source, not the thing to display. Only
-show the plain CLI table instead if asked for it specifically by name.
+Carson's phrase, 2026-09-04. Said out loud or typed, it means **one thing**:
+
+```bash
+cd ~/Rentify/Video-Editor/Video-Editors
+python3 build/vtt_html.py "<video folder>" --open
+```
+
+That writes `<video folder>/video/vtt.html` and opens it in a **new Chrome
+tab**. Then say what it shows — the totals and anything flagged. Do not
+paste the table into chat as well; the page is the answer.
+
+**This replaced the markdown table as the default output.** The combined
+markdown table further down is still correct and still what to use when the
+answer belongs *inside* a reply — a single scene, a quick comparison. The
+plain CLI output is a source, not something to show.
+
+### Which video? Infer it, then say which one you picked
+
+Usually obvious from the conversation: the store and video just built,
+edited, or discussed. State your choice in one line — *"ski-demo
+01-first-time-ordering, v33"* — so a wrong guess is caught before a tab
+opens.
+
+**If two are genuinely in play, or none is, ASK.** Do not default to
+ski-demo because it is the most worked-on. One short question beats a table
+for the wrong store, which looks right and is not.
+
+### Which build? `script_v<N>.json`, and it is a real choice
+
+`--version 33` reads `video/script_v33.json`, the snapshot of the script
+that produced `..._v33.mp4`. With no `--version` it takes the newest one,
+and with no snapshots at all it falls back to `sandbox/script.json`.
+
+The **lines** come from that file; the **numbers** always come from
+`sandbox/` on disk. So a VTT for an old build shows that build's words
+against today's footage. That is usually what is wanted right after a
+build — say which script was read, and the page's footer says so too.
+
+### The tab label matters
+
+The page's `<title>` becomes the Chrome tab, and it is built as
+`<store> VTT v<N>` — **`ski-demo VTT v33`**. Several of these get opened at
+once and a tab that just says "vtt" is no use. The script does this; do not
+hand-edit it to something generic.
+
+### What the page shows
+
+Per scene: clip length, speech length, gap, and the segment / avatar /
+narration frame counts, with the line Sarah says on its own row underneath.
+A summary strip on top: clip, said, dead air %, scenes over 2.5s, words,
+frames.
+
+It also raises the trap from "The combined table" below — any scene whose
+avatar is **shorter than its own `narration.webm`** gets flagged, because
+`segment = avatar` looks tidy and can mean the avatar was trimmed to fit,
+cutting the end off her line.
 
 ## Source: always `sandbox/`, never `dev/`, never anything else
 
@@ -86,9 +143,9 @@ or explaining why `assemble_video.py` printed `clip held` on a scene —
 pull both together:
 
 ```bash
-cd ~/Rentify/Video-Editor
+cd ~/Rentify/Video-Editor/Video-Editors
 
-python3 shared/vtt.py "<video folder>"
+python3 -m editor_base.vtt "<video folder>"
 
 VF="<video folder>/sandbox"
 for d in "$VF"/*/; do

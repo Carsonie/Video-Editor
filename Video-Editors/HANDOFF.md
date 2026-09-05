@@ -1,5 +1,9 @@
 # HANDOFF
 
+> **Run every command in this file from `Video-Editors/`.** The repo root
+> was split on 2026-09-04 into `Customers/` and `Video-Editors/`.
+
+
 Newest work first. One file so there is one place to check for open work.
 
 ---

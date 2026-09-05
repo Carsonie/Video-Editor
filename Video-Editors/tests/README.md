@@ -1,4 +1,7 @@
 # The test suites
+> **Run these from `Video-Editors/`.** The repo root was split on 2026-09-04
+> into `Customers/` and `Video-Editors/`; the code lives in the second one.
+
 
 Six of them. Five drive a real server over HTTP against a disposable store
 built from real footage; the sixth has no server in it.

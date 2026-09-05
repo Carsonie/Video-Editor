@@ -5,6 +5,9 @@ user_invocable: true
 ---
 
 # Launching the editors
+> **Run these from `Video-Editors/`.** The repo root was split on 2026-09-04
+> into `Customers/` and `Video-Editors/`; the code lives in the second one.
+
 
 **"Run the editors" / "run all 4 editors" means these four**, Carson's own
 standing directive (2026-09-02, updated same day when the fourth split
