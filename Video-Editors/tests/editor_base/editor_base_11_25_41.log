@@ -1,0 +1,73 @@
+editor_base Test:  2026-09-05T11:25:31
+Package:           /Users/carsonkramer/Rentify/Video-Editor/Video-Editors/editor_base
+
+  Step 1: editor_base is pure — no routes, no handlers, no HTTP
+     ✓ __init__.py defines no classes   none
+     ✓ __init__.py has no method taking self   none
+     ✓ __init__.py imports nothing HTTP   none
+     ✓ __init__.py defines no do_GET/do_POST
+     ✓ frames.py defines no classes   none
+     ✓ frames.py has no method taking self   none
+     ✓ frames.py imports nothing HTTP   none
+     ✓ frames.py defines no do_GET/do_POST
+     ✓ paths.py defines no classes   none
+     ✓ paths.py has no method taking self   none
+     ✓ paths.py imports nothing HTTP   none
+     ✓ paths.py defines no do_GET/do_POST
+     ✓ vtt.py defines no classes   none
+     ✓ vtt.py has no method taking self   none
+     ✓ vtt.py imports nothing HTTP   none
+     ✓ vtt.py defines no do_GET/do_POST
+
+  Step 2: frames.CACHE — the one piece of state, and it is reachable
+     ✓ there is a default   _shared
+     ✓ use_cache returns what it set   /Users/carsonkramer/Rentify/Video-Editor/Video-Editors/cache/_test_editor_base_probe
+     ✓ ...and the module now reads it   /Users/carsonkramer/Rentify/Video-Editor/Video-Editors/cache/_test_editor_base_probe
+     ✓ no function captures CACHE as a default argument
+     ✓ more than one function reads it, and all at call time   build_frames, use_cache
+     ✓ restored   /Users/carsonkramer/Rentify/Video-Editor/Video-Editors/cache/_shared
+
+  Step 3: the pure functions, against real footage
+     ✓ the fixture really built
+     ✓ the mp4's decoded frame count   40
+     ✓ the alpha webm's decoded frame count   30
+     ✓ both are real counts, not zero or None   (40, 30)
+     ✓ probe returns a real duration   1.600000
+     ✓ slug is stable   segment_22137e5c
+     ✓ two different files never share a slug
+     ✓ slug is URL-safe   segment_22137e5c
+
+  Step 4: paths — the filename shapes every editor agrees on
+     ✓ segment names
+     ✓ dev segment names
+     ✓ dev avatar names
+     ✓ a nonsense name matches nothing
+     ✓ the archive folder is named once, here   z_History
+
+  Step 5: no editor keeps its own copy of what this package owns
+     ✓ mp4_splitter/paths.py is gone
+     ✓ mp4_splitter/frames.py is gone
+     ✓ mp4_splitter/vtt.py is gone
+     ✓ segment_avatar_editor/paths.py is gone
+     ✓ segment_avatar_editor/frames.py is gone
+     ✓ segment_avatar_editor/vtt.py is gone
+     ✓ avatar_editor/paths.py is gone
+     ✓ avatar_editor/frames.py is gone
+     ✓ avatar_editor/vtt.py is gone
+     ✓ frame_blender/paths.py is gone
+     ✓ frame_blender/frames.py is gone
+     ✓ frame_blender/vtt.py is gone
+     ✓ shared/paths.py is a shim, not a copy   35 lines
+     ✓ shared/paths.py says so in its docstring
+     ✓ shared/paths.py re-exports from editor_base
+     ✓ shared/frames.py is a shim, not a copy   28 lines
+     ✓ shared/frames.py says so in its docstring
+     ✓ shared/frames.py re-exports from editor_base
+     ✓ shared/vtt.py is a shim, not a copy   28 lines
+     ✓ shared/vtt.py says so in its docstring
+     ✓ shared/vtt.py re-exports from editor_base
+     ✓ the shims still resolve the way build/ imports them   ['z_History 3']
+
+  Checks:  57/57 passed
+  Elapsed: 10s
+  Result:  PASS

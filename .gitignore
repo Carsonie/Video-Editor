@@ -90,3 +90,11 @@ tests/editor_base/*.txt
 __pycache__/
 *.pyc
 .DS_Store
+
+# ── the test suites' source footage — the RULE is committed, the bytes are not ─
+# Three clips, 3.7 MB, that every one of tests/' six suites builds its store
+# from. They follow this repo's no-video-in-git rule like everything else, so
+# only the README travels. See tests/_fixture_source/README.md for why they
+# live there and what happens if they go missing.
+Video-Editors/tests/_fixture_source/*
+!Video-Editors/tests/_fixture_source/README.md

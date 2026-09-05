@@ -71,8 +71,17 @@ CUSTOMERS = os.path.join(REPO, "Customers")
 STORE = os.path.join(CUSTOMERS, "_Editor_Test")
 ROOT_REL = "_Editor_Test"                      # what the API is given
 
-SRC = os.path.join(CUSTOMERS, "Rentify Demos Corp", "ski-demo", "help-videos",
-                   "videos", "01-first-time-ordering", "dev", "01-login-and-code")
+# The suites' source footage. It lived in ski-demo's `dev/01-login-and-code/`
+# until 2026-09-05, when `dev/` became Carson's own safety mirror of `sandbox/`
+# — refreshed whenever he finishes a working session, and archived wholesale
+# before each refresh. Tests cannot sit on a folder that is deliberately
+# replaced: the first refresh moved it to z_History and every suite would have
+# died looking for a scene name that no longer exists (`01-login-and-code`
+# became `01-intro-and-login` in the rename).
+#
+# So the three clips live here now, beside the tests that read them. They are
+# 3.9 MB, they never change, and nothing else points at them.
+SRC = os.path.join(CODE_ROOT, "tests", "_fixture_source")
 SRC_SEG = os.path.join(SRC, "segment-v6.mp4")
 SRC_AV = os.path.join(SRC, "avatar-v1.webm")
 SRC_NAR = os.path.join(SRC, "narration-v1.webm")

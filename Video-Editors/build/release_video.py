@@ -14,16 +14,33 @@ WHY IT EXISTS
     customer would actually be served.
 
     Now the rule is a folder-shaped one: a store's help-videos/ over there holds
-    finished videos and a README, and nothing else. If it is in that folder it
-    shipped. This tool is what puts it there.
+    a README, and ONE FOLDER PER VIDEO. If it is in there it shipped. This
+    tool is what puts it there.
+
+    Widened 2026-09-04 (Carson): a release is no longer the mp4 on its own.
+    The video, the words that made it, and the timing table travel together,
+    in a folder named for the video — so a year from now the file and its
+    script cannot be separated by a tidy-up.
 
 WHAT IT DOES, EXACTLY
-    Copies  <video folder>/video/<store>_<title>_v<N>.mp4
-    to      <BASIC>/Customers/<Business>/<store>/help-videos/<same name>
+    Creates  <BASIC>/Customers/<Business>/<store>/help-videos/<NN-slug>/
+    and puts three things in it:
 
-    and moves any EARLIER release of that same title into z_History/ over
-    there, so the folder always shows one file per video. It never deletes a
-    release; superseding one is a move.
+        <store>_<title>_v<N>.mp4     the build            (required)
+        script_v<N>.json             the words it used    (required)
+        vtt.html                     the timing table     (if one exists)
+
+    <NN-slug> is the video folder's own name — `01-first-time-ordering` —
+    so the shape over there matches the shape here.
+
+    Any EARLIER release of that same title moves into <NN-slug>/z_History/,
+    so the folder always shows one video. It never deletes a release;
+    superseding one is a move.
+
+    script_v<N>.json is REQUIRED because build_scenes.py --join writes it on
+    every join. If it is missing, the build did not come from a join and the
+    release is refused rather than shipping a video whose words are unknown.
+    vtt.html is optional — it is generated on demand by build/vtt_html.py.
 
     The copy is verified byte-for-byte before the old one is stood down. On one
     APFS volume `cp -c` clones, so a 6 MB video costs no disk and no time.
@@ -138,16 +155,36 @@ def main():
     print("    clock agrees with the frame count ✓")
 
     business, store = store_path_of(F)
-    dst_dir = os.path.join(basic_root(), "Customers", business, store, "help-videos")
-    if not os.path.isdir(dst_dir):
-        sys.exit(f"  no help-videos/ for {store} at {dst_dir}")
+    hv = os.path.join(basic_root(), "Customers", business, store, "help-videos")
+    if not os.path.isdir(hv):
+        sys.exit(f"  no help-videos/ for {store} at {hv}")
+    # One folder per video, named exactly as the video folder is named here.
+    slug = os.path.basename(F.rstrip(os.sep))
+    dst_dir = os.path.join(hv, slug)
     dst = os.path.join(dst_dir, name)
 
-    # Anything already there for this same title, at any other version.
-    older = [f for f in sorted(os.listdir(dst_dir))
-             if f.startswith(title + "_v") and f.endswith(".mp4") and f != name]
+    # The words that made this build. Not optional: --join writes one every
+    # time, so its absence means this mp4 did not come from a join.
+    script_src = os.path.join(vdir, f"script_v{a.version}.json")
+    if not os.path.isfile(script_src):
+        sys.exit(f"\n  REFUSED — no script_v{a.version}.json beside the build.\n"
+                 f"  --join writes one on every join, so this mp4 did not come from one.\n"
+                 f"  A video whose words are unknown is not releasable.\n")
+    # The timing table, if it has been generated. build/vtt_html.py makes it.
+    vtt_src = os.path.join(vdir, "vtt.html")
+    extras = [script_src] + ([vtt_src] if os.path.isfile(vtt_src) else [])
 
-    print(f"\n    -> Customers/{business}/{store}/help-videos/{name}")
+    # Anything already there for this same title, at any other version.
+    older = ([f for f in sorted(os.listdir(dst_dir))
+              if f.startswith(title + "_v") and f.endswith(".mp4") and f != name]
+             if os.path.isdir(dst_dir) else [])
+
+    print(f"\n    -> Customers/{business}/{store}/help-videos/{slug}/")
+    print(f"         {name}")
+    for x in extras:
+        print(f"         {os.path.basename(x)}")
+    if vtt_src not in extras:
+        print("         (no vtt.html — run build/vtt_html.py to include one)")
     for o in older:
         print(f"       standing down: {o}  -> z_History/")
     if os.path.exists(dst) and not a.force:
@@ -163,18 +200,26 @@ def main():
         print("\n    --dry-run: nothing written.\n")
         return 0
 
+    os.makedirs(dst_dir, exist_ok=True)
     if older:
         hist = os.path.join(dst_dir, "z_History")
         os.makedirs(hist, exist_ok=True)
         for o in older:
             shutil.move(os.path.join(dst_dir, o), os.path.join(hist, o))
 
-    # cp -c clones on APFS: no disk, no wait. Falls back to a plain copy.
-    if subprocess.run(["cp", "-c", src, dst], capture_output=True).returncode != 0:
-        shutil.copy2(src, dst)
-    if os.path.getsize(src) != os.path.getsize(dst):
-        sys.exit("  the copy came out a different size — left it in place, check by hand")
-    print(f"\n    released, {os.path.getsize(dst) / 1e6:.1f} MB\n")
+    def put(a_src, a_dst):
+        # cp -c clones on APFS: no disk, no wait. Falls back to a plain copy.
+        if subprocess.run(["cp", "-c", a_src, a_dst], capture_output=True).returncode != 0:
+            shutil.copy2(a_src, a_dst)
+        if os.path.getsize(a_src) != os.path.getsize(a_dst):
+            sys.exit(f"  {os.path.basename(a_dst)} came out a different size — "
+                     f"left it in place, check by hand")
+
+    put(src, dst)
+    for x in extras:
+        put(x, os.path.join(dst_dir, os.path.basename(x)))
+    print(f"\n    released, {os.path.getsize(dst) / 1e6:.1f} MB "
+          f"+ {len(extras)} file(s) beside it\n")
     return 0
 
 
