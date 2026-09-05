@@ -307,3 +307,77 @@ once, since all four already import it — a change to what the report
 looks like only has to happen in one place now, and the four outputs
 can't drift out of shape with each other the way the four editors'
 own `ACTIONS` label tables once had.
+
+## The root became two folders, and the docs had to follow (2026-09-05)
+
+The root mixed Carson's customer video work with fourteen code folders and
+seven loose files. Split so it holds exactly two visible things —
+`Customers/` beside `Video-Editors/` — because he works in the first far more
+than the second.
+
+`.git`, `.gitignore`, `.claude/` and `CLAUDE.md` stayed at the root and had
+to: a skill only registers at `.claude/skills/<folder>/SKILL.md` relative to
+the PROJECT root, so moving `.claude/` down would have made every skill here
+vanish with no error at all.
+
+**The editors needed no changes.** `shared/serve.py`'s `find_repo_root()`
+already walks UP until it finds a folder holding `Customers/`, so one level
+deeper resolved the same. That function was written for exactly this and paid
+for itself.
+
+Three things broke, all outside the editors, and each one was invisible until
+run:
+
+- `Basic_E2E_Testing/.claude/launch.json` — 7 absolute paths into this repo.
+  The launchers live in the OTHER repo, so a move here is invisible to them.
+- `tests/fixture.py` COUNTED LEVELS to reach `Customers/`. Its own comment
+  said a count "is wrong the moment the tree changes" — and it was: all six
+  suites died at once looking for `Video-Editors/Customers/`. It walks up now.
+- `fixture.REPO` had meant two things that were the same folder until that
+  day: where the code is, and where `Customers/` is. Split into `REPO` and
+  `CODE_ROOT`.
+
+## `dev/` stopped being a build stage and became Carson's mirror (2026-09-05)
+
+`<video folder>/dev/` is now his own safety copy of the working files, held
+while the editors and the process are still being built. It mirrors
+`sandbox/`'s scenes, `sandbox/script.json` and `video/vtt.html`, and is
+archived wholesale to the root `z_History/` before each refresh.
+
+That first refresh nearly killed the test suites. `tests/fixture.py` read its
+source footage from `dev/01-login-and-code/` — a folder that was both moved
+AND renamed (`01-intro-and-login`). The three clips now live at
+`tests/_fixture_source/`, gitignored like every other video here, with a
+README that IS committed so the rule travels even though the bytes do not.
+**Nothing may point at `dev/` again**; it gets replaced wholesale.
+
+## A release became a folder, not a file (2026-09-05)
+
+`release_video.py` used to copy one mp4, flat, into the store's
+`help-videos/`. It now creates `help-videos/<NN-slug>/` holding the build,
+its `script_v<N>.json` and its `vtt.html`. The script is REQUIRED — `--join`
+writes one every time, so a build without one did not come from a join, and
+shipping a video whose words are unknown is the thing worth blocking.
+
+ski-demo v33 was the first actual release. v32 could never have been: its
+clock disagrees with its frame count by +0.121s and the gate refuses it —
+which is very likely why it was built and never shipped.
+
+## Two skills, both built out of what went wrong (2026-09-04 → 09-05)
+
+**`/final-video-clean-up`** — run after a release. Its rules are all scar
+tissue: `trim_history.py` ranks archives by a date parsed out of the FOLDER
+NAME, so five archives written as `26-09-04_pose` matched no pattern and the
+dry run proposed deleting that day's only safety copies while keeping backups
+a week older. And proving which raw take a finished video came from is
+DOCUMENTARY work only — three attempts to prove it from the footage gave
+three different answers, because the takes are the same scripted flow on the
+same screen minutes apart.
+
+**`vtt`, extended** — "Show me the VTT" now builds an HTML table and opens a
+Chrome tab. Writing it found that the documented `python3 shared/vtt.py` had
+been a no-op since the `editor_base/` merge: a re-export shim with no CLI, so
+it ran, printed nothing, and exited 0.
+
+1.9 GB came off the repo in the same pass — nothing deleted, all of it moved
+to the Trash or parked in the root `z_History/` for one cycle.

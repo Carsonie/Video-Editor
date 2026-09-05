@@ -1,13 +1,16 @@
 ---
 name: final-video-clean-up
-description: Reclaim disk in the Video-Editor repo AFTER a store's video is finished and released. THE VOICE COMMAND "Final video clean up" (also "clean up the final video", "clean up <store>") means BUILD A LIST FIRST AND WAIT FOR CONFIRMATION — never delete on sight. Covers the one-raw-recording rule, how to prove which recording a finished video was cut from, what regenerates for free, what only looks safe, and the archive-naming trap that makes trim_history.py delete the newest backups. Use whenever asked to clean up, trim, free space, or reduce the size of a video folder, a store's help-videos, raw recordings, the frame cache, or z_History.
+description: Reclaim disk in the Video-Editor repo AFTER a store's video is finished and released. THE VOICE COMMAND "Final video clean up" (also "clean up the final video", "clean up <store>") means WORK THE NUMBERED PROCEDURE AT THE TOP: review what is parked in the root z_History and ASK whether it is obsolete yet, check dev/ against sandbox/, then build a list with sizes and WAIT — never delete on sight, and move to Trash rather than rm. Covers the one-raw-recording rule, how to prove which recording a finished video was cut from (and why comparing frames does not work), what regenerates for free, what only looks safe, the folders that must never be touched, and the archive-naming trap that makes trim_history.py delete the newest backups. Use whenever asked to clean up, trim, free space, or reduce the size of a video folder, a store's help-videos, raw recordings, the frame cache, or z_History.
 user_invocable: true
 ---
-
 # Final video clean up
 
 Run **after** a build is released, never during editing. Editing is when the
 history is worth most.
+
+⚠ **Every size quoted in this file is ski-demo's FIRST pass, 2026-09-04 —
+an example, not a target.** The shape holds; the numbers are already stale.
+Measure, never assume.
 
 ## The rule that governs everything: LIST FIRST, DELETE NEVER
 
@@ -23,6 +26,111 @@ Two separate rules, and both are absolute.
 
 Report **what should be kept beyond the default**, not just what can go. The
 useful sentence is "this one looks droppable and here is why I am not sure".
+
+---
+
+---
+
+## THE PROCEDURE — do these in order
+
+Everything after this section is the *why*. This is the *what*.
+
+0. **Review what is already parked in the ROOT `z_History/`.** Each folder
+   there was moved out of the way by a PREVIOUS clean-up, on the
+   understanding that one cycle would pass before it went. That cycle is now.
+   List each with its size, its date and what it was, and **ask Carson
+   whether it is obsolete yet** — one line each, his call. What he confirms
+   goes to `~/.Trash`; what he is unsure of stays another cycle.
+
+   **Never clear `z_History/` on your own judgement.** It is the folder that
+   exists precisely because a decision was deferred, so deferring it again is
+   a valid answer and only he can give it.
+
+1. **Check `dev/` against `sandbox/` and report it**, asked or not. STEP ZERO
+   below. If it differs, say so and WAIT.
+
+2. **Sizes first.** `du -sh` the repo, `Customers/` vs `Video-Editors/`, then
+   the store's video folder and its `raw_mp4/` — so the list comes out
+   ordered by what actually matters, not by what you looked at first.
+
+3. **Group the raw recordings by scenario** and find the multi-take ones.
+   `raw_mp4/` is one level ABOVE the video folder and is easy to miss.
+
+4. **For each finished video, identify its source recording** from the
+   documentary trail. Say what you found AND what you could not prove.
+
+5. **Dry-run `trim_history.py`** and READ every DROP line. Rename any archive
+   whose name it cannot parse BEFORE trimming.
+
+6. **Present ONE list** — safe / needs-a-decision / keep-and-why — with sizes
+   and a total.
+
+7. **Wait for confirmation.** Then move to `~/.Trash`, never `rm`.
+
+8. **Re-measure and report** what came off, re-run the six suites if anything
+   structural moved, and remind him the Trash is his to empty.
+
+---
+
+## ⚠ STEP ZERO — is `dev/` still identical to `sandbox/`?
+
+Carson keeps `<video folder>/dev/` as his **own safety mirror** of the
+working files, held while the editors and the process are still being built.
+Set 2026-09-05. It is not a build stage and nothing reads from it.
+
+**Check it FIRST, before proposing anything else, and report the answer
+whether or not it is asked for.** Three things must match:
+
+| | sandbox side | dev side |
+|---|---|---|
+| the scenes | `sandbox/<NN-label>/{segment.mp4, avatar.webm, narration.webm}` | same names |
+| the script | `sandbox/script.json` | `dev/script.json` |
+| the timing table | `video/vtt.html` | `dev/vtt.html` |
+
+Compare by **SHA-256, not size or mtime** — a re-encode can land on the same
+size, and copying rewrites mtime.
+
+```python
+import os, hashlib
+def h(p):
+    x = hashlib.sha256()
+    with open(p, "rb") as fh:
+        for b in iter(lambda: fh.read(1 << 20), b""): x.update(b)
+    return x.hexdigest()
+```
+
+Compare the SET of scene folder names too, not just the files inside them —
+a rename (`01-login-and-code` became `01-intro-and-login`) shows up nowhere
+else.
+
+**`z_History/` is NOT part of the mirror.** It is history, not a working
+version; copying it would double the disk and defeat the point.
+
+### If it differs: SAY SO AND WAIT
+
+Report which files differ and which scenes exist on only one side. **Do not
+refresh it unasked** — a stale `dev/` may be exactly the copy he wants back.
+On his confirmation:
+
+1. **Move the whole existing `dev/` to the ROOT `z_History/`**, stamped
+   `z_History/dev-%Y%m%d-%H%M%S/`. Move, not delete — the old mirror is the
+   thing being replaced, so it is the thing most worth keeping for a cycle.
+2. Copy `sandbox/`'s scene working files, `sandbox/script.json` and
+   `video/vtt.html` into a fresh `dev/`.
+3. **Verify by hash** that every file now matches, and say so.
+
+### The trap this walked into
+
+`tests/fixture.py` used to read its source footage from
+`dev/01-login-and-code/`. The first refresh moved `dev/` to `z_History` and
+would have killed **all six suites** — that scene had been renamed, so no
+path would have resolved.
+
+Fixed 2026-09-05: the three clips now live at
+`Video-Editors/tests/_fixture_source/` (3.9 MB, never change). **Nothing may
+depend on `dev/` again** — it is a mirror that gets replaced wholesale, so
+anything pointing at it is a breakage waiting for the next refresh. A new
+reference to `dev/` is a bug, not a dependency.
 
 ---
 
@@ -101,6 +209,8 @@ and say so if it is older.
 
 ---
 
+---
+
 ## Everything else, and what it is worth
 
 Sizes are ski-demo's first pass — the shape holds, the numbers will not.
@@ -154,6 +264,8 @@ rather than applying it because it is the default.
 
 ---
 
+---
+
 ## ⚠ `trim_history.py` WILL DELETE THE NEWEST BACKUPS IF NAMES ARE WRONG
 
 Always dry-run it, and **read the DROP lines before agreeing with them**:
@@ -204,6 +316,8 @@ Rename BEFORE trimming. Renaming is free and reversible; deletion is not.
 
 ---
 
+---
+
 ## Where a video's working edits live — DO NOT invent a new folder
 
 Asked 2026-09-04: *"should we make a new folder in sandbox to hold these
@@ -230,82 +344,7 @@ new directory. The fine-grained per-scene history sits underneath it.
 
 ---
 
-## ⚠ STEP ZERO — is `dev/` still identical to `sandbox/`?
-
-Carson keeps `<video folder>/dev/` as his **own safety mirror** of the
-working files, held while the editors and the process are still being built.
-Set 2026-09-05. It is not a build stage and nothing reads from it.
-
-**Check it FIRST, before proposing anything else, and report the answer
-whether or not it is asked for.** Three things must match:
-
-| | sandbox side | dev side |
-|---|---|---|
-| the scenes | `sandbox/<NN-label>/{segment.mp4, avatar.webm, narration.webm}` | same names |
-| the script | `sandbox/script.json` | `dev/script.json` |
-| the timing table | `video/vtt.html` | `dev/vtt.html` |
-
-Compare by **SHA-256, not size or mtime** — a re-encode can land on the same
-size, and copying rewrites mtime.
-
-```python
-import os, hashlib
-def h(p):
-    x = hashlib.sha256()
-    with open(p, "rb") as fh:
-        for b in iter(lambda: fh.read(1 << 20), b""): x.update(b)
-    return x.hexdigest()
-```
-
-Compare the SET of scene folder names too, not just the files inside them —
-a rename (`01-login-and-code` became `01-intro-and-login`) shows up nowhere
-else.
-
-**`z_History/` is NOT part of the mirror.** It is history, not a working
-version; copying it would double the disk and defeat the point.
-
-### If it differs: SAY SO AND WAIT
-
-Report which files differ and which scenes exist on only one side. **Do not
-refresh it unasked** — a stale `dev/` may be exactly the copy he wants back.
-On his confirmation:
-
-1. **Move the whole existing `dev/` to the ROOT `z_History/`**, stamped
-   `z_History/dev-%Y%m%d-%H%M%S/`. Move, not delete — the old mirror is the
-   thing being replaced, so it is the thing most worth keeping for a cycle.
-2. Copy `sandbox/`'s scene working files, `sandbox/script.json` and
-   `video/vtt.html` into a fresh `dev/`.
-3. **Verify by hash** that every file now matches, and say so.
-
-### The trap this walked into
-
-`tests/fixture.py` used to read its source footage from
-`dev/01-login-and-code/`. The first refresh moved `dev/` to `z_History` and
-would have killed **all six suites** — that scene had been renamed, so no
-path would have resolved.
-
-Fixed 2026-09-05: the three clips now live at
-`Video-Editors/tests/_fixture_source/` (3.9 MB, never change). **Nothing may
-depend on `dev/` again** — it is a mirror that gets replaced wholesale, so
-anything pointing at it is a breakage waiting for the next refresh. A new
-reference to `dev/` is a bug, not a dependency.
-
-## The procedure
-
-0. **Check `dev/` against `sandbox/` and report it.** STEP ZERO above.
-1. **Sizes first.** `du -sh` the repo, `Customers/` vs `Video-Editors/`, then
-   the store's video folder and `raw_mp4/`, so the list is ordered by what
-   actually matters.
-2. **Group the raw recordings by scenario**; find the multi-take ones.
-3. **For each finished video, identify its source recording** by the
-   documentary trail above. Say what you found AND what you could not prove.
-4. **Dry-run `trim_history.py`.** Read every DROP line. Rename bad archive
-   names first.
-5. **Present ONE list**: safe / needs-a-decision / keep-and-why, with sizes
-   and a total.
-6. **Wait.** Then move the confirmed items to `~/.Trash`.
-7. **Re-measure and report** what came off, and remind him the Trash is his
-   to empty.
+---
 
 ## Related
 

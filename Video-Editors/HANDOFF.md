@@ -8,10 +8,61 @@ Newest work first. One file so there is one place to check for open work.
 
 ---
 
+## 2026-09-05 — two-folder root, dev/ as a mirror, a release is a folder
+
+Branch **`customers-videos`**, pushed, and `main` fast-forwarded to match.
+`next_gen_editors` and `All-Four-Editors-Working` are deliberately LEFT at
+`101de08` — they still hold the pre-restructure tree, so checking either one
+out means the editors will not start until you return to `main`.
+
+**The root is now two visible folders**, `Customers/` beside
+`Video-Editors/`. `.git`, `.gitignore`, `.claude/` and `CLAUDE.md` stay at
+the root and must — a skill only registers at the PROJECT root, and moving
+`.claude/` down makes every skill vanish silently.
+
+**Run every command in this repo from `Video-Editors/`.** `Customers/` did
+not move, so from there it is `../Customers`.
+
+**`dev/` is now Carson's safety mirror of `sandbox/`**, not a build stage.
+Nothing reads from it, and nothing may: it is archived to the root
+`z_History/` and replaced wholesale on each refresh. The six suites used to
+read their footage from `dev/01-login-and-code/` and the first refresh would
+have killed all of them; the clips are at `tests/_fixture_source/` now,
+gitignored, with a committed README. ⛔ **Do not touch that folder.**
+
+**A release is a folder.** `release_video.py` writes
+`help-videos/<NN-slug>/` holding the mp4, its `script_v<N>.json` (required)
+and `vtt.html` if one exists. ski-demo v33 is released — the first one.
+
+**Two skills to know about:**
+
+- `/final-video-clean-up` — run after a release. Its step 0 is to ask
+  whether what is parked in the root `z_History/` is obsolete yet.
+- `vtt` — "Show me the VTT" builds an HTML table and opens a Chrome tab.
+  ⚠ `python3 shared/vtt.py` is a NO-OP (a shim with no CLI; it prints
+  nothing and exits 0). Use `python3 -m editor_base.vtt`.
+
+**Open / not done:**
+
+- `887 MB` parked in the root `z_History/` awaiting a decision:
+  `cache-dead-20260904` (835 MB) and `dev-20260905-112452` (52 MB).
+- ~1.1 GB sitting in the Trash, not yet emptied — Carson's call.
+- `build/assemble_video.py` still carries someone else's uncommitted
+  crossfade work. **Do not stage it.**
+- SEVEN of ski-demo's eleven avatars are SHORTER than their own
+  `narration.webm`; `vtt.html` flags them. Scene 2's is deliberate (the pose
+  edit). The other six have not been listened to, so nobody knows whether
+  words were lost.
+- `next-editor-version/web/node_modules` was cleared. That editor needs
+  `npm install` before it will start again.
+
+All six suites pass: 696 checks.
+
 ## 2026-09-04 — the cleanup plan is FINISHED, Phases 3–7
 
-Branch **`plan-implementation`**. **Nothing pushed** — Carson merges it
-back himself. Every step of `README-CODE-CLEANUP-PLAN.md` is now `✅ done`,
+Branch **`plan-implementation`** — ⚠ **that branch no longer exists.** It
+was merged and deleted 2026-09-05 with zero unique commits; all of this work
+is on `main` and `customers-videos`. Every step of `README-CODE-CLEANUP-PLAN.md` is now `✅ done`,
 one commit each.
 
 **The suites, after:**
