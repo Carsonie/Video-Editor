@@ -1,5 +1,60 @@
 # Project rules
 
+## ⛔ NEVER PUSH ANYTHING TO THE LIVE REMOTE SERVER OR ITS DATABASE
+
+Set by Carson 2026-09-06, and it is absolute. It is not a default that a good
+reason can override, and it is not a question to put to him.
+
+**The live remote is `rentify.app`** — the deploy host, the admin at
+`bcp.rentify.app`, and the production database and asset store behind them.
+
+Never do any of these, in any project, in any permission mode:
+
+- Create, update or delete a business, store, collection, item, question,
+  requirement, order or payment on production — through BCP, an Uploader, an
+  RPC, the admin UI, or by hand
+- Upload a PDF code template, an image, or any other asset to production
+- Run an E2E flow against a live remote target — a completed flow places a
+  **real customer order**
+- Copy or sync anything **onto** the server
+- `make manual-deploy`, or any other deploy
+- Write to production's database or its write-ahead log, by any route
+
+**Reading production is allowed, and only reading.** `make copy-db`,
+`make assets-diff`, `make assets-sync` and `make copy-storage` pull data
+*down*. They open the source read-only and change nothing upstream. That is the
+whole permitted surface.
+
+**Do not offer a live-remote option.** Not in an `AskUserQuestion`, not as an
+alternative in prose, not as "A or B". Offering it invites a yes. If a task
+looks like it needs production, say plainly that it is out of scope and stop.
+
+**If Carson asks for it directly, still stop and confirm in writing first** —
+state exactly what would be created or changed, and that a local reset cannot
+undo it — and continue only on an explicit, specific yes. A general "go ahead"
+earlier in the conversation does not carry.
+
+### The guard is a backstop, not the rule
+
+A `PreToolUse` hook at `~/.claude/hooks/guard-rentify-remote.sh` denies any
+command that contacts the host, in **every** permission mode —
+`bypassPermissions` included, because hooks run where permission rules are
+skipped. Every attempt is logged to `~/.claude/hooks/rentify-remote.log`.
+
+It catches mistakes. It is not permission to try. Never work around it, never
+create its approval token (`~/.claude/hooks/.rentify-remote-approved`)
+yourself, and never suggest disabling hooks. Being blocked is the system
+working.
+
+### Why this exists
+
+Production carries real customers' real data. A local mistake costs
+`Local_Host/reset-to-clean.sh` and about a minute; a production mistake cannot
+be undone from here at all. And `Rentify_v10`'s `origin` is
+`alinz/rentify.app` — **someone else's repository** — so pushing code there is
+not ours to do either.
+
+
 This repo makes **help videos**: a HeyGen avatar narrating over a recording of
 the real Rentify UI. It holds the editors, the build pipeline, and every
 customer's `help-videos/` working files while a video is being made.
