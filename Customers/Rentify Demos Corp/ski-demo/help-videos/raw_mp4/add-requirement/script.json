@@ -1,14 +1,14 @@
 {
  "store": "ski-demo",
  "title": "Adding a requirement",
- "_note": "BCP admin recipe add-requirement. A requirement is a named set of questions, and every item points at one.",
+ "_note": "BCP admin recipe add-requirement. A requirement is a named set of questions, and every item points at one. Lead-in trimmed 2026-09-09: the first 4s were desktop and a blank browser.",
  "words_per_second": 3.44,
  "_wps_note": "From 01-first-time-ordering/script_v33.json, measured 31 words / 9.01s. Nothing for THIS video is rendered yet.",
  "_pauses_note": "One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in comes from the scene's footage hold.",
  "_lead_in_seconds": 0.5,
  "_estimated_video_seconds": 62.4,
  "_estimated_video_note": "12 scenes. 161 words / 3.44 wps = 46.8s of speech, + 12 lead-ins at 0.5s = 6.0s, + 12 exit pauses at 0.8s = 9.6s. ESTIMATE \u2014 recompute from the audio once it exists.",
- "_footage_seconds": 74.5,
+ "_footage_seconds": 89.3,
  "scenes": [
   {
    "n": 1,

@@ -4,7 +4,7 @@ NOTE
 add-question — 11 screens, 11 avatar scenes
 ski-demo, BCP admin.
 
-BCP admin recipe add-question. Questions are shared across every store, so this one never visits a business or a store.
+BCP admin recipe add-question. Questions are shared across every store, so this one never visits a business or a store. Lead-in trimmed 2026-09-09: the first 4s were desktop and a blank browser.
 
 EVERY SCENE HAS A LEAD-IN AND AN EXIT PAUSE.
 
@@ -31,7 +31,7 @@ real spoken length. Re-time from the audio once it exists.
   speech only           51.0s
   lead-ins + exits      14.3s
   FINISHED VIDEO        65.3s
-  raw footage           75.1s
+  raw footage           89.4s
 
 NOTE
 scene 01  sign-in

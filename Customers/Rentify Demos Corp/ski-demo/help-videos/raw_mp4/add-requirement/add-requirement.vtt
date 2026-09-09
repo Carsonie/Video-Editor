@@ -4,7 +4,7 @@ NOTE
 add-requirement — 12 screens, 12 avatar scenes
 ski-demo, BCP admin.
 
-BCP admin recipe add-requirement. A requirement is a named set of questions, and every item points at one.
+BCP admin recipe add-requirement. A requirement is a named set of questions, and every item points at one. Lead-in trimmed 2026-09-09: the first 4s were desktop and a blank browser.
 
 EVERY SCENE HAS A LEAD-IN AND AN EXIT PAUSE.
 
@@ -31,7 +31,7 @@ real spoken length. Re-time from the audio once it exists.
   speech only           46.8s
   lead-ins + exits      15.6s
   FINISHED VIDEO        62.4s
-  raw footage           74.5s
+  raw footage           89.3s
 
 NOTE
 scene 01  sign-in

@@ -4,7 +4,7 @@ NOTE
 add-collection — 35 screens, 35 avatar scenes
 ski-demo, BCP admin.
 
-BCP admin recipe add-collection. Three creations in one take: the collection, then its options, then two items. The walk from the dashboard to the store repeats four times, so those lines are deliberately short.
+BCP admin recipe add-collection. Three creations in one take: the collection, then its options, then two items. The walk from the dashboard to the store repeats four times, so those lines are deliberately short. Lead-in trimmed 2026-09-09: the first 4s were desktop and a blank browser.
 
 EVERY SCENE HAS A LEAD-IN AND AN EXIT PAUSE.
 
@@ -31,7 +31,7 @@ real spoken length. Re-time from the audio once it exists.
   speech only           95.2s
   lead-ins + exits      45.5s
   FINISHED VIDEO        140.7s
-  raw footage           227.6s
+  raw footage           253.1s
 
 NOTE
 scene 01  sign-in

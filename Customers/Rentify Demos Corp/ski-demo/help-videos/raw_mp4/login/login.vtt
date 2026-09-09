@@ -1,0 +1,64 @@
+WEBVTT
+
+NOTE
+login — 3 screens, 3 avatar scenes
+ski-demo, BCP admin.
+
+The shared sign-in opening, recorded on its own so it can be dropped over the front of every other BCP video. It ENDS settled on the dashboard — where each of those videos' third screen begins — and has no logout, which is footage the piece it replaces does not have.
+
+EVERY SCENE HAS A LEAD-IN AND AN EXIT PAUSE.
+
+  lead-in  0.5s   Sarah on screen before she starts. A scene that opens
+                mid-word has no edit point.
+  exit     0.8s   after she stops — the join the next scene's crossfade
+                eats into, and what an editor trims to.
+
+  A scene is lead-in + speech + exit. The cue covers ONLY the speech;
+  the scene's own start and end are in its NOTE.
+
+THE CUE TIMES ARE THE NARRATION TIMELINE, not the footage. The `raw` line
+in each NOTE is how long that screen was really on camera. They differ on
+purpose — a screen that takes 15 seconds to fill in does not need 15
+seconds of talking over it. What matters is that no screen is SHORTER
+than its scene.
+
+SPEAKING RATE 3.44 words a second. MEASURED, from two rendered clips —
+31 words in 9.01s, see 01-first-time-ordering/script_v33.json's _wps_note.
+Still an estimate for THIS video: nothing is rendered, so no line has a
+real spoken length. Re-time from the audio once it exists.
+
+  words                 39
+  speech only           11.3s
+  lead-ins + exits      3.9s
+  FINISHED VIDEO        15.2s
+  raw footage           15.5s
+
+NOTE
+scene 01  sign-in
+  raw        6.0s on camera
+  scene      00:00:00.000 to 00:00:06.200  (6.2s)
+  lead-in    0.5s     speech 17 words, 4.9s     exit 0.8s
+
+scene-01-sign-in
+00:00:00.500 --> 00:00:05.400
+This is the sign-in screen. Type the email address for your back-office account, then click Send Code.
+
+NOTE
+scene 02  enter-the-code
+  raw        4.3s on camera
+  scene      00:00:06.200 to 00:00:12.700  (6.5s)
+  lead-in    0.5s     speech 18 words, 5.2s     exit 0.8s
+
+scene-02-enter-the-code
+00:00:06.700 --> 00:00:11.900
+A four-digit code is sent to that address. Type it in — the screen moves on by itself.
+
+NOTE
+scene 03  dashboard
+  raw        1.7s on camera
+  scene      00:00:12.700 to 00:00:15.200  (2.5s)
+  lead-in    0.5s     speech 4 words, 1.2s     exit 0.8s
+
+scene-03-dashboard
+00:00:13.200 --> 00:00:14.400
+And you are in.

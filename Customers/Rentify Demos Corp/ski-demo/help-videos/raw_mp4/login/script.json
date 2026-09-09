@@ -1,0 +1,53 @@
+{
+ "store": "ski-demo",
+ "title": "Signing in",
+ "_note": "The shared sign-in opening, recorded on its own so it can be dropped over the front of every other BCP video. It ENDS settled on the dashboard \u2014 where each of those videos' third screen begins \u2014 and has no logout, which is footage the piece it replaces does not have.",
+ "words_per_second": 3.44,
+ "_wps_note": "From 01-first-time-ordering/script_v33.json, measured 31 words / 9.01s. Nothing for THIS video is rendered yet.",
+ "_pauses_note": "One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in comes from the scene's footage hold.",
+ "_lead_in_seconds": 0.5,
+ "_estimated_video_seconds": 15.2,
+ "_estimated_video_note": "3 scenes. 39 words / 3.44 wps = 11.3s of speech, + 3 lead-ins at 0.5s = 1.5s, + 3 exit pauses at 0.8s = 2.4s. ESTIMATE \u2014 recompute from the audio once it exists.",
+ "_footage_seconds": 15.5,
+ "scenes": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "line": "This is the sign-in screen. Type the email address for your back-office account, then click Send Code.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "6.0s on camera",
+   "estimated-word-time": "4.9 seconds.",
+   "target-length": "6.2 seconds."
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "line": "A four-digit code is sent to that address. Type it in \u2014 the screen moves on by itself.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "4.3s on camera",
+   "estimated-word-time": "5.2 seconds.",
+   "target-length": "6.5 seconds."
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "line": "And you are in.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "1.7s on camera",
+   "estimated-word-time": "1.2 seconds.",
+   "target-length": "2.5 seconds."
+  }
+ ]
+}
