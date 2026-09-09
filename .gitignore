@@ -33,6 +33,13 @@ Customers/**/z_History/**
 # in the form an editor and a player can both read. Added 2026-09-09, when
 # add-item's twelve-scene vtt was written and then silently not committed.
 !Customers/*/*/help-videos/**/*.vtt
+# vtt.html — the same words as a table, and the page Carson means by "show me
+# the VTT". About 9KB. Kept in the two places it is a deliverable: beside a raw
+# capture, and inside a release. NOT in dev/ or sandbox/, which the editors
+# rewrite on every run — tracking a regenerated file there is pure churn, which
+# is the whole reason Customers/** is excluded in the first place.
+!Customers/*/*/help-videos/raw_mp4/**/vtt.html
+!Customers/*/*/help-videos/videos/*/video/vtt.html
 !Customers/*/*/help-videos/**/.gitkeep
 # The cut plan's contact sheet — 65 KB, and the tool tells you to look at it
 # before cutting. It was tracked in Basic_E2E_Testing for the same reason;

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ski-demo scenes — add-item</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{--ground:#F4F6F9;--surface:#fff;--surface-2:#EDF0F5;--ink:#131820;--ink-2:#3D4753;
+--muted:#667082;--line:#D9DEE7;--line-soft:#E7EBF1;--flash:#FFD400;
+--sans:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#12151A;--surface:#191D24;
+--surface-2:#212630;--ink:#E9ECF2;--ink-2:#BCC3CE;--muted:#8D96A6;--line:#2A303A;--line-soft:#232932;}}
+:root[data-theme="dark"]{--ground:#12151A;--surface:#191D24;--surface-2:#212630;--ink:#E9ECF2;
+--ink-2:#BCC3CE;--muted:#8D96A6;--line:#2A303A;--line-soft:#232932;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55}
+.wrap{max-width:1120px;margin:0 auto;padding:36px 22px 64px;display:flex;flex-direction:column;gap:26px}
+.rule{height:3px;width:60px;background:var(--flash);border-radius:2px}
+h1{margin:0;font-size:30px;font-weight:700;letter-spacing:-.02em}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+p{margin:0;max-width:70ch;color:var(--ink-2)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.tile{border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:14px 16px;
+display:flex;flex-direction:column;gap:3px}
+.tile .k{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.tile .v{font-family:var(--mono);font-size:21px;font-weight:500;font-variant-numeric:tabular-nums}
+.tile.hot{box-shadow:inset 0 0 0 2px var(--flash)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;
+color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line);background:var(--surface-2);white-space:nowrap}
+td{padding:11px 12px;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--ink-2)}
+tr:last-child td{border-bottom:none}
+td.n,td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+td.label{font-family:var(--mono);font-size:13px;color:var(--ink);white-space:nowrap}
+td.line{color:var(--ink);min-width:30ch}
+.note{border-left:3px solid var(--flash);background:var(--surface);border-radius:0 6px 6px 0;
+padding:12px 16px;border-top:1px solid var(--line-soft);border-right:1px solid var(--line-soft);
+border-bottom:1px solid var(--line-soft)}
+.note strong{color:var(--ink)}
+code{font-family:var(--mono);font-size:.92em;background:var(--surface-2);padding:1px 5px;border-radius:3px;color:var(--ink)}
+footer{border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:13px;
+display:flex;flex-direction:column;gap:3px}
+</style></head><body><div class="wrap">
+<div class="rule"></div>
+<div class="eyebrow">ski-demo &middot; add-item &middot; raw capture, not built yet</div>
+<h1>Adding an item</h1>
+<p>BCP admin recipe add-item. CUT FROM ski-demo_add-item_dev_09-08-00_v5.mp4 (85.4s) — the only take whose screens are all long enough for their scene. v1-v4 are look tests.</p>
+<div class="tiles">
+<div class="tile hot"><div class="k">Estimated video</div><div class="v">60.3s</div></div>
+<div class="tile"><div class="k">Speech</div><div class="v">44.7s</div></div>
+<div class="tile"><div class="k">Lead-ins</div><div class="v">6.0s</div></div>
+<div class="tile"><div class="k">Exit pauses</div><div class="v">9.6s</div></div>
+<div class="tile"><div class="k">Scenes</div><div class="v">12</div></div>
+<div class="tile"><div class="k">Words</div><div class="v">154</div></div>
+<div class="tile"><div class="k">Footage</div><div class="v">85.4s</div></div>
+</div>
+<div class="note"><strong>Every number here is an estimate.</strong> Speech is words &divide; 3.44 a second, the rate measured from the last rendered video. Nothing has been rendered for THIS one, so no line has a real spoken length. Rebuild this page from the audio once it exists.</div>
+<div class="scroll"><table><thead><tr><th>#</th><th>Scene</th><th>Sarah says</th><th>Words</th><th>Lead-in</th><th>Speech</th><th>Exit</th><th>Scene</th><th>Raw</th></tr></thead><tbody>
+<tr><td class="n">1</td><td class="label">sign-in</td><td class="line">This is the sign-in screen. Type the email address for your back-office account, then click Send Code.</td><td class="num">17</td><td class="num">0.5s</td><td class="num">4.9s</td><td class="num">0.8s</td><td class="num">6.2s</td><td class="num">0:00.0</td></tr>
+<tr><td class="n">2</td><td class="label">enter-the-code</td><td class="line">A four-digit code is sent to that address. Type it in. The screen moves on by itself.</td><td class="num">17</td><td class="num">0.5s</td><td class="num">4.9s</td><td class="num">0.8s</td><td class="num">6.2s</td><td class="num">0:05.5</td></tr>
+<tr><td class="n">3</td><td class="label">dashboard</td><td class="line">This is the dashboard. Everything starts here. Click Businesses.</td><td class="num">9</td><td class="num">0.5s</td><td class="num">2.6s</td><td class="num">0.8s</td><td class="num">3.9s</td><td class="num">0:12.8</td></tr>
+<tr><td class="n">4</td><td class="label">find-the-business</td><td class="line">Type the name of your business, then pick it from the list.</td><td class="num">12</td><td class="num">0.5s</td><td class="num">3.5s</td><td class="num">0.8s</td><td class="num">4.8s</td><td class="num">0:15.0</td></tr>
+<tr><td class="n">5</td><td class="label">the-business</td><td class="line">This is your business page. Click the lookup icon to see its stores.</td><td class="num">13</td><td class="num">0.5s</td><td class="num">3.8s</td><td class="num">0.8s</td><td class="num">5.1s</td><td class="num">0:20.0</td></tr>
+<tr><td class="n">6</td><td class="label">find-the-store</td><td class="line">Type the store name, then pick it.</td><td class="num">7</td><td class="num">0.5s</td><td class="num">2.0s</td><td class="num">0.8s</td><td class="num">3.3s</td><td class="num">0:22.5</td></tr>
+<tr><td class="n">7</td><td class="label">the-store</td><td class="line">This is the store page. Click the gear, then choose Lookup Items.</td><td class="num">12</td><td class="num">0.5s</td><td class="num">3.5s</td><td class="num">0.8s</td><td class="num">4.8s</td><td class="num">0:28.0</td></tr>
+<tr><td class="n">8</td><td class="label">the-item-list</td><td class="line">This lists every item in the store. Click the plus button to add a new one.</td><td class="num">16</td><td class="num">0.5s</td><td class="num">4.7s</td><td class="num">0.8s</td><td class="num">6.0s</td><td class="num">0:31.0</td></tr>
+<tr><td class="n">9</td><td class="label">new-item</td><td class="line">Give the item a name. Then choose the collection it belongs to.</td><td class="num">12</td><td class="num">0.5s</td><td class="num">3.5s</td><td class="num">0.8s</td><td class="num">4.8s</td><td class="num">0:33.5</td></tr>
+<tr><td class="n">10</td><td class="label">item-details</td><td class="line">Now the details. Pick the requirement, pick the size, then set the price and how many you have.</td><td class="num">18</td><td class="num">0.5s</td><td class="num">5.2s</td><td class="num">0.8s</td><td class="num">6.5s</td><td class="num">0:47.0</td></tr>
+<tr><td class="n">11</td><td class="label">save</td><td class="line">Click Update to save. The item is now in your store.</td><td class="num">11</td><td class="num">0.5s</td><td class="num">3.2s</td><td class="num">0.8s</td><td class="num">4.5s</td><td class="num">0:61.0</td></tr>
+<tr><td class="n">12</td><td class="label">sign-out</td><td class="line">To finish, press Control K, type Logout, and press Enter.</td><td class="num">10</td><td class="num">0.5s</td><td class="num">2.9s</td><td class="num">0.8s</td><td class="num">4.2s</td><td class="num">0:63.9</td></tr>
+</tbody></table></div>
+<div class="note">One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in has to come from the scene&#x27;s own footage hold, not the narration.</div>
+<footer>
+<div>Built from <code>script.json</code> by <code>Master_Flows/Recorder/scripts/scene_sheet.py</code></div>
+<div>Once the video is built, Video-Editor's <code>build/vtt_html.py</code> replaces this with the measured version.</div>
+</footer>
+</div></body></html>
