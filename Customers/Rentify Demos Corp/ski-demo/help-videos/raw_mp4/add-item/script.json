@@ -1,11 +1,14 @@
 {
  "store": "ski-demo",
  "title": "Adding an item",
- "_note": "BCP admin recipe add-item. Footage: ski-demo_add-item_dev_09-07-28_v4.mp4 (67.9s).",
+ "_note": "BCP admin recipe add-item. CUT FROM ski-demo_add-item_dev_09-08-00_v5.mp4 (85.4s) \u2014 the only take whose screens are all long enough for their scene. v1-v4 are look tests.",
  "words_per_second": 3.44,
  "_wps_note": "Taken from 01-first-time-ordering/script_v33.json, measured 31 words / 9.01s. Nothing for THIS video is rendered yet.",
  "_pauses_note": "One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in has to come from the scene's own footage hold, not the narration.",
  "_lead_in_seconds": 0.5,
+ "_estimated_video_seconds": 60.3,
+ "_estimated_video_note": "12 scenes. 154 words / 3.44 wps = 44.7s of speech, + 12 lead-ins at 0.5s = 6.0s, + 12 exit pauses = 9.6s. ESTIMATE \u2014 nothing is rendered for this video yet, so no line has a real spoken length. Real lines on 01-first-time-ordering ran 2.8 to 3.9 words a second. Recompute from the audio once it exists.",
+ "_footage_seconds": 85.4,
  "scenes": [
   {
    "n": 1,
