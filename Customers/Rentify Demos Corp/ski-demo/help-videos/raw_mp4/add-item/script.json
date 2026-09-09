@@ -1,0 +1,167 @@
+{
+ "store": "ski-demo",
+ "title": "Adding an item",
+ "_note": "BCP admin recipe add-item. Footage: ski-demo_add-item_dev_09-07-28_v4.mp4 (67.9s).",
+ "words_per_second": 3.44,
+ "_wps_note": "Taken from 01-first-time-ordering/script_v33.json, measured 31 words / 9.01s. Nothing for THIS video is rendered yet.",
+ "_pauses_note": "One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in has to come from the scene's own footage hold, not the narration.",
+ "_lead_in_seconds": 0.5,
+ "scenes": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "line": "This is the sign-in screen. Type the email address for your back-office account, then click Send Code.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "0:00.0",
+   "estimated-word-time": "4.9 seconds.",
+   "target-length": "6.2 seconds."
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "line": "A four-digit code is sent to that address. Type it in. The screen moves on by itself.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "0:05.5",
+   "estimated-word-time": "4.9 seconds.",
+   "target-length": "6.2 seconds."
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "line": "This is the dashboard. Everything starts here. Click Businesses.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "0:12.8",
+   "estimated-word-time": "2.6 seconds.",
+   "target-length": "3.9 seconds."
+  },
+  {
+   "n": 4,
+   "label": "find-the-business",
+   "line": "Type the name of your business, then pick it from the list.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "0:15.0",
+   "estimated-word-time": "3.5 seconds.",
+   "target-length": "4.8 seconds."
+  },
+  {
+   "n": 5,
+   "label": "the-business",
+   "line": "This is your business page. Click the lookup icon to see its stores.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "0:20.0",
+   "estimated-word-time": "3.8 seconds.",
+   "target-length": "5.1 seconds."
+  },
+  {
+   "n": 6,
+   "label": "find-the-store",
+   "line": "Type the store name, then pick it.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "0:22.5",
+   "estimated-word-time": "2.0 seconds.",
+   "target-length": "3.3 seconds."
+  },
+  {
+   "n": 7,
+   "label": "the-store",
+   "line": "This is the store page. Click the gear, then choose Lookup Items.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "0:28.0",
+   "estimated-word-time": "3.5 seconds.",
+   "target-length": "4.8 seconds."
+  },
+  {
+   "n": 8,
+   "label": "the-item-list",
+   "line": "This lists every item in the store. Click the plus button to add a new one.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "0:31.0",
+   "estimated-word-time": "4.7 seconds.",
+   "target-length": "6.0 seconds."
+  },
+  {
+   "n": 9,
+   "label": "new-item",
+   "line": "Give the item a name. Then choose the collection it belongs to.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "0:33.5",
+   "estimated-word-time": "3.5 seconds.",
+   "target-length": "4.8 seconds."
+  },
+  {
+   "n": 10,
+   "label": "item-details",
+   "line": "Now the details. Pick the requirement, pick the size, then set the price and how many you have.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "0:47.0",
+   "estimated-word-time": "5.2 seconds.",
+   "target-length": "6.5 seconds."
+  },
+  {
+   "n": 11,
+   "label": "save",
+   "line": "Click Update to save. The item is now in your store.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "0:61.0",
+   "estimated-word-time": "3.2 seconds.",
+   "target-length": "4.5 seconds."
+  },
+  {
+   "n": 12,
+   "label": "sign-out",
+   "line": "To finish, press Control K, type Logout, and press Enter.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "0:63.9",
+   "estimated-word-time": "2.9 seconds.",
+   "target-length": "4.2 seconds."
+  }
+ ]
+}
