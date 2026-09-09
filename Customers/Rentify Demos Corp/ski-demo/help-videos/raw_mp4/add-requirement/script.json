@@ -1,0 +1,170 @@
+{
+ "store": "ski-demo",
+ "title": "Adding a requirement",
+ "_note": "BCP admin recipe add-requirement. A requirement is a named set of questions, and every item points at one.",
+ "words_per_second": 3.44,
+ "_wps_note": "From 01-first-time-ordering/script_v33.json, measured 31 words / 9.01s. Nothing for THIS video is rendered yet.",
+ "_pauses_note": "One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in comes from the scene's footage hold.",
+ "_lead_in_seconds": 0.5,
+ "_estimated_video_seconds": 62.4,
+ "_estimated_video_note": "12 scenes. 161 words / 3.44 wps = 46.8s of speech, + 12 lead-ins at 0.5s = 6.0s, + 12 exit pauses at 0.8s = 9.6s. ESTIMATE \u2014 recompute from the audio once it exists.",
+ "_footage_seconds": 74.5,
+ "scenes": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "line": "This is the sign-in screen. Type the email address for your back-office account, then click Send Code.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "6.0s on camera",
+   "estimated-word-time": "4.9 seconds.",
+   "target-length": "6.2 seconds."
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "line": "A four-digit code is sent to that address. Type it in. The screen moves on by itself.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "3.1s on camera",
+   "estimated-word-time": "4.9 seconds.",
+   "target-length": "6.2 seconds."
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "line": "This is the dashboard. A requirement belongs to one store, so we start at Businesses.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "1.1s on camera",
+   "estimated-word-time": "4.4 seconds.",
+   "target-length": "5.7 seconds."
+  },
+  {
+   "n": 4,
+   "label": "find-the-business",
+   "line": "Type the name of your business, then pick it from the list.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "5.4s on camera",
+   "estimated-word-time": "3.5 seconds.",
+   "target-length": "4.8 seconds."
+  },
+  {
+   "n": 5,
+   "label": "the-business",
+   "line": "This is your business page. Click the lookup icon to see its stores.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "2.1s on camera",
+   "estimated-word-time": "3.8 seconds.",
+   "target-length": "5.1 seconds."
+  },
+  {
+   "n": 6,
+   "label": "find-the-store",
+   "line": "Type the store name, then pick it.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "6.6s on camera",
+   "estimated-word-time": "2.0 seconds.",
+   "target-length": "3.3 seconds."
+  },
+  {
+   "n": 7,
+   "label": "the-store",
+   "line": "This is the store page. Click the gear, then choose Lookup Requirements.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "2.1s on camera",
+   "estimated-word-time": "3.5 seconds.",
+   "target-length": "4.8 seconds."
+  },
+  {
+   "n": 8,
+   "label": "requirement-list",
+   "line": "This lists the store's requirements. Click the plus button to add one.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "3.5s on camera",
+   "estimated-word-time": "3.5 seconds.",
+   "target-length": "4.8 seconds."
+  },
+  {
+   "n": 9,
+   "label": "new-requirement",
+   "line": "Give the requirement a name. A good name says which items it is for.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "7.3s on camera",
+   "estimated-word-time": "4.1 seconds.",
+   "target-length": "5.4 seconds."
+  },
+  {
+   "n": 10,
+   "label": "requirement-details",
+   "line": "A requirement is a set of questions. Add each one the renter must answer, set the status to Active, then save.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "28.9s on camera",
+   "estimated-word-time": "6.1 seconds.",
+   "target-length": "7.4 seconds."
+  },
+  {
+   "n": 11,
+   "label": "saved",
+   "line": "That is the requirement ready. Items can point at it now.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "3.9s on camera",
+   "estimated-word-time": "3.2 seconds.",
+   "target-length": "4.5 seconds."
+  },
+  {
+   "n": 12,
+   "label": "sign-out",
+   "line": "To finish, press Control K, type Logout, and press Enter.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "3.7s on camera",
+   "estimated-word-time": "2.9 seconds.",
+   "target-length": "4.2 seconds."
+  }
+ ]
+}

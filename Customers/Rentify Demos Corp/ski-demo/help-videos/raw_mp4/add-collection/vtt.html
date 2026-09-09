@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ski-demo scenes — add-collection</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{--ground:#F4F6F9;--surface:#fff;--surface-2:#EDF0F5;--ink:#131820;--ink-2:#3D4753;
+--muted:#667082;--line:#D9DEE7;--line-soft:#E7EBF1;--flash:#FFD400;
+--sans:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#12151A;--surface:#191D24;
+--surface-2:#212630;--ink:#E9ECF2;--ink-2:#BCC3CE;--muted:#8D96A6;--line:#2A303A;--line-soft:#232932;}}
+:root[data-theme="dark"]{--ground:#12151A;--surface:#191D24;--surface-2:#212630;--ink:#E9ECF2;
+--ink-2:#BCC3CE;--muted:#8D96A6;--line:#2A303A;--line-soft:#232932;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55}
+.wrap{max-width:1120px;margin:0 auto;padding:36px 22px 64px;display:flex;flex-direction:column;gap:26px}
+.rule{height:3px;width:60px;background:var(--flash);border-radius:2px}
+h1{margin:0;font-size:30px;font-weight:700;letter-spacing:-.02em}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+p{margin:0;max-width:70ch;color:var(--ink-2)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.tile{border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:14px 16px;
+display:flex;flex-direction:column;gap:3px}
+.tile .k{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.tile .v{font-family:var(--mono);font-size:21px;font-weight:500;font-variant-numeric:tabular-nums}
+.tile.hot{box-shadow:inset 0 0 0 2px var(--flash)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;
+color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line);background:var(--surface-2);white-space:nowrap}
+td{padding:11px 12px;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--ink-2)}
+tr:last-child td{border-bottom:none}
+td.n,td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+td.label{font-family:var(--mono);font-size:13px;color:var(--ink);white-space:nowrap}
+td.line{color:var(--ink);min-width:30ch}
+.note{border-left:3px solid var(--flash);background:var(--surface);border-radius:0 6px 6px 0;
+padding:12px 16px;border-top:1px solid var(--line-soft);border-right:1px solid var(--line-soft);
+border-bottom:1px solid var(--line-soft)}
+.note strong{color:var(--ink)}
+code{font-family:var(--mono);font-size:.92em;background:var(--surface-2);padding:1px 5px;border-radius:3px;color:var(--ink)}
+footer{border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:13px;
+display:flex;flex-direction:column;gap:3px}
+</style></head><body><div class="wrap">
+<div class="rule"></div>
+<div class="eyebrow">ski-demo &middot; add-collection &middot; raw capture, not built yet</div>
+<h1>Adding a collection and its items</h1>
+<p>BCP admin recipe add-collection. Three creations in one take: the collection, then its options, then two items. The walk from the dashboard to the store repeats four times, so those lines are deliberately short.</p>
+<div class="tiles">
+<div class="tile hot"><div class="k">Estimated video</div><div class="v">140.7s</div></div>
+<div class="tile"><div class="k">Speech</div><div class="v">95.2s</div></div>
+<div class="tile"><div class="k">Lead-ins</div><div class="v">17.5s</div></div>
+<div class="tile"><div class="k">Exit pauses</div><div class="v">28.0s</div></div>
+<div class="tile"><div class="k">Scenes</div><div class="v">35</div></div>
+<div class="tile"><div class="k">Words</div><div class="v">326</div></div>
+<div class="tile"><div class="k">Footage</div><div class="v">227.6s</div></div>
+</div>
+<div class="note"><strong>Every number here is an estimate.</strong> Speech is words &divide; 3.44 a second, the rate measured from the last rendered video. Nothing has been rendered for THIS one, so no line has a real spoken length. Rebuild this page from the audio once it exists.</div>
+<div class="scroll"><table><thead><tr><th>#</th><th>Scene</th><th>Sarah says</th><th>Words</th><th>Lead-in</th><th>Speech</th><th>Exit</th><th>Scene</th><th>Raw</th></tr></thead><tbody>
+<tr><td class="n">1</td><td class="label">sign-in</td><td class="line">This is the sign-in screen. Type the email address for your back-office account, then click Send Code.</td><td class="num">17</td><td class="num">0.5s</td><td class="num">4.9s</td><td class="num">0.8s</td><td class="num">6.2s</td><td class="num">5.9s on camera</td></tr>
+<tr><td class="n">2</td><td class="label">enter-the-code</td><td class="line">A four-digit code is sent to that address. Type it in. The screen moves on by itself.</td><td class="num">17</td><td class="num">0.5s</td><td class="num">4.9s</td><td class="num">0.8s</td><td class="num">6.2s</td><td class="num">3.1s on camera</td></tr>
+<tr><td class="n">3</td><td class="label">dashboard</td><td class="line">This is the dashboard. A collection belongs to one store, so we start at Businesses.</td><td class="num">15</td><td class="num">0.5s</td><td class="num">4.4s</td><td class="num">0.8s</td><td class="num">5.7s</td><td class="num">1.1s on camera</td></tr>
+<tr><td class="n">4</td><td class="label">find-the-business</td><td class="line">Type the name of your business, then pick it from the list.</td><td class="num">12</td><td class="num">0.5s</td><td class="num">3.5s</td><td class="num">0.8s</td><td class="num">4.8s</td><td class="num">5.4s on camera</td></tr>
+<tr><td class="n">5</td><td class="label">the-business</td><td class="line">This is your business page. Click the lookup icon to see its stores.</td><td class="num">13</td><td class="num">0.5s</td><td class="num">3.8s</td><td class="num">0.8s</td><td class="num">5.1s</td><td class="num">2.1s on camera</td></tr>
+<tr><td class="n">6</td><td class="label">find-the-store</td><td class="line">Type the store name, then pick it.</td><td class="num">7</td><td class="num">0.5s</td><td class="num">2.0s</td><td class="num">0.8s</td><td class="num">3.3s</td><td class="num">6.6s on camera</td></tr>
+<tr><td class="n">7</td><td class="label">the-store</td><td class="line">This is the store page. Click the gear, then choose Lookup Collections.</td><td class="num">12</td><td class="num">0.5s</td><td class="num">3.5s</td><td class="num">0.8s</td><td class="num">4.8s</td><td class="num">2.1s on camera</td></tr>
+<tr><td class="n">8</td><td class="label">collection-list</td><td class="line">This lists the store&#x27;s collections. Click the plus button to add one.</td><td class="num">12</td><td class="num">0.5s</td><td class="num">3.5s</td><td class="num">0.8s</td><td class="num">4.8s</td><td class="num">3.6s on camera</td></tr>
+<tr><td class="n">9</td><td class="label">new-collection</td><td class="line">Give the collection a name. This is the group your items will sit in.</td><td class="num">14</td><td class="num">0.5s</td><td class="num">4.1s</td><td class="num">0.8s</td><td class="num">5.4s</td><td class="num">6.0s on camera</td></tr>
+<tr><td class="n">10</td><td class="label">collection-details</td><td class="line">Add a short description, and the price it starts from. Then save.</td><td class="num">12</td><td class="num">0.5s</td><td class="num">3.5s</td><td class="num">0.8s</td><td class="num">4.8s</td><td class="num">11.1s on camera</td></tr>
+<tr><td class="n">11</td><td class="label">back-for-options</td><td class="line">Now the options. These are the choices a renter picks between, like a size. We come back to the collection to add them.</td><td class="num">23</td><td class="num">0.5s</td><td class="num">6.7s</td><td class="num">0.8s</td><td class="num">8.0s</td><td class="num">17.0s on camera</td></tr>
+<tr><td class="n">12</td><td class="label">find-the-business-2</td><td class="line">Same route as before.</td><td class="num">4</td><td class="num">0.5s</td><td class="num">1.2s</td><td class="num">0.8s</td><td class="num">2.5s</td><td class="num">5.5s on camera</td></tr>
+<tr><td class="n">13</td><td class="label">the-business-2</td><td class="line">Look up the stores.</td><td class="num">4</td><td class="num">0.5s</td><td class="num">1.2s</td><td class="num">0.8s</td><td class="num">2.5s</td><td class="num">2.1s on camera</td></tr>
+<tr><td class="n">14</td><td class="label">find-the-store-2</td><td class="line">Pick the store.</td><td class="num">3</td><td class="num">0.5s</td><td class="num">0.9s</td><td class="num">0.8s</td><td class="num">2.2s</td><td class="num">6.6s on camera</td></tr>
+<tr><td class="n">15</td><td class="label">the-store-2</td><td class="line">Gear, then Lookup Collections.</td><td class="num">4</td><td class="num">0.5s</td><td class="num">1.2s</td><td class="num">0.8s</td><td class="num">2.5s</td><td class="num">2.1s on camera</td></tr>
+<tr><td class="n">16</td><td class="label">find-the-collection</td><td class="line">Open the collection you just made.</td><td class="num">6</td><td class="num">0.5s</td><td class="num">1.7s</td><td class="num">0.8s</td><td class="num">3.0s</td><td class="num">7.9s on camera</td></tr>
+<tr><td class="n">17</td><td class="label">set-options</td><td class="line">The options field is a list. Each one has a label the renter sees, and the values they can choose. Save when it is done.</td><td class="num">25</td><td class="num">0.5s</td><td class="num">7.3s</td><td class="num">0.8s</td><td class="num">8.6s</td><td class="num">14.4s on camera</td></tr>
+<tr><td class="n">18</td><td class="label">back-for-items</td><td class="line">Now the items themselves. Each one goes into the collection we just built.</td><td class="num">13</td><td class="num">0.5s</td><td class="num">3.8s</td><td class="num">0.8s</td><td class="num">5.1s</td><td class="num">0.4s on camera</td></tr>
+<tr><td class="n">19</td><td class="label">find-the-business-3</td><td class="line">Same route again.</td><td class="num">3</td><td class="num">0.5s</td><td class="num">0.9s</td><td class="num">0.8s</td><td class="num">2.2s</td><td class="num">5.5s on camera</td></tr>
+<tr><td class="n">20</td><td class="label">the-business-3</td><td class="line">Look up the stores.</td><td class="num">4</td><td class="num">0.5s</td><td class="num">1.2s</td><td class="num">0.8s</td><td class="num">2.5s</td><td class="num">2.1s on camera</td></tr>
+<tr><td class="n">21</td><td class="label">find-the-store-3</td><td class="line">Pick the store.</td><td class="num">3</td><td class="num">0.5s</td><td class="num">0.9s</td><td class="num">0.8s</td><td class="num">2.2s</td><td class="num">6.5s on camera</td></tr>
+<tr><td class="n">22</td><td class="label">the-store-3</td><td class="line">This time choose Lookup Items.</td><td class="num">5</td><td class="num">0.5s</td><td class="num">1.5s</td><td class="num">0.8s</td><td class="num">2.8s</td><td class="num">2.1s on camera</td></tr>
+<tr><td class="n">23</td><td class="label">item-list</td><td class="line">Click the plus button to add the first item.</td><td class="num">9</td><td class="num">0.5s</td><td class="num">2.6s</td><td class="num">0.8s</td><td class="num">3.9s</td><td class="num">3.5s on camera</td></tr>
+<tr><td class="n">24</td><td class="label">new-item-1</td><td class="line">Name the item, then choose the collection it belongs to.</td><td class="num">10</td><td class="num">0.5s</td><td class="num">2.9s</td><td class="num">0.8s</td><td class="num">4.2s</td><td class="num">13.9s on camera</td></tr>
+<tr><td class="n">25</td><td class="label">item-details-1</td><td class="line">Pick the requirement, pick its option value, then set the price and how many you have.</td><td class="num">16</td><td class="num">0.5s</td><td class="num">4.7s</td><td class="num">0.8s</td><td class="num">6.0s</td><td class="num">15.5s on camera</td></tr>
+<tr><td class="n">26</td><td class="label">back-for-item-2</td><td class="line">That is the first one. The second is exactly the same journey.</td><td class="num">12</td><td class="num">0.5s</td><td class="num">3.5s</td><td class="num">0.8s</td><td class="num">4.8s</td><td class="num">14.9s on camera</td></tr>
+<tr><td class="n">27</td><td class="label">find-the-business-4</td><td class="line">Same route.</td><td class="num">2</td><td class="num">0.5s</td><td class="num">0.6s</td><td class="num">0.8s</td><td class="num">1.9s</td><td class="num">5.5s on camera</td></tr>
+<tr><td class="n">28</td><td class="label">the-business-4</td><td class="line">Look up the stores.</td><td class="num">4</td><td class="num">0.5s</td><td class="num">1.2s</td><td class="num">0.8s</td><td class="num">2.5s</td><td class="num">2.2s on camera</td></tr>
+<tr><td class="n">29</td><td class="label">find-the-store-4</td><td class="line">Pick the store.</td><td class="num">3</td><td class="num">0.5s</td><td class="num">0.9s</td><td class="num">0.8s</td><td class="num">2.2s</td><td class="num">6.6s on camera</td></tr>
+<tr><td class="n">30</td><td class="label">the-store-4</td><td class="line">Gear, then Lookup Items.</td><td class="num">4</td><td class="num">0.5s</td><td class="num">1.2s</td><td class="num">0.8s</td><td class="num">2.5s</td><td class="num">2.1s on camera</td></tr>
+<tr><td class="n">31</td><td class="label">item-list-2</td><td class="line">Plus button again.</td><td class="num">3</td><td class="num">0.5s</td><td class="num">0.9s</td><td class="num">0.8s</td><td class="num">2.2s</td><td class="num">3.6s on camera</td></tr>
+<tr><td class="n">32</td><td class="label">new-item-2</td><td class="line">Name the second item, and choose the same collection.</td><td class="num">9</td><td class="num">0.5s</td><td class="num">2.6s</td><td class="num">0.8s</td><td class="num">3.9s</td><td class="num">14.1s on camera</td></tr>
+<tr><td class="n">33</td><td class="label">item-details-2</td><td class="line">Same details, with the other option value. Save.</td><td class="num">8</td><td class="num">0.5s</td><td class="num">2.3s</td><td class="num">0.8s</td><td class="num">3.6s</td><td class="num">15.5s on camera</td></tr>
+<tr><td class="n">34</td><td class="label">saved</td><td class="line">The collection now has two items in it.</td><td class="num">8</td><td class="num">0.5s</td><td class="num">2.3s</td><td class="num">0.8s</td><td class="num">3.6s</td><td class="num">1.8s on camera</td></tr>
+<tr><td class="n">35</td><td class="label">sign-out</td><td class="line">To finish, press Control K, type Logout, and press Enter.</td><td class="num">10</td><td class="num">0.5s</td><td class="num">2.9s</td><td class="num">0.8s</td><td class="num">4.2s</td><td class="num">3.7s on camera</td></tr>
+</tbody></table></div>
+<div class="note">One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in comes from the scene&#x27;s footage hold.</div>
+<footer>
+<div>Built from <code>script.json</code> by <code>Master_Flows/Recorder/scripts/scene_sheet.py</code></div>
+<div>Once the video is built, Video-Editor's <code>build/vtt_html.py</code> replaces this with the measured version.</div>
+</footer>
+</div></body></html>

@@ -1,0 +1,154 @@
+WEBVTT
+
+NOTE
+add-requirement — 12 screens, 12 avatar scenes
+ski-demo, BCP admin.
+
+BCP admin recipe add-requirement. A requirement is a named set of questions, and every item points at one.
+
+EVERY SCENE HAS A LEAD-IN AND AN EXIT PAUSE.
+
+  lead-in  0.5s   Sarah on screen before she starts. A scene that opens
+                mid-word has no edit point.
+  exit     0.8s   after she stops — the join the next scene's crossfade
+                eats into, and what an editor trims to.
+
+  A scene is lead-in + speech + exit. The cue covers ONLY the speech;
+  the scene's own start and end are in its NOTE.
+
+THE CUE TIMES ARE THE NARRATION TIMELINE, not the footage. The `raw` line
+in each NOTE is how long that screen was really on camera. They differ on
+purpose — a screen that takes 15 seconds to fill in does not need 15
+seconds of talking over it. What matters is that no screen is SHORTER
+than its scene.
+
+SPEAKING RATE 3.44 words a second. MEASURED, from two rendered clips —
+31 words in 9.01s, see 01-first-time-ordering/script_v33.json's _wps_note.
+Still an estimate for THIS video: nothing is rendered, so no line has a
+real spoken length. Re-time from the audio once it exists.
+
+  words                 161
+  speech only           46.8s
+  lead-ins + exits      15.6s
+  FINISHED VIDEO        62.4s
+  raw footage           74.5s
+
+NOTE
+scene 01  sign-in
+  raw        6.0s on camera
+  scene      00:00:00.000 to 00:00:06.200  (6.2s)
+  lead-in    0.5s     speech 17 words, 4.9s     exit 0.8s
+
+scene-01-sign-in
+00:00:00.500 --> 00:00:05.400
+This is the sign-in screen. Type the email address for your back-office account, then click Send Code.
+
+NOTE
+scene 02  enter-the-code
+  raw        3.1s on camera
+  scene      00:00:06.200 to 00:00:12.400  (6.2s)
+  lead-in    0.5s     speech 17 words, 4.9s     exit 0.8s
+
+scene-02-enter-the-code
+00:00:06.700 --> 00:00:11.600
+A four-digit code is sent to that address. Type it in. The screen moves on by itself.
+
+NOTE
+scene 03  dashboard
+  raw        1.1s on camera
+  scene      00:00:12.400 to 00:00:18.100  (5.7s)
+  lead-in    0.5s     speech 15 words, 4.4s     exit 0.8s
+
+scene-03-dashboard
+00:00:12.900 --> 00:00:17.300
+This is the dashboard. A requirement belongs to one store, so we start at Businesses.
+
+NOTE
+scene 04  find-the-business
+  raw        5.4s on camera
+  scene      00:00:18.100 to 00:00:22.900  (4.8s)
+  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
+
+scene-04-find-the-business
+00:00:18.600 --> 00:00:22.100
+Type the name of your business, then pick it from the list.
+
+NOTE
+scene 05  the-business
+  raw        2.1s on camera
+  scene      00:00:22.900 to 00:00:28.000  (5.1s)
+  lead-in    0.5s     speech 13 words, 3.8s     exit 0.8s
+
+scene-05-the-business
+00:00:23.400 --> 00:00:27.200
+This is your business page. Click the lookup icon to see its stores.
+
+NOTE
+scene 06  find-the-store
+  raw        6.6s on camera
+  scene      00:00:28.000 to 00:00:31.300  (3.3s)
+  lead-in    0.5s     speech 7 words, 2.0s     exit 0.8s
+
+scene-06-find-the-store
+00:00:28.500 --> 00:00:30.500
+Type the store name, then pick it.
+
+NOTE
+scene 07  the-store
+  raw        2.1s on camera
+  scene      00:00:31.300 to 00:00:36.100  (4.8s)
+  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
+
+scene-07-the-store
+00:00:31.800 --> 00:00:35.300
+This is the store page. Click the gear, then choose Lookup Requirements.
+
+NOTE
+scene 08  requirement-list
+  raw        3.5s on camera
+  scene      00:00:36.100 to 00:00:40.900  (4.8s)
+  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
+
+scene-08-requirement-list
+00:00:36.600 --> 00:00:40.100
+This lists the store's requirements. Click the plus button to add one.
+
+NOTE
+scene 09  new-requirement
+  raw        7.3s on camera
+  scene      00:00:40.900 to 00:00:46.300  (5.4s)
+  lead-in    0.5s     speech 14 words, 4.1s     exit 0.8s
+
+scene-09-new-requirement
+00:00:41.400 --> 00:00:45.500
+Give the requirement a name. A good name says which items it is for.
+
+NOTE
+scene 10  requirement-details
+  raw        28.9s on camera
+  scene      00:00:46.300 to 00:00:53.700  (7.4s)
+  lead-in    0.5s     speech 21 words, 6.1s     exit 0.8s
+
+scene-10-requirement-details
+00:00:46.800 --> 00:00:52.900
+A requirement is a set of questions. Add each one the renter must answer, set the status to Active, then save.
+
+NOTE
+scene 11  saved
+  raw        3.9s on camera
+  scene      00:00:53.700 to 00:00:58.200  (4.5s)
+  lead-in    0.5s     speech 11 words, 3.2s     exit 0.8s
+
+scene-11-saved
+00:00:54.200 --> 00:00:57.400
+That is the requirement ready. Items can point at it now.
+
+NOTE
+scene 12  sign-out
+  raw        3.7s on camera
+  scene      00:00:58.200 to 00:01:02.400  (4.2s)
+  lead-in    0.5s     speech 10 words, 2.9s     exit 0.8s
+
+scene-12-sign-out
+00:00:58.700 --> 00:01:01.600
+To finish, press Control K, type Logout, and press Enter.
