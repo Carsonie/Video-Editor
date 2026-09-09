@@ -1,0 +1,173 @@
+WEBVTT
+
+NOTE
+add-item — 12 screens, 12 avatar scenes
+ski-demo, BCP admin. Written 2026-09-09, re-timed the same day.
+
+Source footage: ski-demo_add-item_dev_09-07-28_v4.mp4 (67.9s)
+  The border-only take: no yellow wash, the ring held while a field is typed
+  into, and square elements rounded while lit.
+
+EVERY SCENE HAS A LEAD-IN AND AN EXIT PAUSE.
+
+  lead-in  0.5s   Sarah is on screen before she starts. A scene that opens
+                mid-word has no edit point, and cuts hard against the one
+                before it.
+  exit     0.8s   after she stops. This is the join: it is what the next
+                scene's crossfade eats into, and what an editor trims to.
+
+  So a scene is  lead-in + speech + exit, and the cue below covers ONLY the
+  speech. The scene's own start and end are in its NOTE.
+
+THE EXIT PAUSE IS DECLARED, NOT YET AUTOMATIC. The pipeline's `pauses` field
+(script.json, one entry per scene here) is summed into the spoken length, but
+build/preview_narration.py's own docstring says the splice is NOT performed by
+assemble_video.py — scene 7 of the first-time-ordering video was spliced by
+hand. Treat the exit as a number to cut to, not one that appears on its own.
+
+SPEAKING RATE 3.44 words a second. MEASURED, from two rendered clips —
+31 words in 9.01s — see script_v33.json's _wps_note. An earlier draft of this
+file used 2.58 and every scene came out about a third too long.
+
+Still an ESTIMATE. Nothing has been rendered for THIS video, so no line has a
+real spoken length. Real ones on the first-time-ordering video ran between
+2.8 and 3.9 words a second. Re-time from the audio once it exists.
+
+  words                 154
+  speech only           44.7s
+  lead-ins + exits      15.6s
+  FINISHED VIDEO        60.3s
+  raw footage available  67.9s
+
+NOTE
+scene 01  sign-in
+  screen     the /auth screen, email field
+  raw        0:00.0 in ski-demo_add-item_dev_09-07-28_v4.mp4
+  scene      00:00:00.000 to 00:00:06.200  (6.2s)
+  lead-in    0.5s     speech 17 words, 4.9s     exit 0.8s
+
+scene-01-sign-in
+00:00:00.500 --> 00:00:05.400
+This is the sign-in screen. Type the email address for your back-office account, then click Send Code.
+
+NOTE
+scene 02  enter-the-code
+  screen     the four-digit PIN screen
+  raw        0:05.5 in ski-demo_add-item_dev_09-07-28_v4.mp4
+  scene      00:00:06.200 to 00:00:12.400  (6.2s)
+  lead-in    0.5s     speech 17 words, 4.9s     exit 0.8s
+
+scene-02-enter-the-code
+00:00:06.700 --> 00:00:11.600
+A four-digit code is sent to that address. Type it in. The screen moves on by itself.
+
+NOTE
+scene 03  dashboard
+  screen     the six section cards
+  raw        0:12.8 in ski-demo_add-item_dev_09-07-28_v4.mp4
+  scene      00:00:12.400 to 00:00:16.300  (3.9s)
+  lead-in    0.5s     speech 9 words, 2.6s     exit 0.8s
+
+scene-03-dashboard
+00:00:12.900 --> 00:00:15.500
+This is the dashboard. Everything starts here. Click Businesses.
+
+NOTE
+scene 04  find-the-business
+  screen     Businesses lookup, search box
+  raw        0:15.0 in ski-demo_add-item_dev_09-07-28_v4.mp4
+  scene      00:00:16.300 to 00:00:21.100  (4.8s)
+  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
+
+scene-04-find-the-business
+00:00:16.800 --> 00:00:20.300
+Type the name of your business, then pick it from the list.
+
+NOTE
+scene 05  the-business
+  screen     the business page
+  raw        0:20.0 in ski-demo_add-item_dev_09-07-28_v4.mp4
+  scene      00:00:21.100 to 00:00:26.200  (5.1s)
+  lead-in    0.5s     speech 13 words, 3.8s     exit 0.8s
+
+scene-05-the-business
+00:00:21.600 --> 00:00:25.400
+This is your business page. Click the lookup icon to see its stores.
+
+NOTE
+scene 06  find-the-store
+  screen     Stores lookup, search box
+  raw        0:22.5 in ski-demo_add-item_dev_09-07-28_v4.mp4
+  scene      00:00:26.200 to 00:00:29.500  (3.3s)
+  lead-in    0.5s     speech 7 words, 2.0s     exit 0.8s
+
+scene-06-find-the-store
+00:00:26.700 --> 00:00:28.700
+Type the store name, then pick it.
+
+NOTE
+scene 07  the-store
+  screen     the store page, gear menu
+  raw        0:28.0 in ski-demo_add-item_dev_09-07-28_v4.mp4
+  scene      00:00:29.500 to 00:00:34.300  (4.8s)
+  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
+
+scene-07-the-store
+00:00:30.000 --> 00:00:33.500
+This is the store page. Click the gear, then choose Lookup Items.
+
+NOTE
+scene 08  the-item-list
+  screen     Items lookup, the + button
+  raw        0:31.0 in ski-demo_add-item_dev_09-07-28_v4.mp4
+  scene      00:00:34.300 to 00:00:40.300  (6.0s)
+  lead-in    0.5s     speech 16 words, 4.7s     exit 0.8s
+
+scene-08-the-item-list
+00:00:34.800 --> 00:00:39.500
+This lists every item in the store. Click the plus button to add a new one.
+
+NOTE
+scene 09  new-item
+  screen     the create-item form
+  raw        0:33.5 in ski-demo_add-item_dev_09-07-28_v4.mp4
+  scene      00:00:40.300 to 00:00:45.100  (4.8s)
+  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
+
+scene-09-new-item
+00:00:40.800 --> 00:00:44.300
+Give the item a name. Then choose the collection it belongs to.
+
+NOTE
+scene 10  item-details
+  screen     the saved item's own page
+  raw        0:47.0 in ski-demo_add-item_dev_09-07-28_v4.mp4
+  scene      00:00:45.100 to 00:00:51.600  (6.5s)
+  lead-in    0.5s     speech 18 words, 5.2s     exit 0.8s
+
+scene-10-item-details
+00:00:45.600 --> 00:00:50.800
+Now the details. Pick the requirement, pick the size, then set the price and how many you have.
+
+NOTE
+scene 11  save
+  screen     Update pressed, item saved
+  raw        0:61.0 in ski-demo_add-item_dev_09-07-28_v4.mp4
+  scene      00:00:51.600 to 00:00:56.100  (4.5s)
+  lead-in    0.5s     speech 11 words, 3.2s     exit 0.8s
+
+scene-11-save
+00:00:52.100 --> 00:00:55.300
+Click Update to save. The item is now in your store.
+
+NOTE
+scene 12  sign-out
+  screen     Ctrl+K, then back to /auth
+  raw        0:63.9 in ski-demo_add-item_dev_09-07-28_v4.mp4
+  scene      00:00:56.100 to 00:01:00.300  (4.2s)
+  lead-in    0.5s     speech 10 words, 2.9s     exit 0.8s
+
+scene-12-sign-out
+00:00:56.600 --> 00:00:59.500
+To finish, press Control K, type Logout, and press Enter.
+

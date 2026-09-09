@@ -29,6 +29,10 @@ Customers/**/z_History/**
 !Customers/*/*/help-videos/**/*.json
 !Customers/*/*/help-videos/**/*.md
 !Customers/*/*/help-videos/**/*.txt
+# A .vtt is SCRIPT, not footage — the same words as the script.json beside it,
+# in the form an editor and a player can both read. Added 2026-09-09, when
+# add-item's twelve-scene vtt was written and then silently not committed.
+!Customers/*/*/help-videos/**/*.vtt
 !Customers/*/*/help-videos/**/.gitkeep
 # The cut plan's contact sheet — 65 KB, and the tool tells you to look at it
 # before cutting. It was tracked in Basic_E2E_Testing for the same reason;
