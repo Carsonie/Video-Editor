@@ -1,0 +1,150 @@
+{
+ "source": "ski-demo_add-item_dev_09-14-17_v12.mp4",
+ "output": "ski-demo_add-item_dev_09-14-17_v13.mp4",
+ "output_seconds": 127.72,
+ "scenes": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "src_in": 0.0,
+   "src_out": 6.48,
+   "on_camera": 6.48,
+   "scene_needs": 6.8,
+   "built": 6.8,
+   "factor": 1.0494,
+   "stretched": true
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "src_in": 6.48,
+   "src_out": 13.08,
+   "on_camera": 6.6,
+   "scene_needs": 7.1,
+   "built": 7.08,
+   "factor": 1.0758,
+   "stretched": true
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "src_in": 13.08,
+   "src_out": 17.32,
+   "on_camera": 4.24,
+   "scene_needs": 6.5,
+   "built": 6.52,
+   "factor": 1.533,
+   "stretched": true
+  },
+  {
+   "n": 4,
+   "label": "find-the-business",
+   "src_in": 17.32,
+   "src_out": 25.84,
+   "on_camera": 8.52,
+   "scene_needs": 5.1,
+   "built": 8.52,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 5,
+   "label": "the-business",
+   "src_in": 25.84,
+   "src_out": 30.88,
+   "on_camera": 5.04,
+   "scene_needs": 5.7,
+   "built": 5.72,
+   "factor": 1.131,
+   "stretched": true
+  },
+  {
+   "n": 6,
+   "label": "find-the-store",
+   "src_in": 30.88,
+   "src_out": 40.4,
+   "on_camera": 9.52,
+   "scene_needs": 4.8,
+   "built": 9.52,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 7,
+   "label": "the-store",
+   "src_in": 40.4,
+   "src_out": 48.32,
+   "on_camera": 7.92,
+   "scene_needs": 6.0,
+   "built": 7.92,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 8,
+   "label": "item-list",
+   "src_in": 48.32,
+   "src_out": 51.76,
+   "on_camera": 3.44,
+   "scene_needs": 6.0,
+   "built": 6.0,
+   "factor": 1.7442,
+   "stretched": true
+  },
+  {
+   "n": 9,
+   "label": "new-item",
+   "src_in": 51.76,
+   "src_out": 70.72,
+   "on_camera": 18.96,
+   "scene_needs": 5.7,
+   "built": 18.96,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 10,
+   "label": "item-details",
+   "src_in": 70.72,
+   "src_out": 106.6,
+   "on_camera": 35.88,
+   "scene_needs": 19.4,
+   "built": 35.88,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 11,
+   "label": "saved",
+   "src_in": 106.6,
+   "src_out": 109.44,
+   "on_camera": 2.84,
+   "scene_needs": 4.2,
+   "built": 4.2,
+   "factor": 1.4789,
+   "stretched": true
+  },
+  {
+   "n": 12,
+   "label": "back-to-dashboard",
+   "src_in": 109.44,
+   "src_out": 113.6,
+   "on_camera": 4.16,
+   "scene_needs": 5.4,
+   "built": 5.4,
+   "factor": 1.2981,
+   "stretched": true
+  },
+  {
+   "n": 13,
+   "label": "sign-out",
+   "src_in": 113.6,
+   "src_out": 118.8,
+   "on_camera": 5.2,
+   "scene_needs": 2.8,
+   "built": 5.2,
+   "factor": 1.0,
+   "stretched": false
+  }
+ ]
+}

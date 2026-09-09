@@ -1,170 +1,183 @@
 {
  "store": "ski-demo",
  "title": "Adding an item",
- "_note": "BCP admin recipe add-item. CUT FROM ski-demo_add-item_dev_09-08-00_v5.mp4 (81.6s) \u2014 the only take whose screens are all long enough for their scene. v1-v4 are look tests. Lead-in trimmed 2026-09-09: the first 4s were desktop and a blank browser.",
+ "_note": "BCP admin recipe add-item. Cut from ski-demo_add-item_dev_09-14-17_v15.mp4 (127.72s). The PICTURE has been unchanged since v13 \u2014 v14 and v15 changed only the narration, because every screen was already long enough for the new lines. The lines carry {0.3} beat markers; a marker is never counted as a word and its silence is always added to the scene. \u26a0 v10, v11 and the ORIGINAL v12 capture are no longer on disk, so this cut can no longer be rebuilt from source. bounds_v12.json still holds the screen edges if a re-record happens.",
  "words_per_second": 3.44,
- "_wps_note": "Taken from 01-first-time-ordering/script_v33.json, measured 31 words / 9.01s. Nothing for THIS video is rendered yet.",
- "_pauses_note": "One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in has to come from the scene's own footage hold, not the narration.",
+ "_wps_note": "From 01-first-time-ordering/script_v33.json, measured 31 words / 9.01s. Nothing for THIS video is rendered yet.",
+ "_pauses_note": "One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in comes from the scene's footage hold.",
  "_lead_in_seconds": 0.5,
- "_estimated_video_seconds": 60.3,
- "_estimated_video_note": "12 scenes. 154 words / 3.44 wps = 44.7s of speech, + 12 lead-ins at 0.5s = 6.0s, + 12 exit pauses = 9.6s. ESTIMATE \u2014 nothing is rendered for this video yet, so no line has a real spoken length. Real lines on 01-first-time-ordering ran 2.8 to 3.9 words a second. Recompute from the audio once it exists.",
- "_footage_seconds": 81.6,
+ "_estimated_video_seconds": 99.0,
+ "_estimated_video_note": "13 scenes. 198 words / 3.44 wps = 57.8s of speech, + 13 lead-ins at 0.5s = 6.5s, + 13 exit pauses at 0.8s = 10.4s. ESTIMATE \u2014 recompute from the audio once it exists.",
+ "_footage_seconds": 127.72,
  "scenes": [
   {
    "n": 1,
    "label": "sign-in",
-   "line": "This is the sign-in screen. Type the email address for your back-office account, then click Send Code.",
+   "line": "Please provide us your email, so we can sent you a login code. Then click the Send Code button.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "0:00.0",
-   "estimated-word-time": "4.9 seconds.",
-   "target-length": "6.2 seconds."
+   "raw-source": "6.8s on camera",
+   "estimated-word-time": "5.5 seconds.",
+   "target-length": "6.8 seconds."
   },
   {
    "n": 2,
    "label": "enter-the-code",
-   "line": "A four-digit code is sent to that address. Type it in. The screen moves on by itself.",
+   "line": "We sent you a four-digit code to that address. {.3} If you are not seeing it, check your spam folder.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "0:05.5",
-   "estimated-word-time": "4.9 seconds.",
-   "target-length": "6.2 seconds."
+   "raw-source": "7.08s on camera",
+   "estimated-word-time": "5.5 seconds.",
+   "target-length": "7.1 seconds."
   },
   {
    "n": 3,
    "label": "dashboard",
-   "line": "This is the dashboard. Everything starts here. Click Businesses.",
+   "line": "This is your dashboard. {.5} You can return here anytime with the command + K short keys.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "0:12.8",
-   "estimated-word-time": "2.6 seconds.",
-   "target-length": "3.9 seconds."
+   "raw-source": "6.52s on camera",
+   "estimated-word-time": "4.7 seconds.",
+   "target-length": "6.5 seconds."
   },
   {
    "n": 4,
    "label": "find-the-business",
-   "line": "Type the name of your business, then pick it from the list.",
+   "line": "Type the name of a business, then select it from the dropdown list.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "0:15.0",
-   "estimated-word-time": "3.5 seconds.",
-   "target-length": "4.8 seconds."
-  },
-  {
-   "n": 5,
-   "label": "the-business",
-   "line": "This is your business page. Click the lookup icon to see its stores.",
-   "pauses": [
-    {
-     "seconds": 0.8
-    }
-   ],
-   "raw-source": "0:20.0",
+   "raw-source": "8.52s on camera",
    "estimated-word-time": "3.8 seconds.",
    "target-length": "5.1 seconds."
   },
   {
-   "n": 6,
-   "label": "find-the-store",
-   "line": "Type the store name, then pick it.",
+   "n": 5,
+   "label": "the-business",
+   "line": "This is the business info page. {.3} Click the lookup icon to find the stores.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "0:22.5",
-   "estimated-word-time": "2.0 seconds.",
-   "target-length": "3.3 seconds."
+   "raw-source": "5.72s on camera",
+   "estimated-word-time": "4.1 seconds.",
+   "target-length": "5.7 seconds."
+  },
+  {
+   "n": 6,
+   "label": "find-the-store",
+   "line": "Type the store name, {.3} then select it from the dropdown list.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "9.52s on camera",
+   "estimated-word-time": "3.2 seconds.",
+   "target-length": "4.8 seconds."
   },
   {
    "n": 7,
    "label": "the-store",
-   "line": "This is the store page. Click the gear, then choose Lookup Items.",
+   "line": "Now you are on the store details page. {.3} Click the gear, then choose Lookup Items.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "0:28.0",
-   "estimated-word-time": "3.5 seconds.",
-   "target-length": "4.8 seconds."
+   "raw-source": "7.92s on camera",
+   "estimated-word-time": "4.4 seconds.",
+   "target-length": "6.0 seconds."
   },
   {
    "n": 8,
-   "label": "the-item-list",
-   "line": "This lists every item in the store. Click the plus button to add a new one.",
+   "label": "item-list",
+   "line": "This is the lookup items search. {.3} To add new item, {.3} click the plus button.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "0:31.0",
-   "estimated-word-time": "4.7 seconds.",
+   "raw-source": "6.0s on camera",
+   "estimated-word-time": "4.1 seconds.",
    "target-length": "6.0 seconds."
   },
   {
    "n": 9,
    "label": "new-item",
-   "line": "Give the item a name. Then choose the collection it belongs to.",
+   "line": "Give the item a name. Then choose the collection it belongs to, and create this item.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "0:33.5",
-   "estimated-word-time": "3.5 seconds.",
-   "target-length": "4.8 seconds."
+   "raw-source": "18.96s on camera",
+   "estimated-word-time": "4.7 seconds.",
+   "target-length": "6.0 seconds."
   },
   {
    "n": 10,
    "label": "item-details",
-   "line": "Now the details. Pick the requirement, pick the size, then set the price and how many you have.",
+   "line": "Now add the item details. Add an image first. {1} Then add a description, {10} Add the quantity. {3} And the price. {3} Select the requirement. {3} Then select the boot size as a variant {2} and save.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "0:47.0",
-   "estimated-word-time": "5.2 seconds.",
-   "target-length": "6.5 seconds."
+   "raw-source": "35.88s on camera",
+   "estimated-word-time": "9.3 seconds.",
+   "target-length": "32.6 seconds."
   },
   {
    "n": 11,
-   "label": "save",
-   "line": "Click Update to save. The item is now in your store.",
+   "label": "saved",
+   "line": "That is the item ready for the store to rent.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "0:61.0",
-   "estimated-word-time": "3.2 seconds.",
-   "target-length": "4.5 seconds."
+   "raw-source": "4.2s on camera",
+   "estimated-word-time": "2.9 seconds.",
+   "target-length": "4.2 seconds."
   },
   {
    "n": 12,
-   "label": "sign-out",
-   "line": "To finish, press Control K, type Logout, and press Enter.",
+   "label": "back-to-dashboard",
+   "line": "Back to the dashboard where you can log out or select a card option.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "0:63.9",
-   "estimated-word-time": "2.9 seconds.",
-   "target-length": "4.2 seconds."
+   "raw-source": "5.4s on camera",
+   "estimated-word-time": "4.1 seconds.",
+   "target-length": "5.4 seconds."
+  },
+  {
+   "n": 13,
+   "label": "sign-out",
+   "line": "You are now logged out.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "5.2s on camera",
+   "estimated-word-time": "1.5 seconds.",
+   "target-length": "2.8 seconds."
   }
  ]
 }

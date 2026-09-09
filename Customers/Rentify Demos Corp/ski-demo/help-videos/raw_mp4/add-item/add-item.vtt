@@ -1,173 +1,164 @@
 WEBVTT
 
 NOTE
-add-item — 12 screens, 12 avatar scenes
-ski-demo, BCP admin. Written 2026-09-09, re-timed the same day.
+add-item — 13 screens, 13 avatar scenes
+ski-demo, BCP admin.
 
-Source footage: ski-demo_add-item_dev_09-08-00_v5.mp4 (81.6s, lead-in trimmed)
-  The border-only take: no yellow wash, the ring held while a field is typed
-  into, and square elements rounded while lit.
+BCP admin recipe add-item. Cut from ski-demo_add-item_dev_09-14-17_v15.mp4 (127.72s). The PICTURE has been unchanged since v13 — v14 and v15 changed only the narration, because every screen was already long enough for the new lines. The lines carry {0.3} beat markers; a marker is never counted as a word and its silence is always added to the scene. ⚠ v10, v11 and the ORIGINAL v12 capture are no longer on disk, so this cut can no longer be rebuilt from source. bounds_v12.json still holds the screen edges if a re-record happens.
 
 EVERY SCENE HAS A LEAD-IN AND AN EXIT PAUSE.
 
-  lead-in  0.5s   Sarah is on screen before she starts. A scene that opens
-                mid-word has no edit point, and cuts hard against the one
-                before it.
-  exit     0.8s   after she stops. This is the join: it is what the next
-                scene's crossfade eats into, and what an editor trims to.
+  lead-in  0.5s   Sarah on screen before she starts. A scene that opens
+                mid-word has no edit point.
+  exit     0.8s   after she stops — the join the next scene's crossfade
+                eats into, and what an editor trims to.
 
-  So a scene is  lead-in + speech + exit, and the cue below covers ONLY the
-  speech. The scene's own start and end are in its NOTE.
+  A scene is lead-in + speech + exit. The cue covers ONLY the speech;
+  the scene's own start and end are in its NOTE.
 
-THE EXIT PAUSE IS DECLARED, NOT YET AUTOMATIC. The pipeline's `pauses` field
-(script.json, one entry per scene here) is summed into the spoken length, but
-build/preview_narration.py's own docstring says the splice is NOT performed by
-assemble_video.py — scene 7 of the first-time-ordering video was spliced by
-hand. Treat the exit as a number to cut to, not one that appears on its own.
+THE CUE TIMES ARE THE NARRATION TIMELINE, not the footage. The `raw` line
+in each NOTE is how long that screen was really on camera. They differ on
+purpose — a screen that takes 15 seconds to fill in does not need 15
+seconds of talking over it. What matters is that no screen is SHORTER
+than its scene.
 
 SPEAKING RATE 3.44 words a second. MEASURED, from two rendered clips —
-31 words in 9.01s — see script_v33.json's _wps_note. An earlier draft of this
-file used 2.58 and every scene came out about a third too long.
+31 words in 9.01s, see 01-first-time-ordering/script_v33.json's _wps_note.
+Still an estimate for THIS video: nothing is rendered, so no line has a
+real spoken length. Re-time from the audio once it exists.
 
-Still an ESTIMATE. Nothing has been rendered for THIS video, so no line has a
-real spoken length. Real ones on the first-time-ordering video ran between
-2.8 and 3.9 words a second. Re-time from the audio once it exists.
-
-  words                 154
-  speech only           44.7s
-  lead-ins + exits      15.6s
-  FINISHED VIDEO        60.3s
-  raw footage available  81.6s
+  words                 198
+  speech only           57.8s
+  lead-ins + exits      16.9s
+  FINISHED VIDEO        99.0s
+  raw footage           127.72s
 
 NOTE
 scene 01  sign-in
-  screen     the /auth screen, email field
-  raw        0:00.0 in ski-demo_add-item_dev_09-07-28_v4.mp4
-  scene      00:00:00.000 to 00:00:06.200  (6.2s)
-  lead-in    0.5s     speech 17 words, 4.9s     exit 0.8s
+  raw        6.8s on camera
+  scene      00:00:00.000 to 00:00:06.800  (6.8s)
+  lead-in    0.5s     speech 19 words, 5.5s     exit 0.8s
 
 scene-01-sign-in
-00:00:00.500 --> 00:00:05.400
-This is the sign-in screen. Type the email address for your back-office account, then click Send Code.
+00:00:00.500 --> 00:00:06.000
+Please provide us your email, so we can sent you a login code. Then click the Send Code button.
 
 NOTE
 scene 02  enter-the-code
-  screen     the four-digit PIN screen
-  raw        0:05.5 in ski-demo_add-item_dev_09-07-28_v4.mp4
-  scene      00:00:06.200 to 00:00:12.400  (6.2s)
-  lead-in    0.5s     speech 17 words, 4.9s     exit 0.8s
+  raw        7.08s on camera
+  scene      00:00:06.800 to 00:00:13.900  (7.1s)
+  lead-in    0.5s     speech 19 words, 5.5s     beats 0.3s     exit 0.8s
 
 scene-02-enter-the-code
-00:00:06.700 --> 00:00:11.600
-A four-digit code is sent to that address. Type it in. The screen moves on by itself.
+00:00:07.300 --> 00:00:12.800
+We sent you a four-digit code to that address. {.3} If you are not seeing it, check your spam folder.
 
 NOTE
 scene 03  dashboard
-  screen     the six section cards
-  raw        0:12.8 in ski-demo_add-item_dev_09-07-28_v4.mp4
-  scene      00:00:12.400 to 00:00:16.300  (3.9s)
-  lead-in    0.5s     speech 9 words, 2.6s     exit 0.8s
+  raw        6.52s on camera
+  scene      00:00:13.900 to 00:00:20.400  (6.5s)
+  lead-in    0.5s     speech 16 words, 4.7s     beats 0.5s     exit 0.8s
 
 scene-03-dashboard
-00:00:12.900 --> 00:00:15.500
-This is the dashboard. Everything starts here. Click Businesses.
+00:00:14.400 --> 00:00:19.100
+This is your dashboard. {.5} You can return here anytime with the command + K short keys.
 
 NOTE
 scene 04  find-the-business
-  screen     Businesses lookup, search box
-  raw        0:15.0 in ski-demo_add-item_dev_09-07-28_v4.mp4
-  scene      00:00:16.300 to 00:00:21.100  (4.8s)
-  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
+  raw        8.52s on camera
+  scene      00:00:20.400 to 00:00:25.500  (5.1s)
+  lead-in    0.5s     speech 13 words, 3.8s     exit 0.8s
 
 scene-04-find-the-business
-00:00:16.800 --> 00:00:20.300
-Type the name of your business, then pick it from the list.
+00:00:20.900 --> 00:00:24.700
+Type the name of a business, then select it from the dropdown list.
 
 NOTE
 scene 05  the-business
-  screen     the business page
-  raw        0:20.0 in ski-demo_add-item_dev_09-07-28_v4.mp4
-  scene      00:00:21.100 to 00:00:26.200  (5.1s)
-  lead-in    0.5s     speech 13 words, 3.8s     exit 0.8s
+  raw        5.72s on camera
+  scene      00:00:25.500 to 00:00:31.200  (5.7s)
+  lead-in    0.5s     speech 14 words, 4.1s     beats 0.3s     exit 0.8s
 
 scene-05-the-business
-00:00:21.600 --> 00:00:25.400
-This is your business page. Click the lookup icon to see its stores.
+00:00:26.000 --> 00:00:30.100
+This is the business info page. {.3} Click the lookup icon to find the stores.
 
 NOTE
 scene 06  find-the-store
-  screen     Stores lookup, search box
-  raw        0:22.5 in ski-demo_add-item_dev_09-07-28_v4.mp4
-  scene      00:00:26.200 to 00:00:29.500  (3.3s)
-  lead-in    0.5s     speech 7 words, 2.0s     exit 0.8s
+  raw        9.52s on camera
+  scene      00:00:31.200 to 00:00:36.000  (4.8s)
+  lead-in    0.5s     speech 11 words, 3.2s     beats 0.3s     exit 0.8s
 
 scene-06-find-the-store
-00:00:26.700 --> 00:00:28.700
-Type the store name, then pick it.
+00:00:31.700 --> 00:00:34.900
+Type the store name, {.3} then select it from the dropdown list.
 
 NOTE
 scene 07  the-store
-  screen     the store page, gear menu
-  raw        0:28.0 in ski-demo_add-item_dev_09-07-28_v4.mp4
-  scene      00:00:29.500 to 00:00:34.300  (4.8s)
-  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
+  raw        7.92s on camera
+  scene      00:00:36.000 to 00:00:42.000  (6.0s)
+  lead-in    0.5s     speech 15 words, 4.4s     beats 0.3s     exit 0.8s
 
 scene-07-the-store
-00:00:30.000 --> 00:00:33.500
-This is the store page. Click the gear, then choose Lookup Items.
+00:00:36.500 --> 00:00:40.900
+Now you are on the store details page. {.3} Click the gear, then choose Lookup Items.
 
 NOTE
-scene 08  the-item-list
-  screen     Items lookup, the + button
-  raw        0:31.0 in ski-demo_add-item_dev_09-07-28_v4.mp4
-  scene      00:00:34.300 to 00:00:40.300  (6.0s)
-  lead-in    0.5s     speech 16 words, 4.7s     exit 0.8s
+scene 08  item-list
+  raw        6.0s on camera
+  scene      00:00:42.000 to 00:00:48.000  (6.0s)
+  lead-in    0.5s     speech 14 words, 4.1s     beats 0.6s     exit 0.8s
 
-scene-08-the-item-list
-00:00:34.800 --> 00:00:39.500
-This lists every item in the store. Click the plus button to add a new one.
+scene-08-item-list
+00:00:42.500 --> 00:00:46.600
+This is the lookup items search. {.3} To add new item, {.3} click the plus button.
 
 NOTE
 scene 09  new-item
-  screen     the create-item form
-  raw        0:33.5 in ski-demo_add-item_dev_09-07-28_v4.mp4
-  scene      00:00:40.300 to 00:00:45.100  (4.8s)
-  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
+  raw        18.96s on camera
+  scene      00:00:48.000 to 00:00:54.000  (6.0s)
+  lead-in    0.5s     speech 16 words, 4.7s     exit 0.8s
 
 scene-09-new-item
-00:00:40.800 --> 00:00:44.300
-Give the item a name. Then choose the collection it belongs to.
+00:00:48.500 --> 00:00:53.200
+Give the item a name. Then choose the collection it belongs to, and create this item.
 
 NOTE
 scene 10  item-details
-  screen     the saved item's own page
-  raw        0:47.0 in ski-demo_add-item_dev_09-07-28_v4.mp4
-  scene      00:00:45.100 to 00:00:51.600  (6.5s)
-  lead-in    0.5s     speech 18 words, 5.2s     exit 0.8s
+  raw        35.88s on camera
+  scene      00:00:54.000 to 00:01:26.600  (32.6s)
+  lead-in    0.5s     speech 32 words, 9.3s     beats 22.0s     exit 0.8s
 
 scene-10-item-details
-00:00:45.600 --> 00:00:50.800
-Now the details. Pick the requirement, pick the size, then set the price and how many you have.
+00:00:54.500 --> 00:01:03.800
+Now add the item details. Add an image first. {1} Then add a description, {10} Add the quantity. {3} And the price. {3} Select the requirement. {3} Then select the boot size as a variant {2} and save.
 
 NOTE
-scene 11  save
-  screen     Update pressed, item saved
-  raw        0:61.0 in ski-demo_add-item_dev_09-07-28_v4.mp4
-  scene      00:00:51.600 to 00:00:56.100  (4.5s)
-  lead-in    0.5s     speech 11 words, 3.2s     exit 0.8s
-
-scene-11-save
-00:00:52.100 --> 00:00:55.300
-Click Update to save. The item is now in your store.
-
-NOTE
-scene 12  sign-out
-  screen     Ctrl+K, then back to /auth
-  raw        0:63.9 in ski-demo_add-item_dev_09-07-28_v4.mp4
-  scene      00:00:56.100 to 00:01:00.300  (4.2s)
+scene 11  saved
+  raw        4.2s on camera
+  scene      00:01:26.600 to 00:01:30.800  (4.2s)
   lead-in    0.5s     speech 10 words, 2.9s     exit 0.8s
 
-scene-12-sign-out
-00:00:56.600 --> 00:00:59.500
-To finish, press Control K, type Logout, and press Enter.
+scene-11-saved
+00:01:27.100 --> 00:01:30.000
+That is the item ready for the store to rent.
 
+NOTE
+scene 12  back-to-dashboard
+  raw        5.4s on camera
+  scene      00:01:30.800 to 00:01:36.200  (5.4s)
+  lead-in    0.5s     speech 14 words, 4.1s     exit 0.8s
+
+scene-12-back-to-dashboard
+00:01:31.300 --> 00:01:35.400
+Back to the dashboard where you can log out or select a card option.
+
+NOTE
+scene 13  sign-out
+  raw        5.2s on camera
+  scene      00:01:36.200 to 00:01:39.000  (2.8s)
+  lead-in    0.5s     speech 5 words, 1.5s     exit 0.8s
+
+scene-13-sign-out
+00:01:36.700 --> 00:01:38.200
+You are now logged out.

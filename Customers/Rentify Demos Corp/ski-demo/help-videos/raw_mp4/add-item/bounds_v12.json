@@ -1,0 +1,6 @@
+{
+ "_note": "Screen edges of ski-demo_add-item_dev_09-14-17_v12.mp4, in seconds. Measured off the file (frame-to-frame difference peaks) and confirmed frame by frame against thumbnails. NOT from script.json's raw-source, which came from a different run and had four screens wrong by more than a second.",
+ "source": "ski-demo_add-item_dev_09-14-17_v12.mp4",
+ "labels": ["sign-in","enter-the-code","dashboard","find-the-business","the-business","find-the-store","the-store","item-list","new-item","item-details","saved","back-to-dashboard","sign-out"],
+ "bounds": [[0.0,6.48],[6.48,13.08],[13.08,17.32],[17.32,25.84],[25.84,30.88],[30.88,40.40],[40.40,48.32],[48.32,51.76],[51.76,70.72],[70.72,106.60],[106.60,109.44],[109.44,113.60],[113.60,118.80]]
+}

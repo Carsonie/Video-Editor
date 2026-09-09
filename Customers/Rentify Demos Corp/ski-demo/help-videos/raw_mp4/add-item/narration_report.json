@@ -1,0 +1,151 @@
+{
+ "voice": "Samantha",
+ "video": "ski-demo_add-item_dev_09-14-17_v15.mp4",
+ "output": "ski-demo_add-item_dev_09-14-17_v15-narrated.mp4",
+ "seconds": 127.72,
+ "lines": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "starts_at": 0.5,
+   "room": 5.5,
+   "held_at_end": 0.8,
+   "spoken": 5.35,
+   "rate": 185,
+   "said": "Please provide us your email, so we can sent you a login code. Then click the Send Code button.",
+   "overruns_by": 0
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "starts_at": 7.3,
+   "room": 5.78,
+   "held_at_end": 0.8,
+   "spoken": 5.61,
+   "rate": 155,
+   "said": "We sent you a four-digit code to that address. [[slnc 300]] If you are not seeing it, check your spam folder.",
+   "overruns_by": 0
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "starts_at": 14.38,
+   "room": 5.22,
+   "held_at_end": 0.8,
+   "spoken": 4.99,
+   "rate": 190,
+   "said": "This is your dashboard. [[slnc 500]] You can return here anytime with the command + K short keys.",
+   "overruns_by": 0
+  },
+  {
+   "n": 4,
+   "label": "find-the-business",
+   "starts_at": 20.9,
+   "room": 7.22,
+   "held_at_end": 0.8,
+   "spoken": 3.58,
+   "rate": 155,
+   "said": "Type the name of a business, then select it from the dropdown list.",
+   "overruns_by": 0
+  },
+  {
+   "n": 5,
+   "label": "the-business",
+   "starts_at": 29.42,
+   "room": 4.42,
+   "held_at_end": 0.8,
+   "spoken": 4.28,
+   "rate": 190,
+   "said": "This is the business info page. [[slnc 300]] Click the lookup icon to find the stores.",
+   "overruns_by": 0
+  },
+  {
+   "n": 6,
+   "label": "find-the-store",
+   "starts_at": 35.14,
+   "room": 8.22,
+   "held_at_end": 0.8,
+   "spoken": 3.39,
+   "rate": 155,
+   "said": "Type the store name, [[slnc 300]] then select it from the dropdown list.",
+   "overruns_by": 0
+  },
+  {
+   "n": 7,
+   "label": "the-store",
+   "starts_at": 44.66,
+   "room": 6.62,
+   "held_at_end": 0.8,
+   "spoken": 5.05,
+   "rate": 155,
+   "said": "Now you are on the store details page. [[slnc 300]] Click the gear, then choose Lookup Items.",
+   "overruns_by": 0
+  },
+  {
+   "n": 8,
+   "label": "item-list",
+   "starts_at": 52.58,
+   "room": 4.7,
+   "held_at_end": 0.8,
+   "spoken": 4.67,
+   "rate": 155,
+   "said": "This is the lookup items search. [[slnc 300]] To add new item, [[slnc 300]] click the plus button.",
+   "overruns_by": 0
+  },
+  {
+   "n": 9,
+   "label": "new-item",
+   "starts_at": 58.58,
+   "room": 17.66,
+   "held_at_end": 0.8,
+   "spoken": 4.67,
+   "rate": 155,
+   "said": "Give the item a name. Then choose the collection it belongs to, and create this item.",
+   "overruns_by": 0
+  },
+  {
+   "n": 10,
+   "label": "item-details",
+   "starts_at": 77.54,
+   "room": 34.58,
+   "held_at_end": 0.8,
+   "spoken": 32.33,
+   "rate": 155,
+   "said": "Now add the item details. Add an image first. [[slnc 1000]] Then add a description, [[slnc 10000]] Add the quantity. [[slnc 3000]] And the price. [[slnc 3000]] Select the requirement. [[slnc 3000]] Then select the boot size as a variant [[slnc 2000]] and save.",
+   "overruns_by": 0
+  },
+  {
+   "n": 11,
+   "label": "saved",
+   "starts_at": 113.42,
+   "room": 2.9,
+   "held_at_end": 0.8,
+   "spoken": 2.13,
+   "rate": 155,
+   "said": "That is the item ready for the store to rent.",
+   "overruns_by": 0
+  },
+  {
+   "n": 12,
+   "label": "back-to-dashboard",
+   "starts_at": 117.62,
+   "room": 4.1,
+   "held_at_end": 0.8,
+   "spoken": 3.44,
+   "rate": 155,
+   "said": "Back to the dashboard where you can log out or select a card option.",
+   "overruns_by": 0
+  },
+  {
+   "n": 13,
+   "label": "sign-out",
+   "starts_at": 123.02,
+   "room": 3.9,
+   "held_at_end": 0.8,
+   "spoken": 1.19,
+   "rate": 155,
+   "said": "You are now logged out.",
+   "overruns_by": 0
+  }
+ ]
+}
