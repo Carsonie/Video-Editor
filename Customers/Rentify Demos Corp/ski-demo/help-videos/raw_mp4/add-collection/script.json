@@ -1,469 +1,586 @@
 {
  "store": "ski-demo",
  "title": "Adding a collection and its items",
- "_note": "BCP admin recipe add-collection. Three creations in one take: the collection, then its options, then two items. The walk from the dashboard to the store repeats four times, so those lines are deliberately short. Lead-in trimmed 2026-09-09: the first 4s were desktop and a blank browser.",
+ "_note": "BCP admin recipe add-collection. Cut from ski-demo_add-collection_dev_09-20-00_v4.mp4 (389.94s) \u2014 TWO flows in one browser: create the collection and set its options, then add two items to it. FORTY-FOUR screens, not the 34 the old script assumed. Carson chose to narrate all of them rather than collapse the repeated second item. Twelve of the 44 are the `\u21b0 back x6` walk, which goes BACKWARDS through pages already visited, so they get one short line each and the narration says plainly that we are retracing our steps. Screen edges in bounds_v4.json, taken from the flow logs and checked frame by frame.",
  "words_per_second": 3.44,
  "_wps_note": "From 01-first-time-ordering/script_v33.json, measured 31 words / 9.01s. Nothing for THIS video is rendered yet.",
  "_pauses_note": "One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in comes from the scene's footage hold.",
  "_lead_in_seconds": 0.5,
- "_estimated_video_seconds": 140.7,
- "_estimated_video_note": "35 scenes. 326 words / 3.44 wps = 95.2s of speech, + 35 lead-ins at 0.5s = 17.5s, + 35 exit pauses at 0.8s = 28.0s. ESTIMATE \u2014 recompute from the audio once it exists.",
- "_footage_seconds": 253.1,
+ "_estimated_video_seconds": 226.9,
+ "_estimated_video_note": "44 scenes. 456 words / 3.44 wps = 132.6s of speech, + 44 lead-ins at 0.5s = 22.0s, + 44 exit pauses at 0.8s = 35.2s. ESTIMATE \u2014 recompute from the audio once it exists.",
+ "_footage_seconds": 392.24,
  "scenes": [
   {
    "n": 1,
    "label": "sign-in",
-   "line": "This is the sign-in screen. Type the email address for your back-office account, then click Send Code.",
+   "line": "Type the email address for your back-office account. {0.8} Then click Send Code.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "5.9s on camera",
-   "estimated-word-time": "4.9 seconds.",
-   "target-length": "6.2 seconds."
+   "raw-source": "8.12s on camera",
+   "estimated-word-time": "3.5 seconds.",
+   "target-length": "5.6 seconds."
   },
   {
    "n": 2,
    "label": "enter-the-code",
-   "line": "A four-digit code is sent to that address. Type it in. The screen moves on by itself.",
+   "line": "A four-digit code is sent to that address. {0.5} Type it in \u2014 the screen moves on by itself.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "3.1s on camera",
-   "estimated-word-time": "4.9 seconds.",
-   "target-length": "6.2 seconds."
+   "raw-source": "7.0s on camera",
+   "estimated-word-time": "5.2 seconds.",
+   "target-length": "7.0 seconds."
   },
   {
    "n": 3,
    "label": "dashboard",
-   "line": "This is the dashboard. A collection belongs to one store, so we start at Businesses.",
+   "line": "This is your dashboard. {0.8} A collection belongs to one store, so we start at Businesses.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "1.1s on camera",
+   "raw-source": "7.32s on camera",
    "estimated-word-time": "4.4 seconds.",
-   "target-length": "5.7 seconds."
+   "target-length": "6.5 seconds."
   },
   {
    "n": 4,
-   "label": "find-the-business",
-   "line": "Type the name of your business, then pick it from the list.",
+   "label": "business-lookup",
+   "line": "Type the name of a business, {0.5} then select it from the dropdown list.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "5.4s on camera",
-   "estimated-word-time": "3.5 seconds.",
-   "target-length": "4.8 seconds."
+   "raw-source": "8.48s on camera",
+   "estimated-word-time": "3.8 seconds.",
+   "target-length": "5.6 seconds."
   },
   {
    "n": 5,
    "label": "the-business",
-   "line": "This is your business page. Click the lookup icon to see its stores.",
+   "line": "This is the business info page. {0.5} Click the lookup icon to find its stores.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "2.1s on camera",
-   "estimated-word-time": "3.8 seconds.",
-   "target-length": "5.1 seconds."
+   "raw-source": "6.96s on camera",
+   "estimated-word-time": "4.1 seconds.",
+   "target-length": "5.9 seconds."
   },
   {
    "n": 6,
-   "label": "find-the-store",
-   "line": "Type the store name, then pick it.",
+   "label": "store-lookup",
+   "line": "Type the store name, {0.5} then select it from the list.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "6.6s on camera",
-   "estimated-word-time": "2.0 seconds.",
-   "target-length": "3.3 seconds."
+   "raw-source": "9.48s on camera",
+   "estimated-word-time": "2.9 seconds.",
+   "target-length": "4.7 seconds."
   },
   {
    "n": 7,
    "label": "the-store",
-   "line": "This is the store page. Click the gear, then choose Lookup Collections.",
+   "line": "This is the store details page. {0.8} Click the gear, {0.5} then choose Lookup Collections.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "2.1s on camera",
-   "estimated-word-time": "3.5 seconds.",
-   "target-length": "4.8 seconds."
+   "raw-source": "10.12s on camera",
+   "estimated-word-time": "3.8 seconds.",
+   "target-length": "6.4 seconds."
   },
   {
    "n": 8,
    "label": "collection-list",
-   "line": "This lists the store's collections. Click the plus button to add one.",
+   "line": "This lists the store's collections. {0.5} Click the plus button to add a new one.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "3.6s on camera",
-   "estimated-word-time": "3.5 seconds.",
-   "target-length": "4.8 seconds."
+   "raw-source": "8.76s on camera",
+   "estimated-word-time": "4.1 seconds.",
+   "target-length": "5.9 seconds."
   },
   {
    "n": 9,
    "label": "new-collection",
-   "line": "Give the collection a name. This is the group your items will sit in.",
+   "line": "Give the collection a name, {0.5} then create it.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "6.0s on camera",
-   "estimated-word-time": "4.1 seconds.",
-   "target-length": "5.4 seconds."
+   "raw-source": "6.28s on camera",
+   "estimated-word-time": "2.3 seconds.",
+   "target-length": "4.1 seconds."
   },
   {
    "n": 10,
    "label": "collection-details",
-   "line": "Add a short description, and the price it starts from. Then save.",
+   "line": "Now the collection's own page. {0.8} Add a description, {0.5} set the starting price, {0.5} and update.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "11.1s on camera",
-   "estimated-word-time": "3.5 seconds.",
-   "target-length": "4.8 seconds."
+   "raw-source": "14.52s on camera",
+   "estimated-word-time": "4.1 seconds.",
+   "target-length": "7.2 seconds."
   },
   {
    "n": 11,
-   "label": "back-for-options",
-   "line": "Now the options. These are the choices a renter picks between, like a size. We come back to the collection to add them.",
+   "label": "collection-saved",
+   "line": "The collection is saved.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "17.0s on camera",
-   "estimated-word-time": "6.7 seconds.",
-   "target-length": "8.0 seconds."
+   "raw-source": "3.0s on camera",
+   "estimated-word-time": "1.2 seconds.",
+   "target-length": "2.5 seconds."
   },
   {
    "n": 12,
-   "label": "find-the-business-2",
-   "line": "Same route as before.",
+   "label": "back-collections",
+   "line": "Now we walk back the way we came. {0.5} The collections list.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "5.5s on camera",
-   "estimated-word-time": "1.2 seconds.",
-   "target-length": "2.5 seconds."
+   "raw-source": "8.0s on camera",
+   "estimated-word-time": "3.2 seconds.",
+   "target-length": "5.0 seconds."
   },
   {
    "n": 13,
-   "label": "the-business-2",
-   "line": "Look up the stores.",
+   "label": "back-stores",
+   "line": "The store lookup. {0.5}",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "2.1s on camera",
-   "estimated-word-time": "1.2 seconds.",
-   "target-length": "2.5 seconds."
+   "raw-source": "3.88s on camera",
+   "estimated-word-time": "0.9 seconds.",
+   "target-length": "2.7 seconds."
   },
   {
    "n": 14,
-   "label": "find-the-store-2",
-   "line": "Pick the store.",
+   "label": "back-business",
+   "line": "The business page. {0.5}",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "6.6s on camera",
+   "raw-source": "8.0s on camera",
    "estimated-word-time": "0.9 seconds.",
-   "target-length": "2.2 seconds."
+   "target-length": "2.7 seconds."
   },
   {
    "n": 15,
-   "label": "the-store-2",
-   "line": "Gear, then Lookup Collections.",
+   "label": "back-dashboard",
+   "line": "And the dashboard. {0.5}",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "2.1s on camera",
-   "estimated-word-time": "1.2 seconds.",
-   "target-length": "2.5 seconds."
+   "raw-source": "3.24s on camera",
+   "estimated-word-time": "0.9 seconds.",
+   "target-length": "2.7 seconds."
   },
   {
    "n": 16,
-   "label": "find-the-collection",
-   "line": "Open the collection you just made.",
+   "label": "business-lookup-2",
+   "line": "Now back in, to add the collection's options. {0.5} Type the business name.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "7.9s on camera",
-   "estimated-word-time": "1.7 seconds.",
-   "target-length": "3.0 seconds."
+   "raw-source": "8.64s on camera",
+   "estimated-word-time": "3.5 seconds.",
+   "target-length": "5.3 seconds."
   },
   {
    "n": 17,
-   "label": "set-options",
-   "line": "The options field is a list. Each one has a label the renter sees, and the values they can choose. Save when it is done.",
+   "label": "the-business-2",
+   "line": "The business page again. {0.5} Click the lookup icon.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "14.4s on camera",
-   "estimated-word-time": "7.3 seconds.",
-   "target-length": "8.6 seconds."
+   "raw-source": "6.96s on camera",
+   "estimated-word-time": "2.3 seconds.",
+   "target-length": "4.1 seconds."
   },
   {
    "n": 18,
-   "label": "back-for-items",
-   "line": "Now the items themselves. Each one goes into the collection we just built.",
+   "label": "store-lookup-2",
+   "line": "Type the store name, {0.5} then select it.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "0.4s on camera",
-   "estimated-word-time": "3.8 seconds.",
-   "target-length": "5.1 seconds."
+   "raw-source": "9.48s on camera",
+   "estimated-word-time": "2.0 seconds.",
+   "target-length": "3.8 seconds."
   },
   {
    "n": 19,
-   "label": "find-the-business-3",
-   "line": "Same route again.",
+   "label": "the-store-2",
+   "line": "The store page. {0.8} Gear, {0.5} then Lookup Collections.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "5.5s on camera",
-   "estimated-word-time": "0.9 seconds.",
-   "target-length": "2.2 seconds."
+   "raw-source": "10.12s on camera",
+   "estimated-word-time": "2.0 seconds.",
+   "target-length": "4.6 seconds."
   },
   {
    "n": 20,
-   "label": "the-business-3",
-   "line": "Look up the stores.",
+   "label": "collection-list-2",
+   "line": "Find the collection you just made, {0.5} and open it.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "2.1s on camera",
-   "estimated-word-time": "1.2 seconds.",
-   "target-length": "2.5 seconds."
+   "raw-source": "9.08s on camera",
+   "estimated-word-time": "2.6 seconds.",
+   "target-length": "4.4 seconds."
   },
   {
    "n": 21,
-   "label": "find-the-store-3",
-   "line": "Pick the store.",
+   "label": "collection-options",
+   "line": "Options are what makes a collection useful. {1} This one is Ski Pole Length, {0.8} and its values are the lengths a renter can pick. {1} Then update.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "6.5s on camera",
-   "estimated-word-time": "0.9 seconds.",
-   "target-length": "2.2 seconds."
+   "raw-source": "20.24s on camera",
+   "estimated-word-time": "7.3 seconds.",
+   "target-length": "11.4 seconds."
   },
   {
    "n": 22,
-   "label": "the-store-3",
-   "line": "This time choose Lookup Items.",
+   "label": "dashboard-2",
+   "line": "Back at the dashboard. {0.8} A collection with no items cannot be rented, so now we add two.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "2.1s on camera",
+   "raw-source": "8.4s on camera",
+   "estimated-word-time": "4.9 seconds.",
+   "target-length": "7.0 seconds."
+  },
+  {
+   "n": 23,
+   "label": "business-lookup-3",
+   "line": "Type the business name, {0.5} then select it.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "8.64s on camera",
+   "estimated-word-time": "2.0 seconds.",
+   "target-length": "3.8 seconds."
+  },
+  {
+   "n": 24,
+   "label": "the-business-3",
+   "line": "The business page. {0.5} Click the lookup icon.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "6.96s on camera",
+   "estimated-word-time": "2.0 seconds.",
+   "target-length": "3.8 seconds."
+  },
+  {
+   "n": 25,
+   "label": "store-lookup-3",
+   "line": "Type the store name, {0.5} then select it.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "9.48s on camera",
+   "estimated-word-time": "2.0 seconds.",
+   "target-length": "3.8 seconds."
+  },
+  {
+   "n": 26,
+   "label": "the-store-3",
+   "line": "The store page. {0.8} Gear, {0.5} then Lookup Items this time.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "10.16s on camera",
+   "estimated-word-time": "2.6 seconds.",
+   "target-length": "5.2 seconds."
+  },
+  {
+   "n": 27,
+   "label": "item-list",
+   "line": "This lists every item in the store. {0.8} Click the plus button to add the first pole.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "18.72s on camera",
+   "estimated-word-time": "4.7 seconds.",
+   "target-length": "6.8 seconds."
+  },
+  {
+   "n": 28,
+   "label": "new-item",
+   "line": "Give the item a name. {0.8} Then choose the collection it belongs to, {0.5} and create it.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "13.72s on camera",
+   "estimated-word-time": "4.4 seconds.",
+   "target-length": "7.0 seconds."
+  },
+  {
+   "n": 29,
+   "label": "item-details",
+   "line": "Now the item's details. {0.8} Set the quantity, {0.5} the price, {0.5} the requirement, {0.5} and the pole length. {0.8} Then update.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "12.72s on camera",
+   "estimated-word-time": "4.9 seconds.",
+   "target-length": "9.3 seconds."
+  },
+  {
+   "n": 30,
+   "label": "item-saved",
+   "line": "The first pole is saved. {0.5}",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "3.28s on camera",
+   "estimated-word-time": "1.5 seconds.",
+   "target-length": "3.3 seconds."
+  },
+  {
+   "n": 31,
+   "label": "back-items",
+   "line": "Back the way we came again. {0.5} The items list.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "8.04s on camera",
+   "estimated-word-time": "2.6 seconds.",
+   "target-length": "4.4 seconds."
+  },
+  {
+   "n": 32,
+   "label": "back-stores-2",
+   "line": "The store lookup. {0.5}",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "3.92s on camera",
+   "estimated-word-time": "0.9 seconds.",
+   "target-length": "2.7 seconds."
+  },
+  {
+   "n": 33,
+   "label": "back-business-2",
+   "line": "The business page. {0.5}",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "7.92s on camera",
+   "estimated-word-time": "0.9 seconds.",
+   "target-length": "2.7 seconds."
+  },
+  {
+   "n": 34,
+   "label": "back-dashboard-2",
+   "line": "And the dashboard. {0.5}",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "3.28s on camera",
+   "estimated-word-time": "0.9 seconds.",
+   "target-length": "2.7 seconds."
+  },
+  {
+   "n": 35,
+   "label": "business-lookup-4",
+   "line": "Once more, for the second pole. {0.5} Type the business name.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "8.6s on camera",
+   "estimated-word-time": "2.9 seconds.",
+   "target-length": "4.7 seconds."
+  },
+  {
+   "n": 36,
+   "label": "the-business-4",
+   "line": "The business page. {0.5} Click the lookup icon.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "7.0s on camera",
+   "estimated-word-time": "2.0 seconds.",
+   "target-length": "3.8 seconds."
+  },
+  {
+   "n": 37,
+   "label": "store-lookup-4",
+   "line": "Type the store name, {0.5} then select it.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "9.48s on camera",
+   "estimated-word-time": "2.0 seconds.",
+   "target-length": "3.8 seconds."
+  },
+  {
+   "n": 38,
+   "label": "the-store-4",
+   "line": "The store page. {0.8} Gear, {0.5} then Lookup Items.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "10.16s on camera",
+   "estimated-word-time": "2.0 seconds.",
+   "target-length": "4.6 seconds."
+  },
+  {
+   "n": 39,
+   "label": "item-list-2",
+   "line": "The items list. Click plus.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "3.8s on camera",
    "estimated-word-time": "1.5 seconds.",
    "target-length": "2.8 seconds."
   },
   {
-   "n": 23,
-   "label": "item-list",
-   "line": "Click the plus button to add the first item.",
-   "pauses": [
-    {
-     "seconds": 0.8
-    }
-   ],
-   "raw-source": "3.5s on camera",
-   "estimated-word-time": "2.6 seconds.",
-   "target-length": "3.9 seconds."
-  },
-  {
-   "n": 24,
-   "label": "new-item-1",
-   "line": "Name the item, then choose the collection it belongs to.",
-   "pauses": [
-    {
-     "seconds": 0.8
-    }
-   ],
-   "raw-source": "13.9s on camera",
-   "estimated-word-time": "2.9 seconds.",
-   "target-length": "4.2 seconds."
-  },
-  {
-   "n": 25,
-   "label": "item-details-1",
-   "line": "Pick the requirement, pick its option value, then set the price and how many you have.",
-   "pauses": [
-    {
-     "seconds": 0.8
-    }
-   ],
-   "raw-source": "15.5s on camera",
-   "estimated-word-time": "4.7 seconds.",
-   "target-length": "6.0 seconds."
-  },
-  {
-   "n": 26,
-   "label": "back-for-item-2",
-   "line": "That is the first one. The second is exactly the same journey.",
-   "pauses": [
-    {
-     "seconds": 0.8
-    }
-   ],
-   "raw-source": "14.9s on camera",
-   "estimated-word-time": "3.5 seconds.",
-   "target-length": "4.8 seconds."
-  },
-  {
-   "n": 27,
-   "label": "find-the-business-4",
-   "line": "Same route.",
-   "pauses": [
-    {
-     "seconds": 0.8
-    }
-   ],
-   "raw-source": "5.5s on camera",
-   "estimated-word-time": "0.6 seconds.",
-   "target-length": "1.9 seconds."
-  },
-  {
-   "n": 28,
-   "label": "the-business-4",
-   "line": "Look up the stores.",
-   "pauses": [
-    {
-     "seconds": 0.8
-    }
-   ],
-   "raw-source": "2.2s on camera",
-   "estimated-word-time": "1.2 seconds.",
-   "target-length": "2.5 seconds."
-  },
-  {
-   "n": 29,
-   "label": "find-the-store-4",
-   "line": "Pick the store.",
-   "pauses": [
-    {
-     "seconds": 0.8
-    }
-   ],
-   "raw-source": "6.6s on camera",
-   "estimated-word-time": "0.9 seconds.",
-   "target-length": "2.2 seconds."
-  },
-  {
-   "n": 30,
-   "label": "the-store-4",
-   "line": "Gear, then Lookup Items.",
-   "pauses": [
-    {
-     "seconds": 0.8
-    }
-   ],
-   "raw-source": "2.1s on camera",
-   "estimated-word-time": "1.2 seconds.",
-   "target-length": "2.5 seconds."
-  },
-  {
-   "n": 31,
-   "label": "item-list-2",
-   "line": "Plus button again.",
-   "pauses": [
-    {
-     "seconds": 0.8
-    }
-   ],
-   "raw-source": "3.6s on camera",
-   "estimated-word-time": "0.9 seconds.",
-   "target-length": "2.2 seconds."
-  },
-  {
-   "n": 32,
+   "n": 40,
    "label": "new-item-2",
-   "line": "Name the second item, and choose the same collection.",
+   "line": "The second pole is the same collection and the same shape as the first. {1} Only the name and the length change. {0.8} Name it, {0.5} pick the collection, {0.5} and create it.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "14.1s on camera",
-   "estimated-word-time": "2.6 seconds.",
-   "target-length": "3.9 seconds."
+   "raw-source": "28.92s on camera",
+   "estimated-word-time": "8.4 seconds.",
+   "target-length": "12.5 seconds."
   },
   {
-   "n": 33,
+   "n": 41,
    "label": "item-details-2",
-   "line": "Same details, with the other option value. Save.",
+   "line": "The details again. {0.8} Quantity, {0.5} price, {0.5} requirement, {0.5} and this time a hundred and twenty centimetres. {0.8} Then update.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "15.5s on camera",
-   "estimated-word-time": "2.3 seconds.",
-   "target-length": "3.6 seconds."
+   "raw-source": "12.6s on camera",
+   "estimated-word-time": "4.7 seconds.",
+   "target-length": "9.1 seconds."
   },
   {
-   "n": 34,
-   "label": "saved",
-   "line": "The collection now has two items in it.",
+   "n": 42,
+   "label": "item-saved-2",
+   "line": "Both poles are saved. {0.3} The collection can be rented.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "1.8s on camera",
-   "estimated-word-time": "2.3 seconds.",
-   "target-length": "3.6 seconds."
-  },
-  {
-   "n": 35,
-   "label": "sign-out",
-   "line": "To finish, press Control K, type Logout, and press Enter.",
-   "pauses": [
-    {
-     "seconds": 0.8
-    }
-   ],
-   "raw-source": "3.7s on camera",
-   "estimated-word-time": "2.9 seconds.",
+   "raw-source": "4.68s on camera",
+   "estimated-word-time": "2.6 seconds.",
    "target-length": "4.2 seconds."
+  },
+  {
+   "n": 43,
+   "label": "dashboard-3",
+   "line": "Head back to the dashboard. {0.5} You can get here anytime with the command + K short keys.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "8.52s on camera",
+   "estimated-word-time": "4.9 seconds.",
+   "target-length": "6.7 seconds."
+  },
+  {
+   "n": 44,
+   "label": "sign-out",
+   "line": "Click Logout to finish. {0.5} You are signed out.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "5.56s on camera",
+   "estimated-word-time": "2.3 seconds.",
+   "target-length": "4.1 seconds."
   }
  ]
 }

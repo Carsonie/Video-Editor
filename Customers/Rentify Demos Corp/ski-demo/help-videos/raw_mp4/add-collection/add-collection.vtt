@@ -1,10 +1,10 @@
 WEBVTT
 
 NOTE
-add-collection — 35 screens, 35 avatar scenes
+add-collection — 44 screens, 44 avatar scenes
 ski-demo, BCP admin.
 
-BCP admin recipe add-collection. Three creations in one take: the collection, then its options, then two items. The walk from the dashboard to the store repeats four times, so those lines are deliberately short. Lead-in trimmed 2026-09-09: the first 4s were desktop and a blank browser.
+BCP admin recipe add-collection. Cut from ski-demo_add-collection_dev_09-20-00_v4.mp4 (389.94s) — TWO flows in one browser: create the collection and set its options, then add two items to it. FORTY-FOUR screens, not the 34 the old script assumed. Carson chose to narrate all of them rather than collapse the repeated second item. Twelve of the 44 are the `↰ back x6` walk, which goes BACKWARDS through pages already visited, so they get one short line each and the narration says plainly that we are retracing our steps. Screen edges in bounds_v4.json, taken from the flow logs and checked frame by frame.
 
 EVERY SCENE HAS A LEAD-IN AND AN EXIT PAUSE.
 
@@ -27,358 +27,448 @@ SPEAKING RATE 3.44 words a second. MEASURED, from two rendered clips —
 Still an estimate for THIS video: nothing is rendered, so no line has a
 real spoken length. Re-time from the audio once it exists.
 
-  words                 326
-  speech only           95.2s
-  lead-ins + exits      45.5s
-  FINISHED VIDEO        140.7s
-  raw footage           253.1s
+  words                 456
+  speech only           132.6s
+  lead-ins + exits      57.2s
+  FINISHED VIDEO        226.9s
+  raw footage           392.24s
 
 NOTE
 scene 01  sign-in
-  raw        5.9s on camera
-  scene      00:00:00.000 to 00:00:06.200  (6.2s)
-  lead-in    0.5s     speech 17 words, 4.9s     exit 0.8s
+  raw        8.12s on camera
+  scene      00:00:00.000 to 00:00:05.600  (5.6s)
+  lead-in    0.5s     speech 12 words, 3.5s     beats 0.8s     exit 0.8s
 
 scene-01-sign-in
-00:00:00.500 --> 00:00:05.400
-This is the sign-in screen. Type the email address for your back-office account, then click Send Code.
+00:00:00.500 --> 00:00:04.000
+Type the email address for your back-office account. {0.8} Then click Send Code.
 
 NOTE
 scene 02  enter-the-code
-  raw        3.1s on camera
-  scene      00:00:06.200 to 00:00:12.400  (6.2s)
-  lead-in    0.5s     speech 17 words, 4.9s     exit 0.8s
+  raw        7.0s on camera
+  scene      00:00:05.600 to 00:00:12.600  (7.0s)
+  lead-in    0.5s     speech 18 words, 5.2s     beats 0.5s     exit 0.8s
 
 scene-02-enter-the-code
-00:00:06.700 --> 00:00:11.600
-A four-digit code is sent to that address. Type it in. The screen moves on by itself.
+00:00:06.100 --> 00:00:11.300
+A four-digit code is sent to that address. {0.5} Type it in — the screen moves on by itself.
 
 NOTE
 scene 03  dashboard
-  raw        1.1s on camera
-  scene      00:00:12.400 to 00:00:18.100  (5.7s)
-  lead-in    0.5s     speech 15 words, 4.4s     exit 0.8s
+  raw        7.32s on camera
+  scene      00:00:12.600 to 00:00:19.100  (6.5s)
+  lead-in    0.5s     speech 15 words, 4.4s     beats 0.8s     exit 0.8s
 
 scene-03-dashboard
-00:00:12.900 --> 00:00:17.300
-This is the dashboard. A collection belongs to one store, so we start at Businesses.
+00:00:13.100 --> 00:00:17.500
+This is your dashboard. {0.8} A collection belongs to one store, so we start at Businesses.
 
 NOTE
-scene 04  find-the-business
-  raw        5.4s on camera
-  scene      00:00:18.100 to 00:00:22.900  (4.8s)
-  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
+scene 04  business-lookup
+  raw        8.48s on camera
+  scene      00:00:19.100 to 00:00:24.700  (5.6s)
+  lead-in    0.5s     speech 13 words, 3.8s     beats 0.5s     exit 0.8s
 
-scene-04-find-the-business
-00:00:18.600 --> 00:00:22.100
-Type the name of your business, then pick it from the list.
+scene-04-business-lookup
+00:00:19.600 --> 00:00:23.400
+Type the name of a business, {0.5} then select it from the dropdown list.
 
 NOTE
 scene 05  the-business
-  raw        2.1s on camera
-  scene      00:00:22.900 to 00:00:28.000  (5.1s)
-  lead-in    0.5s     speech 13 words, 3.8s     exit 0.8s
+  raw        6.96s on camera
+  scene      00:00:24.700 to 00:00:30.600  (5.9s)
+  lead-in    0.5s     speech 14 words, 4.1s     beats 0.5s     exit 0.8s
 
 scene-05-the-business
-00:00:23.400 --> 00:00:27.200
-This is your business page. Click the lookup icon to see its stores.
+00:00:25.200 --> 00:00:29.300
+This is the business info page. {0.5} Click the lookup icon to find its stores.
 
 NOTE
-scene 06  find-the-store
-  raw        6.6s on camera
-  scene      00:00:28.000 to 00:00:31.300  (3.3s)
-  lead-in    0.5s     speech 7 words, 2.0s     exit 0.8s
+scene 06  store-lookup
+  raw        9.48s on camera
+  scene      00:00:30.600 to 00:00:35.300  (4.7s)
+  lead-in    0.5s     speech 10 words, 2.9s     beats 0.5s     exit 0.8s
 
-scene-06-find-the-store
-00:00:28.500 --> 00:00:30.500
-Type the store name, then pick it.
+scene-06-store-lookup
+00:00:31.100 --> 00:00:34.000
+Type the store name, {0.5} then select it from the list.
 
 NOTE
 scene 07  the-store
-  raw        2.1s on camera
-  scene      00:00:31.300 to 00:00:36.100  (4.8s)
-  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
+  raw        10.12s on camera
+  scene      00:00:35.300 to 00:00:41.700  (6.4s)
+  lead-in    0.5s     speech 13 words, 3.8s     beats 1.3s     exit 0.8s
 
 scene-07-the-store
-00:00:31.800 --> 00:00:35.300
-This is the store page. Click the gear, then choose Lookup Collections.
+00:00:35.800 --> 00:00:39.600
+This is the store details page. {0.8} Click the gear, {0.5} then choose Lookup Collections.
 
 NOTE
 scene 08  collection-list
-  raw        3.6s on camera
-  scene      00:00:36.100 to 00:00:40.900  (4.8s)
-  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
+  raw        8.76s on camera
+  scene      00:00:41.700 to 00:00:47.600  (5.9s)
+  lead-in    0.5s     speech 14 words, 4.1s     beats 0.5s     exit 0.8s
 
 scene-08-collection-list
-00:00:36.600 --> 00:00:40.100
-This lists the store's collections. Click the plus button to add one.
+00:00:42.200 --> 00:00:46.300
+This lists the store's collections. {0.5} Click the plus button to add a new one.
 
 NOTE
 scene 09  new-collection
-  raw        6.0s on camera
-  scene      00:00:40.900 to 00:00:46.300  (5.4s)
-  lead-in    0.5s     speech 14 words, 4.1s     exit 0.8s
+  raw        6.28s on camera
+  scene      00:00:47.600 to 00:00:51.700  (4.1s)
+  lead-in    0.5s     speech 8 words, 2.3s     beats 0.5s     exit 0.8s
 
 scene-09-new-collection
-00:00:41.400 --> 00:00:45.500
-Give the collection a name. This is the group your items will sit in.
+00:00:48.100 --> 00:00:50.400
+Give the collection a name, {0.5} then create it.
 
 NOTE
 scene 10  collection-details
-  raw        11.1s on camera
-  scene      00:00:46.300 to 00:00:51.100  (4.8s)
-  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
+  raw        14.52s on camera
+  scene      00:00:51.700 to 00:00:58.900  (7.2s)
+  lead-in    0.5s     speech 14 words, 4.1s     beats 1.8s     exit 0.8s
 
 scene-10-collection-details
-00:00:46.800 --> 00:00:50.300
-Add a short description, and the price it starts from. Then save.
+00:00:52.200 --> 00:00:56.300
+Now the collection's own page. {0.8} Add a description, {0.5} set the starting price, {0.5} and update.
 
 NOTE
-scene 11  back-for-options
-  raw        17.0s on camera
-  scene      00:00:51.100 to 00:00:59.100  (8.0s)
-  lead-in    0.5s     speech 23 words, 6.7s     exit 0.8s
-
-scene-11-back-for-options
-00:00:51.600 --> 00:00:58.300
-Now the options. These are the choices a renter picks between, like a size. We come back to the collection to add them.
-
-NOTE
-scene 12  find-the-business-2
-  raw        5.5s on camera
-  scene      00:00:59.100 to 00:01:01.600  (2.5s)
+scene 11  collection-saved
+  raw        3.0s on camera
+  scene      00:00:58.900 to 00:01:01.400  (2.5s)
   lead-in    0.5s     speech 4 words, 1.2s     exit 0.8s
 
-scene-12-find-the-business-2
-00:00:59.600 --> 00:01:00.800
-Same route as before.
+scene-11-collection-saved
+00:00:59.400 --> 00:01:00.600
+The collection is saved.
 
 NOTE
-scene 13  the-business-2
-  raw        2.1s on camera
-  scene      00:01:01.600 to 00:01:04.100  (2.5s)
-  lead-in    0.5s     speech 4 words, 1.2s     exit 0.8s
+scene 12  back-collections
+  raw        8.0s on camera
+  scene      00:01:01.400 to 00:01:06.400  (5.0s)
+  lead-in    0.5s     speech 11 words, 3.2s     beats 0.5s     exit 0.8s
 
-scene-13-the-business-2
-00:01:02.100 --> 00:01:03.300
-Look up the stores.
-
-NOTE
-scene 14  find-the-store-2
-  raw        6.6s on camera
-  scene      00:01:04.100 to 00:01:06.300  (2.2s)
-  lead-in    0.5s     speech 3 words, 0.9s     exit 0.8s
-
-scene-14-find-the-store-2
-00:01:04.600 --> 00:01:05.500
-Pick the store.
+scene-12-back-collections
+00:01:01.900 --> 00:01:05.100
+Now we walk back the way we came. {0.5} The collections list.
 
 NOTE
-scene 15  the-store-2
-  raw        2.1s on camera
-  scene      00:01:06.300 to 00:01:08.800  (2.5s)
-  lead-in    0.5s     speech 4 words, 1.2s     exit 0.8s
+scene 13  back-stores
+  raw        3.88s on camera
+  scene      00:01:06.400 to 00:01:09.100  (2.7s)
+  lead-in    0.5s     speech 3 words, 0.9s     beats 0.5s     exit 0.8s
 
-scene-15-the-store-2
-00:01:06.800 --> 00:01:08.000
-Gear, then Lookup Collections.
-
-NOTE
-scene 16  find-the-collection
-  raw        7.9s on camera
-  scene      00:01:08.800 to 00:01:11.800  (3.0s)
-  lead-in    0.5s     speech 6 words, 1.7s     exit 0.8s
-
-scene-16-find-the-collection
-00:01:09.300 --> 00:01:11.000
-Open the collection you just made.
+scene-13-back-stores
+00:01:06.900 --> 00:01:07.800
+The store lookup. {0.5}
 
 NOTE
-scene 17  set-options
-  raw        14.4s on camera
-  scene      00:01:11.800 to 00:01:20.400  (8.6s)
-  lead-in    0.5s     speech 25 words, 7.3s     exit 0.8s
+scene 14  back-business
+  raw        8.0s on camera
+  scene      00:01:09.100 to 00:01:11.800  (2.7s)
+  lead-in    0.5s     speech 3 words, 0.9s     beats 0.5s     exit 0.8s
 
-scene-17-set-options
-00:01:12.300 --> 00:01:19.600
-The options field is a list. Each one has a label the renter sees, and the values they can choose. Save when it is done.
-
-NOTE
-scene 18  back-for-items
-  raw        0.4s on camera
-  scene      00:01:20.400 to 00:01:25.500  (5.1s)
-  lead-in    0.5s     speech 13 words, 3.8s     exit 0.8s
-
-scene-18-back-for-items
-00:01:20.900 --> 00:01:24.700
-Now the items themselves. Each one goes into the collection we just built.
+scene-14-back-business
+00:01:09.600 --> 00:01:10.500
+The business page. {0.5}
 
 NOTE
-scene 19  find-the-business-3
-  raw        5.5s on camera
-  scene      00:01:25.500 to 00:01:27.700  (2.2s)
-  lead-in    0.5s     speech 3 words, 0.9s     exit 0.8s
+scene 15  back-dashboard
+  raw        3.24s on camera
+  scene      00:01:11.800 to 00:01:14.500  (2.7s)
+  lead-in    0.5s     speech 3 words, 0.9s     beats 0.5s     exit 0.8s
 
-scene-19-find-the-business-3
-00:01:26.000 --> 00:01:26.900
-Same route again.
-
-NOTE
-scene 20  the-business-3
-  raw        2.1s on camera
-  scene      00:01:27.700 to 00:01:30.200  (2.5s)
-  lead-in    0.5s     speech 4 words, 1.2s     exit 0.8s
-
-scene-20-the-business-3
-00:01:28.200 --> 00:01:29.400
-Look up the stores.
+scene-15-back-dashboard
+00:01:12.300 --> 00:01:13.200
+And the dashboard. {0.5}
 
 NOTE
-scene 21  find-the-store-3
-  raw        6.5s on camera
-  scene      00:01:30.200 to 00:01:32.400  (2.2s)
-  lead-in    0.5s     speech 3 words, 0.9s     exit 0.8s
+scene 16  business-lookup-2
+  raw        8.64s on camera
+  scene      00:01:14.500 to 00:01:19.800  (5.3s)
+  lead-in    0.5s     speech 12 words, 3.5s     beats 0.5s     exit 0.8s
 
-scene-21-find-the-store-3
-00:01:30.700 --> 00:01:31.600
-Pick the store.
+scene-16-business-lookup-2
+00:01:15.000 --> 00:01:18.500
+Now back in, to add the collection's options. {0.5} Type the business name.
 
 NOTE
-scene 22  the-store-3
-  raw        2.1s on camera
-  scene      00:01:32.400 to 00:01:35.200  (2.8s)
+scene 17  the-business-2
+  raw        6.96s on camera
+  scene      00:01:19.800 to 00:01:23.900  (4.1s)
+  lead-in    0.5s     speech 8 words, 2.3s     beats 0.5s     exit 0.8s
+
+scene-17-the-business-2
+00:01:20.300 --> 00:01:22.600
+The business page again. {0.5} Click the lookup icon.
+
+NOTE
+scene 18  store-lookup-2
+  raw        9.48s on camera
+  scene      00:01:23.900 to 00:01:27.700  (3.8s)
+  lead-in    0.5s     speech 7 words, 2.0s     beats 0.5s     exit 0.8s
+
+scene-18-store-lookup-2
+00:01:24.400 --> 00:01:26.400
+Type the store name, {0.5} then select it.
+
+NOTE
+scene 19  the-store-2
+  raw        10.12s on camera
+  scene      00:01:27.700 to 00:01:32.300  (4.6s)
+  lead-in    0.5s     speech 7 words, 2.0s     beats 1.3s     exit 0.8s
+
+scene-19-the-store-2
+00:01:28.200 --> 00:01:30.200
+The store page. {0.8} Gear, {0.5} then Lookup Collections.
+
+NOTE
+scene 20  collection-list-2
+  raw        9.08s on camera
+  scene      00:01:32.300 to 00:01:36.700  (4.4s)
+  lead-in    0.5s     speech 9 words, 2.6s     beats 0.5s     exit 0.8s
+
+scene-20-collection-list-2
+00:01:32.800 --> 00:01:35.400
+Find the collection you just made, {0.5} and open it.
+
+NOTE
+scene 21  collection-options
+  raw        20.24s on camera
+  scene      00:01:36.700 to 00:01:48.100  (11.4s)
+  lead-in    0.5s     speech 25 words, 7.3s     beats 2.8s     exit 0.8s
+
+scene-21-collection-options
+00:01:37.200 --> 00:01:44.500
+Options are what makes a collection useful. {1} This one is Ski Pole Length, {0.8} and its values are the lengths a renter can pick. {1} Then update.
+
+NOTE
+scene 22  dashboard-2
+  raw        8.4s on camera
+  scene      00:01:48.100 to 00:01:55.100  (7.0s)
+  lead-in    0.5s     speech 17 words, 4.9s     beats 0.8s     exit 0.8s
+
+scene-22-dashboard-2
+00:01:48.600 --> 00:01:53.500
+Back at the dashboard. {0.8} A collection with no items cannot be rented, so now we add two.
+
+NOTE
+scene 23  business-lookup-3
+  raw        8.64s on camera
+  scene      00:01:55.100 to 00:01:58.900  (3.8s)
+  lead-in    0.5s     speech 7 words, 2.0s     beats 0.5s     exit 0.8s
+
+scene-23-business-lookup-3
+00:01:55.600 --> 00:01:57.600
+Type the business name, {0.5} then select it.
+
+NOTE
+scene 24  the-business-3
+  raw        6.96s on camera
+  scene      00:01:58.900 to 00:02:02.700  (3.8s)
+  lead-in    0.5s     speech 7 words, 2.0s     beats 0.5s     exit 0.8s
+
+scene-24-the-business-3
+00:01:59.400 --> 00:02:01.400
+The business page. {0.5} Click the lookup icon.
+
+NOTE
+scene 25  store-lookup-3
+  raw        9.48s on camera
+  scene      00:02:02.700 to 00:02:06.500  (3.8s)
+  lead-in    0.5s     speech 7 words, 2.0s     beats 0.5s     exit 0.8s
+
+scene-25-store-lookup-3
+00:02:03.200 --> 00:02:05.200
+Type the store name, {0.5} then select it.
+
+NOTE
+scene 26  the-store-3
+  raw        10.16s on camera
+  scene      00:02:06.500 to 00:02:11.700  (5.2s)
+  lead-in    0.5s     speech 9 words, 2.6s     beats 1.3s     exit 0.8s
+
+scene-26-the-store-3
+00:02:07.000 --> 00:02:09.600
+The store page. {0.8} Gear, {0.5} then Lookup Items this time.
+
+NOTE
+scene 27  item-list
+  raw        18.72s on camera
+  scene      00:02:11.700 to 00:02:18.500  (6.8s)
+  lead-in    0.5s     speech 16 words, 4.7s     beats 0.8s     exit 0.8s
+
+scene-27-item-list
+00:02:12.200 --> 00:02:16.900
+This lists every item in the store. {0.8} Click the plus button to add the first pole.
+
+NOTE
+scene 28  new-item
+  raw        13.72s on camera
+  scene      00:02:18.500 to 00:02:25.500  (7.0s)
+  lead-in    0.5s     speech 15 words, 4.4s     beats 1.3s     exit 0.8s
+
+scene-28-new-item
+00:02:19.000 --> 00:02:23.400
+Give the item a name. {0.8} Then choose the collection it belongs to, {0.5} and create it.
+
+NOTE
+scene 29  item-details
+  raw        12.72s on camera
+  scene      00:02:25.500 to 00:02:34.800  (9.3s)
+  lead-in    0.5s     speech 17 words, 4.9s     beats 3.1s     exit 0.8s
+
+scene-29-item-details
+00:02:26.000 --> 00:02:30.900
+Now the item's details. {0.8} Set the quantity, {0.5} the price, {0.5} the requirement, {0.5} and the pole length. {0.8} Then update.
+
+NOTE
+scene 30  item-saved
+  raw        3.28s on camera
+  scene      00:02:34.800 to 00:02:38.100  (3.3s)
+  lead-in    0.5s     speech 5 words, 1.5s     beats 0.5s     exit 0.8s
+
+scene-30-item-saved
+00:02:35.300 --> 00:02:36.800
+The first pole is saved. {0.5}
+
+NOTE
+scene 31  back-items
+  raw        8.04s on camera
+  scene      00:02:38.100 to 00:02:42.500  (4.4s)
+  lead-in    0.5s     speech 9 words, 2.6s     beats 0.5s     exit 0.8s
+
+scene-31-back-items
+00:02:38.600 --> 00:02:41.200
+Back the way we came again. {0.5} The items list.
+
+NOTE
+scene 32  back-stores-2
+  raw        3.92s on camera
+  scene      00:02:42.500 to 00:02:45.200  (2.7s)
+  lead-in    0.5s     speech 3 words, 0.9s     beats 0.5s     exit 0.8s
+
+scene-32-back-stores-2
+00:02:43.000 --> 00:02:43.900
+The store lookup. {0.5}
+
+NOTE
+scene 33  back-business-2
+  raw        7.92s on camera
+  scene      00:02:45.200 to 00:02:47.900  (2.7s)
+  lead-in    0.5s     speech 3 words, 0.9s     beats 0.5s     exit 0.8s
+
+scene-33-back-business-2
+00:02:45.700 --> 00:02:46.600
+The business page. {0.5}
+
+NOTE
+scene 34  back-dashboard-2
+  raw        3.28s on camera
+  scene      00:02:47.900 to 00:02:50.600  (2.7s)
+  lead-in    0.5s     speech 3 words, 0.9s     beats 0.5s     exit 0.8s
+
+scene-34-back-dashboard-2
+00:02:48.400 --> 00:02:49.300
+And the dashboard. {0.5}
+
+NOTE
+scene 35  business-lookup-4
+  raw        8.6s on camera
+  scene      00:02:50.600 to 00:02:55.300  (4.7s)
+  lead-in    0.5s     speech 10 words, 2.9s     beats 0.5s     exit 0.8s
+
+scene-35-business-lookup-4
+00:02:51.100 --> 00:02:54.000
+Once more, for the second pole. {0.5} Type the business name.
+
+NOTE
+scene 36  the-business-4
+  raw        7.0s on camera
+  scene      00:02:55.300 to 00:02:59.100  (3.8s)
+  lead-in    0.5s     speech 7 words, 2.0s     beats 0.5s     exit 0.8s
+
+scene-36-the-business-4
+00:02:55.800 --> 00:02:57.800
+The business page. {0.5} Click the lookup icon.
+
+NOTE
+scene 37  store-lookup-4
+  raw        9.48s on camera
+  scene      00:02:59.100 to 00:03:02.900  (3.8s)
+  lead-in    0.5s     speech 7 words, 2.0s     beats 0.5s     exit 0.8s
+
+scene-37-store-lookup-4
+00:02:59.600 --> 00:03:01.600
+Type the store name, {0.5} then select it.
+
+NOTE
+scene 38  the-store-4
+  raw        10.16s on camera
+  scene      00:03:02.900 to 00:03:07.500  (4.6s)
+  lead-in    0.5s     speech 7 words, 2.0s     beats 1.3s     exit 0.8s
+
+scene-38-the-store-4
+00:03:03.400 --> 00:03:05.400
+The store page. {0.8} Gear, {0.5} then Lookup Items.
+
+NOTE
+scene 39  item-list-2
+  raw        3.8s on camera
+  scene      00:03:07.500 to 00:03:10.300  (2.8s)
   lead-in    0.5s     speech 5 words, 1.5s     exit 0.8s
 
-scene-22-the-store-3
-00:01:32.900 --> 00:01:34.400
-This time choose Lookup Items.
+scene-39-item-list-2
+00:03:08.000 --> 00:03:09.500
+The items list. Click plus.
 
 NOTE
-scene 23  item-list
-  raw        3.5s on camera
-  scene      00:01:35.200 to 00:01:39.100  (3.9s)
-  lead-in    0.5s     speech 9 words, 2.6s     exit 0.8s
+scene 40  new-item-2
+  raw        28.92s on camera
+  scene      00:03:10.300 to 00:03:22.800  (12.5s)
+  lead-in    0.5s     speech 29 words, 8.4s     beats 2.8s     exit 0.8s
 
-scene-23-item-list
-00:01:35.700 --> 00:01:38.300
-Click the plus button to add the first item.
-
-NOTE
-scene 24  new-item-1
-  raw        13.9s on camera
-  scene      00:01:39.100 to 00:01:43.300  (4.2s)
-  lead-in    0.5s     speech 10 words, 2.9s     exit 0.8s
-
-scene-24-new-item-1
-00:01:39.600 --> 00:01:42.500
-Name the item, then choose the collection it belongs to.
+scene-40-new-item-2
+00:03:10.800 --> 00:03:19.200
+The second pole is the same collection and the same shape as the first. {1} Only the name and the length change. {0.8} Name it, {0.5} pick the collection, {0.5} and create it.
 
 NOTE
-scene 25  item-details-1
-  raw        15.5s on camera
-  scene      00:01:43.300 to 00:01:49.300  (6.0s)
-  lead-in    0.5s     speech 16 words, 4.7s     exit 0.8s
+scene 41  item-details-2
+  raw        12.6s on camera
+  scene      00:03:22.800 to 00:03:31.900  (9.1s)
+  lead-in    0.5s     speech 16 words, 4.7s     beats 3.1s     exit 0.8s
 
-scene-25-item-details-1
-00:01:43.800 --> 00:01:48.500
-Pick the requirement, pick its option value, then set the price and how many you have.
-
-NOTE
-scene 26  back-for-item-2
-  raw        14.9s on camera
-  scene      00:01:49.300 to 00:01:54.100  (4.8s)
-  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
-
-scene-26-back-for-item-2
-00:01:49.800 --> 00:01:53.300
-That is the first one. The second is exactly the same journey.
+scene-41-item-details-2
+00:03:23.300 --> 00:03:28.000
+The details again. {0.8} Quantity, {0.5} price, {0.5} requirement, {0.5} and this time a hundred and twenty centimetres. {0.8} Then update.
 
 NOTE
-scene 27  find-the-business-4
-  raw        5.5s on camera
-  scene      00:01:54.100 to 00:01:56.000  (1.9s)
-  lead-in    0.5s     speech 2 words, 0.6s     exit 0.8s
+scene 42  item-saved-2
+  raw        4.68s on camera
+  scene      00:03:31.900 to 00:03:36.100  (4.2s)
+  lead-in    0.5s     speech 9 words, 2.6s     beats 0.3s     exit 0.8s
 
-scene-27-find-the-business-4
-00:01:54.600 --> 00:01:55.200
-Same route.
-
-NOTE
-scene 28  the-business-4
-  raw        2.2s on camera
-  scene      00:01:56.000 to 00:01:58.500  (2.5s)
-  lead-in    0.5s     speech 4 words, 1.2s     exit 0.8s
-
-scene-28-the-business-4
-00:01:56.500 --> 00:01:57.700
-Look up the stores.
+scene-42-item-saved-2
+00:03:32.400 --> 00:03:35.000
+Both poles are saved. {0.3} The collection can be rented.
 
 NOTE
-scene 29  find-the-store-4
-  raw        6.6s on camera
-  scene      00:01:58.500 to 00:02:00.700  (2.2s)
-  lead-in    0.5s     speech 3 words, 0.9s     exit 0.8s
+scene 43  dashboard-3
+  raw        8.52s on camera
+  scene      00:03:36.100 to 00:03:42.800  (6.7s)
+  lead-in    0.5s     speech 17 words, 4.9s     beats 0.5s     exit 0.8s
 
-scene-29-find-the-store-4
-00:01:59.000 --> 00:01:59.900
-Pick the store.
-
-NOTE
-scene 30  the-store-4
-  raw        2.1s on camera
-  scene      00:02:00.700 to 00:02:03.200  (2.5s)
-  lead-in    0.5s     speech 4 words, 1.2s     exit 0.8s
-
-scene-30-the-store-4
-00:02:01.200 --> 00:02:02.400
-Gear, then Lookup Items.
+scene-43-dashboard-3
+00:03:36.600 --> 00:03:41.500
+Head back to the dashboard. {0.5} You can get here anytime with the command + K short keys.
 
 NOTE
-scene 31  item-list-2
-  raw        3.6s on camera
-  scene      00:02:03.200 to 00:02:05.400  (2.2s)
-  lead-in    0.5s     speech 3 words, 0.9s     exit 0.8s
+scene 44  sign-out
+  raw        5.56s on camera
+  scene      00:03:42.800 to 00:03:46.900  (4.1s)
+  lead-in    0.5s     speech 8 words, 2.3s     beats 0.5s     exit 0.8s
 
-scene-31-item-list-2
-00:02:03.700 --> 00:02:04.600
-Plus button again.
-
-NOTE
-scene 32  new-item-2
-  raw        14.1s on camera
-  scene      00:02:05.400 to 00:02:09.300  (3.9s)
-  lead-in    0.5s     speech 9 words, 2.6s     exit 0.8s
-
-scene-32-new-item-2
-00:02:05.900 --> 00:02:08.500
-Name the second item, and choose the same collection.
-
-NOTE
-scene 33  item-details-2
-  raw        15.5s on camera
-  scene      00:02:09.300 to 00:02:12.900  (3.6s)
-  lead-in    0.5s     speech 8 words, 2.3s     exit 0.8s
-
-scene-33-item-details-2
-00:02:09.800 --> 00:02:12.100
-Same details, with the other option value. Save.
-
-NOTE
-scene 34  saved
-  raw        1.8s on camera
-  scene      00:02:12.900 to 00:02:16.500  (3.6s)
-  lead-in    0.5s     speech 8 words, 2.3s     exit 0.8s
-
-scene-34-saved
-00:02:13.400 --> 00:02:15.700
-The collection now has two items in it.
-
-NOTE
-scene 35  sign-out
-  raw        3.7s on camera
-  scene      00:02:16.500 to 00:02:20.700  (4.2s)
-  lead-in    0.5s     speech 10 words, 2.9s     exit 0.8s
-
-scene-35-sign-out
-00:02:17.000 --> 00:02:19.900
-To finish, press Control K, type Logout, and press Enter.
+scene-44-sign-out
+00:03:43.300 --> 00:03:45.600
+Click Logout to finish. {0.5} You are signed out.
