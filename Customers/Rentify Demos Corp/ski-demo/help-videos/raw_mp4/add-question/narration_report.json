@@ -1,0 +1,140 @@
+{
+ "voice": "Samantha",
+ "video": "ski-demo_add-question_dev_09-19-47_v4.mp4",
+ "output": "ski-demo_add-question_dev_09-19-47_v4-narrated.mp4",
+ "seconds": 125.56,
+ "lines": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "starts_at": 0.5,
+   "room": 6.94,
+   "held_at_end": 0.8,
+   "spoken": 4.91,
+   "rate": 155,
+   "said": "Type the email address for your back-office account. [[slnc 800]] Then click Send Code.",
+   "overruns_by": 0
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "starts_at": 8.74,
+   "room": 5.7,
+   "held_at_end": 0.8,
+   "spoken": 5.51,
+   "rate": 155,
+   "said": "A four-digit code is sent to that address. [[slnc 500]] Type it in \u2014 the screen moves on by itself.",
+   "overruns_by": 0
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "starts_at": 15.74,
+   "room": 5.98,
+   "held_at_end": 0.8,
+   "spoken": 5.27,
+   "rate": 155,
+   "said": "This is your dashboard. [[slnc 800]] Questions are shared by every store. Click Questions.",
+   "overruns_by": 0
+  },
+  {
+   "n": 4,
+   "label": "question-list",
+   "starts_at": 23.02,
+   "room": 6.46,
+   "held_at_end": 0.8,
+   "spoken": 4.54,
+   "rate": 155,
+   "said": "This lists every question you have. [[slnc 500]] Click the plus button to add a new one.",
+   "overruns_by": 0
+  },
+  {
+   "n": 5,
+   "label": "new-question",
+   "starts_at": 30.78,
+   "room": 15.22,
+   "held_at_end": 0.8,
+   "spoken": 8.33,
+   "rate": 155,
+   "said": "Give the question a name. [[slnc 800]] Then choose its type. Select One gives the renter a short list to pick from. [[slnc 800]] Now create it.",
+   "overruns_by": 0
+  },
+  {
+   "n": 6,
+   "label": "question-details",
+   "starts_at": 47.3,
+   "room": 30.86,
+   "held_at_end": 0.8,
+   "spoken": 13.24,
+   "rate": 155,
+   "said": "Now the details. [[slnc 800]] The inquiry is what the renter reads. [[slnc 800]] The label is the short name on their form. [[slnc 800]] Add the options they can choose between, [[slnc 500]] set the status to Active, [[slnc 500]] and update.",
+   "overruns_by": 0
+  },
+  {
+   "n": 7,
+   "label": "back-to-questions",
+   "starts_at": 79.46,
+   "room": 9.26,
+   "held_at_end": 0.8,
+   "spoken": 8.22,
+   "rate": 155,
+   "said": "A new question starts as a draft, [[slnc 500]] and a draft cannot be attached to anything. [[slnc 800]] So we go back to Questions to switch it on.",
+   "overruns_by": 0
+  },
+  {
+   "n": 8,
+   "label": "find-the-question",
+   "starts_at": 90.02,
+   "room": 5.18,
+   "held_at_end": 0.8,
+   "spoken": 3.48,
+   "rate": 155,
+   "said": "Type part of the name, [[slnc 500]] then pick your question from the list.",
+   "overruns_by": 0
+  },
+  {
+   "n": 9,
+   "label": "the-question",
+   "starts_at": 96.5,
+   "room": 5.54,
+   "held_at_end": 0.8,
+   "spoken": 4.21,
+   "rate": 155,
+   "said": "This is the question you just made. [[slnc 500]] Everything you typed is still here.",
+   "overruns_by": 0
+  },
+  {
+   "n": 10,
+   "label": "activate",
+   "starts_at": 103.34,
+   "room": 7.42,
+   "held_at_end": 0.8,
+   "spoken": 5.85,
+   "rate": 155,
+   "said": "Change the status to Active, [[slnc 800]] then update. [[slnc 800]] A requirement can use it now.",
+   "overruns_by": 0
+  },
+  {
+   "n": 11,
+   "label": "back-to-dashboard",
+   "starts_at": 112.06,
+   "room": 7.18,
+   "held_at_end": 0.8,
+   "spoken": 5.36,
+   "rate": 155,
+   "said": "Head back to the dashboard. [[slnc 500]] You can get here anytime with the command + K short keys.",
+   "overruns_by": 0
+  },
+  {
+   "n": 12,
+   "label": "sign-out",
+   "starts_at": 120.54,
+   "room": 4.22,
+   "held_at_end": 0.8,
+   "spoken": 3.02,
+   "rate": 155,
+   "said": "Click Logout to finish. [[slnc 500]] You are signed out.",
+   "overruns_by": 0
+  }
+ ]
+}

@@ -1,0 +1,6 @@
+{
+ "_note": "Screen edges of ski-demo_add-requirement_dev_09-19-50_v3.mp4, in seconds. Frame-difference peaks, confirmed against thumbnails. Of 31 candidates only 12 are real screen changes — the rest are typing, dropdowns and checkboxes inside the requirement's own page, which is one screen and holds 38.6s of it.",
+ "source": "ski-demo_add-requirement_dev_09-19-50_v3.mp4",
+ "labels": ["sign-in","enter-the-code","dashboard","find-the-business","the-business","find-the-store","the-store","requirement-list","new-requirement","requirement-details","saved","back-to-dashboard","sign-out"],
+ "bounds": [[0.0,8.16],[8.16,14.88],[14.88,22.24],[22.24,30.68],[30.68,37.68],[37.68,47.20],[47.20,57.32],[57.32,66.08],[66.08,71.68],[71.68,110.32],[110.32,115.72],[115.72,124.20],[124.20,129.68]]
+}

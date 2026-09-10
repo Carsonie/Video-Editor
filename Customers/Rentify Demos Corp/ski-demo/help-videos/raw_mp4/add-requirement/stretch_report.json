@@ -1,0 +1,150 @@
+{
+ "source": "ski-demo_add-requirement_dev_09-19-50_v3.mp4",
+ "output": "ski-demo_add-requirement_dev_09-19-50_v4.mp4",
+ "output_seconds": 131.56,
+ "scenes": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "src_in": 0.0,
+   "src_out": 8.16,
+   "on_camera": 8.16,
+   "scene_needs": 5.6,
+   "built": 8.16,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "src_in": 8.16,
+   "src_out": 14.88,
+   "on_camera": 6.72,
+   "scene_needs": 7.0,
+   "built": 7.0,
+   "factor": 1.0417,
+   "stretched": true
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "src_in": 14.88,
+   "src_out": 22.24,
+   "on_camera": 7.36,
+   "scene_needs": 6.5,
+   "built": 7.36,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 4,
+   "label": "find-the-business",
+   "src_in": 22.24,
+   "src_out": 30.68,
+   "on_camera": 8.44,
+   "scene_needs": 5.6,
+   "built": 8.44,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 5,
+   "label": "the-business",
+   "src_in": 30.68,
+   "src_out": 37.68,
+   "on_camera": 7.0,
+   "scene_needs": 5.9,
+   "built": 7.0,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 6,
+   "label": "find-the-store",
+   "src_in": 37.68,
+   "src_out": 47.2,
+   "on_camera": 9.52,
+   "scene_needs": 4.7,
+   "built": 9.52,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 7,
+   "label": "the-store",
+   "src_in": 47.2,
+   "src_out": 57.32,
+   "on_camera": 10.12,
+   "scene_needs": 7.0,
+   "built": 10.12,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 8,
+   "label": "requirement-list",
+   "src_in": 57.32,
+   "src_out": 66.08,
+   "on_camera": 8.76,
+   "scene_needs": 5.9,
+   "built": 8.76,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 9,
+   "label": "new-requirement",
+   "src_in": 66.08,
+   "src_out": 71.68,
+   "on_camera": 5.6,
+   "scene_needs": 7.2,
+   "built": 7.2,
+   "factor": 1.2857,
+   "stretched": true
+  },
+  {
+   "n": 10,
+   "label": "requirement-details",
+   "src_in": 71.68,
+   "src_out": 110.32,
+   "on_camera": 38.64,
+   "scene_needs": 20.5,
+   "built": 38.64,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 11,
+   "label": "saved",
+   "src_in": 110.32,
+   "src_out": 115.72,
+   "on_camera": 5.4,
+   "scene_needs": 5.0,
+   "built": 5.4,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 12,
+   "label": "back-to-dashboard",
+   "src_in": 115.72,
+   "src_out": 124.2,
+   "on_camera": 8.48,
+   "scene_needs": 6.7,
+   "built": 8.48,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 13,
+   "label": "sign-out",
+   "src_in": 124.2,
+   "src_out": 129.68,
+   "on_camera": 5.48,
+   "scene_needs": 4.1,
+   "built": 5.48,
+   "factor": 1.0,
+   "stretched": false
+  }
+ ]
+}

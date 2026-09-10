@@ -1,10 +1,10 @@
 WEBVTT
 
 NOTE
-add-question — 11 screens, 11 avatar scenes
+add-question — 12 screens, 12 avatar scenes
 ski-demo, BCP admin.
 
-BCP admin recipe add-question. Questions are shared across every store, so this one never visits a business or a store. Lead-in trimmed 2026-09-09: the first 4s were desktop and a blank browser.
+BCP admin recipe add-question. Cut from ski-demo_add-question_dev_09-19-47_v3.mp4 (125.32s), recorded to the v15 standard — rings, click-through navigation, the dashboard's own Logout card. TWELVE screens: the draft's save, the walk back through the dashboard and the second trip to the question list are merged, because to a viewer they are one act. Screen edges measured off the mp4 and kept in bounds_v3.json.
 
 EVERY SCENE HAS A LEAD-IN AND AN EXIT PAUSE.
 
@@ -27,118 +27,128 @@ SPEAKING RATE 3.44 words a second. MEASURED, from two rendered clips —
 Still an estimate for THIS video: nothing is rendered, so no line has a
 real spoken length. Re-time from the audio once it exists.
 
-  words                 176
-  speech only           51.0s
-  lead-ins + exits      14.3s
-  FINISHED VIDEO        65.3s
-  raw footage           89.4s
+  words                 201
+  speech only           58.5s
+  lead-ins + exits      15.6s
+  FINISHED VIDEO        86.6s
+  raw footage           125.56s
 
 NOTE
 scene 01  sign-in
-  raw        5.9s on camera
-  scene      00:00:00.000 to 00:00:06.200  (6.2s)
-  lead-in    0.5s     speech 17 words, 4.9s     exit 0.8s
+  raw        8.24s on camera
+  scene      00:00:00.000 to 00:00:05.600  (5.6s)
+  lead-in    0.5s     speech 12 words, 3.5s     beats 0.8s     exit 0.8s
 
 scene-01-sign-in
-00:00:00.500 --> 00:00:05.400
-This is the sign-in screen. Type the email address for your back-office account, then click Send Code.
+00:00:00.500 --> 00:00:04.000
+Type the email address for your back-office account. {0.8} Then click Send Code.
 
 NOTE
 scene 02  enter-the-code
-  raw        3.1s on camera
-  scene      00:00:06.200 to 00:00:12.400  (6.2s)
-  lead-in    0.5s     speech 17 words, 4.9s     exit 0.8s
+  raw        7.0s on camera
+  scene      00:00:05.600 to 00:00:12.600  (7.0s)
+  lead-in    0.5s     speech 18 words, 5.2s     beats 0.5s     exit 0.8s
 
 scene-02-enter-the-code
-00:00:06.700 --> 00:00:11.600
-A four-digit code is sent to that address. Type it in. The screen moves on by itself.
+00:00:06.100 --> 00:00:11.300
+A four-digit code is sent to that address. {0.5} Type it in — the screen moves on by itself.
 
 NOTE
 scene 03  dashboard
-  raw        1.0s on camera
-  scene      00:00:12.400 to 00:00:18.900  (6.5s)
-  lead-in    0.5s     speech 18 words, 5.2s     exit 0.8s
+  raw        7.28s on camera
+  scene      00:00:12.600 to 00:00:18.200  (5.6s)
+  lead-in    0.5s     speech 12 words, 3.5s     beats 0.8s     exit 0.8s
 
 scene-03-dashboard
-00:00:12.900 --> 00:00:18.100
-This is the dashboard. Questions are shared across every store, so they have their own card. Click Questions.
+00:00:13.100 --> 00:00:16.600
+This is your dashboard. {0.8} Questions are shared by every store. Click Questions.
 
 NOTE
 scene 04  question-list
-  raw        1.4s on camera
-  scene      00:00:18.900 to 00:00:24.000  (5.1s)
-  lead-in    0.5s     speech 13 words, 3.8s     exit 0.8s
+  raw        7.76s on camera
+  scene      00:00:18.200 to 00:00:24.400  (6.2s)
+  lead-in    0.5s     speech 15 words, 4.4s     beats 0.5s     exit 0.8s
 
 scene-04-question-list
-00:00:19.400 --> 00:00:23.200
-This lists every question you have. Click the plus button to add one.
+00:00:18.700 --> 00:00:23.100
+This lists every question you have. {0.5} Click the plus button to add a new one.
 
 NOTE
 scene 05  new-question
-  raw        11.2s on camera
-  scene      00:00:24.000 to 00:00:31.100  (7.1s)
-  lead-in    0.5s     speech 20 words, 5.8s     exit 0.8s
+  raw        16.52s on camera
+  scene      00:00:24.400 to 00:00:34.000  (9.6s)
+  lead-in    0.5s     speech 23 words, 6.7s     beats 1.6s     exit 0.8s
 
 scene-05-new-question
-00:00:24.500 --> 00:00:30.300
-Give the question a name, and choose its type. Select One gives the renter a short list to pick from.
+00:00:24.900 --> 00:00:31.600
+Give the question a name. {0.8} Then choose its type. Select One gives the renter a short list to pick from. {0.8} Now create it.
 
 NOTE
 scene 06  question-details
-  raw        25.5s on camera
-  scene      00:00:31.100 to 00:00:40.200  (9.1s)
-  lead-in    0.5s     speech 27 words, 7.8s     exit 0.8s
+  raw        32.16s on camera
+  scene      00:00:34.000 to 00:00:48.300  (14.3s)
+  lead-in    0.5s     speech 33 words, 9.6s     beats 3.4s     exit 0.8s
 
 scene-06-question-details
-00:00:31.600 --> 00:00:39.400
-Now the details. The inquiry is what the renter reads. The label is the short name on their form. Then add the options they can choose between.
+00:00:34.500 --> 00:00:44.100
+Now the details. {0.8} The inquiry is what the renter reads. {0.8} The label is the short name on their form. {0.8} Add the options they can choose between, {0.5} set the status to Active, {0.5} and update.
 
 NOTE
 scene 07  back-to-questions
-  raw        6.1s on camera
-  scene      00:00:40.200 to 00:00:48.800  (8.6s)
-  lead-in    0.5s     speech 25 words, 7.3s     exit 0.8s
+  raw        10.56s on camera
+  scene      00:00:48.300 to 00:00:58.200  (9.9s)
+  lead-in    0.5s     speech 25 words, 7.3s     beats 1.3s     exit 0.8s
 
 scene-07-back-to-questions
-00:00:40.700 --> 00:00:48.000
-A new question starts as a draft, and a draft cannot be attached to anything. So we go back to Questions to switch it on.
+00:00:48.800 --> 00:00:56.100
+A new question starts as a draft, {0.5} and a draft cannot be attached to anything. {0.8} So we go back to Questions to switch it on.
 
 NOTE
 scene 08  find-the-question
-  raw        6.1s on camera
-  scene      00:00:48.800 to 00:00:52.700  (3.9s)
-  lead-in    0.5s     speech 9 words, 2.6s     exit 0.8s
+  raw        6.48s on camera
+  scene      00:00:58.200 to 00:01:03.500  (5.3s)
+  lead-in    0.5s     speech 12 words, 3.5s     beats 0.5s     exit 0.8s
 
 scene-08-find-the-question
-00:00:49.300 --> 00:00:51.900
-Find the question you just made, and open it.
+00:00:58.700 --> 00:01:02.200
+Type part of the name, {0.5} then pick your question from the list.
 
 NOTE
-scene 09  activate
-  raw        6.9s on camera
-  scene      00:00:52.700 to 00:00:57.800  (5.1s)
-  lead-in    0.5s     speech 13 words, 3.8s     exit 0.8s
+scene 09  the-question
+  raw        6.84s on camera
+  scene      00:01:03.500 to 00:01:09.100  (5.6s)
+  lead-in    0.5s     speech 13 words, 3.8s     beats 0.5s     exit 0.8s
 
-scene-09-activate
-00:00:53.200 --> 00:00:57.000
-Change the status to Active, then save. A requirement can use it now.
-
-NOTE
-scene 10  saved
-  raw        3.4s on camera
-  scene      00:00:57.800 to 00:01:01.100  (3.3s)
-  lead-in    0.5s     speech 7 words, 2.0s     exit 0.8s
-
-scene-10-saved
-00:00:58.300 --> 00:01:00.300
-That is the question ready to use.
+scene-09-the-question
+00:01:04.000 --> 00:01:07.800
+This is the question you just made. {0.5} Everything you typed is still here.
 
 NOTE
-scene 11  sign-out
-  raw        3.7s on camera
-  scene      00:01:01.100 to 00:01:05.300  (4.2s)
-  lead-in    0.5s     speech 10 words, 2.9s     exit 0.8s
+scene 10  activate
+  raw        8.72s on camera
+  scene      00:01:09.100 to 00:01:15.800  (6.7s)
+  lead-in    0.5s     speech 13 words, 3.8s     beats 1.6s     exit 0.8s
 
-scene-11-sign-out
-00:01:01.600 --> 00:01:04.500
-To finish, press Control K, type Logout, and press Enter.
+scene-10-activate
+00:01:09.600 --> 00:01:13.400
+Change the status to Active, {0.8} then update. {0.8} A requirement can use it now.
+
+NOTE
+scene 11  back-to-dashboard
+  raw        8.48s on camera
+  scene      00:01:15.800 to 00:01:22.500  (6.7s)
+  lead-in    0.5s     speech 17 words, 4.9s     beats 0.5s     exit 0.8s
+
+scene-11-back-to-dashboard
+00:01:16.300 --> 00:01:21.200
+Head back to the dashboard. {0.5} You can get here anytime with the command + K short keys.
+
+NOTE
+scene 12  sign-out
+  raw        5.52s on camera
+  scene      00:01:22.500 to 00:01:26.600  (4.1s)
+  lead-in    0.5s     speech 8 words, 2.3s     beats 0.5s     exit 0.8s
+
+scene-12-sign-out
+00:01:23.000 --> 00:01:25.300
+Click Logout to finish. {0.5} You are signed out.

@@ -1,10 +1,10 @@
 WEBVTT
 
 NOTE
-add-requirement — 12 screens, 12 avatar scenes
+add-requirement — 13 screens, 13 avatar scenes
 ski-demo, BCP admin.
 
-BCP admin recipe add-requirement. A requirement is a named set of questions, and every item points at one. Lead-in trimmed 2026-09-09: the first 4s were desktop and a blank browser.
+BCP admin recipe add-requirement. Cut from ski-demo_add-requirement_dev_09-19-50_v3.mp4 (129.68s), recorded to the v15 standard. THIRTEEN screens. The requirement's own page is ONE screen holding 38.6s — three questions ticked from the picker, the status set, then update — so it carries the most narration of any screen in the four recipes. Screen edges in bounds_v3.json.
 
 EVERY SCENE HAS A LEAD-IN AND AN EXIT PAUSE.
 
@@ -27,128 +27,138 @@ SPEAKING RATE 3.44 words a second. MEASURED, from two rendered clips —
 Still an estimate for THIS video: nothing is rendered, so no line has a
 real spoken length. Re-time from the audio once it exists.
 
-  words                 161
-  speech only           46.8s
-  lead-ins + exits      15.6s
-  FINISHED VIDEO        62.4s
-  raw footage           89.3s
+  words                 206
+  speech only           59.9s
+  lead-ins + exits      16.9s
+  FINISHED VIDEO        91.7s
+  raw footage           131.56s
 
 NOTE
 scene 01  sign-in
-  raw        6.0s on camera
-  scene      00:00:00.000 to 00:00:06.200  (6.2s)
-  lead-in    0.5s     speech 17 words, 4.9s     exit 0.8s
+  raw        8.16s on camera
+  scene      00:00:00.000 to 00:00:05.600  (5.6s)
+  lead-in    0.5s     speech 12 words, 3.5s     beats 0.8s     exit 0.8s
 
 scene-01-sign-in
-00:00:00.500 --> 00:00:05.400
-This is the sign-in screen. Type the email address for your back-office account, then click Send Code.
+00:00:00.500 --> 00:00:04.000
+Type the email address for your back-office account. {0.8} Then click Send Code.
 
 NOTE
 scene 02  enter-the-code
-  raw        3.1s on camera
-  scene      00:00:06.200 to 00:00:12.400  (6.2s)
-  lead-in    0.5s     speech 17 words, 4.9s     exit 0.8s
+  raw        7.0s on camera
+  scene      00:00:05.600 to 00:00:12.600  (7.0s)
+  lead-in    0.5s     speech 18 words, 5.2s     beats 0.5s     exit 0.8s
 
 scene-02-enter-the-code
-00:00:06.700 --> 00:00:11.600
-A four-digit code is sent to that address. Type it in. The screen moves on by itself.
+00:00:06.100 --> 00:00:11.300
+A four-digit code is sent to that address. {0.5} Type it in — the screen moves on by itself.
 
 NOTE
 scene 03  dashboard
-  raw        1.1s on camera
-  scene      00:00:12.400 to 00:00:18.100  (5.7s)
-  lead-in    0.5s     speech 15 words, 4.4s     exit 0.8s
+  raw        7.36s on camera
+  scene      00:00:12.600 to 00:00:19.100  (6.5s)
+  lead-in    0.5s     speech 15 words, 4.4s     beats 0.8s     exit 0.8s
 
 scene-03-dashboard
-00:00:12.900 --> 00:00:17.300
-This is the dashboard. A requirement belongs to one store, so we start at Businesses.
+00:00:13.100 --> 00:00:17.500
+This is your dashboard. {0.8} A requirement belongs to one store, so we start at Businesses.
 
 NOTE
 scene 04  find-the-business
-  raw        5.4s on camera
-  scene      00:00:18.100 to 00:00:22.900  (4.8s)
-  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
+  raw        8.44s on camera
+  scene      00:00:19.100 to 00:00:24.700  (5.6s)
+  lead-in    0.5s     speech 13 words, 3.8s     beats 0.5s     exit 0.8s
 
 scene-04-find-the-business
-00:00:18.600 --> 00:00:22.100
-Type the name of your business, then pick it from the list.
+00:00:19.600 --> 00:00:23.400
+Type the name of a business, {0.5} then select it from the dropdown list.
 
 NOTE
 scene 05  the-business
-  raw        2.1s on camera
-  scene      00:00:22.900 to 00:00:28.000  (5.1s)
-  lead-in    0.5s     speech 13 words, 3.8s     exit 0.8s
+  raw        7.0s on camera
+  scene      00:00:24.700 to 00:00:30.600  (5.9s)
+  lead-in    0.5s     speech 14 words, 4.1s     beats 0.5s     exit 0.8s
 
 scene-05-the-business
-00:00:23.400 --> 00:00:27.200
-This is your business page. Click the lookup icon to see its stores.
+00:00:25.200 --> 00:00:29.300
+This is the business info page. {0.5} Click the lookup icon to find its stores.
 
 NOTE
 scene 06  find-the-store
-  raw        6.6s on camera
-  scene      00:00:28.000 to 00:00:31.300  (3.3s)
-  lead-in    0.5s     speech 7 words, 2.0s     exit 0.8s
+  raw        9.52s on camera
+  scene      00:00:30.600 to 00:00:35.300  (4.7s)
+  lead-in    0.5s     speech 10 words, 2.9s     beats 0.5s     exit 0.8s
 
 scene-06-find-the-store
-00:00:28.500 --> 00:00:30.500
-Type the store name, then pick it.
+00:00:31.100 --> 00:00:34.000
+Type the store name, {0.5} then select it from the list.
 
 NOTE
 scene 07  the-store
-  raw        2.1s on camera
-  scene      00:00:31.300 to 00:00:36.100  (4.8s)
-  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
+  raw        10.12s on camera
+  scene      00:00:35.300 to 00:00:42.300  (7.0s)
+  lead-in    0.5s     speech 15 words, 4.4s     beats 1.3s     exit 0.8s
 
 scene-07-the-store
-00:00:31.800 --> 00:00:35.300
-This is the store page. Click the gear, then choose Lookup Requirements.
+00:00:35.800 --> 00:00:40.200
+Now you are on the store details page. {0.8} Click the gear, {0.5} then choose Lookup Requirements.
 
 NOTE
 scene 08  requirement-list
-  raw        3.5s on camera
-  scene      00:00:36.100 to 00:00:40.900  (4.8s)
-  lead-in    0.5s     speech 12 words, 3.5s     exit 0.8s
+  raw        8.76s on camera
+  scene      00:00:42.300 to 00:00:48.200  (5.9s)
+  lead-in    0.5s     speech 14 words, 4.1s     beats 0.5s     exit 0.8s
 
 scene-08-requirement-list
-00:00:36.600 --> 00:00:40.100
-This lists the store's requirements. Click the plus button to add one.
+00:00:42.800 --> 00:00:46.900
+This lists the store's requirements. {0.5} Click the plus button to add a new one.
 
 NOTE
 scene 09  new-requirement
-  raw        7.3s on camera
-  scene      00:00:40.900 to 00:00:46.300  (5.4s)
-  lead-in    0.5s     speech 14 words, 4.1s     exit 0.8s
+  raw        7.2s on camera
+  scene      00:00:48.200 to 00:00:55.400  (7.2s)
+  lead-in    0.5s     speech 17 words, 4.9s     beats 1.0s     exit 0.8s
 
 scene-09-new-requirement
-00:00:41.400 --> 00:00:45.500
-Give the requirement a name. A good name says which items it is for.
+00:00:48.700 --> 00:00:53.600
+Give the requirement a name. {0.5} A good name says which items it is for. {0.5} Then create it.
 
 NOTE
 scene 10  requirement-details
-  raw        28.9s on camera
-  scene      00:00:46.300 to 00:00:53.700  (7.4s)
-  lead-in    0.5s     speech 21 words, 6.1s     exit 0.8s
+  raw        38.64s on camera
+  scene      00:00:55.400 to 00:01:15.900  (20.5s)
+  lead-in    0.5s     speech 42 words, 12.2s     beats 7.0s     exit 0.8s
 
 scene-10-requirement-details
-00:00:46.800 --> 00:00:52.900
-A requirement is a set of questions. Add each one the renter must answer, set the status to Active, then save.
+00:00:55.900 --> 00:01:08.100
+A requirement is a set of questions the renter must answer. {1} Open the question picker, {0.8} and tick each one you need. {1} We add three: {0.8} the skier's age, {0.8} their boot size, {0.8} and the rental agreement. {1} Then set the status to Active, {0.8} and update.
 
 NOTE
 scene 11  saved
-  raw        3.9s on camera
-  scene      00:00:53.700 to 00:00:58.200  (4.5s)
-  lead-in    0.5s     speech 11 words, 3.2s     exit 0.8s
+  raw        5.4s on camera
+  scene      00:01:15.900 to 00:01:20.900  (5.0s)
+  lead-in    0.5s     speech 11 words, 3.2s     beats 0.5s     exit 0.8s
 
 scene-11-saved
-00:00:54.200 --> 00:00:57.400
-That is the requirement ready. Items can point at it now.
+00:01:16.400 --> 00:01:19.600
+That is the requirement ready. {0.5} Items can point at it now.
 
 NOTE
-scene 12  sign-out
-  raw        3.7s on camera
-  scene      00:00:58.200 to 00:01:02.400  (4.2s)
-  lead-in    0.5s     speech 10 words, 2.9s     exit 0.8s
+scene 12  back-to-dashboard
+  raw        8.48s on camera
+  scene      00:01:20.900 to 00:01:27.600  (6.7s)
+  lead-in    0.5s     speech 17 words, 4.9s     beats 0.5s     exit 0.8s
 
-scene-12-sign-out
-00:00:58.700 --> 00:01:01.600
-To finish, press Control K, type Logout, and press Enter.
+scene-12-back-to-dashboard
+00:01:21.400 --> 00:01:26.300
+Head back to the dashboard. {0.5} You can get here anytime with the command + K short keys.
+
+NOTE
+scene 13  sign-out
+  raw        5.48s on camera
+  scene      00:01:27.600 to 00:01:31.700  (4.1s)
+  lead-in    0.5s     speech 8 words, 2.3s     beats 0.5s     exit 0.8s
+
+scene-13-sign-out
+00:01:28.100 --> 00:01:30.400
+Click Logout to finish. {0.5} You are signed out.

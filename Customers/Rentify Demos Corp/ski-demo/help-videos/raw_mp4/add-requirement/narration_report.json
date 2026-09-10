@@ -1,0 +1,151 @@
+{
+ "voice": "Samantha",
+ "video": "ski-demo_add-requirement_dev_09-19-50_v4.mp4",
+ "output": "ski-demo_add-requirement_dev_09-19-50_v4-narrated.mp4",
+ "seconds": 131.56,
+ "lines": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "starts_at": 0.5,
+   "room": 6.86,
+   "held_at_end": 0.8,
+   "spoken": 4.91,
+   "rate": 155,
+   "said": "Type the email address for your back-office account. [[slnc 800]] Then click Send Code.",
+   "overruns_by": 0
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "starts_at": 8.66,
+   "room": 5.7,
+   "held_at_end": 0.8,
+   "spoken": 5.51,
+   "rate": 155,
+   "said": "A four-digit code is sent to that address. [[slnc 500]] Type it in \u2014 the screen moves on by itself.",
+   "overruns_by": 0
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "starts_at": 15.66,
+   "room": 6.06,
+   "held_at_end": 0.8,
+   "spoken": 5.95,
+   "rate": 155,
+   "said": "This is your dashboard. [[slnc 800]] A requirement belongs to one store, so we start at Businesses.",
+   "overruns_by": 0
+  },
+  {
+   "n": 4,
+   "label": "find-the-business",
+   "starts_at": 23.02,
+   "room": 7.14,
+   "held_at_end": 0.8,
+   "spoken": 3.88,
+   "rate": 155,
+   "said": "Type the name of a business, [[slnc 500]] then select it from the dropdown list.",
+   "overruns_by": 0
+  },
+  {
+   "n": 5,
+   "label": "the-business",
+   "starts_at": 31.46,
+   "room": 5.7,
+   "held_at_end": 0.8,
+   "spoken": 4.91,
+   "rate": 155,
+   "said": "This is the business info page. [[slnc 500]] Click the lookup icon to find its stores.",
+   "overruns_by": 0
+  },
+  {
+   "n": 6,
+   "label": "find-the-store",
+   "starts_at": 38.46,
+   "room": 8.22,
+   "held_at_end": 0.8,
+   "spoken": 3.01,
+   "rate": 155,
+   "said": "Type the store name, [[slnc 500]] then select it from the list.",
+   "overruns_by": 0
+  },
+  {
+   "n": 7,
+   "label": "the-store",
+   "starts_at": 47.98,
+   "room": 8.82,
+   "held_at_end": 0.8,
+   "spoken": 6.21,
+   "rate": 155,
+   "said": "Now you are on the store details page. [[slnc 800]] Click the gear, [[slnc 500]] then choose Lookup Requirements.",
+   "overruns_by": 0
+  },
+  {
+   "n": 8,
+   "label": "requirement-list",
+   "starts_at": 58.1,
+   "room": 7.46,
+   "held_at_end": 0.8,
+   "spoken": 4.62,
+   "rate": 155,
+   "said": "This lists the store's requirements. [[slnc 500]] Click the plus button to add a new one.",
+   "overruns_by": 0
+  },
+  {
+   "n": 9,
+   "label": "new-requirement",
+   "starts_at": 66.86,
+   "room": 5.9,
+   "held_at_end": 0.8,
+   "spoken": 5.68,
+   "rate": 155,
+   "said": "Give the requirement a name. [[slnc 500]] A good name says which items it is for. [[slnc 500]] Then create it.",
+   "overruns_by": 0
+  },
+  {
+   "n": 10,
+   "label": "requirement-details",
+   "starts_at": 74.06,
+   "room": 37.34,
+   "held_at_end": 0.8,
+   "spoken": 19.64,
+   "rate": 155,
+   "said": "A requirement is a set of questions the renter must answer. [[slnc 1000]] Open the question picker, [[slnc 800]] and tick each one you need. [[slnc 1000]] We add three: [[slnc 800]] the skier's age, [[slnc 800]] their boot size, [[slnc 800]] and the rental agreement. [[slnc 1000]] Then set the status to Active, [[slnc 800]] and update.",
+   "overruns_by": 0
+  },
+  {
+   "n": 11,
+   "label": "saved",
+   "starts_at": 112.7,
+   "room": 4.1,
+   "held_at_end": 0.8,
+   "spoken": 3.73,
+   "rate": 155,
+   "said": "That is the requirement ready. [[slnc 500]] Items can point at it now.",
+   "overruns_by": 0
+  },
+  {
+   "n": 12,
+   "label": "back-to-dashboard",
+   "starts_at": 118.1,
+   "room": 7.18,
+   "held_at_end": 0.8,
+   "spoken": 5.36,
+   "rate": 155,
+   "said": "Head back to the dashboard. [[slnc 500]] You can get here anytime with the command + K short keys.",
+   "overruns_by": 0
+  },
+  {
+   "n": 13,
+   "label": "sign-out",
+   "starts_at": 126.58,
+   "room": 4.18,
+   "held_at_end": 0.8,
+   "spoken": 3.02,
+   "rate": 155,
+   "said": "Click Logout to finish. [[slnc 500]] You are signed out.",
+   "overruns_by": 0
+  }
+ ]
+}

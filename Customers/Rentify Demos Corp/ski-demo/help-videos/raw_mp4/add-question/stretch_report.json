@@ -1,0 +1,139 @@
+{
+ "source": "ski-demo_add-question_dev_09-19-47_v3.mp4",
+ "output": "ski-demo_add-question_dev_09-19-47_v4.mp4",
+ "output_seconds": 125.56,
+ "scenes": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "src_in": 0.0,
+   "src_out": 8.24,
+   "on_camera": 8.24,
+   "scene_needs": 5.6,
+   "built": 8.24,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "src_in": 8.24,
+   "src_out": 15.04,
+   "on_camera": 6.8,
+   "scene_needs": 7.0,
+   "built": 7.0,
+   "factor": 1.0294,
+   "stretched": true
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "src_in": 15.04,
+   "src_out": 22.28,
+   "on_camera": 7.24,
+   "scene_needs": 7.3,
+   "built": 7.28,
+   "factor": 1.0083,
+   "stretched": true
+  },
+  {
+   "n": 4,
+   "label": "question-list",
+   "src_in": 22.28,
+   "src_out": 30.04,
+   "on_camera": 7.76,
+   "scene_needs": 6.2,
+   "built": 7.76,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 5,
+   "label": "new-question",
+   "src_in": 30.04,
+   "src_out": 46.56,
+   "on_camera": 16.52,
+   "scene_needs": 9.6,
+   "built": 16.52,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 6,
+   "label": "question-details",
+   "src_in": 46.56,
+   "src_out": 78.72,
+   "on_camera": 32.16,
+   "scene_needs": 14.3,
+   "built": 32.16,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 7,
+   "label": "back-to-questions",
+   "src_in": 78.72,
+   "src_out": 89.28,
+   "on_camera": 10.56,
+   "scene_needs": 9.9,
+   "built": 10.56,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 8,
+   "label": "find-the-question",
+   "src_in": 89.28,
+   "src_out": 95.76,
+   "on_camera": 6.48,
+   "scene_needs": 5.3,
+   "built": 6.48,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 9,
+   "label": "the-question",
+   "src_in": 95.76,
+   "src_out": 102.6,
+   "on_camera": 6.84,
+   "scene_needs": 5.6,
+   "built": 6.84,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 10,
+   "label": "activate",
+   "src_in": 102.6,
+   "src_out": 111.32,
+   "on_camera": 8.72,
+   "scene_needs": 6.7,
+   "built": 8.72,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 11,
+   "label": "back-to-dashboard",
+   "src_in": 111.32,
+   "src_out": 119.8,
+   "on_camera": 8.48,
+   "scene_needs": 6.7,
+   "built": 8.48,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 12,
+   "label": "sign-out",
+   "src_in": 119.8,
+   "src_out": 125.32,
+   "on_camera": 5.52,
+   "scene_needs": 4.1,
+   "built": 5.52,
+   "factor": 1.0,
+   "stretched": false
+  }
+ ]
+}

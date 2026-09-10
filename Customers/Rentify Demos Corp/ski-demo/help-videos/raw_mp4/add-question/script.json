@@ -1,157 +1,170 @@
 {
  "store": "ski-demo",
  "title": "Adding a question",
- "_note": "BCP admin recipe add-question. Questions are shared across every store, so this one never visits a business or a store. Lead-in trimmed 2026-09-09: the first 4s were desktop and a blank browser.",
+ "_note": "BCP admin recipe add-question. Cut from ski-demo_add-question_dev_09-19-47_v3.mp4 (125.32s), recorded to the v15 standard \u2014 rings, click-through navigation, the dashboard's own Logout card. TWELVE screens: the draft's save, the walk back through the dashboard and the second trip to the question list are merged, because to a viewer they are one act. Screen edges measured off the mp4 and kept in bounds_v3.json.",
  "words_per_second": 3.44,
  "_wps_note": "From 01-first-time-ordering/script_v33.json, measured 31 words / 9.01s. Nothing for THIS video is rendered yet.",
  "_pauses_note": "One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in comes from the scene's footage hold.",
  "_lead_in_seconds": 0.5,
- "_estimated_video_seconds": 65.3,
- "_estimated_video_note": "11 scenes. 176 words / 3.44 wps = 51.0s of speech, + 11 lead-ins at 0.5s = 5.5s, + 11 exit pauses at 0.8s = 8.8s. ESTIMATE \u2014 recompute from the audio once it exists.",
- "_footage_seconds": 89.4,
+ "_estimated_video_seconds": 86.6,
+ "_estimated_video_note": "12 scenes. 201 words / 3.44 wps = 58.5s of speech, + 12 lead-ins at 0.5s = 6.0s, + 12 exit pauses at 0.8s = 9.6s. ESTIMATE \u2014 recompute from the audio once it exists.",
+ "_footage_seconds": 125.56,
  "scenes": [
   {
    "n": 1,
    "label": "sign-in",
-   "line": "This is the sign-in screen. Type the email address for your back-office account, then click Send Code.",
+   "line": "Type the email address for your back-office account. {0.8} Then click Send Code.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "5.9s on camera",
-   "estimated-word-time": "4.9 seconds.",
-   "target-length": "6.2 seconds."
+   "raw-source": "8.24s on camera",
+   "estimated-word-time": "3.5 seconds.",
+   "target-length": "5.6 seconds."
   },
   {
    "n": 2,
    "label": "enter-the-code",
-   "line": "A four-digit code is sent to that address. Type it in. The screen moves on by itself.",
+   "line": "A four-digit code is sent to that address. {0.5} Type it in \u2014 the screen moves on by itself.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "3.1s on camera",
-   "estimated-word-time": "4.9 seconds.",
-   "target-length": "6.2 seconds."
+   "raw-source": "7.0s on camera",
+   "estimated-word-time": "5.2 seconds.",
+   "target-length": "7.0 seconds."
   },
   {
    "n": 3,
    "label": "dashboard",
-   "line": "This is the dashboard. Questions are shared across every store, so they have their own card. Click Questions.",
+   "line": "This is your dashboard. {0.8} Questions are shared by every store. Click Questions.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "1.0s on camera",
-   "estimated-word-time": "5.2 seconds.",
-   "target-length": "6.5 seconds."
+   "raw-source": "7.28s on camera",
+   "estimated-word-time": "3.5 seconds.",
+   "target-length": "5.6 seconds."
   },
   {
    "n": 4,
    "label": "question-list",
-   "line": "This lists every question you have. Click the plus button to add one.",
+   "line": "This lists every question you have. {0.5} Click the plus button to add a new one.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "1.4s on camera",
-   "estimated-word-time": "3.8 seconds.",
-   "target-length": "5.1 seconds."
+   "raw-source": "7.76s on camera",
+   "estimated-word-time": "4.4 seconds.",
+   "target-length": "6.2 seconds."
   },
   {
    "n": 5,
    "label": "new-question",
-   "line": "Give the question a name, and choose its type. Select One gives the renter a short list to pick from.",
+   "line": "Give the question a name. {0.8} Then choose its type. Select One gives the renter a short list to pick from. {0.8} Now create it.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "11.2s on camera",
-   "estimated-word-time": "5.8 seconds.",
-   "target-length": "7.1 seconds."
+   "raw-source": "16.52s on camera",
+   "estimated-word-time": "6.7 seconds.",
+   "target-length": "9.6 seconds."
   },
   {
    "n": 6,
    "label": "question-details",
-   "line": "Now the details. The inquiry is what the renter reads. The label is the short name on their form. Then add the options they can choose between.",
+   "line": "Now the details. {0.8} The inquiry is what the renter reads. {0.8} The label is the short name on their form. {0.8} Add the options they can choose between, {0.5} set the status to Active, {0.5} and update.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "25.5s on camera",
-   "estimated-word-time": "7.8 seconds.",
-   "target-length": "9.1 seconds."
+   "raw-source": "32.16s on camera",
+   "estimated-word-time": "9.6 seconds.",
+   "target-length": "14.3 seconds."
   },
   {
    "n": 7,
    "label": "back-to-questions",
-   "line": "A new question starts as a draft, and a draft cannot be attached to anything. So we go back to Questions to switch it on.",
+   "line": "A new question starts as a draft, {0.5} and a draft cannot be attached to anything. {0.8} So we go back to Questions to switch it on.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "6.1s on camera",
+   "raw-source": "10.56s on camera",
    "estimated-word-time": "7.3 seconds.",
-   "target-length": "8.6 seconds."
+   "target-length": "9.9 seconds."
   },
   {
    "n": 8,
    "label": "find-the-question",
-   "line": "Find the question you just made, and open it.",
+   "line": "Type part of the name, {0.5} then pick your question from the list.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "6.1s on camera",
-   "estimated-word-time": "2.6 seconds.",
-   "target-length": "3.9 seconds."
+   "raw-source": "6.48s on camera",
+   "estimated-word-time": "3.5 seconds.",
+   "target-length": "5.3 seconds."
   },
   {
    "n": 9,
-   "label": "activate",
-   "line": "Change the status to Active, then save. A requirement can use it now.",
+   "label": "the-question",
+   "line": "This is the question you just made. {0.5} Everything you typed is still here.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "6.9s on camera",
+   "raw-source": "6.84s on camera",
    "estimated-word-time": "3.8 seconds.",
-   "target-length": "5.1 seconds."
+   "target-length": "5.6 seconds."
   },
   {
    "n": 10,
-   "label": "saved",
-   "line": "That is the question ready to use.",
+   "label": "activate",
+   "line": "Change the status to Active, {0.8} then update. {0.8} A requirement can use it now.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "3.4s on camera",
-   "estimated-word-time": "2.0 seconds.",
-   "target-length": "3.3 seconds."
+   "raw-source": "8.72s on camera",
+   "estimated-word-time": "3.8 seconds.",
+   "target-length": "6.7 seconds."
   },
   {
    "n": 11,
-   "label": "sign-out",
-   "line": "To finish, press Control K, type Logout, and press Enter.",
+   "label": "back-to-dashboard",
+   "line": "Head back to the dashboard. {0.5} You can get here anytime with the command + K short keys.",
    "pauses": [
     {
      "seconds": 0.8
     }
    ],
-   "raw-source": "3.7s on camera",
-   "estimated-word-time": "2.9 seconds.",
-   "target-length": "4.2 seconds."
+   "raw-source": "8.48s on camera",
+   "estimated-word-time": "4.9 seconds.",
+   "target-length": "6.7 seconds."
+  },
+  {
+   "n": 12,
+   "label": "sign-out",
+   "line": "Click Logout to finish. {0.5} You are signed out.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "5.52s on camera",
+   "estimated-word-time": "2.3 seconds.",
+   "target-length": "4.1 seconds."
   }
  ]
 }

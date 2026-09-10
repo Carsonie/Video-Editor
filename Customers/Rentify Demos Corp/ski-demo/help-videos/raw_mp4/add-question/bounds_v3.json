@@ -1,0 +1,6 @@
+{
+ "_note": "Screen edges of ski-demo_add-question_dev_09-19-47_v3.mp4, in seconds. Frame-difference peaks, confirmed against thumbnails. Three transit screens were MERGED into their neighbours: the draft's save, the walk back through the dashboard, and the second trip to the question list are one act to a viewer — 'go back to Questions and switch it on'.",
+ "source": "ski-demo_add-question_dev_09-19-47_v3.mp4",
+ "labels": ["sign-in","enter-the-code","dashboard","question-list","new-question","question-details","back-to-questions","find-the-question","the-question","activate","back-to-dashboard","sign-out"],
+ "bounds": [[0.0,8.24],[8.24,15.04],[15.04,22.28],[22.28,30.04],[30.04,46.56],[46.56,78.72],[78.72,89.28],[89.28,95.76],[95.76,102.60],[102.60,111.32],[111.32,119.80],[119.80,125.32]]
+}
