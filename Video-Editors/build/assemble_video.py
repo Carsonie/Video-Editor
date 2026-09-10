@@ -58,6 +58,26 @@ FPS = 25
 
 CANVAS, CORNER = 1152, 320
 END_HOLD = 1.0          # seconds to close on the standard rest pose
+
+# ---- crossfade between consecutive demo scenes ------------------------------
+# Added 2026-08-28. Scene-to-scene cuts were a hard swap on the REAR (footage)
+# track — one screen instantly replaced by a completely different one, which
+# reads as a flash when the two screens don't look alike. Sarah's own track
+# was already smooth across the same cut (the idle-blend seam handles her), so
+# this only touches the background.
+#
+# A true crossfade (xfade) OVERLAPS the tail of one clip with the head of the
+# next and blends them, which shortens the combined timeline by the crossfade
+# length — there is no way to dissolve two clips into each other without also
+# losing that much time somewhere. The front (Sarah) track must lose the exact
+# same amount at the exact same points or the two tracks drift out of sync for
+# the rest of the video — her voice would keep playing over the wrong screen.
+# So every scene boundary trims XFADE_FRAMES off the END of that scene's own
+# front clip (a plain frame-count cut, in step with the "-frames:v N, never
+# -t" rule below), while the rear track gets the actual dissolve.
+XFADE_FRAMES = 6        # 0.24s at 25fps — short enough to read as a soften,
+                        # not a scene change of its own
+XFADE_SECS = XFADE_FRAMES / FPS
 FADE_PER_STEP = 2.0     # one transition frame per this much % difference
 # ⚠ CALIBRATED IN CORNER SPACE, which is NOT the same as full-frame space.
 # The corner crop is head-and-shoulders, so it isolates her FACE — the static
@@ -534,6 +554,11 @@ def main():
     print(f"  pad colour {PAD}")
 
     front, rear, plan = [], [], []
+    # Bookkeeping for the inter-scene crossfade, filled in as each scene is
+    # built below: which front[] entry is that scene's LAST one (front may
+    # hold one or two clips per scene — base clip, plus an optional
+    # breathing/repad tail), and the rear clip + its on-screen duration.
+    scene_front_end, scene_rv = {}, {}
     # ---- opening -------------------------------------------------------
     front.append(OP(f"sarah-intro-{CANVAS}-alpha.webm"))
     # morph + bridge hold, as one piece with the bridge's audio
@@ -715,6 +740,47 @@ def main():
              f"tpad=stop_mode=clone:stop_duration={max(0,on-cd):.3f}",
              "-c:v", "libx264", "-pix_fmt", "yuv420p", "-an", "-y", rv])
         rear.append(rv)
+        scene_front_end[n] = len(front) - 1
+        scene_rv[n] = (rv, on)
+
+    # ---- crossfade the demo footage between consecutive scenes ----------
+    # Video-only (rear has no audio track to begin with) and confined to
+    # scene-to-scene boundaries — the opening's reveal and the closing's own
+    # morph already have their own dedicated fades and are left alone.
+    scene_order = [s["n"] for s in cfg["scenes"] if s["n"] in scene_rv]
+    if len(scene_order) > 1:
+        for i in range(len(scene_order) - 1):
+            n_a, n_b = scene_order[i], scene_order[i + 1]
+            xf = min(XFADE_SECS, scene_rv[n_a][1] - 0.05, scene_rv[n_b][1] - 0.05)
+            if xf <= 0:
+                continue  # a scene too short to spare any of its own length skips the dissolve, not the build
+            rv_a, on_a = scene_rv[n_a]
+            rv_b, on_b = scene_rv[n_b]
+            xout = f"{tmp}/rx_{n_a:02d}_{n_b:02d}.mp4"
+            run(["ffmpeg", "-v", "error", "-i", rv_a, "-i", rv_b, "-filter_complex",
+                 f"[0:v][1:v]xfade=transition=fade:duration={xf:.3f}:offset={on_a - xf:.3f},"
+                 f"format=yuv420p[v]",
+                 "-map", "[v]", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-an", "-y", xout])
+            # xfade already contains both original clips merged (a-then-b, minus the
+            # overlap) — replace the PAIR in rear[] with this one combined clip.
+            ia, ib = rear.index(rv_a), rear.index(rv_b)
+            rear[ia:ib + 1] = [xout]
+            scene_rv[n_b] = (xout, on_a + on_b - xf)  # so the NEXT boundary chains off the combined clip
+            # The front track loses the same xf seconds at the same point, by
+            # trimming FRAMES off the tail of scene n_a's own last front clip —
+            # never re-deriving it from `on_a`/FPS, which can round differently
+            # than the clip actually decodes. See "-frames:v N, never -t" below.
+            fidx = scene_front_end[n_a]
+            fclip = front[fidx]
+            total_frames = round(dur(fclip, True) * FPS)
+            keep = total_frames - XFADE_FRAMES
+            if keep < 1:
+                continue  # nothing safe to trim off a clip this short; leave the front track as-is
+            ftrim = f"{tmp}/ftrim_{n_a:02d}.webm"
+            run(["ffmpeg", "-v", "error", "-c:v", "libvpx-vp9", "-i", fclip,
+                 "-frames:v", str(keep), "-c:v", "libvpx-vp9", "-pix_fmt", "yuva420p",
+                 "-b:v", "2M", "-c:a", "libopus", "-shortest", "-y", ftrim])
+            front[fidx] = ftrim
 
     # ---- closing hold: end on the standard rest pose --------------------
     if os.path.exists(REST_POSE):
