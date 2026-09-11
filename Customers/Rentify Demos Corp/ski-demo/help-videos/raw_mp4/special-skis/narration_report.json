@@ -1,0 +1,240 @@
+{
+ "voice": "Samantha",
+ "video": "ski-demo_special-skis_dev_10-19-12_v12.mp4",
+ "output": "ski-demo_special-skis_dev_10-19-12_v12-narrated.mp4",
+ "seconds": 375.877031,
+ "lines": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "starts_at": 0.5,
+   "room": 5.7,
+   "held_at_end": 0.8,
+   "spoken": 4.37,
+   "rate": 155,
+   "said": "Enter the email address on your Rentify account. [[slnc 300]] Then press Send Code.",
+   "overruns_by": 0
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "starts_at": 7.5,
+   "room": 5.7,
+   "held_at_end": 0.8,
+   "spoken": 5.38,
+   "rate": 155,
+   "said": "We have emailed you a four-digit code. [[slnc 500]] Type it in, and the page moves on by itself.",
+   "overruns_by": 0
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "starts_at": 14.5,
+   "room": 5.7,
+   "held_at_end": 0.8,
+   "spoken": 5.03,
+   "rate": 155,
+   "said": "This is your admin dashboard. [[slnc 300]] Open Businesses to find the store you want to work on.",
+   "overruns_by": 0
+  },
+  {
+   "n": 4,
+   "label": "find-the-business",
+   "starts_at": 21.5,
+   "room": 6.5,
+   "held_at_end": 0.8,
+   "spoken": 4.2,
+   "rate": 155,
+   "said": "Start typing your business name, [[slnc 300]] then choose it from the list that drops down.",
+   "overruns_by": 0
+  },
+  {
+   "n": 5,
+   "label": "the-business",
+   "starts_at": 29.3,
+   "room": 5.7,
+   "held_at_end": 0.8,
+   "spoken": 4.37,
+   "rate": 155,
+   "said": "Your business page opens. [[slnc 300]] Choose Lookup Stores to see the stores it owns.",
+   "overruns_by": 0
+  },
+  {
+   "n": 6,
+   "label": "find-the-store",
+   "starts_at": 36.3,
+   "room": 8.1,
+   "held_at_end": 0.8,
+   "spoken": 6.03,
+   "rate": 155,
+   "said": "Type the name of the store, [[slnc 300]] and pick it from the list. [[slnc 500]] Everything after this belongs to that store alone.",
+   "overruns_by": 0
+  },
+  {
+   "n": 7,
+   "label": "the-store",
+   "starts_at": 45.7,
+   "room": 5.7,
+   "held_at_end": 0.8,
+   "spoken": 4.34,
+   "rate": 155,
+   "said": "This is the store page. [[slnc 300]] Open the gear menu and choose Lookup Collections.",
+   "overruns_by": 0
+  },
+  {
+   "n": 8,
+   "label": "collection-list",
+   "starts_at": 52.7,
+   "room": 5.7,
+   "held_at_end": 0.8,
+   "spoken": 4.16,
+   "rate": 155,
+   "said": "Here are the store's collections. [[slnc 300]] Press the plus button to start a new one.",
+   "overruns_by": 0
+  },
+  {
+   "n": 9,
+   "label": "new-collection",
+   "starts_at": 59.7,
+   "room": 7.1,
+   "held_at_end": 0.8,
+   "spoken": 5.09,
+   "rate": 155,
+   "said": "Give the collection a name. [[slnc 300]] A collection is a group of items that differ only by their options.",
+   "overruns_by": 0
+  },
+  {
+   "n": 10,
+   "label": "collection-details",
+   "starts_at": 68.1,
+   "room": 13.8,
+   "held_at_end": 0.8,
+   "spoken": 10.71,
+   "rate": 155,
+   "said": "Add a description your renters will read. [[slnc 300]] Then set the starting price, in cents \u2014 two thousand five hundred is twenty-five dollars. [[slnc 800]] Press Create once both are filled in.",
+   "overruns_by": 0
+  },
+  {
+   "n": 11,
+   "label": "collection-options",
+   "starts_at": 83.2,
+   "room": 26.4,
+   "held_at_end": 0.8,
+   "spoken": 23.39,
+   "rate": 155,
+   "said": "Options are what make one item different from another. [[slnc 800]] Each block is one choice your renter makes. [[slnc 500]] Label is what they see. [[slnc 300]] Name is the key the item saves it under, and the name is the one that must match. [[slnc 800]] Type says text or number. [[slnc 500]] Required means an item cannot be saved without it. [[slnc 500]] Values are what the dropdown offers. [[slnc 800]] These skis have two choices.",
+   "overruns_by": 0
+  },
+  {
+   "n": 12,
+   "label": "the-collection",
+   "starts_at": 110.9,
+   "room": 6.7,
+   "held_at_end": 0.8,
+   "spoken": 4.97,
+   "rate": 155,
+   "said": "The collection is saved. [[slnc 300]] Now it needs items \u2014 the actual things a renter can book.",
+   "overruns_by": 0
+  },
+  {
+   "n": 13,
+   "label": "back-to-the-store",
+   "starts_at": 118.9,
+   "room": 7.1,
+   "held_at_end": 0.8,
+   "spoken": 5.3,
+   "rate": 155,
+   "said": "Back on the store page. [[slnc 300]] Open the gear menu again, and this time choose Lookup Items.",
+   "overruns_by": 0
+  },
+  {
+   "n": 14,
+   "label": "item-list",
+   "starts_at": 127.3,
+   "room": 5.7,
+   "held_at_end": 0.8,
+   "spoken": 3.64,
+   "rate": 155,
+   "said": "These are the store's items. [[slnc 300]] Press plus to add the first one.",
+   "overruns_by": 0
+  },
+  {
+   "n": 15,
+   "label": "new-item",
+   "starts_at": 134.3,
+   "room": 16.9,
+   "held_at_end": 0.8,
+   "spoken": 10.06,
+   "rate": 155,
+   "said": "Name the item so you can recognise it later. [[slnc 500]] Then search for the collection it belongs to, and pick it. [[slnc 500]] The collection decides which options this item has to answer.",
+   "overruns_by": 0
+  },
+  {
+   "n": 16,
+   "label": "item-details",
+   "starts_at": 152.5,
+   "room": 33.6,
+   "held_at_end": 0.8,
+   "spoken": 26.41,
+   "rate": 155,
+   "said": "Fill in the item's own details. [[slnc 500]] A description, [[slnc 300]] how many you have to rent, [[slnc 300]] and the price in cents. [[slnc 800]] The requirement is the set of questions a renter answers when they book this \u2014 pick the one that fits. [[slnc 800]] Then the options you set on the collection appear as dropdowns. [[slnc 500]] Choose a brand, [[slnc 300]] a length. [[slnc 800]] Each one carries a star, which means the item cannot be saved until it has an answer. [[slnc 500]] Press Update to save it.",
+   "overruns_by": 0
+  },
+  {
+   "n": 17,
+   "label": "first-variant",
+   "starts_at": 187.4,
+   "room": 6.7,
+   "held_at_end": 0.8,
+   "spoken": 5.85,
+   "rate": 155,
+   "said": "That is the first variant saved. [[slnc 500]] Every other one is a copy of it with just one dropdown changed.",
+   "overruns_by": 0
+  },
+  {
+   "n": 18,
+   "label": "the-other-variants",
+   "starts_at": 194.9,
+   "room": 156.2,
+   "held_at_end": 0.0,
+   "spoken": 0.0,
+   "rate": 0,
+   "said": "",
+   "silent": true,
+   "overruns_by": 0
+  },
+  {
+   "n": 19,
+   "label": "last-variant",
+   "starts_at": 351.6,
+   "room": 6.7,
+   "held_at_end": 0.8,
+   "spoken": 4.9,
+   "rate": 155,
+   "said": "All nine variants now exist in the collection \u2014 three brands, each in three lengths.",
+   "overruns_by": 0
+  },
+  {
+   "n": 20,
+   "label": "sign-out",
+   "starts_at": 359.6,
+   "room": 5.7,
+   "held_at_end": 0.8,
+   "spoken": 4.89,
+   "rate": 155,
+   "said": "Back at the dashboard when you are done. [[slnc 300]] Logout is a card here, same as the rest.",
+   "overruns_by": 0
+  },
+  {
+   "n": 21,
+   "label": "signed-out",
+   "starts_at": 366.6,
+   "room": 8.48,
+   "held_at_end": 0.8,
+   "spoken": 5.16,
+   "rate": 155,
+   "said": "You are signed out. [[slnc 500]] Your collection and all nine of its variants are saved and ready to rent.",
+   "overruns_by": 0
+  }
+ ]
+}

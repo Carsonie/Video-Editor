@@ -1,0 +1,283 @@
+{
+ "store": "ski-demo",
+ "title": "Adding a collection with three variants \u2014 Special Ski Poles",
+ "_note": "BCP admin recipe special-poles. Cut from ski-demo_special-poles_dev_10-20-23_v1.mp4 (622.72s). The screens were MEASURED off that capture \u2014 the totals agree with its own length to a tenth of a second \u2014 so every line here was written to a screen that already exists and nothing needs stretching. \u26a0 THE REPEATED ITEMS ARE SILENT ON PURPOSE. Carson, 2026-09-10: \"add the voice for every scene, except for the the items, since they are all repeats of the same first item.\" The first item is narrated in full and its closing line tells the viewer what the silent stretch is before they watch it; the clones are one scene with no cue, as long as the footage it covers, so every later line stays on its own screen. That is a deliberate exception to standard 1 of the raw-video standard, not an omission. Lines carry {0.3} beat markers; a marker is never counted as a word and its silence is always added to the scene.",
+ "words_per_second": 3.44,
+ "_wps_note": "From 01-first-time-ordering/script_v33.json, measured 31 words / 9.01s. Nothing for THIS video is rendered yet.",
+ "_pauses_note": "One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in comes from the scene's footage hold.",
+ "_lead_in_seconds": 0.5,
+ "_estimated_video_seconds": 563.6,
+ "_estimated_video_note": "21 scenes, 20 of them spoken. 474 words / 3.44 wps = 137.8s of speech, + 20 lead-ins at 0.5s = 10.0s, + 20 exit pauses at 0.8s = 16.0s, + 382.3s of deliberate silence over the repeated items. ESTIMATE \u2014 recompute from the audio once it exists.",
+ "_footage_seconds": 622.72,
+ "scenes": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "line": "Enter the email address on your Rentify account. {0.3} Then press Send Code.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "7.0s on camera",
+   "estimated-word-time": "3.5 seconds.",
+   "target-length": "5.1 seconds."
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "line": "We have emailed you a four-digit code. {0.5} Type it in, and the page moves on by itself.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "7.0s on camera",
+   "estimated-word-time": "4.9 seconds.",
+   "target-length": "6.7 seconds."
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "line": "This is your admin dashboard. {0.3} Open Businesses to find the store you want to work on.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "7.0s on camera",
+   "estimated-word-time": "4.7 seconds.",
+   "target-length": "6.3 seconds."
+  },
+  {
+   "n": 4,
+   "label": "find-the-business",
+   "line": "Start typing your business name, {0.3} then choose it from the list that drops down.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "7.8s on camera",
+   "estimated-word-time": "4.1 seconds.",
+   "target-length": "5.7 seconds."
+  },
+  {
+   "n": 5,
+   "label": "the-business",
+   "line": "Your business page opens. {0.3} Choose Lookup Stores to see the stores it owns.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "7.0s on camera",
+   "estimated-word-time": "3.8 seconds.",
+   "target-length": "5.4 seconds."
+  },
+  {
+   "n": 6,
+   "label": "find-the-store",
+   "line": "Type the name of the store, {0.3} and pick it from the list. {0.5} Everything after this belongs to that store alone.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "9.4s on camera",
+   "estimated-word-time": "5.8 seconds.",
+   "target-length": "7.9 seconds."
+  },
+  {
+   "n": 7,
+   "label": "the-store",
+   "line": "This is the store page. {0.3} Open the gear menu and choose Lookup Collections.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "7.0s on camera",
+   "estimated-word-time": "3.8 seconds.",
+   "target-length": "5.4 seconds."
+  },
+  {
+   "n": 8,
+   "label": "collection-list",
+   "line": "Here are the store's collections. {0.3} Press the plus button to start a new one.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "7.0s on camera",
+   "estimated-word-time": "4.1 seconds.",
+   "target-length": "5.7 seconds."
+  },
+  {
+   "n": 9,
+   "label": "new-collection",
+   "line": "Give the collection a name. {0.3} A collection is a group of items that differ only by their options.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "8.7s on camera",
+   "estimated-word-time": "5.2 seconds.",
+   "target-length": "6.8 seconds."
+  },
+  {
+   "n": 10,
+   "label": "collection-details",
+   "line": "Add a description your renters will read. {0.3} Then set the starting price, in cents \u2014 two thousand five hundred is twenty-five dollars. {0.8} Press Create once both are filled in.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "16.3s on camera",
+   "estimated-word-time": "8.4 seconds.",
+   "target-length": "10.8 seconds."
+  },
+  {
+   "n": 11,
+   "label": "collection-options",
+   "line": "Options are what make one item different from another. {0.8} Each block is one choice your renter makes. {0.5} Label is what they see. {0.3} Name is the key the item saves it under, and the name is the one that must match. {0.8} Type says text or number. {0.5} Required means an item cannot be saved without it. {0.5} Values are what the dropdown offers. {0.8} These poles have three choices. {0.8} Three choices multiply rather than add, which is why this collection needs eighteen items and not eight.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "38.7s on camera",
+   "estimated-word-time": "23.8 seconds.",
+   "target-length": "30.1 seconds."
+  },
+  {
+   "n": 12,
+   "label": "the-collection",
+   "line": "The collection is saved. {0.3} Now it needs items \u2014 the actual things a renter can book.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "8.0s on camera",
+   "estimated-word-time": "4.7 seconds.",
+   "target-length": "6.3 seconds."
+  },
+  {
+   "n": 13,
+   "label": "back-to-the-store",
+   "line": "Back on the store page. {0.3} Open the gear menu again, and this time choose Lookup Items.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "8.4s on camera",
+   "estimated-word-time": "4.7 seconds.",
+   "target-length": "6.3 seconds."
+  },
+  {
+   "n": 14,
+   "label": "item-list",
+   "line": "These are the store's items. {0.3} Press plus to add the first one.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "7.0s on camera",
+   "estimated-word-time": "3.5 seconds.",
+   "target-length": "5.1 seconds."
+  },
+  {
+   "n": 15,
+   "label": "new-item",
+   "line": "Name the item so you can recognise it later. {0.5} Then search for the collection it belongs to, and pick it. {0.5} The collection decides which options this item has to answer.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "19.4s on camera",
+   "estimated-word-time": "8.7 seconds.",
+   "target-length": "11.0 seconds."
+  },
+  {
+   "n": 16,
+   "label": "item-details",
+   "line": "Fill in the item's own details. {0.5} A description, {0.3} how many you have to rent, {0.3} and the price in cents. {0.8} The requirement is the set of questions a renter answers when they book this \u2014 pick the one that fits. {0.8} Then the options you set on the collection appear as dropdowns. {0.5} Choose a brand, {0.3} a colour, and a length. {0.8} Each one carries a star, which means the item cannot be saved until it has an answer. {0.5} Press Update to save it.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "40.2s on camera",
+   "estimated-word-time": "23.3 seconds.",
+   "target-length": "29.4 seconds."
+  },
+  {
+   "n": 17,
+   "label": "first-variant",
+   "line": "That is the first variant saved. {0.5} Every other one is a copy of it with only the dropdowns that change.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "8.0s on camera",
+   "estimated-word-time": "5.8 seconds.",
+   "target-length": "7.6 seconds."
+  },
+  {
+   "n": 18,
+   "label": "the-other-variants",
+   "line": "",
+   "silent": true,
+   "_silent_note": "No line, on purpose \u2014 these screens repeat the first item. The scene is as long as its footage so later cues stay on the right picture. Trim or speed this stretch in the edit.",
+   "raw-source": "382.3s on camera",
+   "target-length": "382.3 seconds."
+  },
+  {
+   "n": 19,
+   "label": "last-variant",
+   "line": "All eighteen variants now exist in the collection \u2014 three brands, in three colours, in two lengths.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "8.0s on camera",
+   "estimated-word-time": "4.9 seconds.",
+   "target-length": "6.2 seconds."
+  },
+  {
+   "n": 20,
+   "label": "sign-out",
+   "line": "Back at the dashboard when you are done. {0.3} Logout is a card here, same as the rest.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "7.0s on camera",
+   "estimated-word-time": "4.9 seconds.",
+   "target-length": "6.5 seconds."
+  },
+  {
+   "n": 21,
+   "label": "signed-out",
+   "line": "You are signed out. {0.5} Your collection and all eighteen of its variants are saved and ready to rent.",
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ],
+   "raw-source": "10.0s on camera",
+   "estimated-word-time": "5.2 seconds.",
+   "target-length": "7.0 seconds."
+  }
+ ]
+}

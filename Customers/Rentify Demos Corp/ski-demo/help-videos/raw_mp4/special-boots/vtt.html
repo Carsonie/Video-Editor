@@ -1,0 +1,143 @@
+<title>ski-demo VTT special-boots</title>
+<style>
+  :root { --bg:#f7f7f5; --panel:#fff; --ink:#1c1f22; --dim:#6a7278; --line:#e2e5e7;
+           --accent:#7b4fb5; --warn:#a8631a; --warnbg:#fdf3e4; --say:#4a5257; --zebra:#fafafa; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg:#17191b; --panel:#1e2124; --ink:#e6eaec; --dim:#8b949c; --line:#2f353a;
+    --accent:#c3a9e0; --warn:#e0c060; --warnbg:#2c2617; --say:#9aa4ae; --zebra:#212528; } }
+  :root[data-theme="dark"] {
+    --bg:#17191b; --panel:#1e2124; --ink:#e6eaec; --dim:#8b949c; --line:#2f353a;
+    --accent:#c3a9e0; --warn:#e0c060; --warnbg:#2c2617; --say:#9aa4ae; --zebra:#212528; }
+  body { background:var(--bg); color:var(--ink); margin:0; padding:28px 22px 60px;
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; }
+  .wrap { max-width:1180px; margin:0 auto; }
+  h1 { font-size:20px; margin:0 0 4px; letter-spacing:-.01em; }
+  h1 .v { color:var(--accent); font-weight:700; }
+  .sub { color:var(--dim); font-size:12.5px; margin:0 0 18px; }
+  .strip { display:flex; flex-wrap:wrap; gap:10px; margin:0 0 20px; }
+  .stat { background:var(--panel); border:1px solid var(--line); border-radius:8px;
+           padding:9px 14px; min-width:104px; }
+  .stat .k { font-size:10px; letter-spacing:.13em; color:var(--dim); text-transform:uppercase; }
+  .stat .v { font-size:19px; font-weight:650; margin-top:2px; font-variant-numeric:tabular-nums; }
+  .stat.bad .v { color:var(--warn); }
+  .scroll { overflow-x:auto; background:var(--panel); border:1px solid var(--line);
+             border-radius:10px; }
+  table { border-collapse:collapse; width:100%; min-width:840px; }
+  th { text-align:right; font-size:10px; letter-spacing:.11em; text-transform:uppercase;
+        color:var(--dim); font-weight:700; padding:11px 12px;
+        border-bottom:1px solid var(--line); white-space:nowrap; }
+  th.l { text-align:left; }
+  td { padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:baseline; }
+  tr.scene:nth-of-type(4n+1) td { background:var(--zebra); }
+  td.n { color:var(--dim); text-align:right; width:34px; font-variant-numeric:tabular-nums; }
+  td.lab { font-weight:600; white-space:nowrap; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  td.w { color:var(--dim); }
+  td.warn { color:var(--warn); font-weight:700; background:var(--warnbg);
+             text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  tr.say td { color:var(--say); font-style:italic; padding:2px 12px 13px; }
+  /* A deliberate silence must not look like a missing line. */
+  tr.say.silent td { font-style:normal; opacity:.72; }
+  tr.say.silent b { font-weight:600; opacity:1; }
+  tr.total td { font-weight:700; border-bottom:none; border-top:2px solid var(--line);
+                 background:transparent; }
+  .notes { margin-top:26px; background:var(--panel); border:1px solid var(--line);
+            border-left:3px solid var(--warn); border-radius:8px; padding:14px 18px; }
+  .notes.ok { border-left-color:var(--accent); }
+  .notes h2 { font-size:13px; margin:0 0 8px; }
+  .notes ul { margin:6px 0 0; padding-left:20px; }
+  .notes li { margin:3px 0; }
+  .notes p { margin:8px 0 0; color:var(--dim); font-size:12.5px; }
+  footer { margin-top:22px; color:var(--dim); font-size:11.5px; line-height:1.7; }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11.5px;
+          background:var(--zebra); padding:1px 5px; border-radius:4px; }
+</style>
+
+<div class="wrap">
+<h1>VTT — ski-demo &middot; Adding a collection with variants — Special Ski Boots <span class="v">raw capture</span></h1>
+<p class="sub">Video Timing Table. Not WebVTT subtitles — per scene, how long the footage runs,
+how long Sarah&rsquo;s line takes to say, and the gap between them. Nothing is built yet, so the
+clip column is measured screen time from a run of the recipe, not ffprobe on a segment.</p>
+
+<div class="strip">
+  <div class="stat"><div class="k">footage</div><div class="v">379.9s</div></div>
+  <div class="stat"><div class="k">said</div><div class="v">131.2s</div></div>
+  <div class="stat"><div class="k">video</div><div class="v">331.7s</div></div>
+  <div class="stat"><div class="k">spare</div><div class="v">12%</div></div>
+  <div class="stat"><div class="k">too short</div><div class="v">0</div></div>
+  <div class="stat"><div class="k">scenes</div><div class="v">21</div></div>
+  <div class="stat"><div class="k">words</div><div class="v">451</div></div>
+</div>
+
+<div class="scroll"><table>
+  <thead><tr><th></th><th class="l">ski-demo scenes</th>
+  <th>clip</th><th>lead-in</th><th>speech</th><th>exit</th><th>scene</th>
+  <th>gap</th><th>words</th></tr></thead>
+  <tbody>
+    <tr class="scene"><td class="n">1</td><td class="lab">sign-in</td><td class="num">7.0s</td><td class="num">0.5s</td><td class="num">3.5s</td><td class="num">0.8s</td><td class="num">5.1s</td><td class="num">+1.9s</td><td class="num w">12</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Enter the email address on your Rentify account. {0.3} Then press Send Code.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">2</td><td class="lab">enter-the-code</td><td class="num">7.0s</td><td class="num">0.5s</td><td class="num">4.9s</td><td class="num">0.8s</td><td class="num">6.7s</td><td class="num">+0.3s</td><td class="num w">17</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;We have emailed you a four-digit code. {0.5} Type it in, and the page moves on by itself.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">3</td><td class="lab">dashboard</td><td class="num">7.0s</td><td class="num">0.5s</td><td class="num">4.7s</td><td class="num">0.8s</td><td class="num">6.3s</td><td class="num">+0.7s</td><td class="num w">16</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;This is your admin dashboard. {0.3} Open Businesses to find the store you want to work on.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">4</td><td class="lab">find-the-business</td><td class="num">7.8s</td><td class="num">0.5s</td><td class="num">4.1s</td><td class="num">0.8s</td><td class="num">5.7s</td><td class="num">+2.1s</td><td class="num w">14</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Start typing your business name, {0.3} then choose it from the list that drops down.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">5</td><td class="lab">the-business</td><td class="num">7.0s</td><td class="num">0.5s</td><td class="num">3.8s</td><td class="num">0.8s</td><td class="num">5.4s</td><td class="num">+1.6s</td><td class="num w">13</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Your business page opens. {0.3} Choose Lookup Stores to see the stores it owns.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">6</td><td class="lab">find-the-store</td><td class="num">9.4s</td><td class="num">0.5s</td><td class="num">5.8s</td><td class="num">0.8s</td><td class="num">7.9s</td><td class="num">+1.5s</td><td class="num w">20</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Type the name of the store, {0.3} and pick it from the list. {0.5} Everything after this belongs to that store alone.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">7</td><td class="lab">the-store</td><td class="num">7.0s</td><td class="num">0.5s</td><td class="num">3.8s</td><td class="num">0.8s</td><td class="num">5.4s</td><td class="num">+1.6s</td><td class="num w">13</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;This is the store page. {0.3} Open the gear menu and choose Lookup Collections.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">8</td><td class="lab">collection-list</td><td class="num">7.0s</td><td class="num">0.5s</td><td class="num">4.1s</td><td class="num">0.8s</td><td class="num">5.7s</td><td class="num">+1.3s</td><td class="num w">14</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Here are the store&#x27;s collections. {0.3} Press the plus button to start a new one.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">9</td><td class="lab">new-collection</td><td class="num">8.7s</td><td class="num">0.5s</td><td class="num">5.2s</td><td class="num">0.8s</td><td class="num">6.8s</td><td class="num">+1.9s</td><td class="num w">18</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Give the collection a name. {0.3} A collection is a group of items that differ only by their options.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">10</td><td class="lab">collection-details</td><td class="num">15.9s</td><td class="num">0.5s</td><td class="num">8.4s</td><td class="num">0.8s</td><td class="num">10.8s</td><td class="num">+5.1s</td><td class="num w">29</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Add a description your renters will read. {0.3} Then set the starting price, in cents — two thousand five hundred is twenty-five dollars. {0.8} Press Create once both are filled in.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">11</td><td class="lab">collection-options</td><td class="num">27.3s</td><td class="num">0.5s</td><td class="num">18.9s</td><td class="num">0.8s</td><td class="num">24.4s</td><td class="num">+2.9s</td><td class="num w">65</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Options are what make one item different from another. {0.8} Each block is one choice your renter makes. {0.5} Label is what they see. {0.3} Name is the key the item saves it under, and the name is the one that must match. {0.8} Type says text or number. {0.5} Required means an item cannot be saved without it. {0.5} Values are what the dropdown offers. {0.8} These boots have two choices.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">12</td><td class="lab">the-collection</td><td class="num">8.0s</td><td class="num">0.5s</td><td class="num">4.7s</td><td class="num">0.8s</td><td class="num">6.3s</td><td class="num">+1.7s</td><td class="num w">16</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;The collection is saved. {0.3} Now it needs items — the actual things a renter can book.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">13</td><td class="lab">back-to-the-store</td><td class="num">8.3s</td><td class="num">0.5s</td><td class="num">4.7s</td><td class="num">0.8s</td><td class="num">6.3s</td><td class="num">+2.0s</td><td class="num w">16</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Back on the store page. {0.3} Open the gear menu again, and this time choose Lookup Items.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">14</td><td class="lab">item-list</td><td class="num">7.0s</td><td class="num">0.5s</td><td class="num">3.5s</td><td class="num">0.8s</td><td class="num">5.1s</td><td class="num">+1.9s</td><td class="num w">12</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;These are the store&#x27;s items. {0.3} Press plus to add the first one.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">15</td><td class="lab">new-item</td><td class="num">18.7s</td><td class="num">0.5s</td><td class="num">8.7s</td><td class="num">0.8s</td><td class="num">11.0s</td><td class="num">+7.7s</td><td class="num w">30</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Name the item so you can recognise it later. {0.5} Then search for the collection it belongs to, and pick it. {0.5} The collection decides which options this item has to answer.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">16</td><td class="lab">item-details</td><td class="num">34.6s</td><td class="num">0.5s</td><td class="num">22.4s</td><td class="num">0.8s</td><td class="num">28.5s</td><td class="num">+6.1s</td><td class="num w">77</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Fill in the item&#x27;s own details. {0.5} A description, {0.3} how many you have to rent, {0.3} and the price in cents. {0.8} The requirement is the set of questions a renter answers when they book this — pick the one that fits. {0.8} Then the options you set on the collection appear as dropdowns. {0.5} Choose a brand, {0.3} a size. {0.8} Each one carries a star, which means the item cannot be saved until it has an answer. {0.5} Press Update to save it.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">17</td><td class="lab">first-variant</td><td class="num">8.0s</td><td class="num">0.5s</td><td class="num">5.5s</td><td class="num">0.8s</td><td class="num">7.3s</td><td class="num">+0.7s</td><td class="num w">19</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;That is the first variant saved. {0.5} Every other one is a copy of it with just one dropdown changed.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">18</td><td class="lab">the-other-variants</td><td class="num">157.8s</td><td class="num">0.0s</td><td class="num">0.0s</td><td class="num">0.0s</td><td class="num">157.8s</td><td class="num">+0.0s</td><td class="num w">0</td></tr>
+    <tr class="say silent"><td></td><td colspan="8"><b>Silent, on purpose.</b> These screens repeat the first item, so nothing is said over them. Trim or speed this stretch in the edit.</td></tr>
+    <tr class="scene"><td class="n">19</td><td class="lab">last-variant</td><td class="num">8.0s</td><td class="num">0.5s</td><td class="num">4.4s</td><td class="num">0.8s</td><td class="num">5.7s</td><td class="num">+2.3s</td><td class="num w">15</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;All nine variants now exist in the collection — three brands, each in three sizes.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">20</td><td class="lab">sign-out</td><td class="num">7.0s</td><td class="num">0.5s</td><td class="num">4.9s</td><td class="num">0.8s</td><td class="num">6.5s</td><td class="num">+0.5s</td><td class="num w">17</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Back at the dashboard when you are done. {0.3} Logout is a card here, same as the rest.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">21</td><td class="lab">signed-out</td><td class="num">10.0s</td><td class="num">0.5s</td><td class="num">5.2s</td><td class="num">0.8s</td><td class="num">7.0s</td><td class="num">+3.0s</td><td class="num w">18</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;You are signed out. {0.5} Your collection and all nine of its variants are saved and ready to rent.&rdquo;</td></tr>
+    <tr class="scene total"><td></td><td class="lab">total</td>
+      <td class="num">378.5s</td>
+      <td class="num">10.5s</td>
+      <td class="num">131.2s</td>
+      <td class="num">16.0s</td>
+      <td class="num">331.7s</td>
+      <td class="num">+46.8s</td>
+      <td class="num w">451</td></tr>
+  </tbody>
+</table></div>
+<div class="notes ok">
+  <h2>Every screen is long enough for its line</h2>
+  <p>Nothing needs stretching in the edit.</p>
+</div>
+<footer>
+  Speech length is estimated at <b>3.44 words/sec</b>, the voice&rsquo;s measured rate — taken
+  from the last video that was actually rendered. Nothing is rendered for this one, so no line
+  has a real spoken length yet; re-time from the audio once it exists.<br>
+  A <b>scene</b> is lead-in + speech + exit. <b>Gap</b> is the footage minus that: negative means
+  the screen is shorter than the line and there is not enough to talk over.<br>
+  Built from <code>script.json</code> by <code>Master_Flows/Recorder/scripts/scene_sheet.py</code>.
+  Once the video is built, Video-Editor&rsquo;s <code>build/vtt_html.py</code> replaces this with
+  the measured version.
+</footer>
+</div>
