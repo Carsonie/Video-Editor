@@ -9,11 +9,37 @@
  "_estimated_video_seconds": 330.1,
  "_estimated_video_note": "21 scenes, 20 of them spoken. 451 words / 3.44 wps = 131.2s of speech, + 20 lead-ins at 0.5s = 10.0s, + 20 exit pauses at 0.8s = 16.0s, + 156.2s of deliberate silence over the repeated items. ESTIMATE \u2014 recompute from the audio once it exists.",
  "_footage_seconds": 375.88,
+ "_chapters": [
+  {
+   "at": "sign-in",
+   "value": "Sign in"
+  },
+  {
+   "at": "dashboard",
+   "value": "Find the store"
+  },
+  {
+   "at": "collection-list",
+   "value": "Create the collection"
+  },
+  {
+   "at": "back-to-the-store",
+   "value": "Add the first item"
+  },
+  {
+   "at": "the-other-variants",
+   "value": "The other variants"
+  },
+  {
+   "at": "last-variant",
+   "value": "Sign out"
+  }
+ ],
  "scenes": [
   {
    "n": 1,
    "label": "sign-in",
-   "line": "Enter the email address on your Rentify account. {0.3} Then press Send Code.",
+   "line": "Please provide us your email, so we can sent you a login code. Then click the Send Code button.",
    "pauses": [
     {
      "seconds": 0.8
@@ -21,12 +47,13 @@
    ],
    "raw-source": "7.0s on camera",
    "estimated-word-time": "3.5 seconds.",
-   "target-length": "5.1 seconds."
+   "target-length": "5.1 seconds.",
+   "silent": false
   },
   {
    "n": 2,
    "label": "enter-the-code",
-   "line": "We have emailed you a four-digit code. {0.5} Type it in, and the page moves on by itself.",
+   "line": "We will send you a four-digit code to that address. {.3} If you are not seeing it, check your spam folder.",
    "pauses": [
     {
      "seconds": 0.8
@@ -34,7 +61,8 @@
    ],
    "raw-source": "7.0s on camera",
    "estimated-word-time": "4.9 seconds.",
-   "target-length": "6.7 seconds."
+   "target-length": "6.7 seconds.",
+   "silent": false
   },
   {
    "n": 3,
@@ -47,12 +75,13 @@
    ],
    "raw-source": "7.0s on camera",
    "estimated-word-time": "4.7 seconds.",
-   "target-length": "6.3 seconds."
+   "target-length": "6.3 seconds.",
+   "silent": false
   },
   {
    "n": 4,
    "label": "find-the-business",
-   "line": "Start typing your business name, {0.3} then choose it from the list that drops down.",
+   "line": "Start typing your business name, {0.3} then select it from the dropdown list.",
    "pauses": [
     {
      "seconds": 0.8
@@ -60,7 +89,8 @@
    ],
    "raw-source": "7.8s on camera",
    "estimated-word-time": "4.1 seconds.",
-   "target-length": "5.7 seconds."
+   "target-length": "5.7 seconds.",
+   "silent": false
   },
   {
    "n": 5,
@@ -73,7 +103,8 @@
    ],
    "raw-source": "7.0s on camera",
    "estimated-word-time": "3.8 seconds.",
-   "target-length": "5.4 seconds."
+   "target-length": "5.4 seconds.",
+   "silent": false
   },
   {
    "n": 6,
@@ -86,7 +117,8 @@
    ],
    "raw-source": "9.4s on camera",
    "estimated-word-time": "5.8 seconds.",
-   "target-length": "7.9 seconds."
+   "target-length": "7.9 seconds.",
+   "silent": false
   },
   {
    "n": 7,
@@ -99,7 +131,8 @@
    ],
    "raw-source": "7.0s on camera",
    "estimated-word-time": "3.8 seconds.",
-   "target-length": "5.4 seconds."
+   "target-length": "5.4 seconds.",
+   "silent": false
   },
   {
    "n": 8,
@@ -112,7 +145,8 @@
    ],
    "raw-source": "7.0s on camera",
    "estimated-word-time": "4.1 seconds.",
-   "target-length": "5.7 seconds."
+   "target-length": "5.7 seconds.",
+   "silent": false
   },
   {
    "n": 9,
@@ -125,7 +159,8 @@
    ],
    "raw-source": "8.4s on camera",
    "estimated-word-time": "5.2 seconds.",
-   "target-length": "6.8 seconds."
+   "target-length": "6.8 seconds.",
+   "silent": false
   },
   {
    "n": 10,
@@ -138,7 +173,8 @@
    ],
    "raw-source": "15.1s on camera",
    "estimated-word-time": "8.4 seconds.",
-   "target-length": "10.8 seconds."
+   "target-length": "10.8 seconds.",
+   "silent": false
   },
   {
    "n": 11,
@@ -151,7 +187,8 @@
    ],
    "raw-source": "27.7s on camera",
    "estimated-word-time": "18.9 seconds.",
-   "target-length": "24.4 seconds."
+   "target-length": "24.4 seconds.",
+   "silent": false
   },
   {
    "n": 12,
@@ -164,7 +201,8 @@
    ],
    "raw-source": "8.0s on camera",
    "estimated-word-time": "4.7 seconds.",
-   "target-length": "6.3 seconds."
+   "target-length": "6.3 seconds.",
+   "silent": false
   },
   {
    "n": 13,
@@ -177,7 +215,8 @@
    ],
    "raw-source": "8.4s on camera",
    "estimated-word-time": "4.7 seconds.",
-   "target-length": "6.3 seconds."
+   "target-length": "6.3 seconds.",
+   "silent": false
   },
   {
    "n": 14,
@@ -190,7 +229,8 @@
    ],
    "raw-source": "7.0s on camera",
    "estimated-word-time": "3.5 seconds.",
-   "target-length": "5.1 seconds."
+   "target-length": "5.1 seconds.",
+   "silent": false
   },
   {
    "n": 15,
@@ -203,7 +243,8 @@
    ],
    "raw-source": "18.2s on camera",
    "estimated-word-time": "8.7 seconds.",
-   "target-length": "11.0 seconds."
+   "target-length": "11.0 seconds.",
+   "silent": false
   },
   {
    "n": 16,
@@ -216,7 +257,8 @@
    ],
    "raw-source": "34.9s on camera",
    "estimated-word-time": "22.4 seconds.",
-   "target-length": "28.5 seconds."
+   "target-length": "28.5 seconds.",
+   "silent": false
   },
   {
    "n": 17,
@@ -229,7 +271,8 @@
    ],
    "raw-source": "8.0s on camera",
    "estimated-word-time": "5.5 seconds.",
-   "target-length": "7.3 seconds."
+   "target-length": "7.3 seconds.",
+   "silent": false
   },
   {
    "n": 18,
@@ -251,7 +294,8 @@
    ],
    "raw-source": "8.0s on camera",
    "estimated-word-time": "4.4 seconds.",
-   "target-length": "5.7 seconds."
+   "target-length": "5.7 seconds.",
+   "silent": false
   },
   {
    "n": 20,
@@ -264,7 +308,8 @@
    ],
    "raw-source": "7.0s on camera",
    "estimated-word-time": "4.9 seconds.",
-   "target-length": "6.5 seconds."
+   "target-length": "6.5 seconds.",
+   "silent": false
   },
   {
    "n": 21,
@@ -277,7 +322,8 @@
    ],
    "raw-source": "10.0s on camera",
    "estimated-word-time": "5.2 seconds.",
-   "target-length": "7.0 seconds."
+   "target-length": "7.0 seconds.",
+   "silent": false
   }
  ]
 }

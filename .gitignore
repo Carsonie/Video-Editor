@@ -38,8 +38,18 @@ Customers/**/z_History/**
 # capture, and inside a release. NOT in dev/ or sandbox/, which the editors
 # rewrite on every run — tracking a regenerated file there is pure churn, which
 # is the whole reason Customers/** is excluded in the first place.
-!Customers/*/*/help-videos/raw_mp4/**/vtt.html
-!Customers/*/*/help-videos/videos/*/video/vtt.html
+# ⚠ THE NAME IS <recipe>.vtt.html NOW, AND THIS PATTERN MISSED IT.
+# Renamed 2026-09-14 so eight of these in eight tabs can be told apart. These
+# two lines still said plainly `vtt.html`, so every renamed page fell back to
+# the blanket `Customers/**` exclusion and silently stopped being tracked —
+# checked with `git check-ignore`. Match the suffix, not the whole basename.
+!Customers/*/*/help-videos/raw_mp4/**/*vtt.html
+!Customers/*/*/help-videos/videos/*/video/*vtt.html
+# ...but NOT the editable artifact page. `<recipe>.vtt.artifact.html` is built
+# on demand by Recorder/scripts/vtt_artifact.py, published straight to an
+# artifact, and stale the moment a line is edited. There is no version of it
+# worth keeping, and a tracked copy would disagree with the live page.
+Customers/*/*/help-videos/**/*.vtt.artifact.html
 !Customers/*/*/help-videos/**/.gitkeep
 # The cut plan's contact sheet — 65 KB, and the tool tells you to look at it
 # before cutting. It was tracked in Basic_E2E_Testing for the same reason;

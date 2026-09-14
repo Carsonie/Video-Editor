@@ -1,0 +1,13 @@
+0:00 sign-in
+0:06 enter-the-code
+0:13 dashboard
+0:20 find-the-business
+0:28 the-business
+0:34 find-the-store
+0:44 the-store
+0:52 item-list
+0:58 new-item
+1:17 item-details
+1:52 saved
+1:57 back-to-dashboard
+2:02 sign-out

@@ -1,0 +1,54 @@
+[
+ {
+  "startTime": 0.0,
+  "value": "sign-in"
+ },
+ {
+  "startTime": 8.16,
+  "value": "enter-the-code"
+ },
+ {
+  "startTime": 15.16,
+  "value": "dashboard"
+ },
+ {
+  "startTime": 22.52,
+  "value": "find-the-business"
+ },
+ {
+  "startTime": 30.96,
+  "value": "the-business"
+ },
+ {
+  "startTime": 37.96,
+  "value": "find-the-store"
+ },
+ {
+  "startTime": 47.48,
+  "value": "the-store"
+ },
+ {
+  "startTime": 57.6,
+  "value": "requirement-list"
+ },
+ {
+  "startTime": 66.36,
+  "value": "new-requirement"
+ },
+ {
+  "startTime": 73.56,
+  "value": "requirement-details"
+ },
+ {
+  "startTime": 112.2,
+  "value": "saved"
+ },
+ {
+  "startTime": 117.6,
+  "value": "back-to-dashboard"
+ },
+ {
+  "startTime": 126.08,
+  "value": "sign-out"
+ }
+]

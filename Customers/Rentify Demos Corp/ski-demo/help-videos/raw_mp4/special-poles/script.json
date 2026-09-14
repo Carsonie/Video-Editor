@@ -9,6 +9,32 @@
  "_estimated_video_seconds": 563.6,
  "_estimated_video_note": "21 scenes, 20 of them spoken. 474 words / 3.44 wps = 137.8s of speech, + 20 lead-ins at 0.5s = 10.0s, + 20 exit pauses at 0.8s = 16.0s, + 382.3s of deliberate silence over the repeated items. ESTIMATE \u2014 recompute from the audio once it exists.",
  "_footage_seconds": 622.72,
+ "_chapters": [
+  {
+   "at": "sign-in",
+   "value": "Sign in"
+  },
+  {
+   "at": "dashboard",
+   "value": "Find the store"
+  },
+  {
+   "at": "collection-list",
+   "value": "Create the collection"
+  },
+  {
+   "at": "back-to-the-store",
+   "value": "Add the first item"
+  },
+  {
+   "at": "the-other-variants",
+   "value": "The other variants"
+  },
+  {
+   "at": "last-variant",
+   "value": "Sign out"
+  }
+ ],
  "scenes": [
   {
    "n": 1,

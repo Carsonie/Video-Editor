@@ -1,0 +1,12 @@
+0:00 sign-in
+0:08 enter-the-code
+0:15 dashboard
+0:22 question-list
+0:30 new-question
+0:46 question-details
+1:18 back-to-questions
+1:29 find-the-question
+1:36 the-question
+1:42 activate
+1:51 back-to-dashboard
+2:00 sign-out

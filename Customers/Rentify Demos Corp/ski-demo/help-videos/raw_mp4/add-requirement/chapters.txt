@@ -1,0 +1,13 @@
+0:00 sign-in
+0:08 enter-the-code
+0:15 dashboard
+0:22 find-the-business
+0:30 the-business
+0:37 find-the-store
+0:47 the-store
+0:57 requirement-list
+1:06 new-requirement
+1:13 requirement-details
+1:52 saved
+1:57 back-to-dashboard
+2:06 sign-out

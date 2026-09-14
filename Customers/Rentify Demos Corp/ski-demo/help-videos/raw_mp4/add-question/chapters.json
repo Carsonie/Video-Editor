@@ -1,0 +1,50 @@
+[
+ {
+  "startTime": 0.0,
+  "value": "sign-in"
+ },
+ {
+  "startTime": 8.24,
+  "value": "enter-the-code"
+ },
+ {
+  "startTime": 15.24,
+  "value": "dashboard"
+ },
+ {
+  "startTime": 22.52,
+  "value": "question-list"
+ },
+ {
+  "startTime": 30.28,
+  "value": "new-question"
+ },
+ {
+  "startTime": 46.8,
+  "value": "question-details"
+ },
+ {
+  "startTime": 78.96,
+  "value": "back-to-questions"
+ },
+ {
+  "startTime": 89.52,
+  "value": "find-the-question"
+ },
+ {
+  "startTime": 96.0,
+  "value": "the-question"
+ },
+ {
+  "startTime": 102.84,
+  "value": "activate"
+ },
+ {
+  "startTime": 111.56,
+  "value": "back-to-dashboard"
+ },
+ {
+  "startTime": 120.04,
+  "value": "sign-out"
+ }
+]

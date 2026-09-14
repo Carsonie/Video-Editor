@@ -10,9 +10,9 @@
    "starts_at": 0.5,
    "room": 5.7,
    "held_at_end": 0.8,
-   "spoken": 4.37,
+   "spoken": 5.55,
    "rate": 155,
-   "said": "Enter the email address on your Rentify account. [[slnc 300]] Then press Send Code.",
+   "said": "Please provide us your email, so we can sent you a login code. Then click the Send Code button.",
    "overruns_by": 0
   },
   {
@@ -21,9 +21,9 @@
    "starts_at": 7.5,
    "room": 5.7,
    "held_at_end": 0.8,
-   "spoken": 5.38,
+   "spoken": 5.69,
    "rate": 155,
-   "said": "We have emailed you a four-digit code. [[slnc 500]] Type it in, and the page moves on by itself.",
+   "said": "We will send you a four-digit code to that address. [[slnc 300]] If you are not seeing it, check your spam folder.",
    "overruns_by": 0
   },
   {
@@ -43,9 +43,9 @@
    "starts_at": 21.5,
    "room": 6.5,
    "held_at_end": 0.8,
-   "spoken": 4.2,
+   "spoken": 4.09,
    "rate": 155,
-   "said": "Start typing your business name, [[slnc 300]] then choose it from the list that drops down.",
+   "said": "Start typing your business name, [[slnc 300]] then select it from the dropdown list.",
    "overruns_by": 0
   },
   {

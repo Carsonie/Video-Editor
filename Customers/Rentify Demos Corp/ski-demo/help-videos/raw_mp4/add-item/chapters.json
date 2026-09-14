@@ -1,0 +1,54 @@
+[
+ {
+  "startTime": 0.0,
+  "value": "sign-in"
+ },
+ {
+  "startTime": 6.8,
+  "value": "enter-the-code"
+ },
+ {
+  "startTime": 13.88,
+  "value": "dashboard"
+ },
+ {
+  "startTime": 20.4,
+  "value": "find-the-business"
+ },
+ {
+  "startTime": 28.92,
+  "value": "the-business"
+ },
+ {
+  "startTime": 34.64,
+  "value": "find-the-store"
+ },
+ {
+  "startTime": 44.16,
+  "value": "the-store"
+ },
+ {
+  "startTime": 52.08,
+  "value": "item-list"
+ },
+ {
+  "startTime": 58.08,
+  "value": "new-item"
+ },
+ {
+  "startTime": 77.04,
+  "value": "item-details"
+ },
+ {
+  "startTime": 112.92,
+  "value": "saved"
+ },
+ {
+  "startTime": 117.12,
+  "value": "back-to-dashboard"
+ },
+ {
+  "startTime": 122.52,
+  "value": "sign-out"
+ }
+]

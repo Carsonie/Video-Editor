@@ -1,0 +1,26 @@
+[
+ {
+  "startTime": 0.0,
+  "value": "Sign in"
+ },
+ {
+  "startTime": 14.0,
+  "value": "Find the store"
+ },
+ {
+  "startTime": 52.2,
+  "value": "Create the collection"
+ },
+ {
+  "startTime": 118.4,
+  "value": "Add the first item"
+ },
+ {
+  "startTime": 194.9,
+  "value": "The other variants"
+ },
+ {
+  "startTime": 351.1,
+  "value": "Sign out"
+ }
+]

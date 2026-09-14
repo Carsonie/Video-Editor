@@ -1,0 +1,178 @@
+[
+ {
+  "startTime": 0.0,
+  "value": "sign-in"
+ },
+ {
+  "startTime": 8.12,
+  "value": "enter-the-code"
+ },
+ {
+  "startTime": 15.12,
+  "value": "dashboard"
+ },
+ {
+  "startTime": 22.44,
+  "value": "business-lookup"
+ },
+ {
+  "startTime": 30.92,
+  "value": "the-business"
+ },
+ {
+  "startTime": 37.88,
+  "value": "store-lookup"
+ },
+ {
+  "startTime": 47.36,
+  "value": "the-store"
+ },
+ {
+  "startTime": 57.48,
+  "value": "collection-list"
+ },
+ {
+  "startTime": 66.24,
+  "value": "new-collection"
+ },
+ {
+  "startTime": 72.52,
+  "value": "collection-details"
+ },
+ {
+  "startTime": 87.04,
+  "value": "collection-saved"
+ },
+ {
+  "startTime": 90.04,
+  "value": "back-collections"
+ },
+ {
+  "startTime": 98.04,
+  "value": "back-stores"
+ },
+ {
+  "startTime": 101.92,
+  "value": "back-business"
+ },
+ {
+  "startTime": 109.92,
+  "value": "back-dashboard"
+ },
+ {
+  "startTime": 113.16,
+  "value": "business-lookup-2"
+ },
+ {
+  "startTime": 121.8,
+  "value": "the-business-2"
+ },
+ {
+  "startTime": 128.76,
+  "value": "store-lookup-2"
+ },
+ {
+  "startTime": 138.24,
+  "value": "the-store-2"
+ },
+ {
+  "startTime": 148.36,
+  "value": "collection-list-2"
+ },
+ {
+  "startTime": 157.44,
+  "value": "collection-options"
+ },
+ {
+  "startTime": 177.68,
+  "value": "dashboard-2"
+ },
+ {
+  "startTime": 186.08,
+  "value": "business-lookup-3"
+ },
+ {
+  "startTime": 194.72,
+  "value": "the-business-3"
+ },
+ {
+  "startTime": 201.68,
+  "value": "store-lookup-3"
+ },
+ {
+  "startTime": 211.16,
+  "value": "the-store-3"
+ },
+ {
+  "startTime": 221.32,
+  "value": "item-list"
+ },
+ {
+  "startTime": 240.04,
+  "value": "new-item"
+ },
+ {
+  "startTime": 253.76,
+  "value": "item-details"
+ },
+ {
+  "startTime": 266.48,
+  "value": "item-saved"
+ },
+ {
+  "startTime": 269.76,
+  "value": "back-items"
+ },
+ {
+  "startTime": 277.8,
+  "value": "back-stores-2"
+ },
+ {
+  "startTime": 281.72,
+  "value": "back-business-2"
+ },
+ {
+  "startTime": 289.64,
+  "value": "back-dashboard-2"
+ },
+ {
+  "startTime": 292.92,
+  "value": "business-lookup-4"
+ },
+ {
+  "startTime": 301.52,
+  "value": "the-business-4"
+ },
+ {
+  "startTime": 308.52,
+  "value": "store-lookup-4"
+ },
+ {
+  "startTime": 318.0,
+  "value": "the-store-4"
+ },
+ {
+  "startTime": 328.16,
+  "value": "item-list-2"
+ },
+ {
+  "startTime": 331.96,
+  "value": "new-item-2"
+ },
+ {
+  "startTime": 360.88,
+  "value": "item-details-2"
+ },
+ {
+  "startTime": 373.48,
+  "value": "item-saved-2"
+ },
+ {
+  "startTime": 378.16,
+  "value": "dashboard-3"
+ },
+ {
+  "startTime": 386.68,
+  "value": "sign-out"
+ }
+]

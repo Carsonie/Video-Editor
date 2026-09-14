@@ -120,14 +120,74 @@ instead and every suite died at once; it walks up now too.
 
 ---
 
-## When Carson asks for a "vtt" / "VTT"
+## When Carson asks for a "vtt" / "VTT" — including **"Open vtt"**
 
-Read **`.claude/skills/vtt/SKILL.md`** first, every time. It is the source of
-truth for what "show me the vtt" means (a combined table — timing, frame
-counts, and the narration line under each row — not `vtt.py`'s plain output),
-and it also defines the EVTT (the editor's own live panel) as a separate,
-third thing. Don't rebuild this from memory of a past answer; the skill is
-the one place this is written down, and it can change.
+Read the skill first, every time:
+
+    /Users/carsonkramer/Rentify/Video-Editor/.claude/skills/vtt/SKILL.md
+
+**"Open vtt"** counts, and so do "Show me the VTT", "show the vtt" and
+"vtt for <store>" — all the same instruction. Added 2026-09-14 after "Open vtt"
+was answered three different wrong ways in one session: the in-app Browser pane,
+then a published artifact, then a printed path.
+
+It means **build the EDITABLE page, publish it, and hand back the ARTIFACT
+LINK**, then say what the page shows — the totals and anything it flagged.
+
+    cd ~/Rentify/Basic_E2E_Testing/Master_Flows/Recorder
+    python3 scripts/vtt_artifact.py "<folder holding the mp4 + script.json>"
+    # then publish that file with the Artifact tool and hand back the link
+
+⚠ **THIS REVERSES WHAT THIS SECTION SAID EARLIER THE SAME DAY.** It read "a NEW
+CHROME TAB … not an artifact". Carson changed it: *"if I ask to see open vtt, I
+should see a link to an artifact to open this interface to edit any mp4 video,
+that contains the script file inside the holding/current folder."* A Chrome tab
+is a page you can only READ, and the table is where the words get CHANGED —
+every line is editable and the page carries Save Script and Publish. Still not a
+table pasted into chat, still not the CLI output, still not the Browser pane.
+
+⚠ **THE GATE IS `script.json` IN THE MP4's OWN FOLDER.** No script, no table.
+The builder stops and names the empty folder rather than inventing lines. It
+also prints the capture named in `script.json`'s `_note`, or `NOT NAMED` —
+without one the page builds but **Publish has nothing to lay the voice over**.
+`login` is in that state right now; `add-question` names a `v3` that is gone.
+
+⚠ **ONE ARTIFACT PER VIDEO, AND THE LINK IS STABLE.** The tool keys a page to
+its file path, and the builder always writes `<recipe>.vtt.artifact.html` into
+the video's own folder — so republishing redeploys to the SAME url. Updating one
+from a later session needs its url passed in AND the live version Read first.
+The file itself is gitignored: it is stale the moment a line is edited.
+
+⚠ **THE READ-ONLY PAGES STILL EXIST**, for when nothing will be edited, and the
+wrong one gives an empty page rather than an error:
+
+    BUILT  (Customers/<Business>/<store>/help-videos/videos/<NN-label>/,
+            with sandbox/ scenes)
+      cd ~/Rentify/Video-Editor/Video-Editors
+      python3 build/vtt_html.py "<video folder>" --open
+
+    RAW CAPTURE  (.../help-videos/raw_mp4/<recipe>/, no clips yet)
+      cd ~/Rentify/Basic_E2E_Testing/Master_Flows/Recorder
+      python3 scripts/vtt_build.py "<.../raw_mp4/<recipe>>" --open
+
+`vtt_html.py` ffprobes the sandbox clips, so on a raw capture it finds nothing
+to measure. `vtt_build.py` lives in the OTHER repo — it writes BOTH
+`<recipe>.vtt` and `<recipe>.vtt.html` from the one `script.json` and refuses if
+a cue disagrees, which is the drift it exists to stop.
+
+The combined markdown table further down the skill is the fallback for an answer
+that belongs *inside* a reply — a single scene, a quick comparison.
+
+⚠ **SAY WHICH VIDEO YOU PICKED, IN ONE LINE, BEFORE YOU BUILD.** If two are
+genuinely in play, or none is, ASK — do not default to ski-demo because it is
+the most worked-on.
+
+The skill also defines the **EVTT** (the editor's own live panel) as a separate,
+third thing — and it already edits each line in place and saves to `script.json`
+on blur. Read that section before building anything new that edits narration.
+
+Don't rebuild any of this from memory of a past answer; the skill is the one
+place it is written down, and it can change.
 
 ---
 

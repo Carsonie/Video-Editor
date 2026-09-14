@@ -1,0 +1,3 @@
+0:00 sign-in
+0:06 enter-the-code
+0:10 dashboard

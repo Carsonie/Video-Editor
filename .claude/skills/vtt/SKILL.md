@@ -1,12 +1,384 @@
 ---
 name: vtt
-description: A help video's Video Timing Table — per scene, how long the demo footage runs, how long Sarah's line takes to say, and the gap between them. THE VOICE COMMAND "Show me the VTT" (also "show the vtt", "vtt for <store>") means BUILD THE HTML TABLE AND OPEN IT IN A NEW CHROME TAB — not a chat table, not the CLI output. Use whenever that phrase is said or typed, when checking a store's video timing before or after a build, or when asked about dead air, gaps, speech length or scene frame counts.
+description: A help video's Video Timing Table — per scene, how long the demo footage runs, how long Sarah's line takes to say, and the gap between them, with every line editable. THE STANDING PHRASE "Open VTT" (also "Show me the VTT", "show the vtt", "vtt for <store>") means BUILD THE EDITABLE PAGE WITH Recorder/scripts/vtt_artifact.py, PUBLISH IT AS AN ARTIFACT, AND HAND BACK THE LINK — for any mp4 whose holding folder contains a script.json. Not a chat table, not the CLI output, and no longer a plain Chrome tab. Also covers Save Script, Publish and the soundtrack rebuild. Use whenever that phrase is said or typed, when checking a store's video timing before or after a build, or when asked about dead air, gaps, speech length or scene frame counts.
 user_invocable: true
 ---
 
 # VTT — Video Timing Table
 
 Not to be confused with WebVTT (`.vtt` subtitles). Different thing entirely.
+
+## ⚡ "OPEN VTT" — ANSWER WITH AN ARTIFACT LINK
+
+Carson, 2026-09-14: *"if I ask to see open vtt, I should see a link to an
+artifact to open this interface to edit any mp4 video, that contains the script
+file inside the holding/current folder."*
+
+**This REPLACES the "open it in a new Chrome tab" answer.** That rule stood from
+2026-09-04 to 2026-09-14 and is now wrong — a Chrome tab shows a page you can
+only read, and the table is where the words get CHANGED.
+
+Both repos' `CLAUDE.md` were corrected at the same time, and each keeps a note
+saying the old wording is reversed. If you ever find a copy that still reads
+"a NEW CHROME TAB … not a published artifact" as the live instruction, that copy
+is stale — fix it in place.
+
+### The three steps, every time
+
+```bash
+# 1. build the editable page for the folder in scope
+cd ~/Rentify/Basic_E2E_Testing/Master_Flows/Recorder
+python3 scripts/vtt_artifact.py "<folder holding the mp4 + script.json>"
+```
+
+2. **Publish that file with the Artifact tool.** Same file path on every
+   redeploy, so the link never changes — see "One artifact per video" below.
+3. **Hand back the link**, plus one line of what the page shows: scene count,
+   footage, and anything it flagged as too short.
+
+### The gate: the folder must hold `script.json`
+
+Carson's own wording — *"any mp4 video, that contains the script file inside the
+holding/current folder."* The holding folder is the one the mp4 lives in, and
+`script.json` beside it is the requirement.
+
+**No `script.json`, no table.** The words are the INPUT to this page; there is
+nothing to derive them from. `vtt_artifact.py` stops and says which folder was
+empty rather than inventing lines.
+
+Today every one of ski-demo's eight raw captures passes that gate. Checked
+2026-09-14, all eight built:
+
+| folder | scenes | footage | capture named in `script.json` |
+|---|---|---|---|
+| `add-collection` | 44 | 392.2s | `..._add-collection_dev_09-20-00_v4.mp4` |
+| `add-item` | 13 | 127.7s | `..._add-item_dev_09-14-17_v15.mp4` |
+| `add-question` | 12 | 125.6s | ⚠ names `v3`, and the folder holds `v4` |
+| `add-requirement` | 13 | 131.6s | `..._add-requirement_dev_09-19-50_v3.mp4` |
+| `login` | 3 | 15.5s | ⚠ **names none at all** |
+| `special-boots` | 21 | 379.9s | `..._special-boots_dev_10-19-54_v1.mp4` |
+| `special-poles` | 21 | 622.7s | `..._special-poles_dev_10-20-23_v1.mp4` |
+| `special-skis` | 21 | 375.9s | `..._special-skis_dev_10-19-12_v12.mp4` |
+
+⚠ **A MISSING CAPTURE IS NOT A BUILD FAILURE, AND THAT IS THE TRAP.** The page
+still builds; the fps falls back to *assumed* 25, the title reads
+`login/<no capture named>`, and **Publish has nothing to lay the voice over**.
+The build output prints the capture name or `NOT NAMED` for exactly this reason
+— read that line before promising a publish.
+
+### One artifact per video, and the link is stable
+
+The Artifact tool keys a page to its **file path**. `vtt_artifact.py` always
+writes `<recipe>.vtt.artifact.html` into the video's own folder, so
+republishing the same recipe redeploys to the SAME url and Carson's bookmark
+keeps working. A different path claims a NEW url and orphans the old link.
+
+⚠ **UPDATING ONE FROM A LATER SESSION NEEDS THE URL.** Pass the artifact's url
+as `url` and `Read` the live version FIRST — a publish onto a page this
+conversation has not read is refused, and rightly: someone may have typed into
+it since. Merge their words onto yours, then publish.
+
+⚠ **THE FILE IS GITIGNORED ON PURPOSE.** It is stale the second a line is
+edited in the page, and a tracked copy would disagree with the live artifact.
+Build it, publish it, leave it.
+
+### Do not hand-assemble one again
+
+The first editable page was put together by hand for special-skis. That does
+not answer "any mp4", so the assembly moved into the script on 2026-09-14:
+
+    Recorder/scripts/vtt_artifact.py    the builder
+    Recorder/scripts/vtt_artifact.css   the page's look
+    Recorder/scripts/vtt_artifact.js    the page's behaviour — the app
+
+`vtt_artifact.py` reproduces that hand-built page exactly: same state keys, same
+21 rows, same numbers, verified field by field. So edit the three files, never a
+copy in a scratchpad.
+
+
+## THE TABLE — its columns, and what each one is
+
+Carson's definition, 2026-09-14. **Eleven columns, in this order**, and the
+order is part of the definition — the eye reads left to right from "how long is
+the picture" to "how long are the words" to "do they fit".
+
+| # | column | unit | what it is |
+|---|---|---|---|
+| 1 | **SCENES** | *label* | the scene's own name — `sign-in`, `item-details`. Not a measurement |
+| 2 | **CLIP** | seconds | how long the screen is ON CAMERA. Measured off the footage, never typed |
+| 3 | **LEAD-IN** | seconds | Sarah on screen before she starts. 0.5s |
+| 4 | **SPEECH** | seconds | the line itself, at the voice's measured words-per-second |
+| 5 | **BEAT** | seconds | the `{0.3}` markers in the line, summed. Silence, never words |
+| 6 | **EXIT** | seconds | after she stops — the join the next scene's crossfade eats into. 0.8s |
+| 7 | **SCENE** | seconds | LEAD-IN + SPEECH + BEAT + EXIT. What the scene needs |
+| 8 | **GAP** | seconds | CLIP − SCENE. **Negative is the defect**: the line is still running when the footage has moved on |
+| 9 | **SEGMENT** | **frames** | the scene's `segment.mp4` frame count |
+| 10 | **AVATAR** | **frames** | the scene's `avatar.webm` frame count |
+| 11 | **WORDS** | **a count** | words in the line. A `{0.3}` marker is never one |
+
+**COLUMNS 2 TO 8 ARE THE SEVEN IN SECONDS.** 1 is a label, 9 and 10 are frames,
+11 is a plain count. Nothing else on the row is a time.
+
+⚠ **A SILENT SCENE IS AS LONG AS ITS CLIP.** Cost it the ordinary way and
+LEAD-IN + 0 + EXIT gives 1.3s against a picture that may run for minutes, and
+GAP then reports the opposite of the truth. For a scene with no line, SCENE =
+CLIP, GAP = 0, and LEAD-IN / SPEECH / BEAT / EXIT are all 0.
+
+⚠ **SEGMENT AND AVATAR ONLY EXIST FOR A BUILT VIDEO.** They are frame counts
+read off `sandbox/<NN-label>/`. A RAW CAPTURE has no clips yet, so those two
+columns have nothing behind them — leave them out rather than print a zero that
+reads like a measurement. Everything else applies to both.
+
+⚠ **AND THE TWO GENERATORS ARE BOTH SHORT OF THIS TODAY** — checked 2026-09-14,
+so a table that does not match is a tool to fix, not a definition to bend:
+
+    vtt_artifact.py       ALL ELEVEN. The editable page, and the only generator
+                          that is complete against the definition above — so it
+                          is the one to copy from, not the one to fix.
+    build/vtt_html.py     has SEGMENT + AVATAR, missing LEAD-IN, BEAT, EXIT, SCENE
+                          (it also prints a NARRATION frames column, which is
+                          not in the definition above)
+    scene_sheet.py        has the timing breakdown, missing BEAT
+                          (its SEGMENT/AVATAR are DERIVED — clip x measured fps,
+                          and avatar 0 — which is honest for a raw capture)
+
+## THE TABLE IS NOT TIED TO A VIDEO OR A VERSION
+
+At this level the table is a **shape**, not a report about one film. Carson,
+2026-09-14: *"table is not tied to a specific video, or version at the skill
+level."*
+
+So the columns above are the definition, and the SUBJECT is resolved at the
+moment of asking:
+
+1. the video in the **current working folder**, if that folder holds one; else
+2. the video **currently in context and scope** — the one just built, edited,
+   recorded or discussed.
+
+State which one you resolved to, in one line, before anything opens. If two are
+genuinely in play, or none is, ASK — see "Which video?" below.
+
+### It builds two files, not one
+
+For whichever video that turns out to be:
+
+    <name>.vtt        the readable timeline — cues, lead-in and exit per scene
+    <name>.vtt.html   the same table as a page, for looking at
+
+Both come from that video's own `script.json`, so they cannot disagree. Naming
+them after the video matters: eight of these open in eight tabs, and a file
+called plainly `vtt.html` is indistinguishable the moment it is in one.
+
+**One command builds both, and CHECKS that they agree:**
+
+    RAW CAPTURE
+      cd ~/Rentify/Basic_E2E_Testing/Master_Flows/Recorder
+      python3 scripts/vtt_build.py "<.../raw_mp4/<recipe>>" [--open]
+
+    BUILT VIDEO
+      cd ~/Rentify/Video-Editor/Video-Editors
+      python3 build/vtt_html.py "<video folder>" --open
+
+⚠ **"THEY CANNOT DISAGREE" WAS A CLAIM WITH NO TOOL BEHIND IT UNTIL
+2026-09-14.** `<recipe>.vtt` was only ever written from `recipes.json`, while
+`<recipe>.vtt.html` is written from `script.json` — so the moment a line was
+edited, the page moved and the timeline did not, with nothing saying so.
+Measured on special-skis: three saves after scene 1 had been replaced, the .vtt
+still read *"Enter the email address on your Rentify account."*
+
+`vtt_build.py` takes script.json as the **input**, never rewrites it, emits both
+files, and then compares every cue in the .vtt against script.json — and
+**refuses** rather than shipping a mismatch. A silent scene is exempt: it has a
+NOTE and no cue by design.
+
+⚠ **script.json IS THE INPUT, NOT AN OUTPUT, ONCE A LINE HAS BEEN EDITED.**
+Regenerating it from a recipe spec throws the edit away, along with the fields a
+spec cannot carry — the silent flags, the chapter anchors, the per-scene notes.
+
+## SAVE SCRIPT and PUBLISH — the two actions on the table
+
+Carson, 2026-09-14. A VTT table is not only a report; it is where the words get
+changed. Two actions, and they are **deliberately different sizes**.
+
+| | what it does | cost |
+|---|---|---|
+| **Save Script** | writes the edited lines into `script.json`, and nothing else | instant, reversible |
+| **Publish** | saves first, then rebuilds the narrated mp4 — the soundtrack | a minute or two, re-encodes the video |
+
+### Where the buttons sit
+
+**Save Script on the LEFT. Publish on the RIGHT, on the SAME ROW** — Carson's
+own instruction: *"Add it on the right side of the page view, at the same
+vertical height as the Save button."*
+
+⚠ **The row must not wrap.** The status messages beside each button are long
+enough to push Publish onto a second line at a narrow viewport, which breaks the
+one thing that was specified. Pin the row (`flex-wrap:nowrap`), never let the
+BUTTONS shrink, and let the MESSAGES give way — truncated with an ellipsis,
+since a status line is the cheapest thing on the row to lose.
+
+⚠ **Publish is never styled as the default button.** It re-encodes about a
+gigabyte. It sits apart, outlined in the warning colour, and asks for
+confirmation. It should never be the button a hand lands on by accident.
+
+### Save Script — only the words
+
+`script.json` holds far more than lines: the measured clip lengths, the pauses,
+the chapter anchors, the notes. **Touch only `line`.** Everything else was
+measured or decided elsewhere and a table has no business rewriting it.
+
+⚠ **STRIP THE TABLE'S OWN DECORATION FIRST.** The generated page wraps every
+line in `“ ”` for display. Read the cell back as-is and those quote marks are
+written into `script.json` as real characters — which is exactly how two stray
+quotes got into special-skis' words on 2026-09-14, and how one line then
+measured 0.29s over its screen.
+
+⚠ **AN EMPTIED LINE IS A REAL EDIT, AND IT MAKES THE SCENE SILENT.** Set
+`silent: true` and drop its `pauses`, or every tool downstream costs it as words
+it does not have. A guard of the shape `if (next && next !== old)` silently
+refuses a cleared line — so a scene can be given words and never handed back to
+silence. Both directions have to work.
+
+⚠ **KEEP ONE BACKUP.** The words are the only thing in a video folder that
+cannot be regenerated from something else. `script.json.bak` before each save
+(the EVTT keeps its own copies in `z_History/line-edits/`).
+
+⚠ **A SILENT ROW'S CELL HOLDS THE TABLE'S EXPLANATION, NOT A LINE.** The
+generator renders "Silent, on purpose. These screens repeat the first item…"
+into that cell so a reader knows the silence is meant. Seed an editor from it
+and one Save writes that prose in as the scene's line. Start the cell EMPTY with
+the explanation as a placeholder.
+
+### PUBLISH — what actually happens, end to end
+
+⚠ **THE PAGE CANNOT DO ANY OF IT, AND IT DOES NOT PRETEND TO.** The artifact
+runs in claude.ai's sandbox: no filesystem, and a network locked to a few CDNs.
+So it cannot write `script.json`, cannot run `ffmpeg`, and cannot even reach a
+localhost helper. What it CAN do is leave the words somewhere Claude reads.
+
+**IN THE PAGE** — two documents in the artifact's own `db`:
+
+    script/current      always. The whole patched script.json, plus the lines
+                        as a flat list, the recipe, the capture and a timestamp.
+    requests/publish    only on Publish. {state:'requested', note, requestedAt}
+
+**ON THE MACHINE** — Claude watches that request row and does the four steps:
+
+1. **MEASURE EVERY LINE WITH THE REAL VOICE FIRST**, and report which will be
+   rushed. `words / wps` has no term for punctuation and `say` pauses at every
+   comma: 21 words with four commas measured 8.18s where the formula said 7.9s.
+   A line that will be sped up is worth knowing BEFORE the encode, not after.
+2. Write `script.json`, keeping `script.json.bak`. Then `vtt_build.py`, which
+   REFUSES if any cue disagrees with the script.
+3. Speak the lines and lay them over the picture named in `_note`.
+4. Report the new duration, and how many lines had to be rushed.
+
+**BACK IN THE ROW** — Claude writes progress into `requests/publish` as it goes,
+and the page's spinner follows it:
+
+    state: 'running', step: 'rebuilding the soundtrack'
+    state: 'done',    step: 'soundtrack rebuilt'
+    state: 'failed',  step: '<what broke>', detail: '<why>'
+
+⚠ **PUBLISH DOES NOT RUN ITSELF, AND CARSON HAS ASKED THIS TWICE.** The encode
+happens because Claude is in the conversation and runs it. Say so plainly —
+never let a spinner imply the machine is working on its own.
+
+⚠ **PUBLISH NEEDS THE CAPTURE NAMED IN `script.json`'s `_note`** — "Cut from
+&lt;file&gt;.mp4". Without it there is nothing to lay the voice over, and the
+right move is to stop and say so rather than guess at the folder's mp4s. One
+folder legitimately holds two (a master plus the shared login clip).
+
+⚠ **NEVER WRITE OVER THE MASTER.** The narrated file is a NEW file beside it.
+The master is what the delivered cut is made from, its screen edges live in
+`stretch_report.json`, and this repo has already lost one.
+
+### The four bugs this page has already had — do not write them back
+
+All four were live, all four were found by testing, all four are fixed in
+`vtt_artifact.js`. Each one looked like nothing was wrong.
+
+**1. `confirm()` returns `false` silently in a sandboxed frame.** No dialog, no
+error, no message. The handler's first line was `if (!confirm(...)) return;`, so
+Publish was a completely dead button — while Save Script, which has no confirm,
+kept working. Diagnosed from the store: `script/current` had been written by a
+later click and `requests/publish` was still empty.
+
+    THE FIX: the guard is IN THE PAGE. First click arms, second commits, and it
+    disarms itself after 6 seconds. Nothing depends on a dialog the host may
+    refuse. NEVER put a confirm(), alert() or prompt() in an artifact.
+
+**2. `get()` hands back a SNAPSHOT, and the body is behind `data()` — a
+FUNCTION, not a property.**
+
+    const snap = await DB.doc('requests/publish').get();
+    snap.state          // ALWAYS undefined — this was the bug
+    snap.data().state   // the real value
+
+    type DocumentSnapshot = { id, exists, data(), metadata }
+
+The poll read `r.state` off the snapshot, so it was undefined on every tick, so
+it fell into the "not started yet" branch forever. **The spinner never stopped**,
+even after `state: 'done'` was written. Both reads now go through one `readJob()`
+helper, and a read that THROWS returns `undefined` rather than `null` — "could
+not read" is not the same as "absent", and treating them alike restarts a job.
+
+**3. Negative margins on the sticky title bar.** They pulled the bar up by the
+PAGE's own padding, which only works if the page owns the body. The artifact
+host wraps the content in its own body, so the bar was pushed off the top of the
+scroll port and the title never appeared however far you scrolled. Two
+screenshots arrived that way. Plain margins stick under either wrapper.
+
+**4. Two listeners on one button.** An earlier pass added a SECOND click handler
+to `#save` — the same element hot save already used — which would have run
+`doSave` twice and raced the hand-over. Caught before publishing.
+
+### And three more rules the code already encodes
+
+⚠ **AN EMPTY LINE IS A REAL EDIT.** The old guard was `if (next && next !== old)`,
+which silently refused a cleared line — so a scene could be given words and
+never handed back to silence. Both directions have to work, and clearing a line
+sets `silent: true` and drops its `pauses`.
+
+⚠ **THE WHOLE `script.json` TRAVELS WITH THE PAGE**, in `S.script`. Save Script
+patches the edited words into that copy and hands back a drop-in replacement, so
+every measured clip length, pause, chapter anchor and note survives. Emitting
+only the lines would quietly strip the fields nothing else can regenerate.
+
+⚠ **THE SPINNER RUNS UNTIL THE JOB IS DONE, NOT UNTIL THE CLICK FINISHES.** The
+click only hands the request over; the encode takes a minute or two. Stopping on
+the click would say "finished" over a video still being written — the one thing
+a progress indicator must never do. A page reloaded mid-job reads the row on
+load and picks the spinner straight back up.
+
+
+### Which surface — and the ARTIFACT is the default one now
+
+⚠ **THREE SURFACES. ONLY ONE IS WHAT "OPEN VTT" MEANS.**
+
+    A PUBLISHED ARTIFACT  ← THE ANSWER TO "OPEN VTT", from 2026-09-14
+      Built by Recorder/scripts/vtt_artifact.py, published, link handed back.
+      It CANNOT write script.json and CANNOT run the encode — sandboxed, no
+      filesystem, network locked to a few CDNs, so not even a localhost
+      helper is reachable. So it hands the whole script to its own `db` store
+      and says on screen that Claude places the file. It never implies the
+      page did the work. Full chain above under "PUBLISH — what actually
+      happens".
+
+    EVTT — the editor's own live panel, a BUILT video
+      Lines editable in place, gap repaints as you type, and BLUR SAVES to
+      script.json directly (copies in z_History/line-edits/). No Save button
+      needed, and no Publish. It only covers a BUILT video's sandbox/.
+      READ THAT SECTION BEFORE BUILDING ANYTHING NEW THAT EDITS NARRATION.
+
+    A page served from localhost, a RAW capture
+      Master_Flows/Recorder/scripts/serve_vtt.py. Both buttons write for real,
+      because it runs on the machine the files are on.
+      ⚠ DO NOT RUN IT ALONGSIDE AN ARTIFACT FOR THE SAME FOLDER. Two writers
+      to one script.json. On 2026-09-14 it was left running (pid 9130) after
+      being reported stopped, and it was a second writer the whole time.
+      Prefer the artifact; start this only if Carson asks for localhost.
+
 
 The tool lives in this repo:
 
@@ -50,10 +422,15 @@ instead.)
 
 ## Reading the output
 
-Each row shows: scene label, clip length, speech length, gap, and the exact
-line Sarah says. A trailing summary gives the total clip time, total speech
-time, total gap, and word count — plus a flag if any scene's gap exceeds the
-2.5s threshold, and the dead-air percentage for the whole video.
+**The columns are defined once, at the top of this file** — "THE TABLE, its
+columns, and what each one is". Nothing here restates them, and nothing should:
+the fastest thing to drift in a document like this is a second, slightly
+different list of the same eleven things.
+
+`vtt.py`'s plain output is a SUBSET of that table — timing only, no frame
+counts — and it puts the line Sarah says beside each row. A trailing summary
+gives total clip, total speech, total gap and word count, plus the dead-air
+percentage and a flag for any scene over the 2.5s gap threshold.
 
 A gap on its own is not a defect — the build holds the last frame while she
 finishes talking. It only becomes worth fixing when a single scene's gap is
@@ -61,23 +438,40 @@ large enough to read as a stall (see the `sae-video-building` skill's "closing
 hold" and "held frame" notes for what counts as normal versus worth a second
 look).
 
-## 🔊 VOICE COMMAND — "Show me the VTT"
+## 🔊 VOICE COMMAND — "Show me the VTT" / "Open VTT"
 
-Carson's phrase, 2026-09-04. Said out loud or typed, it means **one thing**:
+Carson's phrase, 2026-09-04. Said out loud or typed — "Open VTT", "Show me the
+VTT", "show the vtt", "vtt for &lt;store&gt;" — it means **one thing, and the one
+thing changed on 2026-09-14.**
+
+⚠ **IT NO LONGER MEANS A CHROME TAB.** Build the editable page, publish it, and
+hand back the artifact link. The full procedure is at the TOP of this file under
+**"OPEN VTT — ANSWER WITH AN ARTIFACT LINK"**. Read that, not this.
+
+**What this section is still for** is the two questions the phrase does not
+answer on its own — *which* video, and *which* build — plus what the page shows
+once it is open. Those are below and they still apply.
+
+**The read-only pages are still real, and still useful.** They are just not what
+the phrase means any more:
 
 ```bash
+# a BUILT video, read-only, ffprobes sandbox/ for real frame counts
 cd ~/Rentify/Video-Editor/Video-Editors
 python3 build/vtt_html.py "<video folder>" --open
+
+# a RAW capture, read-only
+cd ~/Rentify/Basic_E2E_Testing/Master_Flows/Recorder
+python3 scripts/vtt_build.py "<.../raw_mp4/<recipe>>" --open
 ```
 
-That writes `<video folder>/video/vtt.html` and opens it in a **new Chrome
-tab**. Then say what it shows — the totals and anything flagged. Do not
-paste the table into chat as well; the page is the answer.
+Reach for those when the answer is *"what do the numbers say"* and nothing is
+going to be edited. Reach for the artifact whenever a word might change.
 
-**This replaced the markdown table as the default output.** The combined
-markdown table further down is still correct and still what to use when the
-answer belongs *inside* a reply — a single scene, a quick comparison. The
+**The markdown table further down** is still correct and still what to use when
+the answer belongs *inside* a reply — a single scene, a quick comparison. The
 plain CLI output is a source, not something to show.
+
 
 ### Which video? Infer it, then say which one you picked
 
@@ -101,19 +495,31 @@ The **lines** come from that file; the **numbers** always come from
 against today's footage. That is usually what is wanted right after a
 build — say which script was read, and the page's footer says so too.
 
-### The tab label matters
+### The title matters — it is how eight of these are told apart
 
-The page's `<title>` becomes the Chrome tab, and it is built as
-`<store> VTT v<N>` — **`ski-demo VTT v33`**. Several of these get opened at
-once and a tab that just says "vtt" is no use. The script does this; do not
-hand-edit it to something generic.
+The page's `<title>` becomes the browser tab AND the artifact's name in the
+gallery. Built as `<store> VTT <title>` — **`ski-demo VTT Adding a collection
+with variants — Special Skis`**; the read-only builder uses `<store> VTT v<N>`.
+Several of these get opened at once and a tab that just says "vtt" is no use.
+The scripts do this; do not hand-edit it to something generic, and **keep it
+stable across redeploys** — a changed name reads as a different page.
+
+⚠ **AND THE PAGE'S OWN HEADING IS THE PATH, NOT THE PROSE NAME.** Carson,
+2026-09-14: *"Replace this with the folder name and the file name, like this:
+special-skis/ski-demo_special-skis_dev_10-19-12_v12.mp4"*. A prose title says
+what the video is ABOUT; the path says WHICH FILE this table measures — and with
+several recipes and several takes each, that is what you actually need to read
+off a tab. Set in mono at 21.5px, sticky, so it stays put while 21 scenes
+scroll. The prose name moves to the meta row under it.
 
 ### What the page shows
 
-Per scene: clip length, speech length, gap, and the segment / avatar /
-narration frame counts, with the line Sarah says on its own row underneath.
-A summary strip on top: clip, said, dead air %, scenes over 2.5s, words,
-frames.
+The table at the top of this file, with the line Sarah says on its own row
+underneath each scene — plus a summary strip above it: clip, said, dead air %,
+scenes over 2.5s, words, frames.
+
+⚠ It does NOT yet carry every column in the definition — see the gap list
+there. A table that falls short is a tool to fix, not a definition to bend.
 
 It also raises the trap from "The combined table" below — any scene whose
 avatar is **shorter than its own `narration.webm`** gets flagged, because
@@ -136,6 +542,12 @@ quietly falls back elsewhere:
   substitution.
 
 ## The combined table — timing plus frame counts
+
+**This is the same table, pulled together by hand when no page is wanted** —
+an answer that belongs INSIDE a reply: one scene, a quick comparison. The
+columns are the ones defined at the top of this file; the example below shows a
+SUBSET of them, because `vtt.py` prints no frame counts and the shell loop
+supplies only two. Add the rest from the definition when they matter.
 
 `vtt.py` alone doesn't print frame counts, only timing. When checking a
 store's sandbox in detail — confirming the editor and the sandbox agree,

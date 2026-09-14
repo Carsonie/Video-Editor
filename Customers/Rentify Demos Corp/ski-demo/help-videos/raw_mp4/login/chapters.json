@@ -1,0 +1,14 @@
+[
+ {
+  "startTime": 0.0,
+  "value": "sign-in"
+ },
+ {
+  "startTime": 6.0,
+  "value": "enter-the-code"
+ },
+ {
+  "startTime": 10.3,
+  "value": "dashboard"
+ }
+]
