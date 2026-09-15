@@ -216,6 +216,28 @@ def read_json(path, default=None):
 
 # ── the five jobs, and their real state ─────────────────────────────────────
 
+# ⚠ A SCENE'S NAME IS NOT ALWAYS IN `label`. Nine scripts written before the
+# field existed carry it inside `segment`, as "segment-01-login.mp4". Reading
+# sc["label"] on one of those raised KeyError INSIDE the request handler, and
+# ThreadingHTTPServer answers a raised handler with a dropped connection — so
+# the page showed "Failed to fetch — is the server running on 8848?" and the
+# whole editor looked dead because ONE old script was in the folder list.
+# A name is cosmetic. It must never be able to stop the server.
+SEG_RE = re.compile(r"^(?:segment-)?(\d+)-(.+)$")
+
+
+def scene_label(sc):
+    lab = (sc.get("label") or "").strip()
+    if lab:
+        return lab
+    seg = (sc.get("segment") or "").strip()
+    if seg:
+        base = os.path.splitext(os.path.basename(seg))[0]
+        m = SEG_RE.match(base)
+        return m.group(2) if m else base
+    return f"scene {sc.get('n', '?')}"
+
+
 def job_state(folder):
     """One row per job, each with its own numbers and its own blocker.
 
@@ -334,7 +356,7 @@ def job_state(folder):
         # row that says "too short by 0.0s" reads as a broken number, and it
         # teaches you to ignore the column that matters.
         if need - clip > 0.05:
-            short.append({"n": sc["n"], "label": sc["label"],
+            short.append({"n": sc["n"], "label": scene_label(sc),
                           "clip": round(clip, 2), "needs": need,
                           "short_by": round(need - clip, 2)})
     narrative_row = {
@@ -363,7 +385,8 @@ def job_state(folder):
         "job": "voice",
         "seconds": (narration or {}).get("seconds"),
         "rushed": len(fast),
-        "rushed_rows": [{"n": x["n"], "label": x["label"], "rate": x["rate"]} for x in fast],
+        "rushed_rows": [{"n": x.get("n"), "label": scene_label(x),
+                         "rate": x["rate"]} for x in fast],
         "stale": bool(stale),
         "blocked": "" if capture else
             ("script.json's _note does not name the capture it was cut from, "
@@ -395,7 +418,7 @@ def job_state(folder):
         # The dwell at each end, and the frame rate the frames are counted at.
         "lead": lead,
         "fps": (report or {}).get("fps") or probe_fps(master)[0],
-        "scenes": [{"n": s["n"], "label": s["label"],
+        "scenes": [{"n": s["n"], "label": scene_label(s),
                     "line": s.get("line") or "",
                     "silent": bool(s.get("silent")),
                     "start": src_in.get(s["n"]),
@@ -481,7 +504,7 @@ def promote_segments(folder):
 
     done, missing = [], []
     for row in report.get("scenes", []):
-        n, label = row["n"], row["label"]
+        n, label = row["n"], scene_label(row)
         # segments/ names each file by scene, label, factor and edges, so the
         # match is on the leading "NN-label-" rather than an exact filename.
         pre = f"{n:02d}-{label}-"

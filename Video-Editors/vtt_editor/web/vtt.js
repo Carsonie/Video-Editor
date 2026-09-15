@@ -574,6 +574,46 @@ async function refresh() {
 let TREE = [];
 const CRUMB = { biz: '', store: '', stage: '', work: '' };
 
+/*
+  ⚠ THE BREADCRUMB SURVIVES A REFRESH.
+  Carson, 2026-09-15: "A refresh of the browser loses the breadcrumb settings,
+  and load Alpine." It reset to the first business alphabetically — Alpine
+  Sports — every time, so anyone working on ski-demo re-picked four dropdowns
+  after every reload, and a reload is exactly what a republish causes.
+
+  Remembered per browser in localStorage, and VALIDATED against the tree before
+  it is trusted: a saved folder can be renamed, moved or deleted between
+  sessions — ski-demo's own folders moved this very day — and restoring a path
+  that no longer exists would open an editor onto nothing. If it is gone, the
+  fallback is the same "first folder that has a script" rule as a fresh start,
+  and the status line says the saved one went missing rather than silently
+  landing somewhere else.
+
+  ⚠ WRAPPED IN try/catch. localStorage throws outright in some contexts, and a
+  remembered convenience must never be able to stop the page loading.
+*/
+const CRUMB_KEY = 'vtt_editor.crumb.v1';
+
+function saveCrumb() {
+  try { localStorage.setItem(CRUMB_KEY, JSON.stringify(CRUMB)); } catch (_) {}
+}
+
+function loadCrumb() {
+  try {
+    const raw = localStorage.getItem(CRUMB_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (_) { return null; }
+}
+
+/** Is this remembered selection still a real path in the tree? */
+function crumbExists(c) {
+  if (!c || !c.work) return false;
+  const b = TREE.find((x) => x.name === c.biz);
+  const st = b && b.stores.find((x) => x.name === c.store);
+  const sg = st && st.stages.find((x) => x.name === c.stage);
+  return !!(sg && sg.folders.some((f) => f.path === c.work));
+}
+
 function opt(value, label, cls) {
   const o = document.createElement('option');
   o.value = value;
@@ -649,6 +689,9 @@ function paintCrumbs() {
 
 async function openCrumb() {
   paintCrumbs();
+  // Saved AFTER paintCrumbs, because that is where a reset level settles on its
+  // preferred value — saving before would remember the empty string.
+  saveCrumb();
   const sg = stageNode();
   const hit = sg && sg.folders.find((f) => f.path === CRUMB.work);
   if (!hit) { say('nothing to open here', 'bad'); return; }
@@ -675,16 +718,36 @@ async function boot() {
     say('no customers found under Video-Editor/Customers', 'bad');
     return;
   }
+  // Remembered selection first, if it still points at something real.
+  const saved = loadCrumb();
+  let restored = false, lost = '';
+  if (crumbExists(saved)) {
+    Object.assign(CRUMB, saved);
+    restored = true;
+  } else if (saved && saved.work) {
+    // ⚠ SAY THAT IT WENT MISSING. Opening somewhere else in silence is how you
+    // edit the wrong recipe for ten minutes.
+    // ⚠ AND SAY IT *AFTER* THE LOAD, NOT BEFORE. Said here it was true for
+    // about a second: openCrumb() then loaded the fallback folder and wrote
+    // its own note over the top, so the page fell back in silence after all —
+    // exactly the failure the message exists to prevent. Found 2026-09-15 by
+    // planting a dead path and refreshing. It is held and re-said below.
+    lost = `the folder you had open is gone (${saved.work.split('/').pop()}) — `
+         + 'opening the first one with a script instead';
+  }
+
   // ⚠ OPEN ON SOMETHING THAT WORKS. Landing on an empty `development/` folder
-  // makes a working editor look broken on first load, so the first selection is
+  // makes a working editor look broken on first load, so a fresh start picks
   // the first folder in the tree that actually has a script.
-  outer:
-  for (const b of TREE) for (const st of b.stores) for (const sg of st.stages) {
-    for (const f of sg.folders) {
-      if (f.has_script) {
-        CRUMB.biz = b.name; CRUMB.store = st.name;
-        CRUMB.stage = sg.name; CRUMB.work = f.path;
-        break outer;
+  if (!restored) {
+    outer:
+    for (const b of TREE) for (const st of b.stores) for (const sg of st.stages) {
+      for (const f of sg.folders) {
+        if (f.has_script) {
+          CRUMB.biz = b.name; CRUMB.store = st.name;
+          CRUMB.stage = sg.name; CRUMB.work = f.path;
+          break outer;
+        }
       }
     }
   }
@@ -700,6 +763,10 @@ async function boot() {
     });
   }
   await openCrumb();
+  if (lost) {
+    const now = $('status').textContent.trim();
+    say(lost + (now ? ` · ${now}` : ''), 'bad');
+  }
 }
 
 // ── wiring ────────────────────────────────────────────────────────────────
