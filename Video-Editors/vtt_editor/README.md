@@ -1,4 +1,4 @@
-# VTT Editor — v1
+# VTT Editor — v2
 
 The **first edit** on a raw capture, in one place.
 
@@ -20,6 +20,7 @@ I* without a click:
 
     RINGS       28 rings · 22 click, 6 typing · border-only
     SEGMENTS    21 of 21 scenes cut · 27 cached cuts
+    SEGMENT FRAME DUPLICATOR   scene 3 · 18.00s · frame 78
     SCENES      21 of 21 in sandbox/
     NARRATIVE   21 lines · 490 words · every screen fits
     VOICE       380.04s · 1 rushed          collection-list 185 wpm
@@ -39,8 +40,74 @@ already owns it, where the edge cases are written down:
 | scenes | `editor_base/paths.py` — it owns the sandbox layout |
 | narrative | `script.json` + `vtt_build.py`, which refuses on a mismatch |
 | voice | `stretch_request.py` → `narrate_mac.py` |
+| frame duplicator | nothing owned it — see below |
 
 A second copy of an ffmpeg recipe is a second copy to get wrong.
+
+---
+
+## v2 — the Segment Frame Duplicator
+
+Carson, 2026-09-15: *"add another panel like this one, called SEGMENT FRAME
+DUPLICATOR and add 4 buttons to duplicate the trackers current image with the
+05 x / 10 x / 20 x / 50 x buttons."*
+
+Four buttons. Each freezes the frame under the playhead and adds that many
+copies of it, so **one screen gets longer where you are looking**:
+
+    05 x  +0.20s      20 x  +0.80s
+    10 x  +0.40s      50 x  +2.00s        (at 25 fps)
+
+**That is the difference from a Stretch.** `stretch_scenes.py` spreads
+duplicated frames across every part of a segment on purpose, so the screen
+slows rather than stalling. This parks on one frame deliberately — the
+targeted version of the same fix, for when one state needs reading time.
+
+⚠ **IT WRITES THE CACHED CUT IN `segments/`, IN PLACE.** Carson's call, asked
+outright: that is the file the scene strip and the table already read, and
+`sandbox/` was 0 of 44 on the folder he had open, so a panel aimed there would
+have arrived greyed out. The filename is unchanged on purpose — the cache key
+IS the name, so promote and build keep finding it.
+
+⚠ **EVERY PRESS BACKS THE OLD CUT UP FIRST**, into
+`segments/z_History/<stamp>/`, and the new file is only moved into place as the
+last step — so a failure anywhere leaves the segment exactly as it was. That
+backup is why these four have **no two-click arm**: an undoable button pressed
+ten times in a row must not ask twice.
+
+⚠ **FRAMES, NOT SECONDS — AND THAT IS NOT A DETAIL.** The first build cut a
+head, wrote a still, looped it and concat-demuxed the three, copying
+`cut_with_holds`. It was wrong: `-ss` placed BEFORE `-i` is a KEYFRAME seek, so
+the still came from a keyframe rather than the frame on screen, and the tail
+resumed somewhere else again. `select` + `loop` in one filter graph indexes
+frames by NUMBER, so there is nothing to seek inexactly.
+
+⚠ **AND A REAL UI SCREEN CANNOT SHOW YOU THAT FAULT.** Between two frames of a
+sign-in page almost nothing changes, so every frame "matches" every other and
+the bug hides. It was caught against a NUMBERED synthetic clip — `testsrc`,
+40 frames, +5 at frame 12 — where the answer is checkable:
+
+    0..11, 12,12,12,12,12,12, 13..39      frame 12 six times, 40 in, 45 out
+
+⚠ **`loop=loop=N` YIELDS N+1 COPIES**, so the filter is built with
+`copies - 1`. Measured on that same clip, not read off the docs: `loop=5` added
+six frames.
+
+⚠ **THE REPORT MOVES WITH THE FILE.** `job_state` reads each scene's length
+from `stretch_report.json`, never from the segment — so a longer cut with an
+unchanged report leaves the clip, gap and frames columns quietly showing the
+old numbers, and the gap is the column this button exists to close. The new
+length is MEASURED back off the file with ffprobe, so the two cannot drift. It
+is written with `indent=1, ensure_ascii=False` — the exact shape
+`stretch_scenes.py` and `stretch_request.py` use, because the report is TRACKED
+and `indent=2` reformatted all 494 lines for one changed number.
+
+⚠ **THE PLAYHEAD HAS TO BE INSIDE THE SELECTED SCENE.** The row shows the
+scene, the time and the frame number *before* you click, and the four buttons
+disable themselves when the scrub has been dragged out of the scene — freezing
+scene 8's frame into scene 3 is a silent wrong answer rather than an error. On
+a stretched scene the capture time is mapped through the factor
+(add-collection's scene 2 is x1.0651: capture 10.00s → segment frame 50).
 
 ---
 

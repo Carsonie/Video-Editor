@@ -133,6 +133,30 @@ body {
 .job button.heavy:hover:not(:disabled) {
   background:color-mix(in srgb, var(--warn) 14%, transparent);
 }
+/*
+  THE FRAME DUPLICATOR'S FOUR BUTTONS — one row, equal widths, two lines each.
+  ⚠ EQUAL WIDTHS MATTER MORE THAN THEY LOOK. "05 x" and "50 x" are the same
+  two characters wide only because the label is zero-padded; `1fr` each keeps
+  the row from reflowing as the rail narrows, so the button under the cursor
+  does not move between two clicks of the same button.
+  They are NOT `.heavy`: they re-encode one scene in a second or two and keep
+  the old cut, so the warning colour would cry wolf next to Rebuild's minutes.
+*/
+.job .btnrow {
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-top:9px;
+}
+.job button.dup {
+  margin-top:0; padding:5px 4px 4px; display:flex; flex-direction:column;
+  align-items:center; gap:1px; line-height:1.15;
+}
+.job button.dup .lbl { font-family:var(--mono); font-size:12px; }
+/* The seconds are the consequence, so they read as a caption, not a label. */
+.job button.dup .sub {
+  font-family:var(--mono); font-size:9.5px; opacity:.65; letter-spacing:.02em;
+}
+.job button.dup .spin { margin:0; }
+.job button.dup.busy .lbl, .job button.dup.busy .sub { opacity:.35; }
+
 .job button:disabled { opacity:.4; cursor:not-allowed; }
 .job button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 

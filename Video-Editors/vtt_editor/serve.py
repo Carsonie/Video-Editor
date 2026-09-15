@@ -50,6 +50,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.parse
 
@@ -205,6 +206,35 @@ def probe_fps(path):
     return 25.0, "assumed"
 
 
+def probe_duration(path):
+    """A file's real length in seconds, or None. Measured, never assumed."""
+    if not path or not os.path.isfile(path):
+        return None
+    raw = subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+         "-of", "default=nw=1:nk=1", path],
+        capture_output=True, text=True).stdout.strip()
+    try:
+        return float(raw)
+    except ValueError:
+        return None
+
+
+def _run_ff(args):
+    """One ffmpeg call, quiet, and it RAISES on failure.
+
+    ⚠ NEVER `check=False` HERE. A failed head or tail leaves the concat list
+    naming a file that does not exist, and ffmpeg's concat demuxer answers that
+    with a short output rather than an error — so the segment would come back
+    TRUNCATED and look like a successful freeze.
+    """
+    r = subprocess.run(["ffmpeg", "-v", "error", "-nostdin"] + args,
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        raise RuntimeError((r.stderr or "ffmpeg failed").strip()[:400])
+    return r
+
+
 def read_json(path, default=None):
     if not path:
         return default
@@ -300,6 +330,36 @@ def job_state(folder):
         "files": len(cached),
         "of": len(scenes),
         "blocked": "" if report and cached else
+            ("no confirmed scene edges — run stretch_scenes.py peaks and "
+             "confirm them first" if not report else
+             "nothing cut yet — run a stretch to cut the scenes"),
+    }
+
+    # ── SEGMENT FRAME DUPLICATOR ────────────────────────────────────────────
+    # Carson, 2026-09-15: "add another panel like this one, called SEGMENT FRAME
+    # DUPLICATOR and add 4 buttons to duplicate the trackers current image with
+    # the 05 x / 10 x / 20 x / 50 x buttons."
+    #
+    # It freezes the frame under the playhead and adds N copies of it, so ONE
+    # screen gets longer where you are looking, rather than the whole screen
+    # being slowed. That is the difference from a Stretch: `stretch_scenes.py`
+    # spreads duplicated frames across every part of a segment on purpose, and
+    # this parks on one frame deliberately.
+    #
+    # ⚠ IT WRITES THE CACHED CUT IN `segments/`, IN PLACE. Carson's call, asked
+    # outright, because that is the file the scene strip and the table already
+    # read — sandbox/ is 0 of 44 on the folder he had open, so a panel aimed
+    # there would have arrived greyed out. The name is unchanged on purpose:
+    # the cache key IS the name, so promote/ and build/ keep finding it.
+    #
+    # ⚠ SO EVERY PRESS BACKS THE OLD CUT UP FIRST, into
+    # `segments/z_History/<stamp>/`. That backup is why there is no two-click
+    # arm on these four: an undoable button pressed often should not ask twice.
+    dup_row = {
+        "job": "dupframe",
+        "files": len(cached),
+        "fps": (report or {}).get("fps"),
+        "blocked": "" if (report and cached) else
             ("no confirmed scene edges — run stretch_scenes.py peaks and "
              "confirm them first" if not report else
              "nothing cut yet — run a stretch to cut the scenes"),
@@ -429,7 +489,8 @@ def job_state(folder):
                     "clip": built_len.get(s["n"]) if built_len.get(s["n"]) is not None
                             else float(str(s.get("raw-source", "0")).split("s")[0] or 0)}
                    for s in scenes],
-        "jobs": [rings_row, segments_row, scenes_row, narrative_row, voice_row],
+        "jobs": [rings_row, segments_row, dup_row, scenes_row,
+                 narrative_row, voice_row],
     }
 
 
@@ -520,6 +581,173 @@ def promote_segments(folder):
         done.append({"n": n, "label": label, "to": os.path.relpath(dest, folder)})
     return {"ok": not missing, "promoted": done, "missing": missing,
             "err": ("no cached segment for: " + ", ".join(missing)) if missing else ""}
+
+
+# ⚠ THE SAME ENCODE `stretch_scenes.py` USED TO MAKE THESE FILES.
+# Copied deliberately from scripts/stretch_scenes.py:206-212 rather than
+# invented: a cached cut and a frozen insert are concatenated with the concat
+# DEMUXER, which does not re-encode and so demands identical codec parameters
+# on both sides. A different crf or keyint here produces a file that plays but
+# glitches at the seam, which is the kind of fault you only see on the master.
+# If that recipe ever changes, this must change with it.
+DUP_ENCODE = ["-c:v", "libx264", "-crf", "16", "-preset", "fast",
+              "-pix_fmt", "yuv420p"]
+
+
+def _dup_x264(fps: float) -> list:
+    return ["-x264-params",
+            f"keyint={int(round(fps * 2))}:min-keyint={int(round(fps))}"]
+
+
+def cached_for_scene(folder: str, row: dict, fps: float):
+    """The cached cut this report row describes, by its EXACT key.
+
+    ⚠ A PREFIX MATCH IS NOT GOOD ENOUGH HERE. `segments/` is keyed by scene AND
+    factor AND edges, so one scene legitimately has several cached cuts —
+    add-collection has two for `02-enter-the-code` (f1.0355 and f1.0651) and 48
+    files for 44 scenes. `promote_segments` takes the first sorted match, which
+    for scene 2 is the OLDER factor; freezing a frame into the wrong one edits a
+    file nothing reads. So rebuild the key the writer used and fall back to the
+    prefix only when that misses.
+    """
+    seg_dir = os.path.join(folder, "segments")
+    if not os.path.isdir(seg_dir):
+        return None, "no segments/ — cut the scenes first"
+    label = scene_label(row)
+    key = (f"{row['n']:02d}-{label}-f{row['factor']:.4f}-"
+           f"{row['src_in']:.2f}_{row['src_out']:.2f}-{fps:g}fps.mp4")
+    exact = os.path.join(seg_dir, key)
+    if os.path.isfile(exact):
+        return exact, ""
+    pre = f"{row['n']:02d}-{label}-"
+    hit = next((f for f in sorted(os.listdir(seg_dir))
+                if f.startswith(pre) and f.endswith(".mp4")), None)
+    if hit:
+        return os.path.join(seg_dir, hit), ""
+    return None, f"no cached cut for scene {row['n']} ({label})"
+
+
+def dup_frame(folder: str, n: int, at: float, copies: int):
+    """Freeze the frame under the playhead and add `copies` of it to scene `n`.
+
+    `at` is a time in the CAPTURE, because that is the clock the player and the
+    scrub both run on. It is mapped into the segment's own clock here rather
+    than in the page: the segment may be stretched, and the page should not have
+    to know the factor to put a frame in the right place.
+    """
+    if copies < 1 or copies > 500:
+        return {"ok": False, "err": f"{copies} copies is out of range (1-500)"}
+    report = read_json(os.path.join(folder, "stretch_report.json"))
+    if not report:
+        return {"ok": False, "err": "no stretch_report.json — no confirmed edges"}
+    fps = float(report.get("fps") or 25)
+    row = next((r for r in report.get("scenes", []) if r["n"] == n), None)
+    if row is None:
+        return {"ok": False, "err": f"no scene {n} in the report"}
+
+    seg, why = cached_for_scene(folder, row, fps)
+    if not seg:
+        return {"ok": False, "err": why}
+
+    # ⚠ THE PLAYHEAD MUST ACTUALLY BE IN THIS SCENE. Play stops at a scene's
+    # end and the strip parks on its start, so it normally is — but the scrub
+    # can be dragged anywhere, and freezing scene 8's frame into scene 3 is a
+    # silent wrong answer rather than an error.
+    a, b = float(row["src_in"]), float(row["src_out"])
+    if not (a - 0.04 <= at <= b + 0.04):
+        return {"ok": False,
+                "err": f"the playhead is at {at:.2f}s, outside scene {n} "
+                       f"({a:.2f}-{b:.2f}s) — click the scene you mean first"}
+
+    dur = float(probe_duration(seg) or row.get("built") or 0)
+    factor = float(row.get("factor") or 1.0)
+    # The segment's own clock: the capture offset, scaled by the stretch that
+    # made it. Clamped inside the file, so a playhead on the very last frame
+    # appends rather than failing.
+    off = max(0.0, min(dur, (at - a) * factor))
+    added = copies / fps
+
+    # ⚠ FRAMES, NOT SECONDS, AND ONE PASS. The first build of this cut the
+    # head, wrote a still, looped the still and concat-demuxed the three — the
+    # `cut_with_holds` recipe. It was WRONG, and provably: `-ss` placed BEFORE
+    # `-i` is a KEYFRAME seek, not a frame-accurate one, so the still came from
+    # a keyframe rather than the frame on screen and the tail resumed somewhere
+    # else again. Tested against a numbered synthetic clip, which is the only
+    # way to see it: a real UI screen barely changes between frames, so every
+    # frame "matches" every other and the fault hides.
+    #
+    # `select` + `loop` inside ONE filter graph indexes frames by NUMBER, so
+    # there is no seek to be inexact about. Same synthetic test after the
+    # change: 0..11, 12,12,12,12,12,12, 13..39 — frame 12 six times (its own
+    # plus five), 40 frames in, 45 out. Nothing dropped, nothing doubled.
+    #
+    # ⚠ `loop=loop=N` YIELDS N+1 COPIES, so it is `copies - 1`. loop=5 added
+    # six frames, not five — measured, not read off the docs.
+    k = int(round(off * fps))
+    frames_now = int(round(dur * fps))
+    k = max(0, min(frames_now - 1, k))
+    added = copies / fps
+
+    stamp = time.strftime("%Y%m%d-%H%M%S")
+    bak_dir = os.path.join(folder, "segments", "z_History", stamp)
+    os.makedirs(bak_dir, exist_ok=True)
+    shutil.copy2(seg, os.path.join(bak_dir, os.path.basename(seg)))
+
+    tmp = tempfile.mkdtemp(prefix="dupframe_")
+    try:
+        fc = (f"[0:v]select='lte(n,{k})',setpts=N/{fps:g}/TB[a];"
+              f"[0:v]select='eq(n,{k})',loop=loop={copies - 1}:size=1:start=0,"
+              f"setpts=N/{fps:g}/TB[b];"
+              f"[0:v]select='gt(n,{k})',setpts=N/{fps:g}/TB[c];"
+              f"[a][b][c]concat=n=3:v=1[o]")
+        out = os.path.join(tmp, "out.mp4")
+        _run_ff(["-i", seg, "-filter_complex", fc, "-map", "[o]", "-an",
+                 "-r", f"{fps:g}"] + DUP_ENCODE + _dup_x264(fps) + ["-y", out])
+        if not os.path.isfile(out) or os.path.getsize(out) == 0:
+            return {"ok": False, "err": "ffmpeg produced nothing"}
+        shutil.move(out, seg)
+    except RuntimeError as e:
+        # ⚠ AND THE OLD CUT IS STILL THERE. The backup is taken before ffmpeg
+        # runs and `shutil.move` is the last step, so a failure anywhere leaves
+        # the segment exactly as it was. Say what broke; change nothing.
+        return {"ok": False, "err": f"ffmpeg: {e}"}
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+    # ⚠ THE REPORT HOLDS THE LENGTH THE TABLE SHOWS, so it has to move too.
+    # job_state reads each scene's `built` from stretch_report.json, never from
+    # the file — so a longer segment with an unchanged report means the clip,
+    # gap and frames columns all quietly keep the old numbers, and the gap is
+    # the column this button exists to close. MEASURED back off the new file
+    # rather than added up, so the report cannot drift from what is on disk.
+    new_dur = round(float(probe_duration(seg) or (dur + added)), 2)
+    row["built"] = new_dur
+    row["frames_added"] = int(row.get("frames_added") or 0) + copies
+    report["output_seconds"] = round(
+        sum(float(r.get("built") or 0) for r in report["scenes"]), 2)
+    # ⚠ `indent=1`, AND NO TRAILING NEWLINE — the exact shape
+    # stretch_scenes.py:238 writes. It is a TRACKED file, and writing it back
+    # with `indent=2` reformatted all 494 lines, so `git diff` showed "494
+    # insertions, 494 deletions" for a single changed number and a review could
+    # not see what actually moved. Match the writer, not your own taste.
+    #
+    # `ensure_ascii=False` for the same reason: the report's `_output_removed`
+    # note carries an em-dash, `stretch_request.py:268` writes it literally,
+    # and the default would have escaped it to \u2014 — one more line of diff
+    # that is not a change.
+    rp = os.path.join(folder, "stretch_report.json")
+    shutil.copy2(rp, rp + ".bak")
+    with open(rp, "w") as fh:
+        json.dump(report, fh, indent=1, ensure_ascii=False)
+
+    return {"ok": True, "n": n, "label": scene_label(row), "copies": copies,
+            "added": round(added, 3), "at": round(at, 2), "off": round(off, 2),
+            "frame": k,
+            "was": round(dur, 2), "now": new_dur, "fps": fps,
+            "frames_total": int(round(new_dur * fps)),
+            "backup": os.path.relpath(os.path.join(bak_dir,
+                                                   os.path.basename(seg)), folder),
+            "segment": os.path.basename(seg)}
 
 
 def save_line(folder, n, line):
@@ -805,6 +1033,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             session_log("VOICE", folder, f"{r['seconds']}s", r["ok"])
             return self.send_json(r)
 
+        if u.path == "/api/dup_frame":
+            try:
+                num = int(payload.get("n"))
+                at = float(payload.get("at"))
+                copies = int(payload.get("copies"))
+            except (TypeError, ValueError):
+                return self.json_error(
+                    400, "n, at and copies are all required numbers")
+            r = dup_frame(folder, num, at, copies)
+            session_log("DUP FRAME", folder,
+                        f"scene {num} +{copies}f at {at:.2f}s", r.get("ok"))
+            return self.send_json(r)
         if u.path == "/api/dry_run":
             r = run_script("stretch_request.py", [folder, "--dry-run"], timeout=180)
             return self.send_json(r)

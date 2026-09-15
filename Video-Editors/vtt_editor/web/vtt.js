@@ -59,9 +59,20 @@ const wordsIn = (t) => (bare(t) ? bare(t).split(/\s+/).length : 0);
   a missing row reads as a missing feature, and a live row that does nothing is
   worse than both.
 */
+/*
+  The rail's own headings. Five rows are named by their job and read fine that
+  way; this one is not — Carson asked for "SEGMENT FRAME DUPLICATOR", and
+  `dupframe` is the id the buttons and the endpoint use, not a title. So the
+  display name lives here and the id stays short everywhere it is code.
+*/
+const JOB_NAMES = {
+  dupframe: 'Segment Frame Duplicator',
+};
+
 function jobRow(j) {
   const wps = 3.44;
   let state = '', why = j.blocked || '', action = null, cls = 'owed';
+  let actions = null;                // a row with a GROUP of buttons
 
   if (j.job === 'rings') {
     cls = 'rings';
@@ -77,6 +88,47 @@ function jobRow(j) {
     state = `${j.n} of ${j.of} scenes cut`
       + (j.files > j.n ? ` · ${j.files} cached cuts` : '');
     cls = j.n >= j.of && j.of ? 'ok' : (j.blocked ? 'stuck' : 'owed');
+  }
+
+  /*
+    ⚠ THE ONLY ROW WITH MORE THAN ONE BUTTON, AND THE ONLY ONE WITHOUT AN ARM.
+    Carson, 2026-09-15: "add another panel like this one, called SEGMENT FRAME
+    DUPLICATOR and add 4 buttons to duplicate the trackers current image with
+    the 05 x / 10 x / 20 x / 50 x buttons."
+
+    No two-click arm here on purpose. The arm exists for jobs that are slow or
+    hard to undo; this one backs the old cut into segments/z_History/ before
+    every press, and it is meant to be pressed repeatedly while judging a
+    screen. Asking twice for an undoable button trains you to double-click it.
+
+    It says the scene and the exact time it will freeze, because the ONE way to
+    get this wrong is to be parked on the wrong scene — so the row shows what
+    the click will do before you make it, rather than reporting it after.
+  */
+  if (j.job === 'dupframe') {
+    const fps = j.fps || (STATE && STATE.fps) || 25;
+    const sc = STATE && STATE.scenes.find((x) => x.n === SEL);
+    const at = playAt();
+    const inScene = sc && typeof sc.start === 'number'
+      && at >= sc.start - 0.04 && at <= sc.start + (sc.clip || 0) + 0.04;
+    state = j.blocked ? 'unavailable'
+      : `scene ${SEL} · ${at.toFixed(2)}s · frame `
+        + `${sc && typeof sc.start === 'number'
+             ? Math.round((at - sc.start) * fps) : '?'}`;
+    cls = j.blocked ? 'stuck' : (inScene ? 'ok' : 'owed');
+    if (!j.blocked) {
+      why = inScene
+        ? `freezes that frame in ${sc.label} · the old cut is kept in z_History`
+        : 'the playhead is not inside the selected scene — click a scene first';
+      actions = [5, 10, 20, 50].map((c) => ({
+        id: `dup${c}`,
+        // Two lines: the count he asked for, and what it costs in time, because
+        // 50 frames means nothing until you read 2.00s next to it.
+        label: `${String(c).padStart(2, '0')} x`,
+        sub: `+${(c / fps).toFixed(2)}s`,
+        off: !inScene,
+      }));
+    }
   }
 
   if (j.job === 'scenes') {
@@ -114,15 +166,22 @@ function jobRow(j) {
     }
   }
 
-  const btn = action
-    ? `<button data-act="${action.id}"${action.heavy ? ' class="heavy"' : ''}>`
-      + `<span class="spin"></span><span class="lbl">${esc(action.label)}</span></button>`
-    : (j.blocked
-        ? '<button disabled>unavailable</button>'
-        : '');
+  const btn = actions
+    ? `<div class="btnrow">` + actions.map((a) =>
+        `<button data-act="${a.id}"${a.off ? ' disabled' : ''} class="dup">`
+        + `<span class="spin"></span>`
+        + `<span class="lbl">${esc(a.label)}</span>`
+        + (a.sub ? `<span class="sub">${esc(a.sub)}</span>` : '')
+        + `</button>`).join('') + `</div>`
+    : (action
+      ? `<button data-act="${action.id}"${action.heavy ? ' class="heavy"' : ''}>`
+        + `<span class="spin"></span><span class="lbl">${esc(action.label)}</span></button>`
+      : (j.blocked
+          ? '<button disabled>unavailable</button>'
+          : ''));
 
-  return `<li class="job ${cls}">
-    <div class="jname">${esc(j.job)}</div>
+  return `<li class="job ${cls}" data-job="${j.job}">
+    <div class="jname">${esc(JOB_NAMES[j.job] || j.job)}</div>
     <div class="jstate">${esc(state)}</div>
     ${why ? `<div class="jwhy">${esc(why)}</div>` : ''}
     ${btn}
@@ -331,6 +390,59 @@ function sceneStart(n) {
 }
 
 let frameAt = -1;
+
+/*
+  ⚠ THE PLAYHEAD, FROM THE ELEMENT FIRST AND THE CACHE SECOND.
+  `frameAt` is what the scrub and the scene strip last SET, and `<video>`
+  moves on its own while playing — so during playback the cache is stale by up
+  to a frame. The element is the truth when it has one; frameAt covers the
+  moment before any video has loaded, when currentTime is a flat 0 and the
+  strip has already parked on a scene that starts at 27.57s.
+*/
+/*
+  ⚠ THE FRAME DUPLICATOR'S ROW HAS TO FOLLOW THE PLAYHEAD, and it cannot do
+  that through render(): render() rebuilds the whole table, and rebuilding it on
+  every `timeupdate` would fight the typing guard and flicker the rail 4x a
+  second. So the one row that depends on the playhead repaints its own two
+  lines of text in place.
+*/
+function paintDupRow() {
+  const li = document.querySelector('.job[data-job="dupframe"]');
+  if (!li || !STATE) return;
+  const j = (STATE.jobs || []).find((x) => x.job === 'dupframe');
+  if (!j || j.blocked) return;
+  const fps = j.fps || STATE.fps || 25;
+  const sc = STATE.scenes.find((x) => x.n === SEL);
+  const at = playAt();
+  const inScene = sc && typeof sc.start === 'number'
+    && at >= sc.start - 0.04 && at <= sc.start + (sc.clip || 0) + 0.04;
+  const f = sc && typeof sc.start === 'number'
+    ? Math.round((at - sc.start) * fps) : '?';
+  const st = li.querySelector('.jstate');
+  const wy = li.querySelector('.jwhy');
+  if (st) st.textContent = `scene ${SEL} · ${at.toFixed(2)}s · frame ${f}`;
+  if (wy) {
+    wy.textContent = inScene
+      ? `freezes that frame in ${sc.label} · the old cut is kept in z_History`
+      : 'the playhead is not inside the selected scene — click a scene first';
+  }
+  li.classList.toggle('ok', !!inScene);
+  li.classList.toggle('owed', !inScene);
+  // ⚠ NEVER RE-ENABLE A BUTTON MID-JOB. While a freeze runs every job button
+  // is disabled on purpose; a repaint firing on the video's own timeupdate
+  // would hand them all back and let a second ffmpeg pass start on the same
+  // file. So the busy row is left exactly as it is.
+  if (li.querySelector('button.busy')) return;
+  li.querySelectorAll('button.dup').forEach((b) => { b.disabled = !inScene; });
+}
+
+function playAt() {
+  const v = $('vid');
+  if (v && v.readyState >= 1 && v.currentTime > 0) {
+    return Math.round(v.currentTime * 100) / 100;
+  }
+  return frameAt >= 0 ? frameAt : 0;
+}
 let loadedFolder = '';
 let SRC = 'raw';                    // 'raw' or 'narrated' — see the note below
 let stopAt = null;                  // where the current scene ends, while playing
@@ -356,6 +468,7 @@ function showFrame(t) {
   t = Math.max(0, Math.round(t * 100) / 100);
   frameAt = t;
   $('scrubat').textContent = t.toFixed(2) + 's';
+  paintDupRow();
   $('scrub').value = String(t);
   try { v.currentTime = t; } catch (_) { /* not seekable yet; loadeddata retries */ }
   drawRings();
@@ -466,6 +579,40 @@ async function onJobClick(btn) {
       ? `${RINGS.rings.length} rings loaded — they appear on the frame at their own moment`
       : (RINGS.why || 'no rings'), RINGS.rings && RINGS.rings.length ? 'ok' : 'bad');
     drawRings();
+    return;
+  }
+
+  /*
+    ⚠ NO ARM, BECAUSE IT IS UNDOABLE AND IT IS PRESSED OFTEN.
+    Every press copies the old cut into segments/z_History/<stamp>/ before
+    ffmpeg runs, and the server only moves the new file into place as its last
+    step — so a failure anywhere leaves the segment untouched. A button you
+    can undo and will press ten times in a row must not ask twice.
+  */
+  if (act && act.startsWith('dup')) {
+    const copies = Number(act.slice(3));
+    const at = playAt();
+    const all = [...document.querySelectorAll('.job button')];
+    all.forEach((b) => { b.disabled = true; });
+    btn.classList.add('busy');
+    say(`freezing scene ${SEL} at ${at.toFixed(2)}s, +${copies} frames…`, 'work');
+
+    const d = await api('/api/dup_frame', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ folder: FOLDER, n: SEL, at, copies }),
+    });
+
+    btn.classList.remove('busy');
+    all.forEach((b) => { b.disabled = false; });
+    if (!d.ok) {
+      say(`frame duplicate failed: ${(d.err || 'unknown').trim().slice(0, 200)}`, 'bad');
+    } else {
+      say(`${d.label}: frame ${d.frame} held ${d.copies}x (+${d.added}s) — `
+        + `${d.was}s → ${d.now}s, ${d.frames_total} frames. `
+        + `old cut kept in ${d.backup}`, 'ok');
+    }
+    await refresh();
     return;
   }
 
@@ -866,6 +1013,7 @@ $('vid').addEventListener('timeupdate', () => {
   const t = Math.round(v.currentTime * 100) / 100;
   frameAt = t;
   $('scrubat').textContent = t.toFixed(2) + 's';
+  paintDupRow();
   $('scrub').value = String(t);
   drawRings();
   if (stopAt !== null && t >= stopAt - 0.02) {

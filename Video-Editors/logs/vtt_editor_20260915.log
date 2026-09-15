@@ -2,3 +2,4 @@
 13:17:22  ok   SAVE LINE    special-skis       scene 19
 13:17:27  ok   SAVE LINE    special-skis       scene 19
 14:42:22  ok   VOICE        add-collection     101.9s
+17:33:27  ok   DUP FRAME    add-collection     scene 3 +20f at 18.00s
