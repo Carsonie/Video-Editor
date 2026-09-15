@@ -210,8 +210,21 @@ def s_save_scene_proxy():
 # A real, already-committed store's own scene, used by s_load_picker and
 # s_stateless below — REAL_SEG/REAL_AV are never written to, only read from,
 # so this is safe to run against live customer data.
-REAL_STORE_REL = ("Rentify Demos Corp/bike-demo/help-videos/videos/"
-                   "01-first-time-ordering")
+# ⚠ THE STAGE FOLDER IS READ OFF DISK, NOT SPELLED HERE. bike-demo's `videos/`
+# became `development_videos/` on 2026-09-15, matching the split Carson made on
+# ski-demo — and this constant is what broke, silently, because a missing
+# fixture path reads as a failing assertion rather than a moved folder. The
+# stores split one at a time, so the name is whichever one exists.
+def _real_store_rel():
+    for stage in ("development_videos", "videos"):
+        rel = f"Rentify Demos Corp/bike-demo/help-videos/{stage}/01-first-time-ordering"
+        if os.path.isdir(os.path.join(fixture.CUSTOMERS, rel)):
+            return rel
+    return ("Rentify Demos Corp/bike-demo/help-videos/development_videos/"
+            "01-first-time-ordering")
+
+
+REAL_STORE_REL = _real_store_rel()
 REAL_SEG = f"{REAL_STORE_REL}/sandbox/01-login/segment.mp4"
 REAL_AV = f"{REAL_STORE_REL}/sandbox/01-login/avatar.webm"
 
@@ -223,7 +236,20 @@ REAL_AV = f"{REAL_STORE_REL}/sandbox/01-login/avatar.webm"
 # borrow the COMMON library instead, which is where real content actually
 # lives now. Read-only either way: /api/lib_frames only ever EXTRACTS into
 # cache/, it never writes into Customers/ or Sarah/ itself.
-SKI_STORE_REL = "Rentify Demos Corp/ski-demo/help-videos/videos/01-first-time-ordering"
+# ⚠ SAME TRAP AS REAL_STORE_REL ABOVE, AND THIS ONE WAS ALREADY BROKEN.
+# ski-demo renamed videos/ to development_videos/ on 2026-09-15, so this
+# constant had been pointing at nothing since then — and a missing fixture
+# reads as a FAILING ASSERTION, not as a moved folder.
+def _ski_store_rel():
+    for stage in ("development_videos", "videos"):
+        rel = f"Rentify Demos Corp/ski-demo/help-videos/{stage}/01-first-time-ordering"
+        if os.path.isdir(os.path.join(fixture.CUSTOMERS, rel)):
+            return rel
+    return ("Rentify Demos Corp/ski-demo/help-videos/development_videos/"
+            "01-first-time-ordering")
+
+
+SKI_STORE_REL = _ski_store_rel()
 SKI_SEG = f"{SKI_STORE_REL}/sandbox/01-intro-and-login/segment.mp4"
 SKI_AV = f"{SKI_STORE_REL}/sandbox/01-intro-and-login/avatar.webm"
 COMMON_LIB_CLIP = "idle/sarah-idle-10s-alpha.webm"

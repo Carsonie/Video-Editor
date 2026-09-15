@@ -288,26 +288,58 @@ imported, which is true for the spawned flow and a trap for anything else.
 hold `script.json` open, and on 2026-09-14 it was left running after being
 reported stopped.
 
-### ⚠ THE HELP-VIDEO FOLDER LAYOUT — ski-demo SPLIT, THE OTHERS HAVE NOT
+### ⚠ THE HELP-VIDEO FOLDER LAYOUT — ALL FOUR STORES SPLIT, 2026-09-15
 
 Carson reorganised ski-demo on 2026-09-15: *"Review the ski-demo help-video
-folder structure I just updated to keep me a bit better organized."*
+folder structure I just updated to keep me a bit better organized."* Then, the
+same day: *"Refactor the bike demo help-videos folder to match with ski demo."*
+Then *"Do canoe-demo next"*, then *"Do alpine-sports next."* All four now:
 
-    ski-demo/help-videos/            the OTHER three stores/
-      BCP_raw_mp4/                     raw_mp4/            ← still flat
-      UI_raw_mp4/                      videos/
-      development_videos/              development/
-      Completed_Videos/                z_History/
+    <store>/help-videos/
+      BCP_raw_mp4/        the admin recipes
+      UI_raw_mp4/         the renter flows
+      development_videos/ was videos/
+      Completed_Videos/   was development/
       z_History/
+
+⚠ **`raw_mp4` AND `videos` NO LONGER EXIST ANYWHERE UNDER `Customers/`.**
+Not on one store, not as a fallback that something still finds. Any code that
+names either is dead code as of 2026-09-15 — see "WHAT THIS BROKE" below,
+because four files were still naming them and none of them said so.
 
 **Raw captures split by SURFACE** — `BCP_raw_mp4` for the admin recipes,
 `UI_raw_mp4` for the renter flows. `videos/` became `development_videos/`, and
-`Completed_Videos/` is new.
+`development/` was RENAMED to `Completed_Videos/` — it is not new and it is not
+a deletion, which `git show --find-renames a1c11ff` shows outright.
 
-⚠ **NEVER HARDCODE `raw_mp4` AGAIN, AND NEVER RENAME IT EITHER.** Only ski-demo
-moved; alpine-sports, bike-demo and canoe-demo are still flat. A rename breaks
-three stores and a hardcode breaks one — so the folder name is READ OFF DISK,
-every time. Two places do it:
+⚠ **THE SPLITS CAME OUT NEARLY IDENTICAL**, because every store was recorded
+from the same roster. `UI_raw_mp4` gets the same six renter recipes every time.
+`BCP_raw_mp4` varies only in what was actually captured:
+
+    bike-demo      4   catalogue expand-catalogue nav store   (all empty)
+    canoe-demo     4   the same four                          (all empty)
+    alpine-sports  5   + items, and it has 6 REAL captures
+    ski-demo       7   add-collection add-item add-question
+                       add-requirement special-{boots,poles,skis}
+
+⚠ **`git mv` REFUSES A FOLDER GIT DOES NOT TRACK** — "fatal: source directory
+is empty" — and it is ALL-OR-NOTHING, so the whole batch rolls back and you
+have to look to see that nothing moved. alpine-sports' `items/` held one
+gitignored mp4 and no `.gitkeep`, so it needed a plain `mv`. Check
+`git ls-files <folder> | wc -l` per folder first.
+
+⚠ **WHICH SURFACE A RECIPE BELONGS TO IS IN THE CODE, NOT IN YOUR HEAD.** The
+BCP recipe names are the top-level keys of `BCP/Nav/scripts/bcp_runner.ts` —
+`catalogue`, `expand-catalogue`, `nav`, `store`, `add-collection`, `add-item`,
+`add-question`, `add-requirement`, the `special-*` set, and more. Everything
+under `Master_Flows/UI/` is a renter flow. every store's admin
+folders were sorted by running `surface_of()` over each folder name, not by
+eye; none of their names match ski-demo's, so a pattern copied off ski-demo
+would have put them all in the wrong place.
+
+⚠ **NEVER HARDCODE A STAGE FOLDER. READ IT OFF DISK, EVERY TIME.** The
+fallback to `raw_mp4` is kept in both tools below for a store that has not been
+created yet — not because any store uses it. Two places do it right:
 
     record_flow.ts   rawSubdirFor(storeRoot, surface)  — picks BCP_/UI_ when the
                      store has them, else raw_mp4. Asks the DESTINATION repo,
@@ -321,7 +353,118 @@ exists, not on the store's name. That is the point of doing it this way.
 ⚠ **vtt_editor NEEDED NOTHING.** Its breadcrumb walks `help-videos/*` rather
 than assuming a name, so it showed the new folders the moment they appeared —
 `BCP_raw_mp4 (4/4)`, `UI_raw_mp4 (5/11)`, `development_videos (1/1)`. That is
-what a generic walk buys.
+what a generic walk buys. Proven three times over: neither bike-demo's nor
+canoe-demo's split needed a change to it.
+
+### ⚠ WHAT THIS BROKE — READ THIS BEFORE SPLITTING ANOTHER STORE
+
+**A folder rename breaks whatever NAMES the folder in a file, and not one of
+these said so.** Reading the name off disk protects the tools that do it; it
+protects nothing else. Everything below was found by grepping for the old names
+AFTER the move, which is the step to repeat next time.
+
+⚠ **THE `.gitignore` STOPPED TRACKING ALL TEN `*vtt.html` PAGES.** The two
+un-ignore lines named `raw_mp4/` and `videos/`, so every page fell back to the
+blanket `Customers/**` exclusion — **silently**, because an untracked file looks
+exactly like a file with no changes. This is the SECOND time the same two lines
+did this: on 2026-09-14 they missed the `<recipe>.vtt.html` rename. The pattern
+now names no stage folder at all — un-ignore under `help-videos/**`, then put
+back `dev/**` and `sandbox/**`, which the editors rewrite on every run. Verify
+with `git check-ignore`, never by eye:
+
+    find Customers -name '*vtt.html' ! -name '*.artifact.html' | while read -r f; do
+      git check-ignore -q "$f" && echo "IGNORED $f" || echo "tracked $f"; done
+
+Expected today: 9 tracked, and `dev/vtt.html` ignored.
+
+⚠ **`work/boundaries.json` NAMES THE MASTER, AND EVERY STORE HAS ONE.**
+`build/cut_segments.py` passes its `raw` field STRAIGHT TO ffmpeg as `-i`, and
+`/final-video-clean-up` reads it to decide which file is the master. All four
+were stale — three pointed into `Basic_E2E_Testing`, which has not held these
+files since 2026-08-28, and at a flat `raw_mp4/` root rather than the recipe
+folder; ski-demo's was relative, so it only ever resolved from one directory.
+All four now hold an ABSOLUTE path to a file that exists. Check all four at
+once:
+
+    python3 - <<'EOF'
+    import json, io, glob, os
+    for p in sorted(glob.glob('/Users/carsonkramer/Rentify/Video-Editor/Customers/'
+                              '*/*/help-videos/development_videos/*/work/boundaries.json')):
+        print(os.path.isfile(json.load(io.open(p))['raw']), p)
+    EOF
+
+⚠ **THREE OTHER EDITORS NOW FIND NOTHING, ON ALL FOUR STORES. NOT FIXED —
+editor scope lock, needs an explicit go-ahead.** Measured, not guessed:
+
+    mp4_splitter/serve.py     355, 651, 660-661
+    segment_avatar_editor/serve.py  490, 506-514, 907, 916-917, 959, 975
+    avatar_editor/serve.py    396, 412
+    Video-Editors/Makefile    19, 109, 118
+    avatar_editor/web/library.js  30  (a comment only)
+
+    "jump to raw captures" link   0/4 stores   (isdir help-videos/raw_mp4)
+    Load picker, videos found     0/4 stores   (isdir help-videos/videos)
+
+So the SAE's and avatar_editor's Load pickers are EMPTY for every store, and
+the Makefile prints "no videos/ folder — this store is still flat" for all of
+them. ski-demo has been in that state since its own reorg; the other three
+joined it. **The fix is the same read-off-disk rule these two already use** —
+see `rawSubdirFor` and `raw_folder` above.
+
+⚠ **AND TWO THINGS DID NEED CHANGING IN THE TESTS, NEITHER OF WHICH ANNOUNCED
+ITSELF.** Both name a path in a file, which no amount of reading-off-disk
+protects:
+
+    tests/test_{frame_blender,avatar_editor}.py   REAL_STORE_REL named
+                     bike-demo's `videos/` outright, and test_avatar_editor's
+                     SKI_STORE_REL named ski-demo's — that second one had been
+                     dead since ski's own reorg and nobody noticed, because a
+                     moved fixture folder reads as a FAILING ASSERTION, not as
+                     a missing path. It looks like an editor bug. All three
+                     constants now pick whichever of
+                     development_videos/videos exists; all 9 fixture paths
+                     resolve.
+    (boundaries.json and the .gitignore are covered in their own
+                     sections above — they are not test-only problems.)
+
+⚠ **A NEW RECIPE IS FILED BY ITS SURFACE — FIXED 2026-09-15.**
+`scene_script.py`'s fallback used to read `BCP_raw_mp4 if it exists else
+raw_mp4`, so on a split store every brand-new recipe went to the ADMIN folder,
+renter flows included. It only ever bit a recipe whose folder did not exist yet
+— the loop above finds every existing one — but two stores are split now, so it
+was wrong twice over.
+
+    scene_script.py  bcp_recipes()  parses the top-level keys of
+                     BCP/Nav/scripts/bcp_runner.ts's SEQUENCES object
+                     surface_of()   those keys are 'bcp', everything else 'ui';
+                     a `"surface"` in the recipe spec overrides both
+                     raw_folder()   an existing folder wins; otherwise the
+                     surface's own folder, else the flat raw_mp4 — the SAME
+                     rule as record_flow.ts's rawSubdirFor()
+
+⚠ **THE LIST IS PARSED, NEVER COPIED.** A list of recipe names pasted into
+Python goes stale in silence: a recipe added to `bcp_runner.ts` later would
+quietly file itself as a renter flow, and a wrong folder raises nothing. If the
+runner cannot be read, `surface_of` STOPS with the file name and tells you to
+put `"surface"` in the spec — it does not guess, because guessing is the bug.
+
+⚠ **`login` IS A BCP RECIPE, AND ITS FOLDER STAYS UNDER `UI_raw_mp4` ANYWAY.**
+Both halves are settled, so do not re-open either. It is BCP: there is no
+`login` in `UI/Nav/lib/recipe.ts` at all, `bcp_runner.ts` calls it "sign in and
+stop on the dashboard", and ski-demo's own `login/script.json` says the footage
+exists "so it can be dropped over the front of every other BCP video". The
+folder stays put by Carson's decision, 2026-09-15, asked outright. Nothing
+breaks — an existing folder is found before the surface is consulted. **DO NOT
+MOVE IT to make the two agree.**
+
+⚠ **AND `scene_script.py` STILL WRITES `LEAD = 0.5` / `EXIT = 0.8`** (lines
+48-49) while all nine ski-demo scripts carry `_lead_in_seconds: 0.75` and
+`narrate_mac.py` defaults to `LEAD_DEFAULT = 0.75`. So a BRAND-NEW recipe opens
+at 0.5 and disagrees with every existing script, and the voice tool honours
+that 0.5 because it reads the script's own field. **Left alone on purpose** —
+Carson's call, 2026-09-15: `--from-script` recomputes each `.vtt` from these
+two constants, so changing them shifts every existing table on its next
+rebuild. Raise it before the next new recipe is written, not during one.
 
 ⚠ **`mp4_splitter/serve.py` STILL HARDCODES `raw_mp4`** (lines 355, 660-661).
 It is a different editor, the editor scope lock applies, and it has not been

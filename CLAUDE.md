@@ -161,14 +161,21 @@ The file itself is gitignored: it is stale the moment a line is edited.
 ⚠ **THE READ-ONLY PAGES STILL EXIST**, for when nothing will be edited, and the
 wrong one gives an empty page rather than an error:
 
-    BUILT  (Customers/<Business>/<store>/help-videos/videos/<NN-label>/,
+    BUILT  (.../help-videos/development_videos/<NN-label>/,
             with sandbox/ scenes)
       cd ~/Rentify/Video-Editor/Video-Editors
       python3 build/vtt_html.py "<video folder>" --open
 
-    RAW CAPTURE  (.../help-videos/raw_mp4/<recipe>/, no clips yet)
+    RAW CAPTURE  (.../help-videos/{BCP,UI}_raw_mp4/<recipe>/, no clips yet)
       cd ~/Rentify/Basic_E2E_Testing/Master_Flows/Recorder
-      python3 scripts/vtt_build.py "<.../raw_mp4/<recipe>>" --open
+      python3 scripts/vtt_build.py "<.../UI_raw_mp4/<recipe>>" --open
+
+⚠ **THE FOLDER NAMES ABOVE CHANGED ON 2026-09-15, ON ALL FOUR STORES.**
+`videos/` is `development_videos/`, and `raw_mp4/` split into `BCP_raw_mp4/`
+(the admin recipes) and `UI_raw_mp4/` (the renter flows). `raw_mp4` and
+`videos` no longer exist anywhere under `Customers/`. The full layout, the
+recipe→surface rule, and the traps are in `Basic_E2E_Testing/CLAUDE.md`'s
+"THE HELP-VIDEO FOLDER LAYOUT" section and in `skills/vtt/SKILL.md`.
 
 `vtt_html.py` ffprobes the sandbox clips, so on a raw capture it finds nothing
 to measure. `vtt_build.py` lives in the OTHER repo — it writes BOTH

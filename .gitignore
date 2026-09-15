@@ -43,8 +43,20 @@ Customers/**/z_History/**
 # two lines still said plainly `vtt.html`, so every renamed page fell back to
 # the blanket `Customers/**` exclusion and silently stopped being tracked —
 # checked with `git check-ignore`. Match the suffix, not the whole basename.
-!Customers/*/*/help-videos/raw_mp4/**/*vtt.html
-!Customers/*/*/help-videos/videos/*/video/*vtt.html
+# ⚠ AND THE PATTERN MUST NOT NAME THE STAGE FOLDER EITHER. These two lines
+# said `raw_mp4/` and `videos/`, and BOTH names are gone: ski-demo split into
+# BCP_raw_mp4/UI_raw_mp4 and renamed videos/ to development_videos/ on
+# 2026-09-15, and bike-demo, canoe-demo and alpine-sports were refactored to
+# match the same day. So all TEN pages on disk fell back to the blanket
+# `Customers/**` exclusion and stopped being tracked — the identical silent
+# failure the note above describes, from a different direction.
+#
+# So: un-ignore the page ANYWHERE under help-videos, then put back the two
+# places it must not be tracked. `dev/` and `sandbox/` are rewritten by the
+# editors on every run, and a regenerated tracked file is pure churn.
+!Customers/*/*/help-videos/**/*vtt.html
+Customers/*/*/help-videos/**/dev/**/*vtt.html
+Customers/*/*/help-videos/**/sandbox/**/*vtt.html
 # ...but NOT the editable artifact page. `<recipe>.vtt.artifact.html` is built
 # on demand by Recorder/scripts/vtt_artifact.py, published straight to an
 # artifact, and stale the moment a line is edited. There is no version of it

@@ -1,0 +1,117 @@
+<title>ski-demo VTT v33</title>
+<style>
+  :root { --bg:#f7f7f5; --panel:#fff; --ink:#1c1f22; --dim:#6a7278; --line:#e2e5e7;
+           --accent:#7b4fb5; --warn:#a8631a; --warnbg:#fdf3e4; --say:#4a5257; --zebra:#fafafa; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg:#17191b; --panel:#1e2124; --ink:#e6eaec; --dim:#8b949c; --line:#2f353a;
+    --accent:#c3a9e0; --warn:#e0c060; --warnbg:#2c2617; --say:#9aa4ae; --zebra:#212528; } }
+  :root[data-theme="dark"] {
+    --bg:#17191b; --panel:#1e2124; --ink:#e6eaec; --dim:#8b949c; --line:#2f353a;
+    --accent:#c3a9e0; --warn:#e0c060; --warnbg:#2c2617; --say:#9aa4ae; --zebra:#212528; }
+  body { background:var(--bg); color:var(--ink); margin:0; padding:28px 22px 60px;
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; }
+  .wrap { max-width:1180px; margin:0 auto; }
+  h1 { font-size:20px; margin:0 0 4px; letter-spacing:-.01em; }
+  h1 .v { color:var(--accent); font-weight:700; }
+  .sub { color:var(--dim); font-size:12.5px; margin:0 0 18px; }
+  .strip { display:flex; flex-wrap:wrap; gap:10px; margin:0 0 20px; }
+  .stat { background:var(--panel); border:1px solid var(--line); border-radius:8px;
+           padding:9px 14px; min-width:104px; }
+  .stat .k { font-size:10px; letter-spacing:.13em; color:var(--dim); text-transform:uppercase; }
+  .stat .v { font-size:19px; font-weight:650; margin-top:2px; font-variant-numeric:tabular-nums; }
+  .scroll { overflow-x:auto; background:var(--panel); border:1px solid var(--line);
+             border-radius:10px; }
+  table { border-collapse:collapse; width:100%; min-width:840px; }
+  th { text-align:right; font-size:10px; letter-spacing:.11em; text-transform:uppercase;
+        color:var(--dim); font-weight:700; padding:11px 12px;
+        border-bottom:1px solid var(--line); white-space:nowrap; }
+  th.l { text-align:left; }
+  td { padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:baseline; }
+  tr.scene:nth-of-type(4n+1) td { background:var(--zebra); }
+  td.n { color:var(--dim); text-align:right; width:34px; font-variant-numeric:tabular-nums; }
+  td.lab { font-weight:600; white-space:nowrap; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  td.w { color:var(--dim); }
+  td.warn { color:var(--warn); font-weight:700; background:var(--warnbg); }
+  .d { font-size:11px; opacity:.8; }
+  tr.say td { color:var(--say); font-style:italic; padding:2px 12px 13px; }
+  tr.total td { font-weight:700; border-bottom:none; border-top:2px solid var(--line);
+                 background:transparent; }
+  .notes { margin-top:26px; background:var(--panel); border:1px solid var(--line);
+            border-left:3px solid var(--warn); border-radius:8px; padding:14px 18px; }
+  .notes h2 { font-size:13px; margin:0 0 8px; }
+  .notes ul { margin:6px 0 0; padding-left:20px; }
+  .notes li { margin:3px 0; }
+  .notes p { margin:8px 0 0; color:var(--dim); font-size:12.5px; }
+  footer { margin-top:22px; color:var(--dim); font-size:11.5px; line-height:1.7; }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11.5px;
+          background:var(--zebra); padding:1px 5px; border-radius:4px; }
+</style>
+
+<div class="wrap">
+<h1>VTT — ski-demo · First Time Ordering <span class="v">v33</span></h1>
+<p class="sub">Video Timing Table. Not WebVTT subtitles — per scene, how long the footage
+runs, how long Sarah&rsquo;s line takes to say, and the gap between them.</p>
+
+<div class="strip">
+  <div class="stat"><div class="k">clip</div><div class="v">110.1s</div></div>
+  <div class="stat"><div class="k">said</div><div class="v">93.3s</div></div>
+  <div class="stat"><div class="k">dead air</div><div class="v">15%</div></div>
+  <div class="stat"><div class="k">over 2.5s</div><div class="v">1</div></div>
+  <div class="stat"><div class="k">words</div><div class="v">321</div></div>
+  <div class="stat"><div class="k">frames</div><div class="v">2753</div></div>
+</div>
+
+<div class="scroll"><table>
+  <thead><tr><th></th><th class="l">Ski-Demo scenes</th>
+  <th>clip</th><th>speech</th><th>gap</th>
+  <th>segment</th><th>avatar</th><th>narration</th><th>words</th></tr></thead>
+  <tbody>
+    <tr class="scene"><td class="n">1</td><td class="lab">intro-and-login</td><td class="num">19.3s</td><td class="num">16.6s</td><td class="num" class="warn">2.7s</td><td class="num">482</td><td class="num">482</td><td class="num" class="warn">499 <span class="d">−17</span></td><td class="num w">57</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Hi, I&#x27;m Sarah. Let me show you how to place your first order with us at Ski Demo rentals. Let&#x27;s get started. Here are the steps to completing your first ski rental. Enter your email, and we&#x27;ll send you a 4 digit verification code you can enter here to sign in. This will also create your account.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">2</td><td class="lab">dashboard-new-order</td><td class="num">3.5s</td><td class="num">2.3s</td><td class="num">1.2s</td><td class="num">88</td><td class="num">88</td><td class="num" class="warn">124 <span class="d">−36</span></td><td class="num w">8</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;From your dashboard, tap New Order to begin.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">3</td><td class="lab">add-a-person-and-myself</td><td class="num">6.4s</td><td class="num">5.2s</td><td class="num">1.2s</td><td class="num">161</td><td class="num">161</td><td class="num">156</td><td class="num w">18</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;We need to add a person to the order. You can add yourself, or invite a party member.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">4</td><td class="lab">catalogue-search</td><td class="num">9.9s</td><td class="num">8.7s</td><td class="num">1.2s</td><td class="num">248</td><td class="num">248</td><td class="num" class="warn">264 <span class="d">−16</span></td><td class="num w">30</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;To search for a rental item, first select a collection. The collections hold groups of like or similar items, that can come with variants, such as different sizes or colours.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">5</td><td class="lab">dates-and-review</td><td class="num">18.8s</td><td class="num">17.4s</td><td class="num">1.4s</td><td class="num">470</td><td class="num">470</td><td class="num">442</td><td class="num w">60</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Select your rental starting date, and then your return date. For a one day rental, select the same day twice. You will see the start and end date, as well as the number of rental days you have chosen in the status bar. Review your order, taking a moment to check that your rental dates and the prices are correct.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">6</td><td class="lab">requirements</td><td class="num">14.6s</td><td class="num">13.4s</td><td class="num">1.2s</td><td class="num">365</td><td class="num">365</td><td class="num" class="warn">402 <span class="d">−37</span></td><td class="num w">46</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Please answer some questions for us here, so we can expedite the preparation of your rental items. Then when you arrive at the store to pick up your items, you are getting the fastest possible service. Also review and agree to our rental terms and agreements.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">7</td><td class="lab">checkout-pay-with-stripe</td><td class="num">7.0s</td><td class="num">5.8s</td><td class="num">1.2s</td><td class="num">175</td><td class="num">175</td><td class="num" class="warn">206 <span class="d">−31</span></td><td class="num w">20</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Review your total, then continue to payment. Take a moment to check your rental dates and the price are correct.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">8</td><td class="lab">payment-card</td><td class="num">4.1s</td><td class="num">2.9s</td><td class="num">1.2s</td><td class="num">102</td><td class="num">102</td><td class="num" class="warn">130 <span class="d">−28</span></td><td class="num w">10</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;Enter your credit card details to complete your rental order.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">9</td><td class="lab">order-complete</td><td class="num">7.3s</td><td class="num">6.1s</td><td class="num">1.2s</td><td class="num">182</td><td class="num">182</td><td class="num">179</td><td class="num w">21</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;That&#x27;s it — your order is complete. Your invoice is ready, and your items will be waiting for you at the store.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">10</td><td class="lab">order-history</td><td class="num">8.2s</td><td class="num">6.1s</td><td class="num">2.1s</td><td class="num">205</td><td class="num">205</td><td class="num" class="warn">216 <span class="d">−11</span></td><td class="num w">21</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;You can always find your rental in your order history. And your current settings will be saved for your next visit.&rdquo;</td></tr>
+    <tr class="scene"><td class="n">11</td><td class="lab">logout-and-signed-out</td><td class="num">11.0s</td><td class="num">8.7s</td><td class="num">2.3s</td><td class="num">275</td><td class="num">275</td><td class="num">266</td><td class="num w">30</td></tr>
+    <tr class="say"><td></td><td colspan="8">&ldquo;You can now logout, using our dropdown menu in the top right corner. Thank you for renting with Ski Demo. We hope you have a great time on the slopes!&rdquo;</td></tr>
+    <tr class="scene total"><td></td><td class="lab">total</td>
+      <td class="num">110.1s</td><td class="num">93.3s</td>
+      <td class="num">16.8s</td><td class="num">2753</td>
+      <td class="num">2753</td><td class="num">–</td>
+      <td class="num w">321</td></tr>
+  </tbody>
+</table></div>
+
+<div class="notes">
+  <h2>⚠ 7 avatar(s) shorter than the narration they were cut from</h2>
+  <p>Where a scene reads <b>segment = avatar</b> exactly, that is not automatically
+  good. It can mean the avatar was built to the footage&rsquo;s length — or that it was
+  trimmed to fit, cutting the end off Sarah&rsquo;s recorded line. The check is the avatar
+  against its own <code>narration.webm</code>, never against the segment:</p>
+  <ul><li><b>1 intro-and-login</b> — avatar 482 frames, narration 499 (<b>17</b> shorter)</li><li><b>2 dashboard-new-order</b> — avatar 88 frames, narration 124 (<b>36</b> shorter)</li><li><b>4 catalogue-search</b> — avatar 248 frames, narration 264 (<b>16</b> shorter)</li><li><b>6 requirements</b> — avatar 365 frames, narration 402 (<b>37</b> shorter)</li><li><b>7 checkout-pay-with-stripe</b> — avatar 175 frames, narration 206 (<b>31</b> shorter)</li><li><b>8 payment-card</b> — avatar 102 frames, narration 130 (<b>28</b> shorter)</li><li><b>10 order-history</b> — avatar 205 frames, narration 216 (<b>11</b> shorter)</li></ul>
+  <p>A shorter avatar does not always mean lost words — the narration carries lead-in
+  and tail silence too. It means the scene is worth listening to.</p>
+</div>
+<footer>
+  Speech length is estimated at <b>3.44 words/sec</b>, the voice&rsquo;s measured rate.
+  Clip length and every frame count are read from the files on disk in
+  <code>sandbox/</code> — never typed by hand.<br>
+  Lines come from <code>script_v33.json</code>.<br>
+  Written by <code>build/vtt_html.py</code>.
+</footer>
+</div>

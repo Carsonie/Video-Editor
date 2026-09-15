@@ -202,8 +202,21 @@ def s_save_scene_proxy():
 # scene from a real, already-committed store instead of asking the fixture
 # to be something it was never built to be. REAL_SCENE is never written to —
 # only read from — so this is safe to run against live customer data.
-REAL_STORE_REL = ("Rentify Demos Corp/bike-demo/help-videos/videos/"
-                   "01-first-time-ordering")
+# ⚠ THE STAGE FOLDER IS READ OFF DISK, NOT SPELLED HERE. bike-demo's `videos/`
+# became `development_videos/` on 2026-09-15, matching the split Carson made on
+# ski-demo — and this constant is what broke, silently, because a missing
+# fixture path reads as a failing assertion rather than a moved folder. The
+# stores split one at a time, so the name is whichever one exists.
+def _real_store_rel():
+    for stage in ("development_videos", "videos"):
+        rel = f"Rentify Demos Corp/bike-demo/help-videos/{stage}/01-first-time-ordering"
+        if os.path.isdir(os.path.join(fixture.CUSTOMERS, rel)):
+            return rel
+    return ("Rentify Demos Corp/bike-demo/help-videos/development_videos/"
+            "01-first-time-ordering")
+
+
+REAL_STORE_REL = _real_store_rel()
 REAL_SEG = f"{REAL_STORE_REL}/sandbox/01-login/segment.mp4"
 REAL_AV = f"{REAL_STORE_REL}/sandbox/01-login/avatar.webm"
 SAVE_MP4_DIR = os.path.join(fixture.CUSTOMERS, REAL_STORE_REL, "video", "sandbox_mp4_scenes")
