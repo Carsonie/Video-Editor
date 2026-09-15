@@ -195,33 +195,75 @@ NOTE and no cue by design.
 Regenerating it from a recipe spec throws the edit away, along with the fields a
 spec cannot carry — the silent flags, the chapter anchors, the per-scene notes.
 
-## SAVE SCRIPT and PUBLISH — the two actions on the table
+## PUBLISH and STRETCH — the two actions on the table
 
-Carson, 2026-09-14. A VTT table is not only a report; it is where the words get
-changed. Two actions, and they are **deliberately different sizes**.
+Carson, 2026-09-14 and 2026-09-15. A VTT table is not only a report; it is
+where the words get changed, and now where a screen too short for its line
+gets fixed. **Two buttons**, and they do different things to different files.
 
 | | what it does | cost |
 |---|---|---|
-| **Save Script** | writes the edited lines into `script.json`, and nothing else | instant, reversible |
-| **Publish** | saves first, then rebuilds the narrated mp4 — the soundtrack | a minute or two, re-encodes the video |
+| **Publish** | writes the edited lines into `script.json`, then rebuilds the narrated mp4 | a minute or two |
+| **Stretch** | lengthens the screens with a NEGATIVE GAP, then re-narrates over the result | minutes; only the changed scenes after the first run |
+
+### ⚠ SAVE SCRIPT IS GONE. Do not add it back.
+
+There were three buttons until 2026-09-15. Carson asked *"Do we still need the
+Save Script button since the Publish button will also update the script?"* and
+the answer was no:
+
+- Both called **one function**, `pushScript()`. Publish passed the extra flag.
+  So **Publish was a strict superset** of Save Script, never a sibling.
+- The words were never at risk without it. The **hot save** republishes the
+  page on every changed line, with no button pressed — so an edit survives a
+  closed tab whether or not anything was clicked.
+
+What it uniquely offered was a *seconds*-fast write to disk with no encode.
+Real, but thin, and not worth a third button in a row that must not wrap.
+
+⚠ **THE ORDER IS WHAT MAKES DROPPING IT SAFE.** With no cheap save left, every
+job writes `script/current` **before** its request row. If a row could land
+without the words beside it, a job could encode from a stale `script.json`.
+That guarantee is the write order, not a flag — do not reorder it.
+
+⚠ **`#save` WAS LOAD-BEARING IN FOUR PLACES**, and deleting the tag alone
+leaves four `null` dereferences on a page that currently works: `dirty()`
+toggled its `disabled`, `doSave()` disabled and re-enabled it, `spinOn`/
+`spinOff` did too, and the read-only branch stamped `dataset.readonly` on it.
+All four are gone; the status text they wrote lives on the `#msg` span, which
+kept its job. The `unsaved` FLAG stays — `doSave()` refuses when nothing is
+pending and `beforeunload` uses it to get a last line out.
+
+⚠ **AND THE ERROR TEXT CHANGED WITH IT.** A failed save used to say "press
+Save to retry". There is no Save to press; it now says to edit a line again,
+which is what actually retries.
 
 ### Where the buttons sit
 
-**Save Script on the LEFT. Publish on the RIGHT, on the SAME ROW** — Carson's
-own instruction: *"Add it on the right side of the page view, at the same
-vertical height as the Save button."*
+**Publish on the LEFT of the pair, Stretch to its RIGHT, on ONE ROW** — from
+Carson's original instruction, *"Add it on the right side of the page view, at
+the same vertical height as the Save button."* That rule was written about
+Save Script and Publish; it now governs Publish and Stretch.
 
-⚠ **The row must not wrap.** The status messages beside each button are long
-enough to push Publish onto a second line at a narrow viewport, which breaks the
+⚠ **The row must not wrap.** The status messages beside the buttons are long
+enough to push one onto a second line at a narrow viewport, which breaks the
 one thing that was specified. Pin the row (`flex-wrap:nowrap`), never let the
 BUTTONS shrink, and let the MESSAGES give way — truncated with an ellipsis,
 since a status line is the cheapest thing on the row to lose.
 
-⚠ **Publish is never styled as the default button.** It re-encodes about a
-gigabyte. It sits apart, outlined in the warning colour, and asks for
-confirmation. It should never be the button a hand lands on by accident.
+⚠ **NEITHER IS STYLED AS THE DEFAULT BUTTON.** Both cost minutes. Both are
+outlined rather than filled, and they take **different colours** — Publish the
+warning colour, Stretch the accent — because two identical buttons side by side
+is how the wrong one gets pressed.
 
-### Save Script — only the words
+⚠ **STRETCH IS HIDDEN WHEN NOTHING IS SHORT.** A button that cannot help should
+not be on screen. `render()` owns it: it already counts the short screens for
+the summary strip, so it also shows, hides and labels the button — *"Stretch 1
+short screen"*. Edit a line long enough and the button leaves on its own;
+shorten one and it comes back. Toggle `hidden`, never `style.display` — the
+host's reset marks `[hidden]` important and a display value here would fight it.
+
+### Both buttons: the words, and only the words
 
 `script.json` holds far more than lines: the measured clip lengths, the pauses,
 the chapter anchors, the notes. **Touch only `line`.** Everything else was
@@ -246,7 +288,7 @@ cannot be regenerated from something else. `script.json.bak` before each save
 ⚠ **A SILENT ROW'S CELL HOLDS THE TABLE'S EXPLANATION, NOT A LINE.** The
 generator renders "Silent, on purpose. These screens repeat the first item…"
 into that cell so a reader knows the silence is meant. Seed an editor from it
-and one Save writes that prose in as the scene's line. Start the cell EMPTY with
+and one save writes that prose in as the scene's line. Start the cell EMPTY with
 the explanation as a placeholder.
 
 ### PUBLISH — what actually happens, end to end
@@ -292,6 +334,82 @@ folder legitimately holds two (a master plus the shared login clip).
 ⚠ **NEVER WRITE OVER THE MASTER.** The narrated file is a NEW file beside it.
 The master is what the delivered cut is made from, its screen edges live in
 `stretch_report.json`, and this repo has already lost one.
+
+### STRETCH — what actually happens, end to end
+
+Carson, 2026-09-15: *"I want Sonnet to help me stretch the segment when the
+narrative track has a negative gap. We need to add a button to trigger the
+stretch event."*
+
+**IN THE PAGE** — `script/current`, then `requests/stretch` carrying the scenes
+it found short. **ON THE MACHINE** — one command, and the worker runs nothing
+else:
+
+    cd ~/Rentify/Basic_E2E_Testing/Master_Flows/Recorder
+    python3 scripts/stretch_request.py "<folder>"        # --dry-run to look first
+
+It backs up the edges, derives the bounds, stretches, re-narrates, and says what
+came out. A worker must never be assembling ffmpeg arguments itself.
+
+⚠ **THE EDGES COME FROM `stretch_report.json`, NEVER FROM DETECTION.** Every
+report carries `src_in`/`src_out` per scene — edges a person already confirmed
+against a contact sheet. **No report, no stretch**: the command stops and tells
+you to run `stretch_scenes.py peaks` first. Auto-detection was tried twice and
+is untrustworthy — "take the N-1 biggest frame changes" once made `sign-in`
+25.84s and `item-details` 1.04s, because a dropdown opening is a bigger picture
+change than a dark page replacing a dark page. And `script.json`'s `raw-source`
+comes from a DIFFERENT run than the one recorded: on add-item v12 four of
+thirteen were out by more than a second.
+
+⚠ **ONLY THE CHANGED SCENES ARE RE-ENCODED.** Carson's own constraint. Every
+per-scene mp4 is cached in `segments/`, keyed by scene, factor AND edges, so a
+stale hit is impossible rather than unlikely. **Measured on special-skis
+2026-09-15: first run 21 scenes in about 5 minutes; re-run 0 scenes in 24
+seconds.** The first run of a capture has no cache and pays for all of them
+once — say that, rather than promising the fast number.
+
+⚠ **THE PICTURE SLOWS, IT DOES NOT FREEZE.** Frames are duplicated evenly
+across the screen (`setpts=F*PTS` then `fps=25`), so the ring still lands and
+the typing still runs, just slower. Holding the last frame parks the picture,
+and a parked picture reads as a stall.
+
+⚠ **IT ONLY EVER MAKES A SCREEN LONGER.** A screen with time to spare keeps it —
+that spare is the editor's to trim.
+
+⚠ **AND AFTERWARDS THE TABLE IS STALE UNTIL THE PAGE IS REBUILT.** `script.json`'s
+`raw-source` is NOT rewritten by a stretch, and must not be — it is the record
+of a measured run. So `vtt_artifact.py` reads the clip lengths from
+`stretch_report.json`'s `built` whenever that file is there, since that is the
+length each scene actually occupies in the cut the voice was laid over. Found
+2026-09-15: the first real stretch fixed `enter-the-code` from 7.0s to 7.4s and
+the rebuilt page still said *"1 screen too short"*.
+
+### THE WORKER LOOP — who waits, and who works
+
+⚠ **A SUBAGENT CANNOT HOLD AN ARTIFACT WATCH.** Only an interactive main-loop
+session is notified when a page is republished — a subagent, background or print
+session gets nothing. So Sonnet cannot be the monitor, however it is asked for.
+Carson chose the split on 2026-09-15: **the main session waits, Sonnet works.**
+
+On every `artifact-changed` event for a VTT page:
+
+1. Read `requests/publish` AND `requests/stretch`.
+2. `state` is not `'requested'` → **do nothing, say nothing.** That was a line
+   edit; the hot save already handled it. This is the whole point of Carson's
+   *"only publish when I do a Publish event using the button"* — the page saves
+   itself constantly, and a save is not a request.
+3. `state: 'requested'` → set it `'running'`, then spawn a **Sonnet 5** worker
+   (`Agent`, `model: "sonnet"`) with the folder, the job, and the one command.
+4. Write `done` or `failed` back with a real `step`. **A worker that dies
+   silently leaves the spinner turning forever** — the page has no other way to
+   learn the job ended.
+
+⚠ **AND THE WORDS IN THE PAGE ARE USUALLY NEWER THAN THE WORDS ON DISK.** The
+hot save keeps edits in the ARTIFACT; nothing reaches `script.json` until a
+button is pressed. So before any rebuild or republish, **read the live page and
+merge its lines onto disk first.** Measured 2026-09-15: Carson had rewritten
+**12 of 21 lines** in the page while `script.json` still held the old ones — a
+rebuild published without merging would have destroyed all twelve.
 
 ### The four bugs this page has already had — do not write them back
 

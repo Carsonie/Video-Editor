@@ -1,0 +1,46 @@
+0:00 Sign in
+0:14 Find the store
+0:52 Create the collection
+1:58 Add the first item
+3:14 The other variants
+5:51 Sign out
+
+
+Please provide us your email, so we can sent you a login code. Then click the Send Code button.
+We will send you a four-digit code to that address. {.5} If you are not seeing it, check your spam folder.
+
+This is your admin dashboard. {0.5} Open a Businesses with the store you want to work on.
+
+Start typing your business name, {0.3} then select it from the dropdown list.
+
+When your business page opens. {0.5} Choose Lookup Stores to see all the stores of this business.
+
+Start typing the name of the store you are looking for, {0.3} and select it from the dropdown list. {0.5} All activities after this will act against this store alone.
+
+This is the store page. {0.5} Click on the gear icon in the menu and choose Lookup Collections.
+
+Here you can find all the store's collections, if needed. {0.5} Press the plus icon button to add a new collection.
+
+Give the collection a unique name. {0.5} A collection is a group of items that can differ just by their options, or could be some like or similar items.
+
+Add a description to guide your renters. {0.5} Then set the starting price, in cents only, meaning no decimal point.
+
+Options are what makes one item different from another. {0.8} Each block is one option your renter could make. {0.5} The label is what they see. {0.5} The name is the key the item is saved under, and the key for that match. {0.8} The option type can true or false, text or a number. {0.5} The required option means this item is needed to complete the order. {0.5} The values are the list of selections the dropdown will offer. {0.8} These skis have two choices.
+
+
+After the collection is saved. {0.5} Now we can create each item in all its variants.
+
+Return to the store page. {0.5} Open the gear menu again, and this time choose Lookup Items.
+
+This is where all the store's items can be found. {0.5} To add a new item, click the plus icon button.
+
+Name the item so you can recognize it later. {0.5} Then search for the collection it belongs to, and pick it. {0.5} The collection decides which options this item has to answer.
+
+
+
+Fill in the item's own details. {0.5} A description, {0.3} how many you have to rent, {0.3} and the price in cents. {0.8} The requirement is the set of questions a renter answers when they book this — pick the one that fits. {0.8} Then the options you set on the collection appear as dropdowns. {0.5} Choose a brand, {0.3} a length. {0.8} Each one carries a star, which means the item cannot be saved until it has an answer. {0.5} Press Update to save it.
+
+
+
+
+
