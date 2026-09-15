@@ -1,0 +1,164 @@
+{
+ "source": "ski-demo_one-day-rental-owner-one-item_dev_15-16-30_v1.mp4",
+ "output": null,
+ "output_seconds": 66.73,
+ "_why": "Edges only. Nothing was stretched and nothing was cut \u2014 this report exists so vtt_editor has clip lengths to show. PROVISIONAL, see script.json's _note.",
+ "stretched_any": false,
+ "fps": 30.0,
+ "scenes": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "src_in": 2.43,
+   "src_out": 7.93,
+   "on_camera": 5.5,
+   "scene_needs": 0.0,
+   "built": 5.5,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "src_in": 7.93,
+   "src_out": 8.5,
+   "on_camera": 0.57,
+   "scene_needs": 0.0,
+   "built": 0.57,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "src_in": 8.5,
+   "src_out": 11.83,
+   "on_camera": 3.33,
+   "scene_needs": 0.0,
+   "built": 3.33,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 4,
+   "label": "new-order",
+   "src_in": 11.83,
+   "src_out": 16.27,
+   "on_camera": 4.44,
+   "scene_needs": 0.0,
+   "built": 4.44,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 5,
+   "label": "add-party-member",
+   "src_in": 16.27,
+   "src_out": 19.1,
+   "on_camera": 2.83,
+   "scene_needs": 0.0,
+   "built": 2.83,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 6,
+   "label": "member-added",
+   "src_in": 19.1,
+   "src_out": 21.6,
+   "on_camera": 2.5,
+   "scene_needs": 0.0,
+   "built": 2.5,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 7,
+   "label": "item-catalogue",
+   "src_in": 21.6,
+   "src_out": 27.57,
+   "on_camera": 5.97,
+   "scene_needs": 0.0,
+   "built": 5.97,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 8,
+   "label": "pick-the-dates",
+   "src_in": 27.57,
+   "src_out": 34.77,
+   "on_camera": 7.2,
+   "scene_needs": 0.0,
+   "built": 7.2,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 9,
+   "label": "item-on-the-order",
+   "src_in": 34.77,
+   "src_out": 37.0,
+   "on_camera": 2.23,
+   "scene_needs": 0.0,
+   "built": 2.23,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 10,
+   "label": "the-questions",
+   "src_in": 37.0,
+   "src_out": 52.0,
+   "on_camera": 15.0,
+   "scene_needs": 0.0,
+   "built": 15.0,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 11,
+   "label": "order-total",
+   "src_in": 52.0,
+   "src_out": 54.9,
+   "on_camera": 2.9,
+   "scene_needs": 0.0,
+   "built": 2.9,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 12,
+   "label": "checkout",
+   "src_in": 54.9,
+   "src_out": 59.33,
+   "on_camera": 4.43,
+   "scene_needs": 0.0,
+   "built": 4.43,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 13,
+   "label": "order-complete",
+   "src_in": 59.33,
+   "src_out": 61.67,
+   "on_camera": 2.34,
+   "scene_needs": 0.0,
+   "built": 2.34,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 14,
+   "label": "back-to-dashboard",
+   "src_in": 61.67,
+   "src_out": 66.73,
+   "on_camera": 5.06,
+   "scene_needs": 0.0,
+   "built": 5.06,
+   "factor": 1.0,
+   "stretched": false
+  }
+ ]
+}

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VTT Editor</title>
+<link rel="stylesheet" href="/web/vtt.css">
+</head>
+<body>
+
+<!--
+  ⚠ THE RAIL IS THE CONTROL MENU, AND EVERY ROW CARRIES ITS OWN STATE.
+  Carson, 2026-09-15: "an improved interface with a control menu, in a better ui
+  design." Five jobs, one row each, each showing what is done and what is owed —
+  so the page answers "where am I" without a click. A row that cannot act is
+  DISABLED WITH ITS REASON ON SCREEN, never hidden and never live-but-dead.
+-->
+<header class="top">
+  <div class="brand">
+    <span class="mark" aria-hidden="true"></span>
+    <span class="name">VTT Editor</span>
+    <span class="ver">v1</span>
+  </div>
+  <!--
+    ⚠ FOUR DROPDOWNS, NOT ONE. Carson, 2026-09-15: "I need to load the videos
+    for specific stores. So lets add some breadcrumb filters." One flat list was
+    fine at eight captures and wrong across two businesses, four stores and four
+    stages each — it did not say which store a recipe belonged to, and it hid
+    every BUILT video because their script lives in sandbox/ rather than the
+    folder root.
+    Each one narrows the next, left to right, and a folder with no script is
+    still listed — marked, not hidden, so a store never looks empty.
+  -->
+  <nav class="crumbs" aria-label="pick a working folder">
+    <select id="c-biz"   aria-label="business"></select>
+    <span class="sep" aria-hidden="true">/</span>
+    <select id="c-store" aria-label="store"></select>
+    <span class="sep" aria-hidden="true">/</span>
+    <select id="c-stage" aria-label="help-video folder"></select>
+    <span class="sep" aria-hidden="true">/</span>
+    <select id="c-work"  aria-label="working folder"></select>
+  </nav>
+  <div class="head-meta" id="headmeta"></div>
+</header>
+
+<main class="shell">
+
+  <!-- ── the control menu ──────────────────────────────────────────────── -->
+  <nav class="rail" id="rail" aria-label="the five jobs of a first edit">
+    <ol class="jobs" id="jobs"></ol>
+    <div class="railfoot">
+      <div class="note" id="railnote"></div>
+    </div>
+  </nav>
+
+  <section class="stage">
+    <!-- ── the frame, with the scene's own numbers over it ────────────── -->
+    <div class="viewer">
+      <div class="framewrap" id="framewrap">
+        <!-- ⚠ A REAL <video>, NOT A FRAME IMAGE. Carson, 2026-09-15: "I need a
+             play button to run the scenes." A still cannot show a ring appear,
+             a dropdown open, or typing land — which is most of what there is to
+             judge. The server answers byte ranges so seeking is instant. -->
+        <!-- ⚠ NOT MUTED. It was, and Carson could hear nothing: "I can not
+             here it?" `muted` was there so a programmatic play() could not be
+             blocked — but every play here follows a real click, so the
+             attribute bought nothing and cost the whole point of the narrated
+             cut. `controls` is off on purpose: the scene strip and the play
+             button own the transport, and a second set of controls invites
+             scrubbing past a scene's end. -->
+        <video id="vid" preload="metadata" playsinline></video>
+        <div class="frameoverlay" id="overlay"></div>
+        <!-- ⚠ A SILENT SOURCE SAYS SO OVER THE PICTURE, NOT IN A TOOLTIP.
+             Carson asked "I can not here it?" twice. The first time the player
+             was muted (my fault); the second time it was not — he was simply on
+             the raw capture, which is digital silence at -91 dB. A hover title
+             does not answer a question you are asking while looking at the
+             video. So it is a badge on the frame, and it names the fix. -->
+        <div class="silentbadge" id="silentbadge" hidden></div>
+        <div class="framenone" id="framenone">pick a capture</div>
+      </div>
+      <div class="scrub">
+        <!-- Play runs THIS SCENE and stops at its end, because a scene is the
+             unit being judged. Shift-click, or the All button, runs the rest. -->
+        <button id="play" class="play" aria-label="play this scene">▶</button>
+        <button id="playall" class="playall" title="play from here to the end">all</button>
+        <!-- ⚠ THE RAW CAPTURE IS SILENT BY DESIGN — measured -91 dB, a silent
+             AAC track the recorder writes. The voice only exists in the
+             -narrated.mp4. So the source is a choice: RAW to judge the rings
+             and the timing, NARRATED to judge whether a line fits its screen.
+             The narrated option disables itself, with its reason, when there is
+             no narrated cut yet. -->
+        <div class="srcpick" role="group" aria-label="which cut to play">
+          <button id="src-raw" class="srcbtn on" data-src="raw">raw</button>
+          <button id="src-nar" class="srcbtn" data-src="narrated">narrated</button>
+        </div>
+        <button id="mute" class="mutebtn" aria-label="mute">🔊</button>
+        <input type="range" id="scrub" min="0" max="100" step="0.04" value="0"
+               aria-label="scrub the capture">
+        <output id="scrubat" class="mono">0.00s</output>
+      </div>
+    </div>
+
+    <!-- ── the scene strip: the spine. click one, everything follows ──── -->
+    <div class="strip" id="strip" role="tablist" aria-label="scenes"></div>
+
+    <!-- ── the words ─────────────────────────────────────────────────────── -->
+    <div class="tablewrap">
+      <table class="scenes">
+        <thead>
+          <tr>
+            <th class="n">#</th>
+            <th class="l">scene</th>
+            <!-- ⚠ LEAD-IN AND EXIT ARE BACK. Carson, 2026-09-15: "bring back my
+                 lead-in and close-out dwell time of .75 sec on every scene."
+                 They were in the 11-column definition all along and this table
+                 had dropped them, so a SCENE total could not be checked against
+                 its own parts — lead + speech + beat + exit. And FRAMES, because
+                 the edit works in frames even though the timing works in
+                 seconds. -->
+            <th>clip</th><th>lead-in</th><th>speech</th><th>beat</th><th>exit</th>
+            <th>scene</th><th>gap</th><th>frames</th>
+            <th class="l">line</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<!-- One status line for the whole page. Long jobs report through it. -->
+<footer class="status" id="status" role="status" aria-live="polite"></footer>
+
+<script src="/web/vtt.js"></script>
+</body>
+</html>

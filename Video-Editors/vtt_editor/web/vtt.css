@@ -1,0 +1,350 @@
+/*
+  VTT EDITOR — the look.
+
+  ⚠ THE GROUND IS DARK BECAUSE THE CONTENT IS.
+  Every frame this page shows is the BCP admin, which is near-black. A light
+  chrome around it makes the footage look like a hole in the page and makes the
+  eye re-adjust on every scrub. The panel sits a shade above the ground so the
+  frame reads as the brightest thing on screen — which it should be, since it is
+  the thing being judged.
+
+  ⚠ THREE COLOURS, THREE MEANINGS, NEVER MIXED.
+    --accent  #5ac8fa   this is actionable, and it is cheap
+    --warn    #e0a020   this RE-ENCODES — minutes, and a new file
+    --ring    #ffd400   the recorder's own ring colour. Used ONLY where a ring
+                        is the subject, so it never competes with the footage
+                        that is full of it.
+  A fourth colour for "done" (--ok) and that is the whole palette. Two buttons
+  that cost different amounts must never look the same — that is how the wrong
+  one gets pressed.
+*/
+:root {
+  --ground:#141618;
+  --panel:#1c1f22;
+  --panel-2:#22262a;
+  --line:#2a3035;
+  --ink:#e8ecee;
+  --dim:#8b949c;
+  --dimmer:#5d666e;
+  --accent:#5ac8fa;
+  --warn:#e0a020;
+  --ok:#4ec9a0;
+  --ring:#ffd400;
+  --bad:#e06c6c;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  --rail:288px;
+}
+
+* { box-sizing:border-box; }
+html, body { height:100%; }
+body {
+  margin:0; background:var(--ground); color:var(--ink);
+  font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  display:flex; flex-direction:column;
+  /* The numbers in this page line up in columns everywhere. */
+  font-variant-numeric:tabular-nums;
+}
+
+/* ── the top bar ─────────────────────────────────────────────────────────── */
+.top {
+  flex:0 0 auto; display:flex; align-items:center; gap:18px;
+  padding:0 18px; height:52px;
+  background:var(--panel); border-bottom:1px solid var(--line);
+}
+.brand { display:flex; align-items:center; gap:9px; }
+/* The mark is the ring itself, small. This editor is about those rings. */
+.mark {
+  width:15px; height:15px; border-radius:50%;
+  border:3px solid var(--ring); flex:0 0 auto;
+}
+.name { font-weight:650; letter-spacing:-.01em; }
+.ver {
+  font:11px/1 var(--mono); color:var(--dimmer);
+  border:1px solid var(--line); border-radius:4px; padding:3px 5px;
+}
+/*
+  ⚠ ONE PATH, READ LEFT TO RIGHT. The four selects are a breadcrumb, so they are
+  spaced and separated like a path rather than sitting as four unrelated
+  controls. Each is only as wide as its content needs, which is what makes the
+  line read as `business / store / stage / folder` at a glance.
+*/
+.crumbs { display:flex; align-items:center; gap:6px; min-width:0; flex-wrap:nowrap; }
+.crumbs .sep { color:var(--dimmer); font-family:var(--mono); flex:0 0 auto; }
+.crumbs select {
+  font:12.5px/1 var(--mono); color:var(--ink);
+  background:var(--panel-2); border:1px solid var(--line); border-radius:6px;
+  padding:7px 8px; max-width:210px; min-width:0;
+  text-overflow:ellipsis;
+}
+/* The last one is the thing actually being opened, so it carries the accent. */
+.crumbs select#c-work { border-color:var(--accent); max-width:250px; }
+.crumbs select:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+.crumbs select:disabled { opacity:.4; }
+/* A folder with no script is still offered, and says so in its own label. */
+.crumbs option.noscript { color:var(--dimmer); }
+.head-meta {
+  margin-left:auto; display:flex; gap:18px; align-items:baseline;
+  font-size:11.5px; color:var(--dim);
+}
+.head-meta b { color:var(--ink); font-weight:600; font-family:var(--mono); }
+
+/* ── the shell: rail + stage ─────────────────────────────────────────────── */
+.shell { flex:1 1 auto; display:flex; min-height:0; }
+
+.rail {
+  flex:0 0 var(--rail); width:var(--rail);
+  background:var(--panel); border-right:1px solid var(--line);
+  display:flex; flex-direction:column; min-height:0;
+}
+.jobs { list-style:none; margin:0; padding:10px; flex:1 1 auto; overflow-y:auto; }
+
+/*
+  ⚠ ONE ROW PER JOB, AND THE ROW IS THE BUTTON.
+  A job's numbers and its action belong to each other — split across a label and
+  a button somewhere else, they drift. The whole row is the target; the action
+  word sits at its foot so the row reads top-to-bottom: what it is, where it
+  stands, what pressing it does.
+*/
+.job {
+  border:1px solid var(--line); border-radius:9px; background:var(--panel-2);
+  padding:11px 12px 10px; margin-bottom:9px; position:relative;
+  border-left:3px solid var(--line);
+}
+.job .jname {
+  font-size:10px; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--dim); font-weight:700;
+}
+.job .jstate {
+  font-family:var(--mono); font-size:12.5px; margin-top:4px; color:var(--ink);
+}
+.job .jwhy {
+  font-size:11.5px; color:var(--dim); margin-top:6px; line-height:1.45;
+}
+.job button {
+  font:inherit; font-size:12px; font-weight:600; margin-top:9px;
+  padding:6px 11px; border-radius:6px; cursor:pointer;
+  background:transparent; color:var(--accent); border:1px solid var(--accent);
+}
+.job button:hover:not(:disabled) {
+  background:color-mix(in srgb, var(--accent) 14%, transparent);
+}
+/* A job that re-encodes never looks like one that does not. */
+.job button.heavy { color:var(--warn); border-color:var(--warn); }
+.job button.heavy:hover:not(:disabled) {
+  background:color-mix(in srgb, var(--warn) 14%, transparent);
+}
+.job button:disabled { opacity:.4; cursor:not-allowed; }
+.job button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+
+/* The left edge carries the verdict, so the rail can be read down its side. */
+.job.ok    { border-left-color:var(--ok); }
+.job.owed  { border-left-color:var(--warn); }
+.job.stuck { border-left-color:var(--dimmer); }
+.job.rings { border-left-color:var(--ring); }
+.job.stuck .jstate { color:var(--dim); }
+
+/* ⚠ THE ARMED STATE MUST LOOK DIFFERENT, or a second click is a guess.
+   Carried over from the artifact page, where a blocked confirm() made the same
+   point the hard way: the page has to say it is waiting for the second press. */
+.job button.armed {
+  background:color-mix(in srgb, var(--warn) 18%, transparent);
+  border-color:var(--warn); color:var(--warn);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--warn) 22%, transparent);
+}
+.job button.busy { cursor:progress; }
+.job button .spin {
+  display:none; width:10px; height:10px; margin-right:6px; vertical-align:-1px;
+  border:2px solid currentColor; border-top-color:transparent; border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+.job button.busy .spin { display:inline-block; }
+@keyframes spin { to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .job button .spin { animation:none; border-top-color:currentColor; opacity:.5; }
+}
+
+.railfoot { flex:0 0 auto; padding:10px 12px 12px; border-top:1px solid var(--line); }
+.railfoot .note { font-size:11px; color:var(--dimmer); line-height:1.5; }
+
+/* ── the stage ───────────────────────────────────────────────────────────── */
+.stage { flex:1 1 auto; display:flex; flex-direction:column; min-width:0; min-height:0; }
+
+.viewer { flex:0 0 auto; padding:14px 16px 0; }
+.framewrap {
+  position:relative; background:#000; border:1px solid var(--line);
+  border-radius:10px; overflow:hidden;
+  /* The capture is 2304x1926 — close to 6:5, not 16:9. Reserving the real
+     shape stops the whole page jumping on the first frame load. */
+  aspect-ratio:2304 / 1926; max-height:46vh; margin:0 auto; width:auto;
+}
+.framewrap video { display:block; width:100%; height:100%; object-fit:contain;
+                   background:#000; }
+.frameoverlay { position:absolute; inset:0; pointer-events:none; }
+/* A logged ring, drawn over the frame. Same colour as the real one. */
+.frameoverlay .ringbox {
+  position:absolute; border:3px solid var(--ring); border-radius:6px;
+  box-shadow:0 0 0 1px rgba(0,0,0,.6);
+}
+.framenone {
+  position:absolute; inset:0; display:grid; place-items:center;
+  color:var(--dimmer); font-size:12.5px;
+}
+.framewrap.has-frame .framenone { display:none; }
+
+/* Top-right of the picture, out of the way of the admin's own header but
+   impossible to miss while watching. Dimmed, because it is a fact about the
+   file and not an error. */
+.silentbadge {
+  position:absolute; top:10px; right:10px; z-index:5;
+  background:rgba(20,22,24,.86); color:var(--dim);
+  border:1px solid var(--line); border-radius:7px;
+  padding:6px 10px; font-size:11.5px; line-height:1.4; max-width:46%;
+  pointer-events:none;
+}
+.silentbadge b { color:var(--warn); font-weight:700; }
+
+.scrub { display:flex; align-items:center; gap:10px; padding:9px 2px 0; }
+/* ⚠ PLAY IS THE ONE FILLED CONTROL ON THE PAGE. It costs nothing and it is the
+   thing a hand reaches for most, so it is the only affordance that does not
+   have to be read first. Everything that re-encodes stays outlined. */
+.scrub .play {
+  flex:0 0 auto; font:inherit; font-size:13px; line-height:1; cursor:pointer;
+  width:34px; height:30px; border-radius:7px;
+  background:var(--accent); color:#06232e; border:1px solid var(--accent);
+  font-weight:700;
+}
+.scrub .play:hover { filter:brightness(1.1); }
+.scrub .play.playing { background:transparent; color:var(--accent); }
+.scrub .playall {
+  flex:0 0 auto; font:inherit; font-size:11px; cursor:pointer;
+  padding:7px 9px; border-radius:7px; background:transparent;
+  color:var(--dim); border:1px solid var(--line);
+}
+.scrub .playall:hover { color:var(--ink); border-color:var(--dim); }
+.scrub .play:focus-visible, .scrub .playall:focus-visible,
+.scrub .srcbtn:focus-visible, .scrub .mutebtn:focus-visible {
+  outline:2px solid var(--accent); outline-offset:2px;
+}
+
+/* Two states of one choice, so they read as a pair rather than two buttons. */
+.srcpick { flex:0 0 auto; display:flex; border:1px solid var(--line); border-radius:7px;
+           overflow:hidden; }
+.srcbtn {
+  font:inherit; font-size:11px; cursor:pointer; padding:7px 10px;
+  background:transparent; color:var(--dim); border:0;
+}
+.srcbtn + .srcbtn { border-left:1px solid var(--line); }
+.srcbtn:hover:not(:disabled) { color:var(--ink); }
+.srcbtn.on { background:var(--panel-2); color:var(--ink); font-weight:600; }
+/* ⚠ A SOURCE THAT DOES NOT EXIST IS DISABLED WITH ITS REASON IN THE TOOLTIP,
+   never hidden — the same rule as the job rows. */
+.srcbtn:disabled { opacity:.35; cursor:not-allowed; }
+.mutebtn {
+  flex:0 0 auto; font:inherit; font-size:12px; cursor:pointer;
+  padding:6px 8px; border-radius:7px; background:transparent;
+  color:var(--dim); border:1px solid var(--line);
+}
+.mutebtn:hover { color:var(--ink); border-color:var(--dim); }
+/* ⚠ A SILENT SOURCE SAYS SO ON THE CONTROL. The raw capture has an audio
+   track and it is digital silence; a speaker icon that looks live over silence
+   is how you spend ten minutes checking your own volume. */
+.mutebtn.silent { color:var(--dimmer); border-style:dashed; }
+.scrub input { flex:1 1 auto; accent-color:var(--accent); }
+.scrub output { flex:0 0 auto; font-family:var(--mono); font-size:12px; color:var(--dim); }
+
+/*
+  ⚠ THE SCENE STRIP IS THE SPINE. Click a scene and the frame, the table row and
+  the rings all follow it. One selected thing, everywhere — the alternative is
+  three panels each with their own idea of where you are.
+*/
+.strip {
+  flex:0 0 auto; display:flex; gap:5px; overflow-x:auto;
+  padding:12px 16px; margin-top:4px;
+}
+.strip button {
+  flex:0 0 auto; font:inherit; font-size:11.5px; cursor:pointer;
+  background:var(--panel); color:var(--dim);
+  border:1px solid var(--line); border-radius:7px; padding:6px 10px;
+  display:flex; flex-direction:column; gap:2px; align-items:flex-start;
+  min-width:96px; text-align:left;
+}
+.strip button .sn { font-family:var(--mono); font-size:10px; color:var(--dimmer); }
+.strip button .sl { color:inherit; white-space:nowrap; }
+.strip button:hover { border-color:var(--dim); color:var(--ink); }
+.strip button[aria-selected="true"] {
+  background:var(--panel-2); color:var(--ink); border-color:var(--accent);
+}
+/* A screen too short for its line is the defect this whole tool exists for. */
+.strip button.short { border-color:var(--warn); }
+.strip button.short .sn { color:var(--warn); }
+.strip button.silent .sl { font-style:italic; color:var(--dimmer); }
+
+/* ── the table ───────────────────────────────────────────────────────────── */
+.tablewrap {
+  flex:1 1 auto; min-height:0; overflow:auto;
+  margin:0 16px 16px; background:var(--panel);
+  border:1px solid var(--line); border-radius:10px;
+}
+table.scenes { border-collapse:collapse; width:100%; }
+table.scenes th {
+  position:sticky; top:0; z-index:2; background:var(--panel);
+  text-align:right; font-size:10px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--dim); font-weight:700; padding:10px 11px;
+  border-bottom:1px solid var(--line); white-space:nowrap;
+}
+table.scenes th.l, table.scenes td.l { text-align:left; }
+table.scenes th.n, table.scenes td.n { text-align:right; width:38px; }
+table.scenes td {
+  padding:8px 11px; border-bottom:1px solid var(--line);
+  vertical-align:baseline; font-family:var(--mono); font-size:12.5px;
+  text-align:right; white-space:nowrap; color:var(--ink);
+}
+table.scenes td.n { color:var(--dimmer); }
+table.scenes td.lab {
+  text-align:left; font-family:inherit; font-weight:600; white-space:nowrap;
+}
+table.scenes td.dim { color:var(--dimmer); }
+table.scenes td.gapbad { color:var(--warn); font-weight:700; }
+table.scenes tr.sel td { background:var(--panel-2); }
+table.scenes tr.sel td.lab { box-shadow:inset 3px 0 0 var(--accent); }
+
+/* The line is the one editable thing on the row, and it looks it. */
+td.line { text-align:left; width:100%; font-family:inherit; white-space:normal; }
+.linebox {
+  color:var(--ink); outline:none; border-radius:5px; padding:4px 7px;
+  margin:0 -7px; border:1px dashed transparent; min-height:1.4em;
+  font-style:italic; color:#b9c2c8;
+}
+.linebox:hover { border-color:var(--line); }
+.linebox:focus {
+  border-color:var(--accent); border-style:solid; font-style:normal;
+  color:var(--ink); background:var(--ground);
+}
+.linebox.empty:empty::before {
+  content:attr(data-ph); color:var(--dimmer); font-style:normal;
+}
+.linebox.empty:focus:empty::before { content:""; }
+.linebox.saving { border-color:var(--accent); border-style:solid; }
+.linebox.saved  { border-color:var(--ok); border-style:solid; }
+.linebox.failed { border-color:var(--bad); border-style:solid; }
+
+/* ── the one status line ─────────────────────────────────────────────────── */
+.status {
+  flex:0 0 auto; min-height:30px; padding:6px 18px;
+  background:var(--panel); border-top:1px solid var(--line);
+  font-size:12px; color:var(--dim); font-family:var(--mono);
+  display:flex; align-items:center; gap:8px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.status.ok  { color:var(--ok); }
+.status.bad { color:var(--bad); }
+.status.work { color:var(--accent); }
+
+/* ── narrow: the rail goes on top rather than squeezing the frame ───────── */
+@media (max-width: 960px) {
+  .shell { flex-direction:column; }
+  .rail { flex:0 0 auto; width:auto; border-right:none; border-bottom:1px solid var(--line); }
+  .jobs { display:flex; gap:9px; overflow-x:auto; }
+  .job { margin:0; min-width:212px; }
+  .framewrap { max-height:38vh; }
+}

@@ -195,6 +195,139 @@ NOTE and no cue by design.
 Regenerating it from a recipe spec throws the edit away, along with the fields a
 spec cannot carry — the silent flags, the chapter anchors, the per-scene notes.
 
+## THE FIVE JOBS OF A FIRST EDIT — and vtt_editor drives them
+
+Carson, 2026-09-15: *"This will be the first edit on the raw video and will do
+the following things: Add the yellow rings to the click event triggers. Break
+the raw into our segments. Into the scenes. Add some descriptive narrative. And
+add the voice… I want to make this its own editor inside the Video-Editors
+folder and call it `vtt_editor`."*
+
+    cd ~/Rentify/Video-Editor/Video-Editors
+    python3 vtt_editor/serve.py               # http://localhost:8848
+
+Or from `Basic_E2E_Testing/.claude/launch.json` as **`vtt-editor`**. Five jobs,
+one rail, each row showing its own state and its own blocker.
+
+| job | reads | writes |
+|---|---|---|
+| **RINGS** | `<capture>.clicks.jsonl` | nothing — it shows them on the frame |
+| **SEGMENTS** | `stretch_report.json`'s confirmed edges | `segments/` (cached cuts) |
+| **SCENES** | `segments/` | `sandbox/<NN-label>/segment.mp4` |
+| **NARRATIVE** | `script.json` | `script.json` + `.bak`, then `vtt_build.py` verifies |
+| **VOICE** | the script and the edges | `-narrated.mp4` |
+
+⚠ **NOTHING IN THE EDITOR RE-IMPLEMENTS A TOOL.** It shells out to
+`stretch_scenes.py`, `stretch_request.py`, `narrate_mac.py` and `vtt_build.py`,
+and resolves the scene layout through `editor_base/paths.py`. A second copy of
+an ffmpeg recipe is a second copy to get wrong.
+
+### ⚠ THE RINGS ARE ALREADY IN EVERY CAPTURE — border-only, 750ms
+
+This is the part that reads like new work and is not. `instrumentClicks` is
+patched onto every page in `Core/lib/browser.ts`, and the recorder sets:
+
+    record_flow.ts:381   CLICK_HIGHLIGHT_MS   = 750    the ring holds 0.75s
+    record_flow.ts:393   CLICK_HIGHLIGHT_FILL = 0      the fill is OFF
+
+**Border only, no yellow wash** — Carson, 2026-09-09: *"we will only use the
+rings from now on. Looks better."* Reaffirmed 2026-09-15 when he asked *"Are
+they done with the yellow background fill or just the rings?"* and chose to keep
+it. The fill exists in `highlightCss()` and defaults to 0.35 when nobody
+overrides it; the recorder always overrides it. `set_collection_options.ts:129`
+also passes `{fill: 0}` for the one screen where a wash was proven unreadable.
+
+⚠ **AND A WARNING ABOUT MEASURING IT.** A scan that downscaled the video to
+320px reported "no yellow anywhere" on a capture that plainly has rings — a 3px
+outline at 2304px wide is 0.4px at 320. **Never measure a thin line on a
+downscaled frame.** Pull a full-resolution frame at a moment a click happens and
+look at it; a typing ring is held for seconds and is the easiest to catch.
+
+### ⚠ THE CLICK LOG — new on 2026-09-15, and older captures have none
+
+Rings were burnt into the pixels with no record of where or when, so nothing
+downstream could move, extend or remove one. Now `holdFlash()` — the one choke
+point every ring goes through — appends a line as it lights:
+
+    {"t": 4.10, "kind": "click", "fill": 0, "held_ms": 750,
+     "selector": "#go", "x": 300, "y": 120, "w": 160, "h": 44}
+
+Written as **JSONL, appended synchronously**: a flow that crashes half way
+through still leaves every ring it drew, which is exactly the run whose footage
+you most want. Filed as `<capture>.clicks.jsonl` beside the capture.
+
+⚠ **`t` IS SECONDS INTO THE CAPTURE, AND THE LEAD-IN TRIM MOVES IT.** OBS starts
+before the flow does, so `record_flow.ts` passes the recording's start as
+`CLICK_LOG_T0`. Then `trim_lead.py` cuts the dead opening off the FRONT of that
+same file — so every `t` shifts. `record_flow.ts` reads the trim's own JSON
+(`cut`) and rebases the log, recording the amount in the header. Caught before
+shipping by reading what happens to a capture AFTER it is saved; left alone the
+numbers stay plausible and land on the wrong frames.
+
+⚠ **THE RECT IS CSS PIXELS OF THE PAGE, NOT PIXELS OF THE VIDEO.** The capture
+is a cropped window region on a scaled monitor. The log's first line is a
+GEOMETRY HEADER carrying the window region and the chrome crop, and the
+transform happens in the page where the rendered frame's size is also known.
+
+⚠ **ONE RING, ONE LINE.** `page.click` goes through `handle.click` and both are
+patched, so a single click wrote TWO entries until an `inPageClick` depth guard
+was added. Measured on a two-action harness that logged three rings.
+
+⚠ **OFF UNLESS `CLICK_LOG_PATH` IS SET**, and read lazily rather than captured
+at import — a module-level const meant the env had to be set before the file was
+imported, which is true for the spawned flow and a trap for anything else.
+
+### The three surfaces, corrected
+
+    vtt_editor          localhost:8848. THE place to do a first edit.
+    the artifact page   stays — the one that opens anywhere.
+    the SAE's EVTT      stays — it covers a BUILT video's sandbox/.
+    serve_vtt.py        GONE. Replaced, with its vtt-live entry (8847).
+
+⚠ `serve_vtt.py` was one writer too many: it and an artifact page could both
+hold `script.json` open, and on 2026-09-14 it was left running after being
+reported stopped.
+
+### ⚠ THE HELP-VIDEO FOLDER LAYOUT — ski-demo SPLIT, THE OTHERS HAVE NOT
+
+Carson reorganised ski-demo on 2026-09-15: *"Review the ski-demo help-video
+folder structure I just updated to keep me a bit better organized."*
+
+    ski-demo/help-videos/            the OTHER three stores/
+      BCP_raw_mp4/                     raw_mp4/            ← still flat
+      UI_raw_mp4/                      videos/
+      development_videos/              development/
+      Completed_Videos/                z_History/
+      z_History/
+
+**Raw captures split by SURFACE** — `BCP_raw_mp4` for the admin recipes,
+`UI_raw_mp4` for the renter flows. `videos/` became `development_videos/`, and
+`Completed_Videos/` is new.
+
+⚠ **NEVER HARDCODE `raw_mp4` AGAIN, AND NEVER RENAME IT EITHER.** Only ski-demo
+moved; alpine-sports, bike-demo and canoe-demo are still flat. A rename breaks
+three stores and a hardcode breaks one — so the folder name is READ OFF DISK,
+every time. Two places do it:
+
+    record_flow.ts   rawSubdirFor(storeRoot, surface)  — picks BCP_/UI_ when the
+                     store has them, else raw_mp4. Asks the DESTINATION repo,
+                     not this one, because the split folders live over there.
+    scene_script.py  looks for the recipe under BCP_raw_mp4, UI_raw_mp4, then
+                     raw_mp4, and takes whichever already holds it.
+
+⚠ **A STORE THAT SPLITS LATER NEEDS NO CODE CHANGE.** Both checks are on what
+exists, not on the store's name. That is the point of doing it this way.
+
+⚠ **vtt_editor NEEDED NOTHING.** Its breadcrumb walks `help-videos/*` rather
+than assuming a name, so it showed the new folders the moment they appeared —
+`BCP_raw_mp4 (4/4)`, `UI_raw_mp4 (5/11)`, `development_videos (1/1)`. That is
+what a generic walk buys.
+
+⚠ **`mp4_splitter/serve.py` STILL HARDCODES `raw_mp4`** (lines 355, 660-661).
+It is a different editor, the editor scope lock applies, and it has not been
+touched. Its store rows will not jump to ski-demo's captures until someone with
+a go-ahead fixes it.
+
 ## PUBLISH and STRETCH — the two actions on the table
 
 Carson, 2026-09-14 and 2026-09-15. A VTT table is not only a report; it is
