@@ -1,0 +1,242 @@
+{
+ "source": "bike-demo_owner-plus-one-invite-one-item-each_dev_15-12-20_v3.mp4",
+ "output": "bike-demo_owner-plus-one-invite-one-item-each_dev_15-12-20_v3-stretched.mp4",
+ "output_seconds": 98.47,
+ "scenes": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "src_in": 2.37,
+   "src_out": 7.93,
+   "on_camera": 5.56,
+   "scene_needs": 4.4,
+   "built": 5.57,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "src_in": 7.93,
+   "src_out": 8.5,
+   "on_camera": 0.57,
+   "scene_needs": 0.8,
+   "built": 0.77,
+   "factor": 1.4035,
+   "stretched": true
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "src_in": 8.5,
+   "src_out": 11.87,
+   "on_camera": 3.37,
+   "scene_needs": 2.4,
+   "built": 3.37,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 4,
+   "label": "new-order",
+   "src_in": 11.87,
+   "src_out": 16.4,
+   "on_camera": 4.53,
+   "scene_needs": 4.1,
+   "built": 4.53,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 5,
+   "label": "add-a-person",
+   "src_in": 16.4,
+   "src_out": 19.2,
+   "on_camera": 2.8,
+   "scene_needs": 2.4,
+   "built": 2.8,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 6,
+   "label": "member-added",
+   "src_in": 19.2,
+   "src_out": 21.63,
+   "on_camera": 2.43,
+   "scene_needs": 2.4,
+   "built": 2.43,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 7,
+   "label": "item-catalogue",
+   "src_in": 21.63,
+   "src_out": 31.27,
+   "on_camera": 9.64,
+   "scene_needs": 8.8,
+   "built": 9.63,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 8,
+   "label": "first-dates",
+   "src_in": 31.27,
+   "src_out": 38.47,
+   "on_camera": 7.2,
+   "scene_needs": 5.3,
+   "built": 7.2,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 9,
+   "label": "first-item-added",
+   "src_in": 38.47,
+   "src_out": 41.7,
+   "on_camera": 3.23,
+   "scene_needs": 2.7,
+   "built": 3.23,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 10,
+   "label": "add-party-member",
+   "src_in": 41.7,
+   "src_out": 43.53,
+   "on_camera": 1.83,
+   "scene_needs": 0.8,
+   "built": 1.83,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 11,
+   "label": "party-members",
+   "src_in": 43.53,
+   "src_out": 47.5,
+   "on_camera": 3.97,
+   "scene_needs": 4.1,
+   "built": 4.07,
+   "factor": 1.0327,
+   "stretched": true
+  },
+  {
+   "n": 12,
+   "label": "invite-the-member",
+   "src_in": 47.5,
+   "src_out": 48.93,
+   "on_camera": 1.43,
+   "scene_needs": 0.8,
+   "built": 1.43,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 13,
+   "label": "member-two-added",
+   "src_in": 48.93,
+   "src_out": 51.9,
+   "on_camera": 2.97,
+   "scene_needs": 3.2,
+   "built": 3.17,
+   "factor": 1.0774,
+   "stretched": true
+  },
+  {
+   "n": 14,
+   "label": "second-catalogue",
+   "src_in": 51.9,
+   "src_out": 61.53,
+   "on_camera": 9.63,
+   "scene_needs": 5.0,
+   "built": 9.63,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 15,
+   "label": "second-dates",
+   "src_in": 61.53,
+   "src_out": 68.77,
+   "on_camera": 7.24,
+   "scene_needs": 5.0,
+   "built": 7.23,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 16,
+   "label": "both-items",
+   "src_in": 68.77,
+   "src_out": 71.03,
+   "on_camera": 2.26,
+   "scene_needs": 2.7,
+   "built": 2.7,
+   "factor": 1.1947,
+   "stretched": true
+  },
+  {
+   "n": 17,
+   "label": "the-questions",
+   "src_in": 71.03,
+   "src_out": 85.2,
+   "on_camera": 14.17,
+   "scene_needs": 13.4,
+   "built": 14.17,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 18,
+   "label": "order-total",
+   "src_in": 85.2,
+   "src_out": 88.23,
+   "on_camera": 3.03,
+   "scene_needs": 3.0,
+   "built": 3.03,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 19,
+   "label": "checkout",
+   "src_in": 88.23,
+   "src_out": 92.8,
+   "on_camera": 4.57,
+   "scene_needs": 3.2,
+   "built": 4.57,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 20,
+   "label": "order-complete",
+   "src_in": 92.8,
+   "src_out": 94.97,
+   "on_camera": 2.17,
+   "scene_needs": 0.8,
+   "built": 2.17,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 21,
+   "label": "back-to-dashboard",
+   "src_in": 94.97,
+   "src_out": 99.9,
+   "on_camera": 4.93,
+   "scene_needs": 4.4,
+   "built": 4.93,
+   "factor": 1.0,
+   "stretched": false
+  }
+ ],
+ "segments_reused": 21,
+ "segments_encoded": 0,
+ "fps": 30.0,
+ "_output_removed": "bike-demo_owner-plus-one-invite-one-item-each_dev_15-12-20_v3-stretched.mp4 was deleted after narration — it is picture-only and silent by design, and its name reads like the finished cut. Rebuild it in ~20s from segments/: python3 scripts/stretch_request.py \"<this folder>\""
+}

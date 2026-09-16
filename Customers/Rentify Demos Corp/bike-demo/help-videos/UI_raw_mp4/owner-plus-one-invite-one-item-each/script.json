@@ -1,0 +1,311 @@
+{
+ "_note": "Renter flow owner-plus-one-invite-one-item-each. Cut from bike-demo_owner-plus-one-invite-one-item-each_dev_15-12-20_v3.mp4 (100.07s). EDGES CONFIRMED 2026-09-15 by reading a contact sheet of every candidate and keeping only the real screen changes. Nine candidates dropped: a duplicate frame, the New Order ring and its transition, rings landing on a screen already open, an email being typed into a panel already showing, the questions once filled, the pay spinner, and one edge past the last real frame. JUNK RE-MEASURED by first_edit.py: 2.37s-99.97s became 2.37s-99.9s.",
+ "_edges": "CONFIRMED",
+ "store": "ski-demo",
+ "title": "Booking for two riders",
+ "words_per_second": 3.44,
+ "_lead_in_seconds": 0.75,
+ "_footage_seconds": 100.07,
+ "_dead_lead_in_seconds": 2.37,
+ "_dead_tail_seconds": 0.17,
+ "_dead_note": "The capture opens and closes on the macOS wallpaper, with white flash frames between it and the app. Scene 1 starts at 2.37s and the last scene ends at 99.97s, so no junk is inside any segment. The MASTER is untouched.",
+ "_fps": 30.0,
+ "_frames_note": "`frames` on each scene is its own footage at 30fps — the rate was MEASURED, never assumed 25.",
+ "scenes": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "line": "Two riders, one booking. Enter your email for a code.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 167,
+   "raw-source": "5.56s on camera",
+   "target-length": "4.4 seconds."
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 17,
+   "raw-source": "0.57s on camera",
+   "target-length": "0.57 seconds."
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "line": "Tap New Order.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 101,
+   "raw-source": "3.37s on camera",
+   "target-length": "2.4 seconds."
+  },
+  {
+   "n": 4,
+   "label": "new-order",
+   "line": "Your order opens empty, so add the first rider.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 136,
+   "raw-source": "4.53s on camera",
+   "target-length": "4.1 seconds."
+  },
+  {
+   "n": 5,
+   "label": "add-a-person",
+   "line": "Add yourself first.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 84,
+   "raw-source": "2.8s on camera",
+   "target-length": "2.4 seconds."
+  },
+  {
+   "n": 6,
+   "label": "member-added",
+   "line": "You are added.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 73,
+   "raw-source": "2.43s on camera",
+   "target-length": "2.4 seconds."
+  },
+  {
+   "n": 7,
+   "label": "item-catalogue",
+   "line": "Open a collection and choose your own bike. The size and the colour are picked right here on the row, before you check the dates.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 289,
+   "raw-source": "9.64s on camera",
+   "target-length": "8.8 seconds."
+  },
+  {
+   "n": 8,
+   "label": "first-dates",
+   "line": "Pick the day you collect it, then the day you bring it back.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 216,
+   "raw-source": "7.2s on camera",
+   "target-length": "5.3 seconds."
+  },
+  {
+   "n": 9,
+   "label": "first-item-added",
+   "line": "Your bike is booked.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 97,
+   "raw-source": "3.23s on camera",
+   "target-length": "2.7 seconds."
+  },
+  {
+   "n": 10,
+   "label": "add-party-member",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 55,
+   "raw-source": "1.83s on camera",
+   "target-length": "1.83 seconds."
+  },
+  {
+   "n": 11,
+   "label": "party-members",
+   "line": "Now invite the second rider to the same order.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 119,
+   "raw-source": "3.97s on camera",
+   "target-length": "4.1 seconds."
+  },
+  {
+   "n": 12,
+   "label": "invite-the-member",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 43,
+   "raw-source": "1.43s on camera",
+   "target-length": "1.43 seconds."
+  },
+  {
+   "n": 13,
+   "label": "member-two-added",
+   "line": "They are on the order too.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 89,
+   "raw-source": "2.97s on camera",
+   "target-length": "3.2 seconds."
+  },
+  {
+   "n": 14,
+   "label": "second-catalogue",
+   "line": "Choose their bike the same way, size and colour on the row.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 289,
+   "raw-source": "9.63s on camera",
+   "target-length": "5.0 seconds."
+  },
+  {
+   "n": 15,
+   "label": "second-dates",
+   "line": "Their dates go on their own calendar, so you need not match.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 217,
+   "raw-source": "7.24s on camera",
+   "target-length": "5.0 seconds."
+  },
+  {
+   "n": 16,
+   "label": "both-items",
+   "line": "Both bikes are booked.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 68,
+   "raw-source": "2.26s on camera",
+   "target-length": "2.7 seconds."
+  },
+  {
+   "n": 17,
+   "label": "the-questions",
+   "line": "Now the questions, one set per rider. Age and height for you, then the same for them on their own card. We set every frame and saddle from these numbers. Then agree to the terms for both of you, and save.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 425,
+   "raw-source": "14.17s on camera",
+   "target-length": "13.4 seconds."
+  },
+  {
+   "n": 18,
+   "label": "order-total",
+   "line": "One total for the pair.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 91,
+   "raw-source": "3.03s on camera",
+   "target-length": "3.0 seconds."
+  },
+  {
+   "n": 19,
+   "label": "checkout",
+   "line": "One payment covers the whole order.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 137,
+   "raw-source": "4.57s on camera",
+   "target-length": "3.2 seconds."
+  },
+  {
+   "n": 20,
+   "label": "order-complete",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 65,
+   "raw-source": "2.17s on camera",
+   "target-length": "2.17 seconds."
+  },
+  {
+   "n": 21,
+   "label": "back-to-dashboard",
+   "line": "Both bikes sit under this one booking in your history.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 148,
+   "raw-source": "4.93s on camera",
+   "target-length": "4.4 seconds."
+  }
+ ]
+}

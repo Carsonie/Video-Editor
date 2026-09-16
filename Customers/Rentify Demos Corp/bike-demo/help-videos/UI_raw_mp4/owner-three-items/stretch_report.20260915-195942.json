@@ -1,0 +1,230 @@
+{
+ "source": "bike-demo_owner-three-items_dev_15-11-47_v2.mp4",
+ "output": "bike-demo_owner-three-items_dev_15-11-47_v2-stretched.mp4",
+ "output_seconds": 106.9,
+ "scenes": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "src_in": 2.33,
+   "src_out": 7.8,
+   "on_camera": 5.47,
+   "scene_needs": 4.7,
+   "built": 5.47,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "src_in": 7.8,
+   "src_out": 8.27,
+   "on_camera": 0.47,
+   "scene_needs": 0.8,
+   "built": 0.77,
+   "factor": 1.7021,
+   "stretched": true
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "src_in": 8.27,
+   "src_out": 11.67,
+   "on_camera": 3.4,
+   "scene_needs": 2.4,
+   "built": 3.4,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 4,
+   "label": "new-order",
+   "src_in": 11.67,
+   "src_out": 16.23,
+   "on_camera": 4.56,
+   "scene_needs": 4.4,
+   "built": 4.57,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 5,
+   "label": "add-a-person",
+   "src_in": 16.23,
+   "src_out": 18.97,
+   "on_camera": 2.74,
+   "scene_needs": 3.0,
+   "built": 2.97,
+   "factor": 1.0949,
+   "stretched": true
+  },
+  {
+   "n": 6,
+   "label": "member-added",
+   "src_in": 18.97,
+   "src_out": 21.5,
+   "on_camera": 2.53,
+   "scene_needs": 2.4,
+   "built": 2.53,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 7,
+   "label": "item-catalogue",
+   "src_in": 21.5,
+   "src_out": 31.13,
+   "on_camera": 9.63,
+   "scene_needs": 9.1,
+   "built": 9.63,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 8,
+   "label": "first-dates",
+   "src_in": 31.13,
+   "src_out": 39.97,
+   "on_camera": 8.84,
+   "scene_needs": 5.3,
+   "built": 8.83,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 9,
+   "label": "first-item-added",
+   "src_in": 39.97,
+   "src_out": 42.33,
+   "on_camera": 2.36,
+   "scene_needs": 2.4,
+   "built": 2.4,
+   "factor": 1.0169,
+   "stretched": true
+  },
+  {
+   "n": 10,
+   "label": "second-catalogue",
+   "src_in": 42.33,
+   "src_out": 51.93,
+   "on_camera": 9.6,
+   "scene_needs": 7.0,
+   "built": 9.6,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 11,
+   "label": "second-dates",
+   "src_in": 51.93,
+   "src_out": 60.8,
+   "on_camera": 8.87,
+   "scene_needs": 5.6,
+   "built": 8.87,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 12,
+   "label": "second-item-added",
+   "src_in": 60.8,
+   "src_out": 63.17,
+   "on_camera": 2.37,
+   "scene_needs": 2.4,
+   "built": 2.37,
+   "factor": 1.0127,
+   "stretched": true
+  },
+  {
+   "n": 13,
+   "label": "third-catalogue",
+   "src_in": 63.17,
+   "src_out": 72.8,
+   "on_camera": 9.63,
+   "scene_needs": 7.6,
+   "built": 9.63,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 14,
+   "label": "third-dates",
+   "src_in": 72.8,
+   "src_out": 81.67,
+   "on_camera": 8.87,
+   "scene_needs": 4.4,
+   "built": 8.87,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 15,
+   "label": "three-items",
+   "src_in": 81.67,
+   "src_out": 83.87,
+   "on_camera": 2.2,
+   "scene_needs": 2.7,
+   "built": 2.7,
+   "factor": 1.2273,
+   "stretched": true
+  },
+  {
+   "n": 16,
+   "label": "the-questions",
+   "src_in": 83.87,
+   "src_out": 92.77,
+   "on_camera": 8.9,
+   "scene_needs": 9.6,
+   "built": 9.6,
+   "factor": 1.0787,
+   "stretched": true
+  },
+  {
+   "n": 17,
+   "label": "order-total",
+   "src_in": 92.77,
+   "src_out": 95.8,
+   "on_camera": 3.03,
+   "scene_needs": 3.0,
+   "built": 3.03,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 18,
+   "label": "checkout",
+   "src_in": 95.8,
+   "src_out": 100.33,
+   "on_camera": 4.53,
+   "scene_needs": 3.0,
+   "built": 4.53,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 19,
+   "label": "order-complete",
+   "src_in": 100.33,
+   "src_out": 102.43,
+   "on_camera": 2.1,
+   "scene_needs": 0.8,
+   "built": 2.1,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 20,
+   "label": "back-to-dashboard",
+   "src_in": 102.43,
+   "src_out": 107.47,
+   "on_camera": 5.04,
+   "scene_needs": 4.1,
+   "built": 5.03,
+   "factor": 1.0,
+   "stretched": false
+  }
+ ],
+ "segments_reused": 0,
+ "segments_encoded": 20,
+ "fps": 30.0
+}

@@ -158,8 +158,7 @@
    "stretched": true
   }
  ],
- "segments_reused": 14,
- "segments_encoded": 0,
- "fps": 30.0,
- "_output_removed": "ski-demo_one-day-rental-owner-one-item_dev_15-16-30_v1-stretched.mp4 was deleted after narration — it is picture-only and silent by design, and its name reads like the finished cut. Rebuild it in ~20s from segments/: python3 scripts/stretch_request.py \"<this folder>\""
+ "segments_reused": 0,
+ "segments_encoded": 14,
+ "fps": 30.0
 }

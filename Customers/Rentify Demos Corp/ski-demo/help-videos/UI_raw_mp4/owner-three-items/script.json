@@ -1,0 +1,311 @@
+{
+ "_note": "Renter flow owner-three-items. Cut from ski-demo_owner-three-items_dev_15-10-52_v1.mp4 (108.1s). EDGES CONFIRMED 2026-09-15 by reading a contact sheet of every candidate and keeping only the real screen changes. 16 of 36 candidates dropped: a duplicate frame, the New Order click and its transition, eleven rings, scrolls and dropdowns inside the three catalogue visits, a Continue ring on a screen already open, the questions once filled, the pay spinner, and the account menu opening after the last real frame. TAIL RE-TRIMMED 2026-09-15: the last scene ended 108.0s, which kept 2 junk frame(s); it now ends 107.93s.",
+ "_edges": "CONFIRMED",
+ "store": "ski-demo",
+ "title": "Renting three items at once",
+ "words_per_second": 3.44,
+ "_lead_in_seconds": 0.75,
+ "_footage_seconds": 108.1,
+ "_dead_lead_in_seconds": 2.73,
+ "_dead_tail_seconds": 0.17,
+ "_dead_note": "The capture opens and closes on the macOS wallpaper, with white flash frames between it and the app. Scene 1 starts at 2.73s and the last scene ends at 108.0s, so no junk is inside any segment. The MASTER is untouched.",
+ "_fps": 30.0,
+ "_frames_note": "`frames` on each scene is its own footage at 30fps — the rate was MEASURED, never assumed 25.",
+ "scenes": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "line": "Renting three items on one order. {0.3} Enter your email to sign in.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 160,
+   "raw-source": "5.34s on camera",
+   "target-length": "5.3 seconds."
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 15,
+   "raw-source": "0.5s on camera",
+   "target-length": "0.5 seconds."
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "line": "Tap New Order to start.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 101,
+   "raw-source": "3.36s on camera",
+   "target-length": "3.0 seconds."
+  },
+  {
+   "n": 4,
+   "label": "new-order",
+   "line": "Your order opens empty, so add yourself to it first.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 136,
+   "raw-source": "4.54s on camera",
+   "target-length": "4.4 seconds."
+  },
+  {
+   "n": 5,
+   "label": "add-a-person",
+   "line": "Add yourself to the order.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 83,
+   "raw-source": "2.76s on camera",
+   "target-length": "3.0 seconds."
+  },
+  {
+   "n": 6,
+   "label": "member-added",
+   "line": "You are on it now.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 75,
+   "raw-source": "2.5s on camera",
+   "target-length": "3.0 seconds."
+  },
+  {
+   "n": 7,
+   "label": "item-catalogue",
+   "line": "Open a collection to see what is inside it. {0.3} Each collection holds gear of one kind, so you can compare before you choose. {0.3} Start with the board.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 289,
+   "raw-source": "9.64s on camera",
+   "target-length": "9.9 seconds."
+  },
+  {
+   "n": 8,
+   "label": "first-dates",
+   "line": "Pick the pickup day, then the return day. {0.3} We hold it for every day between.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 216,
+   "raw-source": "7.2s on camera",
+   "target-length": "6.2 seconds."
+  },
+  {
+   "n": 9,
+   "label": "first-item-added",
+   "line": "One item down.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 71,
+   "raw-source": "2.36s on camera",
+   "target-length": "2.4 seconds."
+  },
+  {
+   "n": 10,
+   "label": "second-catalogue",
+   "line": "Go back to the catalogue for the second item, a ski package this time.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 178,
+   "raw-source": "5.94s on camera",
+   "target-length": "5.6 seconds."
+  },
+  {
+   "n": 11,
+   "label": "second-dates",
+   "line": "Each item gets its own dates, so you can take one out for longer than another.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 217,
+   "raw-source": "7.23s on camera",
+   "target-length": "6.2 seconds."
+  },
+  {
+   "n": 12,
+   "label": "second-item-added",
+   "line": "That is two on the order.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 71,
+   "raw-source": "2.37s on camera",
+   "target-length": "3.2 seconds."
+  },
+  {
+   "n": 13,
+   "label": "third-catalogue",
+   "line": "Once more for the third item. {0.3} There is no limit here — keep adding while the order is still open, and the running total follows along.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 289,
+   "raw-source": "9.63s on camera",
+   "target-length": "9.4 seconds."
+  },
+  {
+   "n": 14,
+   "label": "third-dates",
+   "line": "Dates for the third item, the same way as the others.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 217,
+   "raw-source": "7.23s on camera",
+   "target-length": "4.7 seconds."
+  },
+  {
+   "n": 15,
+   "label": "three-items",
+   "line": "All three are booked.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 67,
+   "raw-source": "2.24s on camera",
+   "target-length": "2.7 seconds."
+  },
+  {
+   "n": 16,
+   "label": "the-questions",
+   "line": "Now the questions. {0.3} Your height, your boot size, your skill level, your weight and your age. {0.3} You answer these once, and they apply across every item on the order, so three items is no more work than one. {0.3} Then agree to the terms and save.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 532,
+   "raw-source": "17.73s on camera",
+   "target-length": "15.5 seconds."
+  },
+  {
+   "n": 17,
+   "label": "order-total",
+   "line": "Check the total, then pay.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 89,
+   "raw-source": "2.97s on camera",
+   "target-length": "3.0 seconds."
+  },
+  {
+   "n": 18,
+   "label": "checkout",
+   "line": "One payment covers all three items.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 138,
+   "raw-source": "4.6s on camera",
+   "target-length": "3.2 seconds."
+  },
+  {
+   "n": 19,
+   "label": "order-complete",
+   "line": "The order is complete.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 63,
+   "raw-source": "2.1s on camera",
+   "target-length": "2.7 seconds."
+  },
+  {
+   "n": 20,
+   "label": "back-to-dashboard",
+   "line": "All three rentals sit together in your order history.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 149,
+   "raw-source": "4.96s on camera",
+   "target-length": "4.1 seconds."
+  }
+ ]
+}

@@ -1,0 +1,586 @@
+{
+ "_note": "Renter flow owner-plus-three-invites-two-items-each. Cut from bike-demo_owner-plus-three-invites-two-items-each_dev_15-12-24_v3.mp4 (248.8s). EDGES CONFIRMED 2026-09-15 by reading a contact sheet of every candidate and keeping only the real screen changes. 34 of 81 candidates dropped: a duplicate frame, the New Order ring and its transition, rings inside the eight catalogue visits, rings landing on a screen already open, emails typed into a panel already showing, two exactly duplicated edge times, six scrolls inside the long questions screen, the Pay click, and the pay spinner. The seven repeated cycles are SILENT on purpose.",
+ "_edges": "CONFIRMED",
+ "store": "ski-demo",
+ "title": "Booking for a party of four",
+ "words_per_second": 3.44,
+ "_lead_in_seconds": 0.75,
+ "_footage_seconds": 248.8,
+ "_dead_lead_in_seconds": 2.47,
+ "_dead_tail_seconds": 0.13,
+ "_dead_note": "The capture opens and closes on the macOS wallpaper, with white flash frames between it and the app. Scene 1 starts at 2.47s and the last scene ends at 248.67s, so no junk is inside any segment. The MASTER is untouched.",
+ "_fps": 30.0,
+ "_frames_note": "`frames` on each scene is its own footage at 30fps — the rate was MEASURED, never assumed 25.",
+ "scenes": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "line": "Four riders, two bikes each, one booking. Enter your email.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 167,
+   "raw-source": "5.56s on camera",
+   "target-length": "4.4 seconds."
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 18,
+   "raw-source": "0.6s on camera",
+   "target-length": "0.6 seconds."
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "line": "Tap New Order.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 100,
+   "raw-source": "3.34s on camera",
+   "target-length": "2.4 seconds."
+  },
+  {
+   "n": 4,
+   "label": "new-order",
+   "line": "Your order opens empty. Add the first rider to it.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 137,
+   "raw-source": "4.56s on camera",
+   "target-length": "4.4 seconds."
+  },
+  {
+   "n": 5,
+   "label": "add-myself",
+   "line": "Add yourself first.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 83,
+   "raw-source": "2.77s on camera",
+   "target-length": "2.4 seconds."
+  },
+  {
+   "n": 6,
+   "label": "member-added",
+   "line": "You are added.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 74,
+   "raw-source": "2.47s on camera",
+   "target-length": "2.4 seconds."
+  },
+  {
+   "n": 7,
+   "label": "catalogue-1",
+   "line": "Open a collection and choose your first bike. Size and colour are picked on the row.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 289,
+   "raw-source": "9.63s on camera",
+   "target-length": "6.2 seconds."
+  },
+  {
+   "n": 8,
+   "label": "dates-1",
+   "line": "Then pick the day you collect it and the day you bring it back.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 216,
+   "raw-source": "7.2s on camera",
+   "target-length": "5.6 seconds."
+  },
+  {
+   "n": 9,
+   "label": "item-1-added",
+   "line": "First bike.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 72,
+   "raw-source": "2.4s on camera",
+   "target-length": "2.1 seconds."
+  },
+  {
+   "n": 10,
+   "label": "catalogue-2",
+   "line": "Now your second.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 288,
+   "raw-source": "9.6s on camera",
+   "target-length": "2.4 seconds."
+  },
+  {
+   "n": 11,
+   "label": "dates-2",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 217,
+   "raw-source": "7.23s on camera",
+   "target-length": "7.23 seconds."
+  },
+  {
+   "n": 12,
+   "label": "item-2-added",
+   "line": "Both of yours are booked.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 97,
+   "raw-source": "3.24s on camera",
+   "target-length": "3.0 seconds."
+  },
+  {
+   "n": 13,
+   "label": "add-party-member-1",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 55,
+   "raw-source": "1.83s on camera",
+   "target-length": "1.83 seconds."
+  },
+  {
+   "n": 14,
+   "label": "party-members-1",
+   "line": "Now invite the rest of your party.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 120,
+   "raw-source": "4.0s on camera",
+   "target-length": "3.5 seconds."
+  },
+  {
+   "n": 15,
+   "label": "invite-harry",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 42,
+   "raw-source": "1.4s on camera",
+   "target-length": "1.4 seconds."
+  },
+  {
+   "n": 16,
+   "label": "member-2-added",
+   "line": "They are on the order.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 89,
+   "raw-source": "2.97s on camera",
+   "target-length": "3.0 seconds."
+  },
+  {
+   "n": 17,
+   "label": "catalogue-3",
+   "line": "Their two bikes go on the same way yours did.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 288,
+   "raw-source": "9.6s on camera",
+   "target-length": "4.4 seconds."
+  },
+  {
+   "n": 18,
+   "label": "dates-3",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 217,
+   "raw-source": "7.23s on camera",
+   "target-length": "7.23 seconds."
+  },
+  {
+   "n": 19,
+   "label": "item-3-added",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 71,
+   "raw-source": "2.37s on camera",
+   "target-length": "2.37 seconds."
+  },
+  {
+   "n": 20,
+   "label": "catalogue-4",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 289,
+   "raw-source": "9.63s on camera",
+   "target-length": "9.63 seconds."
+  },
+  {
+   "n": 21,
+   "label": "dates-4",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 217,
+   "raw-source": "7.23s on camera",
+   "target-length": "7.23 seconds."
+  },
+  {
+   "n": 22,
+   "label": "item-4-added",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 98,
+   "raw-source": "3.27s on camera",
+   "target-length": "3.27 seconds."
+  },
+  {
+   "n": 23,
+   "label": "add-party-member-2",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 25,
+   "raw-source": "0.83s on camera",
+   "target-length": "0.83 seconds."
+  },
+  {
+   "n": 24,
+   "label": "party-members-2",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 149,
+   "raw-source": "4.97s on camera",
+   "target-length": "4.97 seconds."
+  },
+  {
+   "n": 25,
+   "label": "invite-ron",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 43,
+   "raw-source": "1.43s on camera",
+   "target-length": "1.43 seconds."
+  },
+  {
+   "n": 26,
+   "label": "member-3-added",
+   "line": "Now the third rider.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 88,
+   "raw-source": "2.94s on camera",
+   "target-length": "2.7 seconds."
+  },
+  {
+   "n": 27,
+   "label": "catalogue-5",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 289,
+   "raw-source": "9.63s on camera",
+   "target-length": "9.63 seconds."
+  },
+  {
+   "n": 28,
+   "label": "dates-5",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 217,
+   "raw-source": "7.23s on camera",
+   "target-length": "7.23 seconds."
+  },
+  {
+   "n": 29,
+   "label": "item-5-added",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 70,
+   "raw-source": "2.34s on camera",
+   "target-length": "2.34 seconds."
+  },
+  {
+   "n": 30,
+   "label": "catalogue-6",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 289,
+   "raw-source": "9.63s on camera",
+   "target-length": "9.63 seconds."
+  },
+  {
+   "n": 31,
+   "label": "dates-6",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 217,
+   "raw-source": "7.23s on camera",
+   "target-length": "7.23 seconds."
+  },
+  {
+   "n": 32,
+   "label": "item-6-added",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 122,
+   "raw-source": "4.07s on camera",
+   "target-length": "4.07 seconds."
+  },
+  {
+   "n": 33,
+   "label": "add-party-member-3",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 30,
+   "raw-source": "1.0s on camera",
+   "target-length": "1.0 seconds."
+  },
+  {
+   "n": 34,
+   "label": "party-members-3",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 118,
+   "raw-source": "3.93s on camera",
+   "target-length": "3.93 seconds."
+  },
+  {
+   "n": 35,
+   "label": "invite-hermione",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 44,
+   "raw-source": "1.47s on camera",
+   "target-length": "1.47 seconds."
+  },
+  {
+   "n": 36,
+   "label": "member-4-added",
+   "line": "And the fourth.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 88,
+   "raw-source": "2.93s on camera",
+   "target-length": "2.4 seconds."
+  },
+  {
+   "n": 37,
+   "label": "catalogue-7",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 288,
+   "raw-source": "9.6s on camera",
+   "target-length": "9.6 seconds."
+  },
+  {
+   "n": 38,
+   "label": "dates-7",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 218,
+   "raw-source": "7.27s on camera",
+   "target-length": "7.27 seconds."
+  },
+  {
+   "n": 39,
+   "label": "item-7-added",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 71,
+   "raw-source": "2.37s on camera",
+   "target-length": "2.37 seconds."
+  },
+  {
+   "n": 40,
+   "label": "catalogue-8",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 288,
+   "raw-source": "9.6s on camera",
+   "target-length": "9.6 seconds."
+  },
+  {
+   "n": 41,
+   "label": "dates-8",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 219,
+   "raw-source": "7.3s on camera",
+   "target-length": "7.3 seconds."
+  },
+  {
+   "n": 42,
+   "label": "item-8-added",
+   "line": "Eight bikes.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 67,
+   "raw-source": "2.23s on camera",
+   "target-length": "2.1 seconds."
+  },
+  {
+   "n": 43,
+   "label": "the-questions",
+   "line": "Now the questions, one set for every rider. Age and height for each of the four of you in turn. {0.3} We set every frame and every saddle from these numbers, so eight bikes are fitted and standing ready before anybody arrives. {0.3} It is the longest part of the booking, and it is the part that saves you the most time on the day. {0.3} Work down the cards, agree to the terms for everybody, and save.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 759,
+   "raw-source": "25.3s on camera",
+   "target-length": "24.2 seconds."
+  },
+  {
+   "n": 44,
+   "label": "order-total",
+   "line": "Here is the party total.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 90,
+   "raw-source": "3.0s on camera",
+   "target-length": "3.0 seconds."
+  },
+  {
+   "n": 45,
+   "label": "checkout",
+   "line": "One payment covers all four riders and all eight bikes.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 139,
+   "raw-source": "4.63s on camera",
+   "target-length": "4.4 seconds."
+  },
+  {
+   "n": 46,
+   "label": "order-complete",
+   "line": "",
+   "silent": true,
+   "pauses": [],
+   "frames": 65,
+   "raw-source": "2.17s on camera",
+   "target-length": "2.17 seconds."
+  },
+  {
+   "n": 47,
+   "label": "back-to-dashboard",
+   "line": "Every bike sits under this one booking in your history.",
+   "silent": false,
+   "pauses": [
+    {
+     "at": "end",
+     "seconds": 0.75
+    }
+   ],
+   "frames": 149,
+   "raw-source": "4.97s on camera",
+   "target-length": "4.4 seconds."
+  }
+ ]
+}

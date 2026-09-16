@@ -1,0 +1,164 @@
+{
+ "voice": "Samantha",
+ "video": "ski-demo_owner-one-item-same-day_dev_15-16-13_v1-stretched.mp4",
+ "output": "ski-demo_owner-one-item-same-day_dev_15-16-13_v1-narrated.mp4",
+ "seconds": 66.3,
+ "lines": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "starts_at": 0.75,
+   "room": 4.03,
+   "held_at_end": 0.75,
+   "spoken": 3.21,
+   "rate": 155,
+   "said": "Renting for today. [[slnc 300]] Enter your email to sign in.",
+   "overruns_by": 0
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "starts_at": 5.53,
+   "room": 0.77,
+   "held_at_end": 0.0,
+   "spoken": 0.0,
+   "rate": 0,
+   "said": "",
+   "silent": true,
+   "overruns_by": 0
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "starts_at": 7.05,
+   "room": 1.83,
+   "held_at_end": 0.75,
+   "spoken": 1.42,
+   "rate": 155,
+   "said": "Tap New Order to start.",
+   "overruns_by": 0
+  },
+  {
+   "n": 4,
+   "label": "new-order",
+   "starts_at": 10.38,
+   "room": 3.17,
+   "held_at_end": 0.75,
+   "spoken": 3.07,
+   "rate": 190,
+   "said": "Your order opens empty, so add a person to it first.",
+   "overruns_by": 0
+  },
+  {
+   "n": 5,
+   "label": "add-a-person",
+   "starts_at": 15.05,
+   "room": 1.5,
+   "held_at_end": 0.75,
+   "spoken": 1.32,
+   "rate": 155,
+   "said": "Add yourself to the order.",
+   "overruns_by": 0
+  },
+  {
+   "n": 6,
+   "label": "member-added",
+   "starts_at": 18.05,
+   "room": 1.47,
+   "held_at_end": 0.75,
+   "spoken": 1.04,
+   "rate": 155,
+   "said": "You are on it now.",
+   "overruns_by": 0
+  },
+  {
+   "n": 7,
+   "label": "item-catalogue",
+   "starts_at": 21.02,
+   "room": 4.43,
+   "held_at_end": 0.75,
+   "spoken": 3.2,
+   "rate": 155,
+   "said": "Open a collection, and pick the gear you want from inside it.",
+   "overruns_by": 0
+  },
+  {
+   "n": 8,
+   "label": "pick-the-dates",
+   "starts_at": 26.95,
+   "room": 5.73,
+   "held_at_end": 0.75,
+   "spoken": 4.65,
+   "rate": 155,
+   "said": "Choose today as your pickup day, [[slnc 300]] then tap the same date again to bring it back tonight.",
+   "overruns_by": 0
+  },
+  {
+   "n": 9,
+   "label": "item-on-the-order",
+   "starts_at": 34.18,
+   "room": 1.2,
+   "held_at_end": 0.75,
+   "spoken": 0.97,
+   "rate": 155,
+   "said": "Your item is added.",
+   "overruns_by": 0
+  },
+  {
+   "n": 10,
+   "label": "the-questions",
+   "starts_at": 36.88,
+   "room": 13.47,
+   "held_at_end": 0.75,
+   "spoken": 10.05,
+   "rate": 155,
+   "said": "Answer a few questions so your gear is fitted before you get here. [[slnc 300]] Your height, your boot size, your skill level, your weight and your age. [[slnc 300]] Then agree to the terms and save.",
+   "overruns_by": 0
+  },
+  {
+   "n": 11,
+   "label": "order-total",
+   "starts_at": 51.85,
+   "room": 1.5,
+   "held_at_end": 0.75,
+   "spoken": 1.49,
+   "rate": 205,
+   "said": "Check the total, then pay.",
+   "overruns_by": 0
+  },
+  {
+   "n": 12,
+   "label": "checkout",
+   "starts_at": 54.85,
+   "room": 3.07,
+   "held_at_end": 0.75,
+   "spoken": 2.4,
+   "rate": 155,
+   "said": "Enter your card details to finish the rental.",
+   "overruns_by": 0
+  },
+  {
+   "n": 13,
+   "label": "order-complete",
+   "starts_at": 59.42,
+   "room": 1.2,
+   "held_at_end": 0.75,
+   "spoken": 1.16,
+   "rate": 200,
+   "said": "Your order is complete.",
+   "overruns_by": 0
+  },
+  {
+   "n": 14,
+   "label": "back-to-dashboard",
+   "starts_at": 62.12,
+   "room": 3.43,
+   "held_at_end": 0.75,
+   "spoken": 3.02,
+   "rate": 155,
+   "said": "Pick your gear up today, and it is yours until closing.",
+   "overruns_by": 0
+  }
+ ],
+ "_video_removed": "ski-demo_owner-one-item-same-day_dev_15-16-13_v1-stretched.mp4 was deleted after narration — it is picture-only and silent by design, and its name reads like the finished cut. Rebuild it in ~20s from segments/: python3 scripts/stretch_request.py \"<this folder>\""
+}

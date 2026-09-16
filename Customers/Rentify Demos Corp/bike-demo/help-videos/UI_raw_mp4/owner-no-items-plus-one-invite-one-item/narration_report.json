@@ -1,0 +1,189 @@
+{
+ "voice": "Samantha",
+ "video": "bike-demo_owner-no-items-plus-one-invite-one-item_dev_15-12-26_v3-stretched.mp4",
+ "output": "bike-demo_owner-no-items-plus-one-invite-one-item_dev_15-12-26_v3-narrated.mp4",
+ "seconds": 69.8,
+ "lines": [
+  {
+   "n": 1,
+   "label": "sign-in",
+   "starts_at": 0.75,
+   "room": 4.07,
+   "held_at_end": 0.75,
+   "spoken": 3.61,
+   "rate": 155,
+   "said": "Booking a bike for somebody else. Enter your email for a code.",
+   "overruns_by": 0
+  },
+  {
+   "n": 2,
+   "label": "enter-the-code",
+   "starts_at": 5.57,
+   "room": 0.77,
+   "held_at_end": 0.0,
+   "spoken": 0.0,
+   "rate": 0,
+   "said": "",
+   "silent": true,
+   "overruns_by": 0
+  },
+  {
+   "n": 3,
+   "label": "dashboard",
+   "starts_at": 7.09,
+   "room": 1.9,
+   "held_at_end": 0.75,
+   "spoken": 0.89,
+   "rate": 155,
+   "said": "Tap New Order.",
+   "overruns_by": 0
+  },
+  {
+   "n": 4,
+   "label": "new-order",
+   "starts_at": 10.49,
+   "room": 3.5,
+   "held_at_end": 0.75,
+   "spoken": 3.42,
+   "rate": 200,
+   "said": "Your order opens empty. You are booking for somebody else this time.",
+   "overruns_by": 0
+  },
+  {
+   "n": 5,
+   "label": "add-party-member",
+   "starts_at": 14.74,
+   "room": 1.73,
+   "held_at_end": 0.0,
+   "spoken": 0.0,
+   "rate": 0,
+   "said": "",
+   "silent": true,
+   "overruns_by": 0
+  },
+  {
+   "n": 6,
+   "label": "party-members",
+   "starts_at": 17.22,
+   "room": 2.5,
+   "held_at_end": 0.75,
+   "spoken": 1.85,
+   "rate": 155,
+   "said": "Invite a party member to the order.",
+   "overruns_by": 0
+  },
+  {
+   "n": 7,
+   "label": "invite-the-member",
+   "starts_at": 20.47,
+   "room": 1.43,
+   "held_at_end": 0.0,
+   "spoken": 0.0,
+   "rate": 0,
+   "said": "",
+   "silent": true,
+   "overruns_by": 0
+  },
+  {
+   "n": 8,
+   "label": "member-added",
+   "starts_at": 22.65,
+   "room": 1.67,
+   "held_at_end": 0.75,
+   "spoken": 1.29,
+   "rate": 155,
+   "said": "They are on the order now.",
+   "overruns_by": 0
+  },
+  {
+   "n": 9,
+   "label": "item-catalogue",
+   "starts_at": 25.82,
+   "room": 8.13,
+   "held_at_end": 0.75,
+   "spoken": 5.68,
+   "rate": 155,
+   "said": "Open a collection and choose their bike. Ladies, mens, boys, girls and electric each have their own.",
+   "overruns_by": 0
+  },
+  {
+   "n": 10,
+   "label": "pick-the-dates",
+   "starts_at": 35.45,
+   "room": 7.37,
+   "held_at_end": 0.75,
+   "spoken": 2.88,
+   "rate": 155,
+   "said": "Pick the day they collect it, then the day it comes back.",
+   "overruns_by": 0
+  },
+  {
+   "n": 11,
+   "label": "item-on-the-order",
+   "starts_at": 44.32,
+   "room": 1.2,
+   "held_at_end": 0.75,
+   "spoken": 1.03,
+   "rate": 155,
+   "said": "Their bike is booked.",
+   "overruns_by": 0
+  },
+  {
+   "n": 12,
+   "label": "the-questions",
+   "starts_at": 47.02,
+   "room": 7.4,
+   "held_at_end": 0.75,
+   "spoken": 6.0,
+   "rate": 155,
+   "said": "Now their age and their height, so we set the frame and the saddle before they arrive. Then agree to the terms and save.",
+   "overruns_by": 0
+  },
+  {
+   "n": 13,
+   "label": "order-total",
+   "starts_at": 55.92,
+   "room": 1.5,
+   "held_at_end": 0.75,
+   "spoken": 1.49,
+   "rate": 205,
+   "said": "Check the total, then pay.",
+   "overruns_by": 0
+  },
+  {
+   "n": 14,
+   "label": "checkout",
+   "starts_at": 58.92,
+   "room": 3.07,
+   "held_at_end": 0.75,
+   "spoken": 2.39,
+   "rate": 155,
+   "said": "Enter your card details to finish the booking.",
+   "overruns_by": 0
+  },
+  {
+   "n": 15,
+   "label": "order-complete",
+   "starts_at": 62.74,
+   "room": 2.07,
+   "held_at_end": 0.0,
+   "spoken": 0.0,
+   "rate": 0,
+   "said": "",
+   "silent": true,
+   "overruns_by": 0
+  },
+  {
+   "n": 16,
+   "label": "back-to-dashboard",
+   "starts_at": 65.56,
+   "room": 3.5,
+   "held_at_end": 0.75,
+   "spoken": 3.02,
+   "rate": 155,
+   "said": "The order is complete, and their bike is booked and waiting.",
+   "overruns_by": 0
+  }
+ ],
+ "_video_removed": "bike-demo_owner-no-items-plus-one-invite-one-item_dev_15-12-26_v3-stretched.mp4 was deleted after narration — it is picture-only and silent by design, and its name reads like the finished cut. Rebuild it in ~20s from segments/: python3 scripts/stretch_request.py \"<this folder>\""
+}
