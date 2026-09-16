@@ -195,6 +195,145 @@ NOTE and no cue by design.
 Regenerating it from a recipe spec throws the edit away, along with the fields a
 spec cannot carry — the silent flags, the chapter anchors, the per-scene notes.
 
+## ⚡ "MAKE THESE VTT READY" — from a bare raw mp4, in two commands
+
+Carson, 2026-09-15: *"This will be the first edit on these raw videos and you
+will do the following things to get them ready for me to load them into the VTT
+Editor… Do these one at a time."* Then: *"do them to completion."*
+
+**Seventeen videos** across ski-demo, canoe-demo and bike-demo were prepared
+this way that day — 380 scenes. The procedure is now a tool, so the eighteenth
+does not start from first principles:
+
+    cd ~/Rentify/Basic_E2E_Testing/Master_Flows/Recorder
+    python3 scripts/first_edit.py propose "<folder holding the capture>"
+    #   ... read first_edit_sheet.png, confirm first_edit.json ...
+    python3 scripts/first_edit.py build   "<same folder>"
+
+`propose` finds the junk at both ends, lists every candidate scene edge, and
+writes a contact sheet plus a `first_edit.json` draft. `build` writes
+`script.json` and `bounds.json`, then shells out to `stretch_scenes.py build`
+and `stretch_request.py`. Afterwards the folder has everything vtt_editor
+wants: a script, confirmed edges, `segments/`, and a `-narrated.mp4`.
+
+### The seven steps, and which of them is actually work
+
+| Carson's step | what really happens |
+|---|---|
+| remove junk frames at lead and tail | MEASURED and written as scene edges. The master is never cut. |
+| add the yellow rings | **nothing to do** — they are burnt in at record time |
+| remove any yellow backgrounds | **nothing to remove** — `ring_check.py` proves it per capture |
+| break the raw into `segments/` | `stretch_scenes.py build`, from CONFIRMED edges |
+| into the scenes, 0.75 lead + close-out | `script.json`: `_lead_in_seconds` and a per-scene end pause |
+| frame counts per scene | `frames`, at the MEASURED fps — three of the 17 are 25, not 30 |
+| descriptive narrative | written to each STORE'S OWN GEAR, and to each screen's length |
+| add the voice | `stretch_request.py` → `narrate_mac.py` |
+
+⚠ **THE MASTER IS NEVER WRITTEN OVER, AND THAT IS WHY THE JUNK IS A NUMBER.**
+Every capture opens on the macOS wallpaper (2.3 - 3.2s) and closes on it again,
+with a white flash or a fade between. It is expressed as scene 1's start and
+the last scene's end, so it sits outside every segment. All seventeen masters
+were md5-identical afterwards — check it, every time.
+
+⚠ **`trim_lead.py` IS A DIFFERENT TOOL FOR A DIFFERENT MOMENT. DO NOT WRITE A
+THIRD JUNK DETECTOR.** It belongs to RECORDING: run seconds after a take, it
+cuts the dead opening out of the file with a lossless keyframe-aligned stream
+copy and `os.replace`s the master. That is right when the file is new and wrong
+once it is the master of finished work. It was missed on 2026-09-15 and a
+brightness-based detector was written instead — which had two bugs a change-based
+one would not have had. **Its docstring says outright: not by brightness, by
+change**, measured across five takes from four recipes. Borrow the method.
+
+### ⚠ THE EDGES NEED EYES. THIS IS MEASURED, NOT CAUTIOUS.
+
+`propose` lists candidates; **a person keeps the real ones.** Three attempts
+have now been made to automate that judgement and all three failed:
+
+    "the N-1 biggest changes"     made sign-in 25.84s — stretch_scenes.py's
+                                  own docstring rejects it
+    "how much the frame changed"  real edges 0.5-13.8%, false ones 0.4-8.6%
+                                  — complete overlap, no threshold exists
+    "did it settle afterwards"    catches a page still DRAWING, which is real
+                                  and useful, but says nothing about whether a
+                                  settled change is a new SCREEN
+
+Across the seventeen captures, **741 candidates were 380 real scenes.** The
+other 361 were catalogue scrolls, dropdowns opening, a ring landing on a screen
+already open, a pay spinner, an email being typed into a panel already showing,
+and the same frame 0.08s later. Read the sheet. It takes two minutes.
+
+⚠ **AND THE SETTLE TEST DOES EARN ITS KEEP.** one-day-rental's `order-complete`
+edge had a change of 213 at 59.33s and was **still moving** — the page was
+drawing. It settles at 59.50s. Cutting at 59.33 opens that scene on a frame
+that then flickers.
+
+### ⚠ THREE BUGS THIS TOOL WAS BUILT OUT OF. DO NOT REINTRODUCE THEM.
+
+All three were found on 2026-09-15, and two of them damaged delivered work:
+
+**1. A rule that dropped any scene shorter than 0.5s.** The code-verification
+screen is **0.22s to 0.63s**. Its edge vanished, the code screen appeared to run
+for five seconds, and **its line played over the dashboard** on two ski-demo
+videos. A short scene is still a scene: it is kept and flagged, never dropped.
+
+**2. A settle walk with no upper bound.** A screen shorter than the 0.4s settle
+window never settles — so the walk pushed the email→code edge forward onto the
+code→dashboard edge and **merged two scenes into one**. The walk now stops at
+the next candidate.
+
+**3. A junk-tail rule that tested `luma > 200` for the closing flash.** One
+capture fades 38 → 255 → 228 → **152** → 92, and the 152 frame is plainly junk.
+Six already-built videos kept one or two wallpaper frames inside their final
+scene. Detection is by CHANGE now, as `trim_lead.py` always said.
+
+And one that was caught before it did damage: **`ls *.mp4 | head -1` picks
+`<name>-narrated.mp4`**, because `-` sorts before `.`. A re-scan analysed the
+file the previous run had produced and reported 10 edges for a capture with 19.
+`capture_in()` filters the outputs out.
+
+### ⚠ A LINE IS WRITTEN TO ITS SCREEN, NOT THE SCREEN STRETCHED TO THE LINE
+
+`build` REFUSES, naming every offender, if a line cannot fit even at
+`narrate_mac.py`'s 260 wpm ceiling — before any encoding happens.
+
+    "Order complete."   2 words = 0.69s at 260 wpm
+    a 2.10s scene       leaves 0.60s after its two 0.75s dwells
+
+That overran on three videos before the check existed, and **shortening the
+line further was never the answer** — two words is already the floor. The fix
+is to make that screen SILENT and put the words on the next one, which is
+longer. Same for the very short screens: `add-party-member` (1.7s) and
+`invite-the-member` (1.4s) are silent on purpose, because a sentence on either
+needed a ×3 stretch and ×3 reads as a stall.
+
+⚠ **AND WRITE TO THE STORE'S OWN GEAR.** The three stores are the same flow and
+NOT the same words. ski-demo asks height, boot size, skill level, weight and
+age, and the line explains that bindings are set from them. bike-demo asks age
+and height, for the frame and the saddle. canoe-demo asks **nothing** — a boat
+needs no sizing, so its questions screen is only the two terms checkboxes and
+runs 3.4s where ski's runs 15s. A line copied between stores is wrong.
+
+⚠ **AND SILENCE THE REPEATS.** The party-of-four captures run eight
+catalogue-and-calendar cycles. Narrating all eight identically is a drone and
+needs eight stretches; the first cycle is explained in full and the rest are
+silent, with the voice returning only when something new happens.
+
+### Checking a capture's rings
+
+    python3 scripts/ring_check.py <capture.mp4>
+
+Prints the ring count and then re-reads the biggest one on a **lossless** frame:
+
+    2064 yellow pixels in a 693x56 box
+    5.3% solid   (a filled box would be 38808 px, 100%)
+    VERDICT: BORDER-ONLY
+
+⚠ Full resolution only, and PNG not JPEG — the same ring measured 1,030 px on a
+q6 JPEG and 2,070 through ffmpeg's own decode. The 25% threshold is nowhere near
+the real gap, so it does not need to be measured finely.
+
+---
+
 ## THE FIVE JOBS OF A FIRST EDIT — and vtt_editor drives them
 
 Carson, 2026-09-15: *"This will be the first edit on the raw video and will do
