@@ -53,7 +53,7 @@
   {
    "n": 2,
    "label": "enter-the-code",
-   "line": "We will send you a four-digit code to that address. {.5} If you are not seeing it, check your spam folder.",
+   "line": "We will send you a four-digit code to that address. {.8} If you are not seeing it, please check your spam folder.",
    "pauses": [
     {
      "seconds": 0.75
@@ -67,7 +67,7 @@
   {
    "n": 3,
    "label": "dashboard",
-   "line": "This is your admin dashboard. {0.5} Open a Businesses with the store you want to work on.",
+   "line": "This is your admin dashboard. {0.5} Open a Business with the store you want to work on.",
    "pauses": [
     {
      "seconds": 0.75

@@ -160,3 +160,7 @@ MUX-Management/**/*.wav
 MUX-Management/**/*.png
 MUX-Management/**/*.jpg
 MUX-Management/**/node_modules/
+
+# sae_vtt_sync.py records (Basic_E2E_Testing): file sizes + times on THIS machine,
+# meaningless anywhere else. One per sandbox scene.
+**/sandbox/**/.sync.json

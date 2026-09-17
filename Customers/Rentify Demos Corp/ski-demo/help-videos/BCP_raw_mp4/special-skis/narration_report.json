@@ -2,7 +2,7 @@
  "voice": "Samantha",
  "video": "ski-demo_special-skis_dev_10-19-12_v12-stretched.mp4",
  "output": "ski-demo_special-skis_dev_10-19-12_v12-narrated.mp4",
- "seconds": 381.04,
+ "seconds": 381.6,
  "lines": [
   {
    "n": 1,
@@ -19,28 +19,28 @@
    "n": 2,
    "label": "enter-the-code",
    "starts_at": 7.75,
-   "room": 6.3,
+   "room": 6.9,
    "held_at_end": 0.75,
-   "spoken": 5.9,
+   "spoken": 6.49,
    "rate": 155,
-   "said": "We will send you a four-digit code to that address. [[slnc 500]] If you are not seeing it, check your spam folder.",
+   "said": "We will send you a four-digit code to that address. [[slnc 800]] If you are not seeing it, please check your spam folder.",
    "overruns_by": 0
   },
   {
    "n": 3,
    "label": "dashboard",
-   "starts_at": 15.55,
-   "room": 5.5,
+   "starts_at": 16.15,
+   "room": 5.46,
    "held_at_end": 0.75,
-   "spoken": 5.03,
+   "spoken": 4.89,
    "rate": 155,
-   "said": "This is your admin dashboard. [[slnc 500]] Open a Businesses with the store you want to work on.",
+   "said": "This is your admin dashboard. [[slnc 500]] Open a Business with the store you want to work on.",
    "overruns_by": 0
   },
   {
    "n": 4,
    "label": "find-the-business",
-   "starts_at": 22.55,
+   "starts_at": 23.11,
    "room": 6.3,
    "held_at_end": 0.75,
    "spoken": 4.09,
@@ -51,7 +51,7 @@
   {
    "n": 5,
    "label": "the-business",
-   "starts_at": 30.35,
+   "starts_at": 30.91,
    "room": 5.5,
    "held_at_end": 0.75,
    "spoken": 5.23,
@@ -62,7 +62,7 @@
   {
    "n": 6,
    "label": "find-the-store",
-   "starts_at": 37.35,
+   "starts_at": 37.91,
    "room": 8.9,
    "held_at_end": 0.75,
    "spoken": 8.77,
@@ -73,7 +73,7 @@
   {
    "n": 7,
    "label": "the-store",
-   "starts_at": 47.75,
+   "starts_at": 48.31,
    "room": 5.5,
    "held_at_end": 0.75,
    "spoken": 5.28,
@@ -84,7 +84,7 @@
   {
    "n": 8,
    "label": "collection-list",
-   "starts_at": 54.75,
+   "starts_at": 55.31,
    "room": 6.3,
    "held_at_end": 0.75,
    "spoken": 6.19,
@@ -95,7 +95,7 @@
   {
    "n": 9,
    "label": "new-collection",
-   "starts_at": 62.55,
+   "starts_at": 63.11,
    "room": 8.62,
    "held_at_end": 0.75,
    "spoken": 8.22,
@@ -106,7 +106,7 @@
   {
    "n": 10,
    "label": "collection-details",
-   "starts_at": 72.67,
+   "starts_at": 73.23,
    "room": 13.62,
    "held_at_end": 0.75,
    "spoken": 8.52,
@@ -117,7 +117,7 @@
   {
    "n": 11,
    "label": "collection-options",
-   "starts_at": 87.79,
+   "starts_at": 88.35,
    "room": 26.22,
    "held_at_end": 0.75,
    "spoken": 22.36,
@@ -128,7 +128,7 @@
   {
    "n": 12,
    "label": "the-collection",
-   "starts_at": 115.51,
+   "starts_at": 116.07,
    "room": 6.5,
    "held_at_end": 0.75,
    "spoken": 4.75,
@@ -139,7 +139,7 @@
   {
    "n": 13,
    "label": "back-to-the-store",
-   "starts_at": 123.51,
+   "starts_at": 124.07,
    "room": 6.9,
    "held_at_end": 0.75,
    "spoken": 5.67,
@@ -150,7 +150,7 @@
   {
    "n": 14,
    "label": "item-list",
-   "starts_at": 131.91,
+   "starts_at": 132.47,
    "room": 6.3,
    "held_at_end": 0.75,
    "spoken": 5.98,
@@ -161,7 +161,7 @@
   {
    "n": 15,
    "label": "new-item",
-   "starts_at": 139.71,
+   "starts_at": 140.27,
    "room": 16.7,
    "held_at_end": 0.75,
    "spoken": 10.06,
@@ -172,7 +172,7 @@
   {
    "n": 16,
    "label": "item-details",
-   "starts_at": 157.91,
+   "starts_at": 158.47,
    "room": 33.42,
    "held_at_end": 0.75,
    "spoken": 26.41,
@@ -183,7 +183,7 @@
   {
    "n": 17,
    "label": "first-variant",
-   "starts_at": 192.83,
+   "starts_at": 193.39,
    "room": 6.5,
    "held_at_end": 0.75,
    "spoken": 5.85,
@@ -194,7 +194,7 @@
   {
    "n": 18,
    "label": "the-other-variants",
-   "starts_at": 200.08,
+   "starts_at": 200.64,
    "room": 156.2,
    "held_at_end": 0.0,
    "spoken": 0.0,
@@ -206,7 +206,7 @@
   {
    "n": 19,
    "label": "last-variant",
-   "starts_at": 357.03,
+   "starts_at": 357.59,
    "room": 6.5,
    "held_at_end": 0.75,
    "spoken": 4.9,
@@ -217,7 +217,7 @@
   {
    "n": 20,
    "label": "sign-out",
-   "starts_at": 365.03,
+   "starts_at": 365.59,
    "room": 5.5,
    "held_at_end": 0.75,
    "spoken": 4.89,
@@ -228,7 +228,7 @@
   {
    "n": 21,
    "label": "signed-out",
-   "starts_at": 372.03,
+   "starts_at": 372.59,
    "room": 8.26,
    "held_at_end": 0.75,
    "spoken": 5.16,

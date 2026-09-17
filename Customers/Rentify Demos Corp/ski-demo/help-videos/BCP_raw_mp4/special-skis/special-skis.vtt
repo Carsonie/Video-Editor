@@ -27,10 +27,10 @@ SPEAKING RATE 3.44 words a second. MEASURED, from two rendered clips —
 Still an estimate for THIS video: nothing is rendered, so no line has a
 real spoken length. Re-time from the audio once it exists.
 
-  words                 490
-  speech only           142.4s
+  words                 491
+  speech only           142.7s
   lead-ins + exits      26.0s   (20 spoken scenes; 1 silent)
-  FINISHED VIDEO        342.4s
+  FINISHED VIDEO        343.0s
   raw footage           375.88s
 
 NOTE
@@ -46,196 +46,196 @@ Please provide us your email, so we can sent you a login code. Then click the Se
 NOTE
 scene 02  enter-the-code
   raw        7.0s on camera
-  scene      00:00:06.800 to 00:00:14.400  (7.6s)
-  lead-in    0.5s     speech 20 words, 5.8s     beats 0.5s     exit 0.8s
+  scene      00:00:06.800 to 00:00:15.000  (8.2s)
+  lead-in    0.5s     speech 21 words, 6.1s     beats 0.8s     exit 0.8s
 
 scene-02-enter-the-code
-00:00:07.300 --> 00:00:13.100
-We will send you a four-digit code to that address. {.5} If you are not seeing it, check your spam folder.
+00:00:07.300 --> 00:00:13.400
+We will send you a four-digit code to that address. {.8} If you are not seeing it, please check your spam folder.
 
 NOTE
 scene 03  dashboard
   raw        7.0s on camera
-  scene      00:00:14.400 to 00:00:20.900  (6.5s)
+  scene      00:00:15.000 to 00:00:21.500  (6.5s)
   lead-in    0.5s     speech 16 words, 4.7s     beats 0.5s     exit 0.8s
 
 scene-03-dashboard
-00:00:14.900 --> 00:00:19.600
-This is your admin dashboard. {0.5} Open a Businesses with the store you want to work on.
+00:00:15.500 --> 00:00:20.200
+This is your admin dashboard. {0.5} Open a Business with the store you want to work on.
 
 NOTE
 scene 04  find-the-business
   raw        7.8s on camera
-  scene      00:00:20.900 to 00:00:26.000  (5.1s)
+  scene      00:00:21.500 to 00:00:26.600  (5.1s)
   lead-in    0.5s     speech 12 words, 3.5s     beats 0.3s     exit 0.8s
 
 scene-04-find-the-business
-00:00:21.400 --> 00:00:24.900
+00:00:22.000 --> 00:00:25.500
 Start typing your business name, {0.3} then select it from the dropdown list.
 
 NOTE
 scene 05  the-business
   raw        7.0s on camera
-  scene      00:00:26.000 to 00:00:32.500  (6.5s)
+  scene      00:00:26.600 to 00:00:33.100  (6.5s)
   lead-in    0.5s     speech 16 words, 4.7s     beats 0.5s     exit 0.8s
 
 scene-05-the-business
-00:00:26.500 --> 00:00:31.200
+00:00:27.100 --> 00:00:31.800
 When your business page opens. {0.5} Choose Lookup Stores to see all the stores of this business.
 
 NOTE
 scene 06  find-the-store
   raw        9.4s on camera
-  scene      00:00:32.500 to 00:00:42.700  (10.2s)
+  scene      00:00:33.100 to 00:00:43.300  (10.2s)
   lead-in    0.5s     speech 28 words, 8.1s     beats 0.8s     exit 0.8s
 
 scene-06-find-the-store
-00:00:33.000 --> 00:00:41.100
+00:00:33.600 --> 00:00:41.700
 Start typing the name of the store you are looking for, {0.3} and select it from the dropdown list. {0.5} All activities after this will act against this store alone.
 
 NOTE
 scene 07  the-store
   raw        7.0s on camera
-  scene      00:00:42.700 to 00:00:49.400  (6.7s)
+  scene      00:00:43.300 to 00:00:50.000  (6.7s)
   lead-in    0.5s     speech 17 words, 4.9s     beats 0.5s     exit 0.8s
 
 scene-07-the-store
-00:00:43.200 --> 00:00:48.100
+00:00:43.800 --> 00:00:48.700
 This is the store page. {0.5} Click on the gear icon in the menu and choose Lookup Collections.
 
 NOTE
 scene 08  collection-list
   raw        7.0s on camera
-  scene      00:00:49.400 to 00:00:57.000  (7.6s)
+  scene      00:00:50.000 to 00:00:57.600  (7.6s)
   lead-in    0.5s     speech 20 words, 5.8s     beats 0.5s     exit 0.8s
 
 scene-08-collection-list
-00:00:49.900 --> 00:00:55.700
+00:00:50.500 --> 00:00:56.300
 Here you can find all the store's collections, if needed. {0.5} Press the plus icon button to add a new collection.
 
 NOTE
 scene 09  new-collection
   raw        8.4s on camera
-  scene      00:00:57.000 to 00:01:06.900  (9.9s)
+  scene      00:00:57.600 to 00:01:07.500  (9.9s)
   lead-in    0.5s     speech 28 words, 8.1s     beats 0.5s     exit 0.8s
 
 scene-09-new-collection
-00:00:57.500 --> 00:01:05.600
+00:00:58.100 --> 00:01:06.200
 Give the collection a unique name. {0.5} A collection is a group of items that can differ just by their options, or could be some like or similar items.
 
 NOTE
 scene 10  collection-details
   raw        15.1s on camera
-  scene      00:01:06.900 to 00:01:15.700  (8.8s)
+  scene      00:01:07.500 to 00:01:16.300  (8.8s)
   lead-in    0.5s     speech 19 words, 5.5s     beats 2.0s     exit 0.8s
 
 scene-10-collection-details
-00:01:07.400 --> 00:01:12.900
+00:01:08.000 --> 00:01:13.500
 Add a description to guide your renters. {2} Then set the starting price, in cents only, meaning no decimal point.
 
 NOTE
 scene 11  collection-options
   raw        27.7s on camera
-  scene      00:01:15.700 to 00:01:40.200  (24.5s)
+  scene      00:01:16.300 to 00:01:40.800  (24.5s)
   lead-in    0.5s     speech 69 words, 20.1s     beats 3.1s     exit 0.8s
 
 scene-11-collection-options
-00:01:16.200 --> 00:01:36.300
+00:01:16.800 --> 00:01:36.900
 Options are what makes one item different from another. {0.8} The label is what renter will see. {0.5} The name is the system key the item is saved under, and used for an item match. {0.8} The type can bool, string or a number. {0.5} The required option means this item is needed to complete the order and should always be true. {0.5} The values are the list of selections the dropdown will offer.
 
 NOTE
 scene 12  the-collection
   raw        8.0s on camera
-  scene      00:01:40.200 to 00:01:46.100  (5.9s)
+  scene      00:01:40.800 to 00:01:46.700  (5.9s)
   lead-in    0.5s     speech 14 words, 4.1s     beats 0.5s     exit 0.8s
 
 scene-12-the-collection
-00:01:40.700 --> 00:01:44.800
+00:01:41.300 --> 00:01:45.400
 After the collection is saved. {0.5} We can create each item from all these variants.
 
 NOTE
 scene 13  back-to-the-store
   raw        8.4s on camera
-  scene      00:01:46.100 to 00:01:52.600  (6.5s)
+  scene      00:01:46.700 to 00:01:53.200  (6.5s)
   lead-in    0.5s     speech 16 words, 4.7s     beats 0.5s     exit 0.8s
 
 scene-13-back-to-the-store
-00:01:46.600 --> 00:01:51.300
+00:01:47.200 --> 00:01:51.900
 Return to the store page. {0.5} Open the gear menu again, and this time choose Lookup Items.
 
 NOTE
 scene 14  item-list
   raw        7.0s on camera
-  scene      00:01:52.600 to 00:02:00.200  (7.6s)
+  scene      00:01:53.200 to 00:02:00.800  (7.6s)
   lead-in    0.5s     speech 20 words, 5.8s     beats 0.5s     exit 0.8s
 
 scene-14-item-list
-00:01:53.100 --> 00:01:58.900
+00:01:53.700 --> 00:01:59.500
 This is where all the store's items can be found. {0.5} To add a new item, click the plus icon button.
 
 NOTE
 scene 15  new-item
   raw        18.2s on camera
-  scene      00:02:00.200 to 00:02:11.200  (11.0s)
+  scene      00:02:00.800 to 00:02:11.800  (11.0s)
   lead-in    0.5s     speech 30 words, 8.7s     beats 1.0s     exit 0.8s
 
 scene-15-new-item
-00:02:00.700 --> 00:02:09.400
+00:02:01.300 --> 00:02:10.000
 Name the item so you can recognise it later. {0.5} Then search for the collection it belongs to, and pick it. {0.5} The collection decides which options this item has to answer.
 
 NOTE
 scene 16  item-details
   raw        34.9s on camera
-  scene      00:02:11.200 to 00:02:39.700  (28.5s)
+  scene      00:02:11.800 to 00:02:40.300  (28.5s)
   lead-in    0.5s     speech 77 words, 22.4s     beats 4.8s     exit 0.8s
 
 scene-16-item-details
-00:02:11.700 --> 00:02:34.100
+00:02:12.300 --> 00:02:34.700
 Fill in the item's own details. {0.5} A description, {0.3} how many you have to rent, {0.3} and the price in cents. {0.8} The requirement is the set of questions a renter answers when they book this — pick the one that fits. {0.8} Then the options you set on the collection appear as dropdowns. {0.5} Choose a brand, {0.3} a length. {0.8} Each one carries a star, which means the item cannot be saved until it has an answer. {0.5} Press Update to save it.
 
 NOTE
 scene 17  first-variant
   raw        8.0s on camera
-  scene      00:02:39.700 to 00:02:47.000  (7.3s)
+  scene      00:02:40.300 to 00:02:47.600  (7.3s)
   lead-in    0.5s     speech 19 words, 5.5s     beats 0.5s     exit 0.8s
 
 scene-17-first-variant
-00:02:40.200 --> 00:02:45.700
+00:02:40.800 --> 00:02:46.300
 That is the first variant saved. {0.5} Every other one is a copy of it with just one dropdown changed.
 
 NOTE
 scene 18  the-other-variants
   raw        156.2s on camera
-  scene      00:02:47.000 to 00:05:23.200  (156.2s)
+  scene      00:02:47.600 to 00:05:23.800  (156.2s)
   SILENT      no line, on purpose — the repeats of the first item
   editor      trim or speed this stretch; nothing is said over it
 
 NOTE
 scene 19  last-variant
   raw        8.0s on camera
-  scene      00:05:23.200 to 00:05:28.900  (5.7s)
+  scene      00:05:23.800 to 00:05:29.500  (5.7s)
   lead-in    0.5s     speech 15 words, 4.4s     exit 0.8s
 
 scene-19-last-variant
-00:05:23.700 --> 00:05:28.100
+00:05:24.300 --> 00:05:28.700
 All nine variants now exist in the collection — three brands, each in three lengths.
 
 NOTE
 scene 20  sign-out
   raw        7.0s on camera
-  scene      00:05:28.900 to 00:05:35.400  (6.5s)
+  scene      00:05:29.500 to 00:05:36.000  (6.5s)
   lead-in    0.5s     speech 17 words, 4.9s     beats 0.3s     exit 0.8s
 
 scene-20-sign-out
-00:05:29.400 --> 00:05:34.300
+00:05:30.000 --> 00:05:34.900
 Back at the dashboard when you are done. {0.3} Logout is a card here, same as the rest.
 
 NOTE
 scene 21  signed-out
   raw        10.0s on camera
-  scene      00:05:35.400 to 00:05:42.400  (7.0s)
+  scene      00:05:36.000 to 00:05:43.000  (7.0s)
   lead-in    0.5s     speech 18 words, 5.2s     beats 0.5s     exit 0.8s
 
 scene-21-signed-out
-00:05:35.900 --> 00:05:41.100
+00:05:36.500 --> 00:05:41.700
 You are signed out. {0.5} Your collection and all nine of its variants are saved and ready to rent.
