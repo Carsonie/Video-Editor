@@ -165,7 +165,7 @@
   {
    "n": 10,
    "label": "collection-details",
-   "line": "Add a description to guide your renters. {2} Then set the starting price, in cents only, meaning no decimal point.",
+   "line": "Add a description to guide your renters. {4} Then set the starting price, in cents only, meaning no decimal point.",
    "pauses": [
     {
      "seconds": 0.75
@@ -193,7 +193,7 @@
   {
    "n": 12,
    "label": "the-collection",
-   "line": "After the collection is saved. {0.5} We can create each item from all these variants.",
+   "line": "After the collection is saved. {0.5} We can create an item from every one of these variants.",
    "pauses": [
     {
      "seconds": 0.75
@@ -207,7 +207,7 @@
   {
    "n": 13,
    "label": "back-to-the-store",
-   "line": "Return to the store page. {0.5} Open the gear menu again, and this time choose Lookup Items.",
+   "line": "Now, lets return to the collections page. {2} Then we can return to the store page. {2} Open the menu again using the gear icon. {1} Then choose Lookup Items.",
    "pauses": [
     {
      "seconds": 0.75
@@ -235,7 +235,7 @@
   {
    "n": 15,
    "label": "new-item",
-   "line": "Name the item so you can recognise it later. {0.5} Then search for the collection it belongs to, and pick it. {0.5} The collection decides which options this item has to answer.",
+   "line": "Give the item a name with the variants added, to easily understand the options. {0.5} Then search and select the collection this item belongs to. {1.5} Use the Create button to save it.",
    "pauses": [
     {
      "seconds": 0.75
