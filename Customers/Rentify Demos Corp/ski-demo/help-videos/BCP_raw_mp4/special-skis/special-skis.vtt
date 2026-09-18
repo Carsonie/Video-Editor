@@ -27,10 +27,10 @@ SPEAKING RATE 3.44 words a second. MEASURED, from two rendered clips —
 Still an estimate for THIS video: nothing is rendered, so no line has a
 real spoken length. Re-time from the audio once it exists.
 
-  words                 505
-  speech only           146.7s
+  words                 517
+  speech only           150.2s
   lead-ins + exits      26.0s   (20 spoken scenes; 1 silent)
-  FINISHED VIDEO        354.5s
+  FINISHED VIDEO        358.0s
   raw footage           375.88s
 
 NOTE
@@ -176,66 +176,66 @@ This is where all the store's items can be found. {0.5} To add a new item, click
 NOTE
 scene 15  new-item
   raw        18.2s on camera
-  scene      00:02:11.000 to 00:02:23.300  (12.3s)
-  lead-in    0.5s     speech 31 words, 9.0s     beats 2.0s     exit 0.8s
+  scene      00:02:11.000 to 00:02:26.800  (15.8s)
+  lead-in    0.5s     speech 43 words, 12.5s     beats 2.0s     exit 0.8s
 
 scene-15-new-item
-00:02:11.500 --> 00:02:20.500
-Give the item a name with the variants added, to easily understand the options. {0.5} Then search and select the collection this item belongs to. {1.5} Use the Create button to save it.
+00:02:11.500 --> 00:02:24.000
+Give the item a name with the variants added. The renter can see by the item name that they are getting the item options they want. {0.5} Then search and select the collection this item belongs to. {1.5} Use the Create button to save it.
 
 NOTE
 scene 16  item-details
   raw        34.9s on camera
-  scene      00:02:23.300 to 00:02:51.800  (28.5s)
+  scene      00:02:26.800 to 00:02:55.300  (28.5s)
   lead-in    0.5s     speech 77 words, 22.4s     beats 4.8s     exit 0.8s
 
 scene-16-item-details
-00:02:23.800 --> 00:02:46.200
+00:02:27.300 --> 00:02:49.700
 Fill in the item's own details. {0.5} A description, {0.3} how many you have to rent, {0.3} and the price in cents. {0.8} The requirement is the set of questions a renter answers when they book this — pick the one that fits. {0.8} Then the options you set on the collection appear as dropdowns. {0.5} Choose a brand, {0.3} a length. {0.8} Each one carries a star, which means the item cannot be saved until it has an answer. {0.5} Press Update to save it.
 
 NOTE
 scene 17  first-variant
   raw        8.0s on camera
-  scene      00:02:51.800 to 00:02:59.100  (7.3s)
+  scene      00:02:55.300 to 00:03:02.600  (7.3s)
   lead-in    0.5s     speech 19 words, 5.5s     beats 0.5s     exit 0.8s
 
 scene-17-first-variant
-00:02:52.300 --> 00:02:57.800
+00:02:55.800 --> 00:03:01.300
 That is the first variant saved. {0.5} Every other one is a copy of it with just one dropdown changed.
 
 NOTE
 scene 18  the-other-variants
   raw        156.2s on camera
-  scene      00:02:59.100 to 00:05:35.300  (156.2s)
+  scene      00:03:02.600 to 00:05:38.800  (156.2s)
   SILENT      no line, on purpose — the repeats of the first item
   editor      trim or speed this stretch; nothing is said over it
 
 NOTE
 scene 19  last-variant
   raw        8.0s on camera
-  scene      00:05:35.300 to 00:05:41.000  (5.7s)
+  scene      00:05:38.800 to 00:05:44.500  (5.7s)
   lead-in    0.5s     speech 15 words, 4.4s     exit 0.8s
 
 scene-19-last-variant
-00:05:35.800 --> 00:05:40.200
+00:05:39.300 --> 00:05:43.700
 All nine variants now exist in the collection — three brands, each in three lengths.
 
 NOTE
 scene 20  sign-out
   raw        7.0s on camera
-  scene      00:05:41.000 to 00:05:47.500  (6.5s)
+  scene      00:05:44.500 to 00:05:51.000  (6.5s)
   lead-in    0.5s     speech 17 words, 4.9s     beats 0.3s     exit 0.8s
 
 scene-20-sign-out
-00:05:41.500 --> 00:05:46.400
+00:05:45.000 --> 00:05:49.900
 Back at the dashboard when you are done. {0.3} Logout is a card here, same as the rest.
 
 NOTE
 scene 21  signed-out
   raw        10.0s on camera
-  scene      00:05:47.500 to 00:05:54.500  (7.0s)
+  scene      00:05:51.000 to 00:05:58.000  (7.0s)
   lead-in    0.5s     speech 18 words, 5.2s     beats 0.5s     exit 0.8s
 
 scene-21-signed-out
-00:05:48.000 --> 00:05:53.200
+00:05:51.500 --> 00:05:56.700
 You are signed out. {0.5} Your collection and all nine of its variants are saved and ready to rent.

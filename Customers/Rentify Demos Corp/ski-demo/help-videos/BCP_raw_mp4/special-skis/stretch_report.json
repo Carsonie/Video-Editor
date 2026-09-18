@@ -1,7 +1,7 @@
 {
  "source": "ski-demo_special-skis_dev_10-19-12_v12.mp4",
  "output": "ski-demo_special-skis_dev_10-19-12_v12-stretched.mp4",
- "output_seconds": 386.0,
+ "output_seconds": 401.04,
  "scenes": [
   {
    "n": 1,
@@ -163,8 +163,8 @@
    "src_in": 133.8,
    "src_out": 152.0,
    "on_camera": 18.2,
-   "scene_needs": 12.5,
-   "built": 18.2,
+   "scene_needs": 16.0,
+   "built": 16.28,
    "factor": 1.0,
    "stretched": false
   },
@@ -174,10 +174,10 @@
    "src_in": 152.0,
    "src_out": 186.9,
    "on_camera": 34.9,
-   "scene_needs": 28.7,
-   "built": 34.92,
-   "factor": 1.0,
-   "stretched": false
+   "scene_needs": 44.1,
+   "built": 51.88,
+   "factor": 1.2636,
+   "stretched": true
   },
   {
    "n": 17,

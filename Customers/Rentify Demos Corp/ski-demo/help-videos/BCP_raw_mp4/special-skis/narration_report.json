@@ -2,7 +2,7 @@
  "voice": "Samantha",
  "video": "ski-demo_special-skis_dev_10-19-12_v12-stretched.mp4",
  "output": "ski-demo_special-skis_dev_10-19-12_v12-narrated.mp4",
- "seconds": 386.0,
+ "seconds": 401.04,
  "lines": [
   {
    "n": 1,
@@ -162,28 +162,28 @@
    "n": 15,
    "label": "new-item",
    "starts_at": 144.67,
-   "room": 16.7,
+   "room": 14.78,
    "held_at_end": 0.75,
-   "spoken": 11.23,
+   "spoken": 13.48,
    "rate": 155,
-   "said": "Give the item a name with the variants added, to easily understand the options. [[slnc 500]] Then search and select the collection this item belongs to. [[slnc 1500]] Use the Create button to save it.",
+   "said": "Give the item a name with the variants added. The renter can see by the item name that they are getting the item options they want. [[slnc 500]] Then search and select the collection this item belongs to. [[slnc 1500]] Use the Create button to save it.",
    "overruns_by": 0
   },
   {
    "n": 16,
    "label": "item-details",
-   "starts_at": 162.87,
-   "room": 33.42,
+   "starts_at": 160.95,
+   "room": 50.38,
    "held_at_end": 0.75,
-   "spoken": 26.41,
+   "spoken": 43.8,
    "rate": 155,
-   "said": "Fill in the item's own details. [[slnc 500]] A description, [[slnc 300]] how many you have to rent, [[slnc 300]] and the price in cents. [[slnc 800]] The requirement is the set of questions a renter answers when they book this — pick the one that fits. [[slnc 800]] Then the options you set on the collection appear as dropdowns. [[slnc 500]] Choose a brand, [[slnc 300]] a length. [[slnc 800]] Each one carries a star, which means the item cannot be saved until it has an answer. [[slnc 500]] Press Update to save it.",
+   "said": "Build our the item here, in the details page. [[slnc 500]] Add an Item description, [[slnc 300]] Confirm you are in the right collection. Then add how many of this specific item you have for rent. [[slnc 300]] Then add the price in cents. [[slnc 800]] The requirement is the set of questions a renter answers for the equipment items they are renting from you. [[slnc 800]] The attributes may hold some image details that will be automatically added, so you can skip over this. Finally add the specific options for this item by selecting the option variant from the dropdown list. [[slnc 500]] Choose the brand variant, [[slnc 300]] and a length variant. [[slnc 800]] The star after the option name indicates that you made these a required field, which means the renter needs to make a variant selection. [[slnc 500]] Then Press Update to save it.",
    "overruns_by": 0
   },
   {
    "n": 17,
    "label": "first-variant",
-   "starts_at": 197.79,
+   "starts_at": 212.83,
    "room": 6.5,
    "held_at_end": 0.75,
    "spoken": 5.85,
@@ -194,7 +194,7 @@
   {
    "n": 18,
    "label": "the-other-variants",
-   "starts_at": 205.04,
+   "starts_at": 220.08,
    "room": 156.2,
    "held_at_end": 0.0,
    "spoken": 0.0,
@@ -206,7 +206,7 @@
   {
    "n": 19,
    "label": "last-variant",
-   "starts_at": 361.99,
+   "starts_at": 377.03,
    "room": 6.5,
    "held_at_end": 0.75,
    "spoken": 4.9,
@@ -217,7 +217,7 @@
   {
    "n": 20,
    "label": "sign-out",
-   "starts_at": 369.99,
+   "starts_at": 385.03,
    "room": 5.5,
    "held_at_end": 0.75,
    "spoken": 4.89,
@@ -228,7 +228,7 @@
   {
    "n": 21,
    "label": "signed-out",
-   "starts_at": 376.99,
+   "starts_at": 392.03,
    "room": 8.26,
    "held_at_end": 0.75,
    "spoken": 5.16,
