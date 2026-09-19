@@ -1,7 +1,7 @@
 {
  "source": "ski-demo_special-skis_dev_10-19-12_v12.mp4",
  "output": "ski-demo_special-skis_dev_10-19-12_v12-stretched.mp4",
- "output_seconds": 418.08,
+ "output_seconds": 418.04,
  "scenes": [
   {
    "n": 1,
@@ -196,10 +196,10 @@
    "src_in": 186.9,
    "src_out": 194.9,
    "on_camera": 8.0,
-   "scene_needs": 6.9,
-   "built": 10.72,
-   "factor": 1.0,
-   "stretched": false
+   "scene_needs": 10.7,
+   "built": 10.68,
+   "factor": 1.3375,
+   "stretched": true
   },
   {
    "n": 19,
@@ -208,7 +208,7 @@
    "src_out": 213.42,
    "on_camera": 18.52,
    "scene_needs": 0.8,
-   "built": 18.52,
+   "built": 156.2,
    "factor": 1.0,
    "stretched": false
   },
@@ -218,8 +218,8 @@
    "src_in": 213.42,
    "src_out": 236.02,
    "on_camera": 22.6,
-   "scene_needs": 0.8,
-   "built": 22.6,
+   "scene_needs": 0,
+   "built": 0,
    "factor": 1.0,
    "stretched": false
   },
@@ -229,8 +229,8 @@
    "src_in": 236.02,
    "src_out": 351.1,
    "on_camera": 115.08,
-   "scene_needs": 0.8,
-   "built": 115.08,
+   "scene_needs": 0,
+   "built": 0,
    "factor": 1.0,
    "stretched": false
   },
@@ -268,8 +268,8 @@
    "stretched": false
   }
  ],
- "segments_reused": 24,
- "segments_encoded": 0,
+ "segments_reused": 21,
+ "segments_encoded": 1,
  "fps": 25.0,
  "_output_removed": "ski-demo_special-skis_dev_10-19-12_v12-stretched.mp4 was deleted after narration — it is picture-only and silent by design, and its name reads like the finished cut. Rebuild it in ~20s from segments/: python3 scripts/stretch_request.py \"<this folder>\""
 }

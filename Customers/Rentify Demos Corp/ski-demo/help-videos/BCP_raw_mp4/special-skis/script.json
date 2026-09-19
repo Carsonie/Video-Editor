@@ -249,7 +249,7 @@
   {
    "n": 16,
    "label": "item-details",
-   "line": "Build out the item here, in the details page. {2} Add an Item description, {2} Confirm you are in the right collection. {2} Then add how many of this specific item you have for rent. {2} Then add the price in cents. {2} The requirement is the set of questions a renter answers for the equipment items they are renting from you. {2} The attributes may hold some image details that will be automatically added, so you can skip over this.",
+   "line": "Build out the item here, in the details page. {2} Add an Item description, {2} Confirm you are in the right collection. {2} Then add how many of this specific item you have for rent. {2} Then add the price in cents. {2} The requirement is the set of questions,{.5} that a renter answers for the equipment items they are renting from you. {2} The attributes may hold some image details that will be automatically added, so you can skip over this.",
    "pauses": [
     {
      "seconds": 0.75
@@ -277,7 +277,7 @@
   {
    "n": 18,
    "label": "first-variant",
-   "line": "That is the first variant saved. {0.5} Every other one is a copy of it with just one dropdown changed.",
+   "line": "That is the first variant saved. {0.5} Use the duplicate button to make a copy of this item.",
    "pauses": [
     {
      "seconds": 0.75
@@ -294,11 +294,29 @@
    "line": "",
    "silent": true,
    "_silent_note": "No line, on purpose — these screens repeat the first item. The scene is as long as its footage so later cues stay on the right picture. Trim or speed this stretch in the edit.",
-   "raw-source": "156.2s on camera",
+   "raw-source": "split at 213.42s",
    "target-length": "156.2 seconds."
   },
   {
    "n": 20,
+   "label": "duplicate-item",
+   "line": "",
+   "silent": true,
+   "_silent_note": "No line, on purpose — these screens repeat the first item. The scene is as long as its footage so later cues stay on the right picture. Trim or speed this stretch in the edit.",
+   "raw-source": "split from the-other-variants at 213.42s",
+   "target-length": "156.2 seconds."
+  },
+  {
+   "n": 21,
+   "label": "remaining-variants",
+   "line": "",
+   "silent": true,
+   "_silent_note": "No line, on purpose — these screens repeat the first item. The scene is as long as its footage so later cues stay on the right picture. Trim or speed this stretch in the edit.",
+   "raw-source": "split from the-other-variants at 236.02s",
+   "target-length": "156.2 seconds."
+  },
+  {
+   "n": 22,
    "label": "last-variant",
    "line": "All nine variants now exist in the collection — three brands, each in three lengths.",
    "pauses": [
@@ -312,7 +330,7 @@
    "silent": false
   },
   {
-   "n": 21,
+   "n": 23,
    "label": "sign-out",
    "line": "Back at the dashboard when you are done. {0.3} Logout is a card here, same as the rest.",
    "pauses": [
@@ -326,7 +344,7 @@
    "silent": false
   },
   {
-   "n": 22,
+   "n": 24,
    "label": "signed-out",
    "line": "You are signed out. {0.5} Your collection and all nine of its variants are saved and ready to rent.",
    "pauses": [
