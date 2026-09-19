@@ -2,7 +2,7 @@
  "voice": "Samantha",
  "video": "ski-demo_special-skis_dev_10-19-12_v12-stretched.mp4",
  "output": "ski-demo_special-skis_dev_10-19-12_v12-narrated.mp4",
- "seconds": 401.04,
+ "seconds": 414.32,
  "lines": [
   {
    "n": 1,
@@ -162,7 +162,7 @@
    "n": 15,
    "label": "new-item",
    "starts_at": 144.67,
-   "room": 14.78,
+   "room": 19.06,
    "held_at_end": 0.75,
    "spoken": 13.48,
    "rate": 155,
@@ -172,18 +172,29 @@
   {
    "n": 16,
    "label": "item-details",
-   "starts_at": 160.95,
-   "room": 50.38,
+   "starts_at": 165.23,
+   "room": 33.86,
    "held_at_end": 0.75,
-   "spoken": 43.8,
-   "rate": 155,
-   "said": "Build our the item here, in the details page. [[slnc 500]] Add an Item description, [[slnc 300]] Confirm you are in the right collection. Then add how many of this specific item you have for rent. [[slnc 300]] Then add the price in cents. [[slnc 800]] The requirement is the set of questions a renter answers for the equipment items they are renting from you. [[slnc 800]] The attributes may hold some image details that will be automatically added, so you can skip over this. Finally add the specific options for this item by selecting the option variant from the dropdown list. [[slnc 500]] Choose the brand variant, [[slnc 300]] and a length variant. [[slnc 800]] The star after the option name indicates that you made these a required field, which means the renter needs to make a variant selection. [[slnc 500]] Then Press Update to save it.",
+   "spoken": 32.7,
+   "rate": 185,
+   "said": "Build out the item here, in the details page. [[slnc 2000]] Add an Item description, [[slnc 2000]] Confirm you are in the right collection. [[slnc 2000]] Then add how many of this specific item you have for rent. [[slnc 2000]] Then add the price in cents. [[slnc 2000]] The requirement is the set of questions a renter answers for the equipment items they are renting from you. [[slnc 2000]] The attributes may hold some image details that will be automatically added, so you can skip over this.",
    "overruns_by": 0
   },
   {
    "n": 17,
+   "label": "item-detail-variants",
+   "starts_at": 200.59,
+   "room": 24.02,
+   "held_at_end": 0.75,
+   "spoken": 23.95,
+   "rate": 185,
+   "said": "Finally add the specific options for this item by selecting the option variant from the dropdown list. [[slnc 2000]] Choose the brand variant, [[slnc 2000]] and a length variant. [[slnc 2000]] The star after the option name indicates that you made these a required field, which means the renter needs to make a variant selection. [[slnc 2000]] Then Press Update to save it.",
+   "overruns_by": 0
+  },
+  {
+   "n": 18,
    "label": "first-variant",
-   "starts_at": 212.83,
+   "starts_at": 226.11,
    "room": 6.5,
    "held_at_end": 0.75,
    "spoken": 5.85,
@@ -192,9 +203,9 @@
    "overruns_by": 0
   },
   {
-   "n": 18,
+   "n": 19,
    "label": "the-other-variants",
-   "starts_at": 220.08,
+   "starts_at": 233.36,
    "room": 156.2,
    "held_at_end": 0.0,
    "spoken": 0.0,
@@ -204,9 +215,9 @@
    "overruns_by": 0
   },
   {
-   "n": 19,
+   "n": 20,
    "label": "last-variant",
-   "starts_at": 377.03,
+   "starts_at": 390.31,
    "room": 6.5,
    "held_at_end": 0.75,
    "spoken": 4.9,
@@ -215,9 +226,9 @@
    "overruns_by": 0
   },
   {
-   "n": 20,
+   "n": 21,
    "label": "sign-out",
-   "starts_at": 385.03,
+   "starts_at": 398.31,
    "room": 5.5,
    "held_at_end": 0.75,
    "spoken": 4.89,
@@ -226,9 +237,9 @@
    "overruns_by": 0
   },
   {
-   "n": 21,
+   "n": 22,
    "label": "signed-out",
-   "starts_at": 392.03,
+   "starts_at": 405.31,
    "room": 8.26,
    "held_at_end": 0.75,
    "spoken": 5.16,

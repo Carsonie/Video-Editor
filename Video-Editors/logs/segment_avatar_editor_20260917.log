@@ -112,3 +112,20 @@ Server:          http://localhost:8846
 18:19:05  Save scene     segment_66486022             nb_frames=1297  duration_s=51.92
 18:21:28  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=14,15,16,17
 18:23:27  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=14,15,16,17
+07:57:37  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=14,15,16,17
+08:01:25  - Zone         segment_66486022           a=1 b=48  nb_frames=1249
+08:01:25  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=14,15,16,17
+08:04:39  Save scene     segment_66486022             nb_frames=1249  duration_s=49.96
+08:15:23  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=14,15,16,17
+08:17:09  + Frame        segment_66486022           at=1259 count=216 side=right  nb_frames=1475
+08:17:09  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=14,15,16,17
+08:26:14  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=14,15,16,17
+08:27:41  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=14,15,16,17
+08:28:02  Undo           segment_66486022             nb_frames=1259
+08:28:07  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=14,15,16,17
+08:34:02  - Zone         segment_66486022           a=1 b=50  nb_frames=1209
+08:34:02  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=14,15,16,17
+08:45:50  - Zone         segment_66486022           a=41 b=141  nb_frames=1108
+08:45:50  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=14,15,16,17
+08:50:30  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=14,15,16,17
+09:10:26  Undo           segment_66486022             nb_frames=1259

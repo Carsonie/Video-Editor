@@ -1,7 +1,7 @@
 {
  "source": "ski-demo_special-skis_dev_10-19-12_v12.mp4",
  "output": "ski-demo_special-skis_dev_10-19-12_v12-stretched.mp4",
- "output_seconds": 414.32,
+ "output_seconds": 399.52,
  "scenes": [
   {
    "n": 1,
@@ -164,7 +164,7 @@
    "src_out": 154.33,
    "on_camera": 20.53,
    "scene_needs": 16.0,
-   "built": 20.56,
+   "built": 16.28,
    "factor": 1.0,
    "stretched": false
   },
@@ -172,26 +172,15 @@
    "n": 16,
    "label": "item-details",
    "src_in": 154.33,
-   "src_out": 177.86,
-   "on_camera": 23.53,
-   "scene_needs": 35.3,
-   "built": 35.36,
-   "factor": 1.5002,
+   "src_out": 186.9,
+   "on_camera": 32.57,
+   "scene_needs": 50.3,
+   "built": 50.36,
+   "factor": 1.4413,
    "stretched": true
   },
   {
    "n": 17,
-   "label": "item-detail-variants",
-   "src_in": 177.86,
-   "src_out": 186.9,
-   "on_camera": 9.04,
-   "scene_needs": 25.5,
-   "built": 25.52,
-   "factor": 2.8208,
-   "stretched": true
-  },
-  {
-   "n": 18,
    "label": "first-variant",
    "src_in": 186.9,
    "src_out": 194.9,
@@ -202,7 +191,7 @@
    "stretched": false
   },
   {
-   "n": 19,
+   "n": 18,
    "label": "the-other-variants",
    "src_in": 194.9,
    "src_out": 351.1,
@@ -213,7 +202,7 @@
    "stretched": false
   },
   {
-   "n": 20,
+   "n": 19,
    "label": "last-variant",
    "src_in": 351.1,
    "src_out": 359.1,
@@ -224,7 +213,7 @@
    "stretched": false
   },
   {
-   "n": 21,
+   "n": 20,
    "label": "sign-out",
    "src_in": 359.1,
    "src_out": 366.1,
@@ -235,7 +224,7 @@
    "stretched": false
   },
   {
-   "n": 22,
+   "n": 21,
    "label": "signed-out",
    "src_in": 366.1,
    "src_out": 375.88,
@@ -246,8 +235,8 @@
    "stretched": false
   }
  ],
- "segments_reused": 15,
- "segments_encoded": 7,
+ "segments_reused": 20,
+ "segments_encoded": 1,
  "fps": 25.0,
  "_output_removed": "ski-demo_special-skis_dev_10-19-12_v12-stretched.mp4 was deleted after narration — it is picture-only and silent by design, and its name reads like the finished cut. Rebuild it in ~20s from segments/: python3 scripts/stretch_request.py \"<this folder>\""
 }

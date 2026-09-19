@@ -1,7 +1,7 @@
 {
  "source": "ski-demo_special-skis_dev_10-19-12_v12.mp4",
  "output": "ski-demo_special-skis_dev_10-19-12_v12-stretched.mp4",
- "output_seconds": 414.32,
+ "output_seconds": 414.8,
  "scenes": [
   {
    "n": 1,
@@ -174,9 +174,9 @@
    "src_in": 154.33,
    "src_out": 177.86,
    "on_camera": 23.53,
-   "scene_needs": 35.3,
-   "built": 35.36,
-   "factor": 1.5002,
+   "scene_needs": 61.3,
+   "built": 61.36,
+   "factor": 1.8821,
    "stretched": true
   },
   {
@@ -185,10 +185,10 @@
    "src_in": 177.86,
    "src_out": 186.9,
    "on_camera": 9.04,
-   "scene_needs": 25.5,
-   "built": 25.52,
-   "factor": 2.8208,
-   "stretched": true
+   "scene_needs": 0,
+   "built": 0,
+   "factor": 1.0,
+   "stretched": false
   },
   {
    "n": 18,
@@ -246,8 +246,8 @@
    "stretched": false
   }
  ],
- "segments_reused": 15,
- "segments_encoded": 7,
+ "segments_reused": 20,
+ "segments_encoded": 1,
  "fps": 25.0,
  "_output_removed": "ski-demo_special-skis_dev_10-19-12_v12-stretched.mp4 was deleted after narration — it is picture-only and silent by design, and its name reads like the finished cut. Rebuild it in ~20s from segments/: python3 scripts/stretch_request.py \"<this folder>\""
 }
