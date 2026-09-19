@@ -2,7 +2,7 @@
  "voice": "Samantha",
  "video": "ski-demo_special-skis_dev_10-19-12_v12-stretched.mp4",
  "output": "ski-demo_special-skis_dev_10-19-12_v12-narrated.mp4",
- "seconds": 414.32,
+ "seconds": 419.48,
  "lines": [
   {
    "n": 1,
@@ -173,17 +173,17 @@
    "n": 16,
    "label": "item-details",
    "starts_at": 165.23,
-   "room": 33.86,
+   "room": 39.02,
    "held_at_end": 0.75,
-   "spoken": 32.7,
-   "rate": 185,
+   "spoken": 33.93,
+   "rate": 155,
    "said": "Build out the item here, in the details page. [[slnc 2000]] Add an Item description, [[slnc 2000]] Confirm you are in the right collection. [[slnc 2000]] Then add how many of this specific item you have for rent. [[slnc 2000]] Then add the price in cents. [[slnc 2000]] The requirement is the set of questions a renter answers for the equipment items they are renting from you. [[slnc 2000]] The attributes may hold some image details that will be automatically added, so you can skip over this.",
    "overruns_by": 0
   },
   {
    "n": 17,
    "label": "item-detail-variants",
-   "starts_at": 200.59,
+   "starts_at": 205.75,
    "room": 24.02,
    "held_at_end": 0.75,
    "spoken": 23.95,
@@ -194,7 +194,7 @@
   {
    "n": 18,
    "label": "first-variant",
-   "starts_at": 226.11,
+   "starts_at": 231.27,
    "room": 6.5,
    "held_at_end": 0.75,
    "spoken": 5.85,
@@ -205,7 +205,7 @@
   {
    "n": 19,
    "label": "the-other-variants",
-   "starts_at": 233.36,
+   "starts_at": 238.52,
    "room": 156.2,
    "held_at_end": 0.0,
    "spoken": 0.0,
@@ -217,7 +217,7 @@
   {
    "n": 20,
    "label": "last-variant",
-   "starts_at": 390.31,
+   "starts_at": 395.47,
    "room": 6.5,
    "held_at_end": 0.75,
    "spoken": 4.9,
@@ -228,7 +228,7 @@
   {
    "n": 21,
    "label": "sign-out",
-   "starts_at": 398.31,
+   "starts_at": 403.47,
    "room": 5.5,
    "held_at_end": 0.75,
    "spoken": 4.89,
@@ -239,7 +239,7 @@
   {
    "n": 22,
    "label": "signed-out",
-   "starts_at": 405.31,
+   "starts_at": 410.47,
    "room": 8.26,
    "held_at_end": 0.75,
    "spoken": 5.16,
