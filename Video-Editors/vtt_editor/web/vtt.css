@@ -307,8 +307,28 @@ body {
 .tablewrap {
   flex:1 1 auto; min-height:0; overflow:auto;
   margin:0 16px 16px; background:var(--panel);
-  border:1px solid var(--line); border-radius:10px;
+  border:1px solid var(--line); border-top:0; border-radius:0 0 10px 10px;
 }
+
+/* The top scrollbar. It holds one wide, empty child so the browser gives it a
+   real thumb; vtt.js keeps that child as wide as the table and mirrors the
+   scroll both ways. */
+.hscroll {
+  flex:0 0 auto; margin:0 16px; height:15px;
+  overflow-x:scroll; overflow-y:hidden;
+  background:var(--panel); border:1px solid var(--line); border-bottom:0;
+  border-radius:10px 10px 0 0;
+  scrollbar-width:auto;              /* Firefox: never thin it away */
+}
+.hscroll > div { height:1px; }
+/* ⚠ DRAWN ALL THE TIME. Without these rules macOS hides the bar until a scroll
+   is in progress, which is the whole problem this bar exists to solve. */
+.hscroll::-webkit-scrollbar { height:12px; -webkit-appearance:none; }
+.hscroll::-webkit-scrollbar-track { background:var(--panel-2); border-radius:6px; }
+.hscroll::-webkit-scrollbar-thumb {
+  background:var(--dim); border-radius:6px; border:2px solid var(--panel);
+}
+.hscroll::-webkit-scrollbar-thumb:hover { background:var(--ink); }
 table.scenes { border-collapse:collapse; width:100%; }
 table.scenes th {
   position:sticky; top:0; z-index:2; background:var(--panel);

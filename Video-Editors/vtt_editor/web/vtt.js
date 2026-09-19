@@ -858,7 +858,34 @@ async function openCrumb() {
   await refresh();
 }
 
+/*
+  THE TOP SCROLLBAR, KEPT IN STEP WITH THE TABLE.
+
+  Two elements scroll the same content, so each one writes the other's
+  scrollLeft — and a write triggers the other's scroll event straight back.
+  `lock` breaks that loop; without it the bar stutters and fights the drag.
+
+  The inner spacer is re-measured whenever the table changes width, which is
+  every render (a longer line widens the LINE column) and every window resize.
+*/
+function hookHScroll() {
+  const bar = $('hscroll'), inner = $('hscrollInner'), wrap = $('tablewrap');
+  if (!bar || !inner || !wrap) return;
+  let lock = false;
+  const sync = () => { inner.style.width = wrap.scrollWidth + 'px'; };
+  bar.addEventListener('scroll', () => {
+    if (lock) return; lock = true; wrap.scrollLeft = bar.scrollLeft; lock = false;
+  });
+  wrap.addEventListener('scroll', () => {
+    if (lock) return; lock = true; bar.scrollLeft = wrap.scrollLeft; lock = false;
+  });
+  new ResizeObserver(sync).observe(wrap);
+  window.addEventListener('resize', sync);
+  sync();
+}
+
 async function boot() {
+  hookHScroll();
   const d = await api('/api/tree');
   TREE = d.tree || [];
   if (!TREE.length) {

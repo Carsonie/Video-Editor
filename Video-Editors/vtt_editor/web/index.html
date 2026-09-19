@@ -19,7 +19,7 @@
   <div class="brand">
     <span class="mark" aria-hidden="true"></span>
     <span class="name">VTT Editor</span>
-    <span class="ver">v2</span>
+    <span class="ver">v3</span>
   </div>
   <!--
     ⚠ FOUR DROPDOWNS, NOT ONE. Carson, 2026-09-15: "I need to load the videos
@@ -105,7 +105,13 @@
     <div class="strip" id="strip" role="tablist" aria-label="scenes"></div>
 
     <!-- ── the words ─────────────────────────────────────────────────────── -->
-    <div class="tablewrap">
+    <!-- ⚠ A SECOND, ALWAYS-VISIBLE HORIZONTAL SCROLLBAR, ABOVE THE ROWS.
+         Carson, 2026-09-19: the table's own scrollbar sits at the bottom of the
+         window, which is where macOS pops the Dock up, so the end of a long
+         line could not be reached. This bar drives the same scroll from the top
+         and is styled to stay drawn — macOS overlay scrollbars fade otherwise. -->
+    <div class="hscroll" id="hscroll" aria-hidden="true"><div id="hscrollInner"></div></div>
+    <div class="tablewrap" id="tablewrap">
       <table class="scenes">
         <thead>
           <tr>
