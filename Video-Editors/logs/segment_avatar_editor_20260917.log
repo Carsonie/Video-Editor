@@ -193,3 +193,33 @@ Server:          http://localhost:8846
 09:39:34  Save scene     segment_358f06b5             nb_frames=225  duration_s=9.0
 09:49:30  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=22  line=You are signed out. {0.5} Your collection and all nine of its variants are saved and ready to rent. TEST
 09:49:48  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=22  line=You are signed out. {0.5} Your collection and all nine of its variants are saved and ready to rent.
+10:25:26  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=8
+10:26:05  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=8,9
+10:26:38  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=7,8,9,10
+10:30:25  + Frame        segment_9191b441           at=248 count=25 side=right  nb_frames=278
+10:30:25  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=7,8,9,10
+10:33:39  - Zone         segment_9191b441           a=125 b=150  nb_frames=252
+10:33:39  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=7,8,9,10
+10:34:54  Save scene     segment_9191b441             nb_frames=252  duration_s=10.12
+10:35:17  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=13
+10:37:07  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13
+10:45:58  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13
+10:48:05  + Frame        segment_28ebe6d2           at=1 count=100 side=right  nb_frames=457
+10:48:05  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13
+10:51:23  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=10,11,12,13,14
+10:53:13  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=13  line=Now, lets return to the collections page. {3} Then we can return to the store page. {2} Open the menu again using the gear icon. {1} Then choose Lookup Items.
+10:56:29  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=13  line=Now, lets return to the collections page. {3} Click the back arrow. {1} Then we can return to the store page. {2} Open the menu again using the gear icon. {1} Then choose Lookup Items.
+10:58:06  - Zone         segment_1af86e67           a=197 b=200  nb_frames=196
+10:58:06  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13
+10:58:33  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=9,10,11,12,13,14
+11:03:16  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13
+11:05:17  Save scene     segment_1af86e67             nb_frames=196  duration_s=7.84
+11:05:22  Save scene     segment_28ebe6d2             nb_frames=None  duration_s=18.28
+11:08:58  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13
+11:15:31  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13
+11:21:11  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13
+11:23:19  - Zone         segment_1af86e67           a=176 b=178  nb_frames=175
+11:23:19  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13
+11:27:14  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=13  line=Scroll up and return to the collections page. {3} Click the back arrow. {1} Then we can return to the store page. {2} Open the menu again using the gear icon. {1} Then choose Lookup Items.
+11:27:42  Save scene     segment_1af86e67             nb_frames=175  duration_s=7.0
+11:28:47  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13

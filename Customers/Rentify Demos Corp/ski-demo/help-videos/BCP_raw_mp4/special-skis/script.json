@@ -207,7 +207,7 @@
     {
       "n": 13,
       "label": "back-to-the-store",
-      "line": "Now, lets return to the collections page. {2} Then we can return to the store page. {2} Open the menu again using the gear icon. {1} Then choose Lookup Items.",
+      "line": "Scroll up and use the back arrow to return to the collections page. {1} Then we can return to the store page. {2} Open the menu again using the gear icon. {1} Then choose Lookup Items.",
       "pauses": [
         {
           "seconds": 0.75

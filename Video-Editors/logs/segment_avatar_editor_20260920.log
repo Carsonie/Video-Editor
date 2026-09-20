@@ -1,0 +1,38 @@
+
+Editor Session:  2026-09-20T11:38:33
+Player:          Segment and Avatar Editor v65
+Server:          http://localhost:8846
+
+11:38:58  + Frame        segment_1af86e67           at=10 count=1 side=right  nb_frames=176
+11:38:58  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13
+11:39:08  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13
+11:53:27  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13
+11:55:10  Save scene     segment_1af86e67             nb_frames=176  duration_s=7.08
+11:56:13  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13
+11:59:49  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13
+12:00:42  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13,14
+
+Editor Session:  2026-09-20T12:03:27
+Player:          Segment and Avatar Editor v66
+Server:          http://localhost:8846
+
+12:03:37  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13
+12:03:50  + Frame        segment_1af86e67           at=10 count=1 side=right  nb_frames=177
+12:03:50  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13
+12:07:39  Undo           segment_1af86e67             nb_frames=176
+12:07:39  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13
+12:13:22  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=13  line=Scroll up and return to the collections page. {1} Click the back arrow. {1} Then we can return to the store page. {2} Open the menu again using the gear icon. {1} Then choose Lookup Items.
+
+Editor Session:  2026-09-20T12:16:14
+Player:          Segment and Avatar Editor v67
+Server:          http://localhost:8846
+
+
+Editor Session:  2026-09-20T12:20:26
+Player:          Segment and Avatar Editor v68
+Server:          http://localhost:8846
+
+12:21:50  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13
+12:24:50  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=13  line=Scroll up and use the back arrow to return to the collections page. {1} Then we can return to the store page. {2} Open the menu again using the gear icon. {1} Then choose Lookup Items.
+12:29:25  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13
+12:31:28  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=11,12,13
