@@ -3,11 +3,17 @@
 > into `Customers/` and `Video-Editors/`; the code lives in the second one.
 
 
-Six of them. Five drive a real server over HTTP against a disposable store
-built from real footage; the sixth has no server in it.
+Five of them. Four drive a real server over HTTP against a disposable store
+built from real footage; the fifth has no server in it.
+
+⚠ THERE WERE SIX. `test_editor.py` drove `shared/serve.py` on 8842 — an 82%
+copy of the Segment and Avatar Editor that Frame Blender and Avatar Editor
+imported and configured by writing into its globals. Both now use
+`editor_base/server.py` and `editor_base/session.py`, so the copy and its
+suite were retired on 2026-09-21. `git show` has them if a question ever
+needs the old behaviour.
 
 ```bash
-python3 tests/test_editor.py                 # shared/serve.py, port 8842 (old combined) — 166
 python3 tests/test_avatar_editor.py          # avatar_editor/serve.py, port 8844          — 173
 python3 tests/test_segment_avatar_editor.py  # segment_avatar_editor/serve.py, port 8846  — 119
 python3 tests/test_mp4_splitter.py           # mp4_splitter/serve.py, port 8845           — 102
@@ -15,7 +21,7 @@ python3 tests/test_frame_blender.py          # frame_blender/serve.py, port 8843
 python3 tests/test_editor_base.py            # editor_base/ — pure functions, no server   —  57
 ```
 
-688 checks. Exit code is non-zero if any fail.
+544 checks. Exit code is non-zero if any fail.
 
 **A change inside `editor_base/` runs all six, not one.** That is the trade
 the shared package makes: it is imported by every editor, so a change there

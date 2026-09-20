@@ -78,14 +78,21 @@ ROOT = os.path.dirname(HERE)                             # <repo>
 CACHE = os.path.join(ROOT, "cache", "avatar-editor")       # this tool's OWN cache
 GAP_LOG_DIR = os.path.join(ROOT, "logs")                  # same logs/ the editor's own daily log lives in
 sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, "shared"))
 sys.path.insert(0, os.path.join(ROOT, "build"))
 # frames.py and paths.py are editor_base/ since 2026-09-03 — one copy
 # instead of three. The names still resolvable through shared/ are
 # re-export shims for build/; import the real package directly.
 from editor_base import frames as build_mod               # noqa: E402
-import serve as main_serve                                # noqa: E402  for its session_log — see log()
-from serve import safe_join, CUSTOMERS_ROOT               # noqa: E402
+# ⚠ NOT `import serve as main_serve` ANY MORE. This tool used to borrow the
+# old shared/serve.py — an 82% copy of the Segment and Avatar Editor — and
+# CONFIGURE it by writing into that module's globals, so the log you got
+# depended on which import ran last. Those helpers are editor_base now:
+# shared code, not a second editor imported sideways.
+from editor_base import server as ebserver                 # noqa: E402
+from editor_base import session                            # noqa: E402
+from editor_base import stores as ebstores                 # noqa: E402  the Load listing
+safe_join = ebserver.safe_join                             # one rule, one place
+CUSTOMERS_ROOT = ebserver.CUSTOMERS_ROOT
 import build_scenes                                       # noqa: E402  reuse its real ffmpeg recipe
 from editor_base import paths as PTH                      # noqa: E402  script()/sandbox_root() — see stores()
 
@@ -106,7 +113,7 @@ build_mod.use_cache(CACHE)
 # ...and point shared/serve.py's borrowed helpers at it too.
 #
 # This tool does not copy shared/serve.py's pure helpers, it calls them —
-# main_serve.resolve_outdir() and main_serve.frame_count() among them, so a
+# ebserver.resolve_outdir() and ebserver.frame_count() among them, so a
 # scene's frame count and pristine/dirty state stay computed exactly one
 # way. Both read shared/serve.py's OWN module-level CACHE, which is
 # <repo>/cache.
@@ -121,7 +128,7 @@ build_mod.use_cache(CACHE)
 #
 # The same monkey-patch shape main() already uses for SESSION_OFF,
 # SESSION_LOG and ACTIONS.
-main_serve.CACHE = CACHE
+build_mod.use_cache(CACHE)          # ours; ebserver reads the same value
 
 SARAH_ROOT = os.path.join(ROOT, "Sarah")                 # her common library — see Sarah/README.md
 
@@ -166,7 +173,7 @@ def log(path, payload, result, status):
     action (Load, Save, Undo) calls this explicitly; none of them log
     themselves for free.
     """
-    main_serve.session_log(path, payload, result, status)
+    session.log(path, payload, result, status)
 
 
 # Measured audibility, cached per (path, mtime, size) — see has_audible().
@@ -384,36 +391,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         Two levels down from Customers/ is assumed to be Business/store,
         same as /api/list's own STORE-folder detection.
         """
-        out = []
-        if not os.path.isdir(CUSTOMERS_ROOT):
-            return self._relay(200, {"stores": out})
-        for biz in sorted(os.listdir(CUSTOMERS_ROOT), key=str.lower):
-            biz_dir = os.path.join(CUSTOMERS_ROOT, biz)
-            if biz.startswith(".") or not os.path.isdir(biz_dir):
-                continue
-            for store in sorted(os.listdir(biz_dir), key=str.lower):
-                store_dir = os.path.join(biz_dir, store)
-                videos_root = os.path.join(store_dir, "help-videos", "videos")
-                if store.startswith(".") or not os.path.isdir(videos_root):
-                    continue
-                videos = []
-                for vname in sorted(os.listdir(videos_root), key=str.lower):
-                    vdir = os.path.join(videos_root, vname)
-                    script_p = PTH.script(vdir)
-                    if vname.startswith(".") or not os.path.isfile(script_p):
-                        continue
-                    try:
-                        doc = json.load(open(script_p))
-                        ns = sorted(x["n"] for x in doc.get("scenes", []) if "n" in x)
-                    except (OSError, ValueError, KeyError):
-                        ns = []
-                    has_sandbox = os.path.isdir(PTH.sandbox_root(vdir))
-                    videos.append({"name": vname,
-                                   "root": f"{biz}/{store}/help-videos/videos/{vname}",
-                                   "scenes": ns, "has_sandbox": has_sandbox})
-                if videos:
-                    out.append({"business": biz, "store": store, "videos": videos})
-        self._relay(200, {"stores": out})
+        # ⚠ THE LISTING IS editor_base/stores.py, NOT A COPY HERE.
+        # This loop named `help-videos/videos/`, which no store has had since
+        # 2026-09-15 — so Load came back empty on all four stores, in silence,
+        # in three editors at once. One rule, read off disk, in one place.
+        self._relay(200, {"stores": ebstores.list_stores(CUSTOMERS_ROOT)})
 
     def siblings(self, rel):
         """
@@ -455,16 +437,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         for n, label in PTH.scenes_from_script(final):
             sb = PTH.sandbox_only(final, n, label)
             seg, av = sb["segment"], sb["avatar"]
-            nfr, nex = (main_serve.frame_count(seg) if seg else (None, False))
-            ofr, oex = (main_serve.frame_count(av) if av else (None, False))
+            nfr, nex = (ebserver.frame_count(seg) if seg else (None, False))
+            ofr, oex = (ebserver.frame_count(av) if av else (None, False))
             dur = None
             if seg:
                 try:
                     dur = round(float(build_mod.probe(seg, "duration")), 2)
                 except (ValueError, RuntimeError):
                     dur = None
-            base_slug, base_edited = main_serve.cache_state(seg)
-            over_slug, over_edited = main_serve.cache_state(av)
+            base_slug, base_edited = ebserver.cache_state(seg)
+            over_slug, over_edited = ebserver.cache_state(av)
             items.append({
                 "n": n, "label": label,
                 "name": os.path.basename(seg) if seg else "—",
@@ -501,10 +483,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     dur = round(float(build_mod.probe(seg, "duration")), 2)
                 except (ValueError, RuntimeError):
                     pass
-                bfr, bex = main_serve.frame_count(seg)
-                afr, aex = (main_serve.frame_count(av) if os.path.isfile(av) else (None, False))
-                base_slug, base_edited = main_serve.cache_state(seg)
-                over_slug, over_edited = (main_serve.cache_state(av) if os.path.isfile(av)
+                bfr, bex = ebserver.frame_count(seg)
+                afr, aex = (ebserver.frame_count(av) if os.path.isfile(av) else (None, False))
+                base_slug, base_edited = ebserver.cache_state(seg)
+                over_slug, over_edited = (ebserver.cache_state(av) if os.path.isfile(av)
                                            else (None, False))
                 items.append({
                     "n": n, "label": m.group(2), "name": "segment.mp4", "dur": dur,
@@ -911,7 +893,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         exactly what one shared process used to prevent for free, and
         every independent tool acting on the same cache reopens it.
         """
-        outdir = main_serve.resolve_outdir(payload.get("slug"), payload.get("which"))
+        outdir = ebserver.resolve_outdir(payload.get("slug"), payload.get("which"))
         if outdir is None:
             return self.json_error(400, "unknown slug")
         with build_mod.dir_lock(outdir):
@@ -937,8 +919,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             tmp_dir = tempfile.mkdtemp(prefix="avatar_editor_save_")
             try:
                 runs = build_mod.group_frame_runs(frame_map)
-                built = os.path.join(tmp_dir, "built.webm" if main_serve.is_alpha(src) else "built.mp4")
-                r = main_serve.build_segment(src, fps, runs, built, tmp_dir)
+                built = os.path.join(tmp_dir, "built.webm" if ebserver.is_alpha(src) else "built.mp4")
+                r = ebserver.build_segment(src, fps, runs, built, tmp_dir)
                 if r.returncode != 0:
                     return self.json_error(500, r.stderr[-500:])
                 got = float(build_mod.probe(built, "duration"))
@@ -959,11 +941,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                                         force=True,
                                         alpha_png=(meta.get("ext") == ".png"),
                                         log=lambda m: sys.stderr.write(m + "\n"))
-                main_serve.save_marks(outdir, [])
+                ebserver.save_marks(outdir, [])
                 new_meta = json.load(open(os.path.join(outdir, "meta.json")))
                 nb_frames = new_meta["nb_frames"]
 
-                wrote = build_mod.decoded_frames(src, main_serve.dec_for(src))
+                wrote = build_mod.decoded_frames(src, ebserver.dec_for(src))
                 if wrote is not None and wrote != want_frames:
                     warning = (f"wrote {wrote} frames, expected {want_frames} — the rebuild "
                                f"is time-based and loses a frame per cut")
@@ -994,7 +976,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         See save_scene's own docstring for the dir_lock cross-process
         caveat — it applies here too.
         """
-        outdir = main_serve.resolve_outdir(payload.get("slug"), payload.get("which"))
+        outdir = ebserver.resolve_outdir(payload.get("slug"), payload.get("which"))
         if outdir is None:
             return self.json_error(400, "unknown slug")
         target = payload.get("frame_map")
@@ -1005,8 +987,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 n = build_mod.restore_map(outdir, target, log=lambda m: sys.stderr.write(m + "\n"))
             except (RuntimeError, OSError) as e:
                 return self.json_error(400, str(e))
-            marks = [m for m in main_serve.load_marks(outdir) if 1 <= m <= n]
-            main_serve.save_marks(outdir, marks)
+            marks = [m for m in ebserver.load_marks(outdir) if 1 <= m <= n]
+            ebserver.save_marks(outdir, marks)
             meta = json.load(open(os.path.join(outdir, "meta.json")))
         result = {"nb_frames": n, "marks": sorted(marks), "edited": bool(meta.get("edited"))}
         # "/api/frames/restore" — the ACTIONS key "Undo" is registered
@@ -1100,17 +1082,16 @@ def main():
     # process — safe because they're plain Python globals, not shared state
     # between the two actual server processes, and read back by the same
     # module's own session_log() every time this process calls it.
-    main_serve.SESSION_OFF = a.no_session_log
     # A dedicated file, not shared/serve.py's own logs/editor_<date>.log —
     # every editor logs to its own file now (Carson's own call, 2026-09-02),
     # so one editor's actions are never interleaved with another's in the
     # same log. Reuses session_log()'s own FORMATTING code (still imported
     # as a plain module) — only the destination file changes.
-    main_serve.SESSION_LOG = os.path.join(
-        main_serve.SESSION_DIR, f"avatar_editor_{time.strftime('%Y%m%d')}.log")
+    session.configure(
+        os.path.join(ROOT, "logs", f"avatar_editor_{time.strftime('%Y%m%d')}.log"),
+        SESSION_ACTIONS, off=a.no_session_log)
     # Same idea, for the LABELS session_log() writes — see SESSION_ACTIONS'
     # own comment above for why the "FB:" prefix is wrong here.
-    main_serve.ACTIONS = SESSION_ACTIONS
 
     os.makedirs(CACHE, exist_ok=True)
     import functools
@@ -1118,7 +1099,7 @@ def main():
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", a.port), handler)
     print(f"  avatar editor serving on http://localhost:{a.port}")
     print(f"  cache: {CACHE}")
-    print(f"  session log: {'off' if a.no_session_log else main_serve.SESSION_LOG}")
+    print(f"  session log: {'off' if a.no_session_log else session.log_path()}")
     httpd.serve_forever()
 
 

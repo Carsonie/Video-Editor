@@ -59,7 +59,6 @@ import fixture
 # Sarah/ moved WITH the code, so it is CODE_ROOT, not REPO.  # noqa: E402
 
 PLAYERS = os.path.dirname(HERE)
-MAIN_SERVE = os.path.join(PLAYERS, "shared", "serve.py")
 AE_SERVE = os.path.join(PLAYERS, "avatar_editor", "serve.py")
 
 MAIN_BASE = None    # set by main()
@@ -917,15 +916,25 @@ def s_own_cache():
     eq("editor_base will extract into that same folder",
        ae_serve.build_mod.CACHE, ae_serve.CACHE)
 
-    # The third one, and the one that actually broke. This tool CALLS
-    # shared/serve.py's pure helpers rather than copying them, and two of
-    # them — resolve_outdir() and frame_count() — read that module's own
-    # CACHE. Leave it pointing at <repo>/cache and extraction goes to one
-    # folder while every lookup goes to another: Save then fails with
-    # "changed on disk since this was loaded here", a staleness error about
-    # a file nobody touched.
-    eq("shared/serve.py's borrowed helpers look in that folder too",
-       ae_serve.main_serve.CACHE, ae_serve.CACHE)
+    # The third one, and the one that actually broke. This tool CALLS the
+    # shared helpers rather than copying them, and two of them —
+    # resolve_outdir() and frame_count() — read a cache. Leave that pointing
+    # at <repo>/cache and extraction goes to one folder while every lookup
+    # goes to another: Save then fails with "changed on disk since this was
+    # loaded here", a staleness error about a file nobody touched.
+    #
+    # ⚠ THE SHAPE OF THIS CHANGED 2026-09-21. The helpers used to live in
+    # shared/serve.py, imported here as `main_serve` and configured by
+    # writing to its globals (`main_serve.CACHE = ...`) — this check read
+    # that attribute. They are editor_base/server.py now and they read
+    # editor_base.frames.CACHE, which this tool sets with use_cache(), so
+    # the hazard is the same one and the assertion follows it.
+    from editor_base import server as ebserver       # noqa: E402
+    from editor_base import frames as ebframes       # noqa: E402
+    eq("the shared helpers look in that folder too",
+       ebframes.CACHE, ae_serve.CACHE)
+    eq("and resolve_outdir lands inside it",
+       os.path.dirname(ebserver.resolve_outdir(slug) or ""), ae_serve.CACHE)
 
 
 FUNCTIONS = [s_static_page, s_app_js_parses, s_load_order_forward_refs, s_original_audio_stack, s_working_clips, s_common_library_wiring, s_tooltips, s_stateless, s_load_picker, s_load_store,
@@ -956,16 +965,15 @@ def main():
         check(f"{n:02d}-{label}", True, f"segment={ns} avatar={na} narration={nn}")
     fixture.build(quiet=True)
 
-    main_srv = subprocess.Popen(
-        [sys.executable, MAIN_SERVE, "--port", str(a.main_port), "--no-session-log"],
-        cwd=os.path.dirname(MAIN_SERVE), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # ⚠ NO "MAIN EDITOR" ANY MORE. This suite used to boot shared/serve.py
+    # beside the tool under test, because the tool borrowed that module and
+    # proxied two routes to it. Both are gone: the helpers are editor_base
+    # now and every route is served here. Retired 2026-09-21.
     fb_srv = subprocess.Popen(
         [sys.executable, AE_SERVE, "--port", str(a.fb_port), "--no-session-log"],
         cwd=os.path.dirname(AE_SERVE), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         env={**os.environ, "MAIN_EDITOR_URL": MAIN_BASE})
     try:
-        if not wait_up(MAIN_BASE + "/browse.html"):
-            sys.exit("  the main editor never came up")
         if not wait_up(AE_BASE + "/"):
             sys.exit("  avatar_editor never came up")
 
@@ -973,7 +981,6 @@ def main():
             fn()
     finally:
         if not a.keep:
-            main_srv.terminate()
             fb_srv.terminate()
             fixture.destroy()
         else:

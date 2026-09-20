@@ -177,7 +177,7 @@ By eye, in the MP4 Splitter — mark, ＋/− Frame, ＋/− Zone, Loop Zone, Cu
 the hand-off into `dev/`.
 
 ```bash
-python3 shared/serve.py --port 8842
+python3 segment_avatar_editor/serve.py --port 8846   # shared/serve.py retired 2026-09-21
 ```
 
 `build/cut_segments.py` can do it from flow-log stamps instead, but it must
@@ -241,7 +241,7 @@ hole.
 ### 7. Adjust — Carson's step, in the editor
 
 ```bash
-python3 shared/serve.py --port 8842
+python3 segment_avatar_editor/serve.py --port 8846   # shared/serve.py retired 2026-09-21
 ```
 
 Frame and zone edits, marks, Join, Split, Solo, the VTT panel, **Save Scenes**

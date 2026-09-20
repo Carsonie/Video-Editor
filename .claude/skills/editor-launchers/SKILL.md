@@ -17,7 +17,7 @@ into two) — always these four unless he names a different set:
 |---|---|---|---|---|
 | **MP4 Splitter** | Cuts a raw recording into numbered segments. `mp4_splitter/serve.py` | `mp4-splitter` | 8845 | `cache/mp4-splitter/` |
 | **Segment and Avatar Editor** | Layers a segment + avatar overlay, timelines, Join/Split. `segment_avatar_editor/serve.py` | `segment-avatar-editor` | 8846 | `cache/segment-avatar-editor/` |
-| **Frame Blender** | Monitors how the base and overlay tracks flow together, frame by frame, to form the current scene — and (planned) drives a visual frame-by-frame mp4 build, showing the build as it happens. `frame_blender/` | `frame-blender` | 8843 | `cache/_shared/` — shared only with the old 8842 server. Giving it `cache/frame-blender/` for symmetry is a separate task. |
+| **Frame Blender** | Monitors how the base and overlay tracks flow together, frame by frame, to form the current scene — and (planned) drives a visual frame-by-frame mp4 build, showing the build as it happens. `frame_blender/` | `frame-blender` | 8843 | `cache/_shared/` — its own now that 8842 is retired. Renaming it `cache/frame-blender/` for symmetry is a separate task. |
 | **Avatar Editor** | Edits Sarah's own overlay — her clip library (stills, idle loops, transitions, sound bits) via the Gap Builder, for building and adjusting her overlay scene by scene. `avatar_editor/` | `avatar-editor` | 8844 | `cache/avatar-editor/` — its own since 2026-09-04. It shared the old repo-root `cache/` with Frame Blender until then. |
 
 **Frame Blender's purpose (2026-09-02):** it exists to watch the two
@@ -54,21 +54,36 @@ rendered by a private duplicate of MP4 Splitter's player
 nothing in any UI ever linked to the page itself, so it was deleted.
 `/<slug>/base/viewer.html` now 404s, by design.
 
-**`shared/serve.py` still exists, still on port 8842** — it has to: Frame
-Blender and Avatar Editor both import plain functions out of it directly
-(`resolve_outdir`, `build_segment`, `cache_state`, ...), so it cannot be
-removed or gutted. Avatar Editor also *monkey-patches* its `CACHE` at
-import time (2026-09-04), because two of those borrowed helpers read it.
+**`shared/serve.py` IS RETIRED — 2026-09-21, and port 8842 with it.** It was
+an 82% copy of the Segment and Avatar Editor's own server (2711 lines against
+2487), kept alive only because Frame Blender and Avatar Editor imported plain
+functions out of it (`resolve_outdir`, `build_segment`, `cache_state`, ...) and
+then CONFIGURED it by writing into its globals — Avatar Editor monkey-patched
+its `CACHE` at import time, so which log you got depended on which import ran
+last.
+
+Those helpers are shared code now, and nothing imports an editor sideways:
+
+    editor_base/server.py    safe_join, resolve_outdir, frame_count,
+                             cache_state, build_segment, the marks, the
+                             encoder settings — lifted verbatim, and they
+                             read editor_base.frames.CACHE, which each
+                             editor sets once with use_cache()
+    editor_base/session.py   the per-editor log: configure() it, call log()
+    editor_base/stores.py    the Load listing, read off disk
+    editor_base/recorder.py  the recorder's scripts, in the other repo
+
+The `video-editor` entry is out of `.claude/launch.json` and
+`tests/test_editor.py` went with it — five suites now, 544 checks, all green.
+`git show` has the file if its old behaviour is ever a question.
 
 What did change on 2026-09-03: `shared/frames.py`, `shared/paths.py` and
 `shared/vtt.py` are now ~25-line **re-export shims** over `editor_base/`,
 the one package every editor imports from. They keep the nine scripts in
 `build/` working unchanged. The real code is in `editor_base/`.
 
-Starting it (`video-editor` in launch.json) still works and still serves
-both tools combined on one page — but it is no longer part of "run the
-editors." Only mention/launch it if Carson specifically asks for the old
-combined page.
+There is no combined page any more: the Splitter and the SAE each serve their
+own, on 8845 and 8846.
 
 **The next-gen web editor is a FIFTH, separate tool** — not part of "the
 four," not started by "run the editors." Launch it only when Carson names

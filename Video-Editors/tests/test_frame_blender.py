@@ -46,7 +46,6 @@ sys.path.insert(0, HERE)
 import fixture  # noqa: E402
 
 PLAYERS = os.path.dirname(HERE)
-MAIN_SERVE = os.path.join(PLAYERS, "shared", "serve.py")
 FB_SERVE = os.path.join(PLAYERS, "frame_blender", "serve.py")
 
 MAIN_BASE = None    # set by main()
@@ -464,16 +463,15 @@ def main():
         check(f"{n:02d}-{label}", True, f"segment={ns} avatar={na} narration={nn}")
     fixture.build(quiet=True)
 
-    main_srv = subprocess.Popen(
-        [sys.executable, MAIN_SERVE, "--port", str(a.main_port), "--no-session-log"],
-        cwd=os.path.dirname(MAIN_SERVE), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # ⚠ NO "MAIN EDITOR" ANY MORE. This suite used to boot shared/serve.py
+    # beside the tool under test, because the tool borrowed that module and
+    # proxied two routes to it. Both are gone: the helpers are editor_base
+    # now and every route is served here. Retired 2026-09-21.
     fb_srv = subprocess.Popen(
         [sys.executable, FB_SERVE, "--port", str(a.fb_port), "--no-session-log"],
         cwd=os.path.dirname(FB_SERVE), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         env={**os.environ, "MAIN_EDITOR_URL": MAIN_BASE})
     try:
-        if not wait_up(MAIN_BASE + "/browse.html"):
-            sys.exit("  the main editor never came up")
         if not wait_up(FB_BASE + "/"):
             sys.exit("  frame_blender never came up")
 
@@ -493,7 +491,6 @@ def main():
             os.rmdir(SAVE_MP4_DIR)
 
         if not a.keep:
-            main_srv.terminate()
             fb_srv.terminate()
             fixture.destroy()
         else:
