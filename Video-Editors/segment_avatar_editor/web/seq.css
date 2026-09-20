@@ -305,6 +305,23 @@
      a reload part way through leaves the rest unwritten. */
   /* Something on this timeline is not written to disk yet. Green, because the
      answer is a keystroke away rather than a warning about damage. */
+  /* ⚠ A SPINNER THAT OUTLIVES THE PAGE. Save Timeline ends by re-opening the
+     timeline, and a button spinner dies with the old document — so the last
+     seconds of a save looked like a frozen page. This overlay is drawn over
+     everything, stays up across the navigation, and the new page clears it on
+     load. Carson, 2026-09-21: "Keep a process spinner in motion while the
+     updates are in progress." */
+  #busy { position:fixed; inset:0; z-index:9999; display:none;
+          background:rgba(10,12,14,.72); backdrop-filter:blur(2px);
+          align-items:center; justify-content:center; flex-direction:column; gap:14px; }
+  #busy.on { display:flex; }
+  #busy .ring { width:54px; height:54px; border-radius:50%;
+                border:4px solid #2b3440; border-top-color:#57d98a;
+                animation:busyspin .8s linear infinite; }
+  #busy .say { font:600 13px/1.5 ui-sans-serif,system-ui; color:#cfe6f5;
+               text-align:center; max-width:38ch; }
+  @keyframes busyspin { to { transform:rotate(360deg); } }
+
   button.dirty { color:#57d98a; border-color:#2f7d4f; font-weight:700; }
   button.dirty:hover { color:#7ce8a6; }
   button.working { position:relative; color:#cfe6f5; border-color:#2e8ecc;

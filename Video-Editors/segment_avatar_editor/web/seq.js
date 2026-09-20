@@ -1001,7 +1001,17 @@ ${v.scenes.length} scene(s).
     so the only thing outstanding is the voice, and the green button has to do
     that job too. Carson, 2026-09-20: "It needs to rebuild voice when I click it."
   */
+  /* The overlay spinner: one place that turns it on, with a message. */
+  function busy(on, say) {
+    const box = document.getElementById('busy');
+    if (!box) return;
+    if (say) document.getElementById('busySay').textContent = say;
+    box.classList.toggle('on', !!on);
+  }
+
   async function syncAndReturn(btn, label, what) {
+    busy(true, 'Saving, then updating the words, the cuts and the voice.\n'
+             + 'Only the scenes on this timeline are touched.');
     if (btn) { btn.classList.add('working'); btn.disabled = true;
                btn.innerHTML = 'Updating words &amp; voice…'; }
     status(`${what} Updating the words, the cuts and the voice — this re-encodes `
@@ -1010,11 +1020,12 @@ ${v.scenes.length} scene(s).
     try {
       const rs = await fetch('/api/sync', { method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ root: ROOT_REL }) });
+        body: JSON.stringify({ root: ROOT_REL, ns: SEQ.map(s => s.n) }) });
       sync = await rs.json();
     } catch (e) { sync = { error: String(e) }; }
     if (sync && sync.error) {
       if (btn) { btn.classList.remove('working'); btn.disabled = false; btn.innerHTML = label; }
+      busy(false);
       renderScenes();
       status(`${what} The update FAILED:\n⚠ ${sync.error}`);
       return false;
@@ -1023,6 +1034,7 @@ ${v.scenes.length} scene(s).
       sessionStorage.setItem('sae.resume', JSON.stringify(
         { root: ROOT_REL, ns: SEQ.map(s => s.n).join(','), frame: +$('slider').value }));
     } catch (_) {}
+    busy(true, 'Updated. Re-reading the scenes…');
     status('Updated — re-reading the scenes…');
     location.href = `/api/open-seq-go?root=${encodeURIComponent(ROOT_REL)}`
                   + `&ns=${SEQ.map(s => s.n).join(',')}`;
@@ -1030,10 +1042,35 @@ ${v.scenes.length} scene(s).
   }
 
   async function saveScenes(includeNarrative) {
+    /*
+      ⚠ THE WHOLE TIMELINE, AS IT IS, EVERY TIME.
+
+      Carson, 2026-09-21: "All frames in all the current time line scenes are
+      to [be] saved into the sandbox scenes, as is, at the time of the save. All
+      narrative in all the current time line scenes are to [be] saved into the
+      sandbox scripts, as is." So the button no longer saves "what changed" —
+      it makes sandbox/ match this timeline, and the script match this VTT.
+
+      ⚠ A SCENE WITH NO FRAME EDITS IS VERIFIED, NOT RE-ENCODED. Its clip is
+      already the file those frames came from, byte for byte; rebuilding it
+      would add an encode generation on every save and change nothing you can
+      see. `pendingOf()` is what separates the two, so the promise holds and
+      the picture does not decay.
+
+      ⚠ AND THE LINES GO WITH IT, under Save Timeline too. They used to need
+      Save all, so a line typed in the VTT panel could sit in the browser while
+      the frames went to disk — two halves of one timeline, saved apart.
+    */
     const withWork = SEQ.map((s, i) => ({ i, n: s.n, layers: pendingOf(i) }))
         .filter(x => x.layers.length);
-    const lineWork = includeNarrative ? SEQ.filter(s => vDirty.has(s.n)) : [];
-    if (!withWork.length && !lineWork.length && WORDS_STALE) {
+    const unchanged = SEQ.filter((s, i) => !pendingOf(i).length).map(s => s.n);
+    // Every scene on this timeline whose line differs from the script on disk.
+    const lineWork = SEQ.filter(s => {
+      const now = (vLine[s.n] !== undefined ? vLine[s.n] : (VTT && VTT.byN[s.n] ? VTT.byN[s.n].line : ''));
+      const was = (VTT && VTT.byN[s.n]) ? VTT.byN[s.n].line : '';
+      return vDirty.has(s.n) || (now || '') !== (was || '');
+    });
+    if (!withWork.length && !lineWork.length && WORDS_STALE) {   // only the voice is behind
       // The words are already on disk; only the soundtrack is behind.
       stop();
       await syncAndReturn($(includeNarrative ? 'saveAllBtn' : 'saveTimelineBtn'),
@@ -1063,7 +1100,8 @@ ${v.scenes.length} scene(s).
 `);
     const lineList = lineWork.map(s => `  scene ${s.n}: narrative line`).join(`
 `);
-    if (!confirm(`Save ${withWork.length} scene(s)`
+    if (!confirm(`Save this timeline: ${SEQ.length} scene(s)`
+               + (withWork.length ? `, ${withWork.length} with frame edits` : `, none edited`)
                + (lineWork.length ? ` and ${lineWork.length} line(s)` : ``)
                + `?
 
@@ -1076,7 +1114,12 @@ WRITING TO
 ${ROOT_REL}/sandbox/
 
 `
-               + `Each file keeps its previous version in its own scene's `
+               + `A scene with no frame edits is left as it is — its file is `
+               + `already those frames, and re-encoding it would only cost a `
+               + `generation of picture quality.
+
+`
+               + `Each file written keeps its previous version in its own scene's `
                + `z_History/.
 
 `
@@ -1093,6 +1136,7 @@ ${ROOT_REL}/sandbox/
       btn.innerHTML = label; } };
     busy();
 
+    busy(true, `Saving ${withWork.length} scene(s) to sandbox/…`);
     const done = [], failed = [], warn = [], stale = [];
     const saveOne = (i, w, force) => fetch('/api/save', { method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1187,6 +1231,7 @@ ${list}
       return;
     }
 
+    busy(false);
     // Put the labels back BEFORE anything else, so a failure below cannot
     // leave the button spinning over a run that has stopped.
     rest();
@@ -2027,11 +2072,30 @@ Nothing was changed. Untick the shorter track, or move to a `
   const vDirty = new Set();             // n -> edited but not written yet
 
   const clipS = i => lenOf(i, 'base') / (SEQ[i].fps || 25);
-  const wordsOf = t => t.split(/\s+/).filter(w => /[A-Za-z0-9]/.test(w)).length;
+  /*
+    ⚠ A `{0.5}` IS SILENCE, NOT A WORD, and this page was counting it as one.
+
+    `{0.5}` in a line is a BEAT: narrate_mac.py speaks nothing and holds for
+    that many seconds. editor_base/vtt.py and vtt_editor both strip the markers
+    out of the word count and add their seconds instead — this page split on
+    whitespace, so "{0.5}" passed the has-a-digit test and was charged as a
+    spoken word (0.29s at 3.44 wps) while its own 0.5s of silence went
+    uncounted. The same line therefore read differently in the two editors,
+    which is exactly the drift the shared rule exists to prevent. Found
+    2026-09-21 while auditing for duplicated maths.
+
+    `r.pause` stays: that is the scene's own close-out from script.json's
+    `pauses`, which is a different thing from a beat inside the line.
+  */
+  const BEAT_RE = /\{\s*(\d*\.?\d+)\s*\}/g;
+  const bareOf = t => (t || '').replace(BEAT_RE, ' ');
+  const beatsOf = t => [...(t || '').matchAll(BEAT_RE)]
+      .reduce((s, m) => s + parseFloat(m[1] || 0), 0);
+  const wordsOf = t => bareOf(t).split(/\s+/).filter(w => /[A-Za-z0-9]/.test(w)).length;
   function speechS(n, text) {
     const r = VTT && VTT.byN[n];
     if (!r) return null;
-    return wordsOf(text) / VTT.wps + (r.pause || 0);
+    return wordsOf(text) / VTT.wps + beatsOf(text) + (r.pause || 0);
   }
 
   async function loadVtt() {

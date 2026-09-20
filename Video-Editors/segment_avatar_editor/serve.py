@@ -123,6 +123,8 @@ from editor_base import frames as build_mod                 # noqa: E402
 from segment_avatar_editor import player as sae             # noqa: E402  this package's own player.py
 from editor_base import paths as PTH                        # noqa: E402
 from editor_base import vtt as vtt_mod                      # noqa: E402
+from editor_base import recorder                            # noqa: E402  the other repo's scripts
+from editor_base import stores as ebstores                  # noqa: E402  the Load listing, shared
 
 # editor_base's two per-editor knobs, set here at import time and not in
 # main(): the test imports this module without ever calling main(), and an
@@ -965,36 +967,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         picker choosing between two whole customer businesses first is a
         step nobody asked for.
         """
-        out = []
-        if not os.path.isdir(CUSTOMERS_ROOT):
-            return self.send_json({"stores": out})
-        for biz in sorted(os.listdir(CUSTOMERS_ROOT), key=str.lower):
-            biz_dir = os.path.join(CUSTOMERS_ROOT, biz)
-            if biz.startswith(".") or not os.path.isdir(biz_dir):
-                continue
-            for store in sorted(os.listdir(biz_dir), key=str.lower):
-                store_dir = os.path.join(biz_dir, store)
-                videos_root = os.path.join(store_dir, "help-videos", "videos")
-                if store.startswith(".") or not os.path.isdir(videos_root):
-                    continue
-                videos = []
-                for vname in sorted(os.listdir(videos_root), key=str.lower):
-                    vdir = os.path.join(videos_root, vname)
-                    script_p = PTH.script(vdir)
-                    if vname.startswith(".") or not os.path.isfile(script_p):
-                        continue
-                    try:
-                        doc = json.load(open(script_p))
-                        ns = sorted(x["n"] for x in doc.get("scenes", []) if "n" in x)
-                    except (OSError, ValueError, KeyError):
-                        ns = []
-                    has_sandbox = os.path.isdir(PTH.sandbox_root(vdir))
-                    videos.append({"name": vname,
-                                   "root": f"{biz}/{store}/help-videos/videos/{vname}",
-                                   "scenes": ns, "has_sandbox": has_sandbox})
-                if videos:
-                    out.append({"business": biz, "store": store, "videos": videos})
-        self.send_json({"stores": out})
+        self.send_json({"stores": ebstores.list_stores(CUSTOMERS_ROOT)})
 
     def api_open_seq_go(self, qs):
         """Build the timeline and redirect — extraction can take a while and a
@@ -2197,12 +2170,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             shutil.rmtree(tmp_dir, ignore_errors=True)
         self.send_json({"outdir": dest_dir, "version": version, "count": len(segments), "segments": segments})
 
-    # Where the sync lives. It belongs to the RECORDER, not to this editor:
-    # it rebuilds the Mac voice with stretch_request.py, which is that repo's
-    # tool. Overridable for a machine that keeps the repos somewhere else.
-    SYNC = os.path.expanduser(os.environ.get(
-        "SAE_VTT_SYNC",
-        "~/Rentify/Basic_E2E_Testing/Master_Flows/Recorder/scripts/sae_vtt_sync.py"))
+    # The sync belongs to the RECORDER, not to this editor: it rebuilds the Mac
+    # voice with stretch_request.py, which is that repo's tool. Where that repo
+    # is lives in editor_base/recorder.py — one fact for every editor, rather
+    # than the hard-coded home-directory path this line used to carry.
+    SYNC = "sae_vtt_sync.py"
 
     def api_sync(self, payload):
         """
@@ -2226,13 +2198,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         final = safe_join(root_rel)
         if final is None or not os.path.isdir(final):
             return self.send_json({"error": f"not a folder under Customers/: {root_rel}"}, 400)
-        if not os.path.isfile(self.SYNC):
-            return self.send_json({"error": f"no sync script at {self.SYNC}"}, 500)
-        r = subprocess.run([sys.executable, self.SYNC, final, "--apply"],
-                           capture_output=True, text=True, timeout=1800)
-        tail = [l.rstrip() for l in (r.stdout or "").splitlines() if l.strip()][-8:]
-        if r.returncode:
-            return self.send_json({"error": (r.stderr or r.stdout or "sync failed")[-400:],
+        # ⚠ ONLY THE TIMELINE'S SCENES. Carson, 2026-09-21: "The Save Timeline
+        # should only save the currently open timeline ... All other scenes are
+        # not to be processed by this Save Timeline." The page sends the scene
+        # numbers it is showing; without them the sync walks the whole folder.
+        ns = [str(int(n)) for n in (payload.get("ns") or []) if str(n).strip()]
+        args = [final, "--apply"] + (["--scenes", ",".join(ns)] if ns else [])
+        r = recorder.run(self.SYNC, args, timeout=1800)
+        tail = [l.rstrip() for l in (r["out"] or "").splitlines() if l.strip()][-8:]
+        if not r["ok"]:
+            return self.send_json({"error": (r["err"] or r["out"] or "sync failed")[-400:],
                                    "tail": tail}, 500)
         return self.send_json({"ok": True, "tail": tail})
 
