@@ -311,6 +311,17 @@
      everything, stays up across the navigation, and the new page clears it on
      load. Carson, 2026-09-21: "Keep a process spinner in motion while the
      updates are in progress." */
+  #bartip { position:fixed; z-index:9998; display:none; pointer-events:none;
+            background:#131a22; color:#e8eef5; border:1px solid #2b3440;
+            border-radius:8px; padding:7px 10px; font:12px/1.45 ui-sans-serif,system-ui;
+            box-shadow:0 8px 24px rgba(0,0,0,.45); white-space:nowrap; }
+  #bartip.on { display:block; }
+  #bartip .sub { color:#8da2b5; font-size:11px; }
+  /* ⚠ THE LINE THAT ANSWERS THE QUESTION IS THE BIG ONE. Carson, 2026-09-21:
+     "make the second line of text larger so its easier for me to read." */
+  #bartip .big { display:inline-block; margin:3px 0 2px;
+                 font-size:17px; font-weight:700; color:#fff; letter-spacing:.2px; }
+
   #busy { position:fixed; inset:0; z-index:9999; display:none;
           background:rgba(10,12,14,.72); backdrop-filter:blur(2px);
           align-items:center; justify-content:center; flex-direction:column; gap:14px; }

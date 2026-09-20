@@ -194,6 +194,7 @@ function viewSlug() {
     const { i } = at(+$('slider').value);
     const n = SEQ[i].n;
     [...$('segbar').children].forEach((el, k) => el.classList.toggle('cur', k === i));
+    refreshTip();                            // the number follows the playhead
     // Matched on the scene NUMBER, not the row's position: the list holds every
     // scene now, so position and scene are no longer the same thing.
     [...$('sceneList').children].forEach(el => el.classList.toggle('cur', +el.dataset.n === n));
@@ -205,11 +206,102 @@ function viewSlug() {
       const s = SEQ[i];
       const b = document.createElement('div');
       b.className = 'segblk'; b.style.flex = String(s.base_n); b.dataset.n = s.n;
-      b.textContent = s.n; b.title = `${s.n} ${s.label} — ${(s.base_n / (s.fps || 25)).toFixed(2)}s`;
+      b.textContent = s.n;
+      // ⚠ NO NATIVE title HERE. The browser's own tooltip fires on its own
+      // schedule and cannot say where the playhead is; this block gets the
+      // hover tooltip below instead, which waits a second and then counts.
+      b.dataset.i = String(i);
       b.onclick = () => { stop(); show(starts[i] + 1); };
+      b.addEventListener('mouseenter', () => hoverIn(i, b));
+      b.addEventListener('mouseleave', hoverOut);
       $('segbar').appendChild(b);
     }
     paintBar();
+  }
+
+  /*
+    THE SCENE BAR'S TOOLTIP — ONE SECOND, THEN THE COUNT.
+
+    Carson, 2026-09-21: "Create a 1 second hover delay for a tooltip, to open
+    over the green bar of the active scene. When the tooltip opens, I want to
+    see the current frame count from the beginning of that active scene to the
+    current pointer location on the time line."
+
+    So it answers one question: how far into THIS scene is the playhead. The
+    browser's own `title` could not — it shows fixed text, on its own timing,
+    and the number moves as you scrub.
+
+    ⚠ THE DELAY IS THE POINT. The bar is a row of small blocks and the mouse
+    crosses several to reach one; without the wait, tooltips flash past all the
+    way along. One second means the one you stopped on.
+
+    ⚠ IT COUNTS FROM THE SCENE'S OWN FIRST FRAME, not the timeline's. Frame 1
+    of a scene is frame 1 here even when it is frame 715 of the film, because
+    every edit you make is in the scene's own numbering.
+  */
+  let hoverTimer = null, hoverAt = -1;
+
+  function scenePos(i) {
+    const g = +$('slider').value;                 // where the playhead is, globally
+    const first = starts[i] + 1, last = starts[i] + SEQ[i].base_n;
+    if (g < first) return { before: true, local: 0, total: SEQ[i].base_n };
+    if (g > last) return { after: true, local: SEQ[i].base_n, total: SEQ[i].base_n };
+    return { local: g - starts[i], total: SEQ[i].base_n };
+  }
+
+  function showTip(i, el) {
+    {
+      const tip = $('bartip');
+      if (!tip) return;
+      const s = SEQ[i], p = scenePos(i), fps = s.fps || 25;
+      const where = p.before ? 'the playhead is before this scene'
+                  : p.after ? 'the playhead is past this scene'
+                  : `frame ${p.local.toLocaleString()} of ${p.total.toLocaleString()}`
+                    + `  ·  ${(p.local / fps).toFixed(2)}s into it`;
+      // ⚠ ESCAPED HERE, BY HAND. `esc()` is vtt_editor's helper, not this
+      // page's — calling it threw inside the timer, so the tooltip silently
+      // never opened. A label is a folder name, but it is still text going
+      // into innerHTML.
+      const label = String(s.label || '').replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      // The middle line is the answer; the rest is context. It gets its own
+      // class so it can be read at a glance without leaning in.
+      tip.innerHTML = `<b>${s.n} ${label}</b><br><span class="big">${where}</span><br>`
+                    + `<span class="sub">${p.total.toLocaleString()} frames`
+                    + `  ·  ${(p.total / fps).toFixed(2)}s  ·  starts at film frame `
+                    + `${(starts[i] + 1).toLocaleString()}</span>`;
+      const r = el.getBoundingClientRect();
+      tip.classList.add('on');
+      // Centred over the block, and nudged back inside the window if the block
+      // is near an edge — a tooltip half off-screen says nothing.
+      const w = tip.offsetWidth;
+      let x = r.left + r.width / 2 - w / 2;
+      x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
+      tip.style.left = `${x}px`;
+      tip.style.top = `${Math.max(8, r.top - tip.offsetHeight - 8)}px`;
+      hoverAt = i;
+    }
+  }
+
+  function hoverIn(i, el) {
+    clearTimeout(hoverTimer);
+    // ⚠ the one second Carson asked for, and the reason it is not shorter:
+    // the mouse crosses several blocks on its way to the one you meant.
+    hoverTimer = setTimeout(() => showTip(i, el), 1000);
+  }
+
+  function hoverOut() {
+    clearTimeout(hoverTimer);
+    hoverAt = -1;
+    const tip = $('bartip');
+    if (tip) tip.classList.remove('on');
+  }
+
+  // Scrubbing while it is open keeps the number honest.
+  function refreshTip() {
+    if (hoverAt < 0) return;
+    const el = [...$('segbar').children].find(c => +c.dataset.i === hoverAt);
+    if (el) showTip(hoverAt, el);           // repaint in place, no second wait
   }
 
   // ── break points ──────────────────────────────────────────────────────
