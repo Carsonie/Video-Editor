@@ -681,6 +681,9 @@ async function refresh() {
   const d = await api(`/api/state?folder=${encodeURIComponent(FOLDER)}`);
   if (!d.ok) { say(d.err || 'could not read that folder', 'bad'); return; }
   STATE = d.state;
+  // Our own read is as good a stamp as the poll's, and it keeps a save made
+  // here from reading as someone else's change on the next tick.
+  if (typeof STATE.script_mtime === 'number') SCRIPT_STAMP = STATE.script_mtime;
 
   // ⚠ THE WRONG TOOL, SAID PLAINLY. A BUILT video's lengths live in its
   // sandbox clips, not in its script, so this editor would show 11 scenes of
@@ -900,8 +903,49 @@ function hookHScroll() {
   sync();
 }
 
+/*
+  WATCH script.json, BECAUSE THIS PAGE IS NOT ITS ONLY WRITER.
+
+  The Segment and Avatar Editor edits the same lines, in the same file, the
+  moment focus leaves one of its boxes. Nothing told this page, so its table
+  stayed on the old words until it was reloaded by hand.
+
+  ⚠ NEVER WHILE A LINE IS BEING TYPED INTO. render() replaces the whole tbody,
+  so a refresh mid-edit would throw away what is being written — the same rule
+  render() already follows for a job finishing. The poll skips those ticks and
+  the next one picks the change up.
+
+  ⚠ AND THE STAMP IS TAKEN AFTER OUR OWN SAVES TOO, so a line saved here does
+  not read as a change made elsewhere and bounce the table.
+*/
+let SCRIPT_STAMP = 0;
+let stampTimer = null;
+
+async function pollScript() {
+  if (!FOLDER) return;
+  const live = document.activeElement;
+  if (live && live.classList && live.classList.contains('linebox')) return;
+  let d;
+  try {
+    d = await api(`/api/stamp?folder=${encodeURIComponent(FOLDER)}`);
+  } catch (_) { return; }                 // a blip is not worth a message
+  const m = (d && d.mtime) || 0;
+  if (!m || !SCRIPT_STAMP) { SCRIPT_STAMP = m; return; }
+  if (m === SCRIPT_STAMP) return;
+  SCRIPT_STAMP = m;
+  say('the script changed on disk — reloading the words', 'work');
+  await refresh();
+  say('words reloaded from script.json');
+}
+
+function watchScript() {
+  if (stampTimer) clearInterval(stampTimer);
+  stampTimer = setInterval(pollScript, 2000);
+}
+
 async function boot() {
   hookHScroll();
+  watchScript();
   const d = await api('/api/tree');
   TREE = d.tree || [];
   if (!TREE.length) {

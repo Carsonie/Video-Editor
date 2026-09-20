@@ -481,9 +481,12 @@ def job_state(folder):
     if not capture and not any(s.get("raw-source") for s in scenes):
         kind = "built"
 
+    script_p2 = script_in(folder)
     return {
         "folder": folder,
         "kind": kind,
+        # The same number /api/stamp polls, so a read here resets the watcher.
+        "script_mtime": os.path.getmtime(script_p2) if script_p2 and os.path.isfile(script_p2) else 0,
         "recipe": os.path.basename(folder.rstrip("/")),
         "store": (spec or {}).get("store", ""),
         "title": (spec or {}).get("title", ""),
@@ -862,6 +865,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.send_json({"ok": True, "folders": recipe_folders()})
         if u.path == "/api/tree":
             return self.send_json({"ok": True, "tree": breadcrumbs()})
+        # ⚠ ONE NUMBER, POLLED. The Segment and Avatar Editor writes a line edit
+        # straight into script.json (its api_line), so this page can be showing
+        # yesterday's words while the file on disk is minutes old — Carson hit
+        # exactly that on 2026-09-20: "when I change the narrative in the SAE
+        # vtt, that new narrative is not updating the VTT Editor". A full
+        # /api/state on a timer would re-read the report and re-probe the
+        # capture every few seconds; this is a stat() and nothing else, and the
+        # page only refreshes when the number moves.
+        if u.path == "/api/stamp":
+            folder = (q.get("folder") or [""])[0]
+            p = script_in(folder) if folder and os.path.isdir(folder) else ""
+            return self.send_json({"mtime": os.path.getmtime(p) if p and os.path.isfile(p) else 0})
         if u.path == "/api/state":
             folder = (q.get("folder") or [""])[0]
             if not folder or not os.path.isdir(folder):
