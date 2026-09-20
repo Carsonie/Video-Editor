@@ -1,7 +1,7 @@
 {
  "source": "ski-demo_special-skis_dev_10-19-12_v12.mp4",
  "output": "ski-demo_special-skis_dev_10-19-12_v12-stretched.mp4",
- "output_seconds": 277.68,
+ "output_seconds": 415.36,
  "scenes": [
   {
    "n": 1,
@@ -196,7 +196,7 @@
    "src_in": 186.9,
    "src_out": 198.78,
    "on_camera": 11.88,
-   "scene_needs": 7.4,
+   "scene_needs": 6.9,
    "built": 11.88,
    "factor": 1.0,
    "stretched": false
@@ -207,13 +207,24 @@
    "src_in": 198.78,
    "src_out": 213.42,
    "on_camera": 14.64,
-   "scene_needs": 13.0,
+   "scene_needs": 0.8,
    "built": 14.64,
    "factor": 1.0,
    "stretched": false
   },
   {
    "n": 20,
+   "label": "duplicate-item",
+   "src_in": 213.42,
+   "src_out": 236.02,
+   "on_camera": 22.6,
+   "scene_needs": 0.8,
+   "built": 22.6,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 21,
    "label": "last-variant",
    "src_in": 351.1,
    "src_out": 359.1,
@@ -224,7 +235,7 @@
    "stretched": false
   },
   {
-   "n": 21,
+   "n": 22,
    "label": "sign-out",
    "src_in": 359.1,
    "src_out": 366.1,
@@ -235,7 +246,7 @@
    "stretched": false
   },
   {
-   "n": 22,
+   "n": 23,
    "label": "signed-out",
    "src_in": 366.1,
    "src_out": 375.88,
@@ -247,7 +258,7 @@
   }
  ],
  "segments_reused": 22,
- "segments_encoded": 0,
+ "segments_encoded": 2,
  "fps": 25.0,
  "_output_removed": "ski-demo_special-skis_dev_10-19-12_v12-stretched.mp4 was deleted after narration — it is picture-only and silent by design, and its name reads like the finished cut. Rebuild it in ~20s from segments/: python3 scripts/stretch_request.py \"<this folder>\""
 }

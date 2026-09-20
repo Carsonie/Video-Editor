@@ -157,3 +157,14 @@ Server:          http://localhost:8846
 11:48:41  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=17,18,19,20
 11:50:14  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=18,19,20,21,22
 11:51:56  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=18,19,20,21,22
+12:47:46  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=18,19,20,21,22
+12:55:54  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=18,19,20,21,22,23
+13:04:52  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=18,19,20,21,22,23
+13:10:40  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=18,19,20,21,22,23
+08:39:43  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=18,19,20,21,22,23
+08:42:24  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=18,19,20,22
+08:42:42  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=18
+08:43:49  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=18,19,20
+08:44:43  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=17,18,19,20
+08:46:31  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=19  line=Update the new item with the same name, but with the different variant options.{1} Always remember to update this new item before you use the duplicate again. {.5} Work through all the 9 possible variations.
+08:48:13  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=17,18,19,20

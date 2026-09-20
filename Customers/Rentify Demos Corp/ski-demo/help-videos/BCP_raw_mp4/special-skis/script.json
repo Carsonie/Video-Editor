@@ -1,362 +1,349 @@
 {
- "store": "ski-demo",
- "title": "Adding a collection with variants — Special Skis",
- "_note": "BCP admin recipe special-skis. Cut from ski-demo_special-skis_dev_10-19-12_v12.mp4 (375.88s). The screens were MEASURED off that capture — the totals agree with its own length to a tenth of a second — so every line here was written to a screen that already exists and nothing needs stretching. ⚠ THE REPEATED ITEMS ARE SILENT ON PURPOSE. Carson, 2026-09-10: \"add the voice for every scene, except for the the items, since they are all repeats of the same first item.\" The first item is narrated in full and its closing line tells the viewer what the silent stretch is before they watch it; the clones are one scene with no cue, as long as the footage it covers, so every later line stays on its own screen. That is a deliberate exception to standard 1 of the raw-video standard, not an omission. Lines carry {0.3} beat markers; a marker is never counted as a word and its silence is always added to the scene.",
- "words_per_second": 3.44,
- "_wps_note": "From 01-first-time-ordering/script_v33.json, measured 31 words / 9.01s. Nothing for THIS video is rendered yet.",
- "_pauses_note": "One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in comes from the scene's footage hold.",
- "_lead_in_seconds": 0.75,
- "_estimated_video_seconds": 330.1,
- "_estimated_video_note": "21 scenes, 20 of them spoken. 451 words / 3.44 wps = 131.2s of speech, + 20 lead-ins at 0.5s = 10.0s, + 20 exit pauses at 0.8s = 16.0s, + 156.2s of deliberate silence over the repeated items. ESTIMATE — recompute from the audio once it exists.",
- "_footage_seconds": 375.88,
- "_chapters": [
-  {
-   "at": "sign-in",
-   "value": "Sign in"
-  },
-  {
-   "at": "dashboard",
-   "value": "Find the store"
-  },
-  {
-   "at": "collection-list",
-   "value": "Create the collection"
-  },
-  {
-   "at": "back-to-the-store",
-   "value": "Add the first item"
-  },
-  {
-   "at": "the-other-variants",
-   "value": "The other variants"
-  },
-  {
-   "at": "last-variant",
-   "value": "Sign out"
-  }
- ],
- "scenes": [
-  {
-   "n": 1,
-   "label": "sign-in",
-   "line": "Please provide us your email, so we can sent you a login code. Then click the Send Code button.",
-   "pauses": [
+  "store": "ski-demo",
+  "title": "Adding a collection with variants \u2014 Special Skis",
+  "_note": "BCP admin recipe special-skis. Cut from ski-demo_special-skis_dev_10-19-12_v12.mp4 (375.88s). The screens were MEASURED off that capture \u2014 the totals agree with its own length to a tenth of a second \u2014 so every line here was written to a screen that already exists and nothing needs stretching. \u26a0 THE REPEATED ITEMS ARE SILENT ON PURPOSE. Carson, 2026-09-10: \"add the voice for every scene, except for the the items, since they are all repeats of the same first item.\" The first item is narrated in full and its closing line tells the viewer what the silent stretch is before they watch it; the clones are one scene with no cue, as long as the footage it covers, so every later line stays on its own screen. That is a deliberate exception to standard 1 of the raw-video standard, not an omission. Lines carry {0.3} beat markers; a marker is never counted as a word and its silence is always added to the scene.",
+  "words_per_second": 3.44,
+  "_wps_note": "From 01-first-time-ordering/script_v33.json, measured 31 words / 9.01s. Nothing for THIS video is rendered yet.",
+  "_pauses_note": "One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in comes from the scene's footage hold.",
+  "_lead_in_seconds": 0.75,
+  "_estimated_video_seconds": 330.1,
+  "_estimated_video_note": "21 scenes, 20 of them spoken. 451 words / 3.44 wps = 131.2s of speech, + 20 lead-ins at 0.5s = 10.0s, + 20 exit pauses at 0.8s = 16.0s, + 156.2s of deliberate silence over the repeated items. ESTIMATE \u2014 recompute from the audio once it exists.",
+  "_footage_seconds": 375.88,
+  "_chapters": [
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "7.0s on camera",
-   "estimated-word-time": "3.5 seconds.",
-   "target-length": "5.1 seconds.",
-   "silent": false
-  },
-  {
-   "n": 2,
-   "label": "enter-the-code",
-   "line": "We will send you a four-digit code to that address. {.8} If you are not seeing it, please check your spam folder.",
-   "pauses": [
+      "at": "sign-in",
+      "value": "Sign in"
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "7.0s on camera",
-   "estimated-word-time": "4.9 seconds.",
-   "target-length": "6.7 seconds.",
-   "silent": false
-  },
-  {
-   "n": 3,
-   "label": "dashboard",
-   "line": "This is your admin dashboard. {0.5} Open a Business with the store you want to work on.",
-   "pauses": [
+      "at": "dashboard",
+      "value": "Find the store"
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "7.0s on camera",
-   "estimated-word-time": "4.7 seconds.",
-   "target-length": "6.3 seconds.",
-   "silent": false
-  },
-  {
-   "n": 4,
-   "label": "find-the-business",
-   "line": "Start typing your business name, {0.3} then select it from the dropdown list.",
-   "pauses": [
+      "at": "collection-list",
+      "value": "Create the collection"
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "7.8s on camera",
-   "estimated-word-time": "4.1 seconds.",
-   "target-length": "5.7 seconds.",
-   "silent": false
-  },
-  {
-   "n": 5,
-   "label": "the-business",
-   "line": "When your business page opens. {0.5} Choose Lookup Stores to see all the stores of this business.",
-   "pauses": [
+      "at": "back-to-the-store",
+      "value": "Add the first item"
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "7.0s on camera",
-   "estimated-word-time": "3.8 seconds.",
-   "target-length": "5.4 seconds.",
-   "silent": false
-  },
-  {
-   "n": 6,
-   "label": "find-the-store",
-   "line": "Start typing the name of the store you are looking for, {0.3} and select it from the dropdown list. {0.5} All activities after this will act against this store alone.",
-   "pauses": [
+      "at": "the-other-variants",
+      "value": "The other variants"
+    },
     {
-     "seconds": 0.75
+      "at": "last-variant",
+      "value": "Sign out"
     }
-   ],
-   "raw-source": "9.4s on camera",
-   "estimated-word-time": "5.8 seconds.",
-   "target-length": "7.9 seconds.",
-   "silent": false
-  },
-  {
-   "n": 7,
-   "label": "the-store",
-   "line": "This is the store page. {0.5} Click on the gear icon in the menu and choose Lookup Collections.",
-   "pauses": [
+  ],
+  "scenes": [
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "7.0s on camera",
-   "estimated-word-time": "3.8 seconds.",
-   "target-length": "5.4 seconds.",
-   "silent": false
-  },
-  {
-   "n": 8,
-   "label": "collection-list",
-   "line": "Here you can find all the store's collections, if needed. {0.5} Press the plus icon button to add a new collection.",
-   "pauses": [
+      "n": 1,
+      "label": "sign-in",
+      "line": "Please provide us your email, so we can sent you a login code. Then click the Send Code button.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "7.0s on camera",
+      "estimated-word-time": "3.5 seconds.",
+      "target-length": "5.1 seconds.",
+      "silent": false
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "7.0s on camera",
-   "estimated-word-time": "4.1 seconds.",
-   "target-length": "5.7 seconds.",
-   "silent": false
-  },
-  {
-   "n": 9,
-   "label": "new-collection",
-   "line": "Give the collection a unique name. {0.5} A collection is a group of items that can differ just by their options, or could be some like or similar items.",
-   "pauses": [
+      "n": 2,
+      "label": "enter-the-code",
+      "line": "We will send you a four-digit code to that address. {.8} If you are not seeing it, please check your spam folder.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "7.0s on camera",
+      "estimated-word-time": "4.9 seconds.",
+      "target-length": "6.7 seconds.",
+      "silent": false
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "8.4s on camera",
-   "estimated-word-time": "5.2 seconds.",
-   "target-length": "6.8 seconds.",
-   "silent": false
-  },
-  {
-   "n": 10,
-   "label": "collection-details",
-   "line": "Add a description to guide your renters. {4} Then set the starting price, in cents only, meaning no decimal point.",
-   "pauses": [
+      "n": 3,
+      "label": "dashboard",
+      "line": "This is your admin dashboard. {0.5} Open a Business with the store you want to work on.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "7.0s on camera",
+      "estimated-word-time": "4.7 seconds.",
+      "target-length": "6.3 seconds.",
+      "silent": false
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "15.1s on camera",
-   "estimated-word-time": "8.4 seconds.",
-   "target-length": "10.8 seconds.",
-   "silent": false
-  },
-  {
-   "n": 11,
-   "label": "collection-options",
-   "line": "Options are what makes one item different from another. {0.8} The label is what renter will see. {0.5} The name is the system key the item is saved under, and used for an item match. {0.8} The type can bool, string or a number. {0.5} The required option means this item is needed to complete the order and should always be true. {0.5} The values are the list of selections the dropdown will offer.",
-   "pauses": [
+      "n": 4,
+      "label": "find-the-business",
+      "line": "Start typing your business name, {0.3} then select it from the dropdown list.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "7.8s on camera",
+      "estimated-word-time": "4.1 seconds.",
+      "target-length": "5.7 seconds.",
+      "silent": false
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "27.7s on camera",
-   "estimated-word-time": "18.9 seconds.",
-   "target-length": "24.4 seconds.",
-   "silent": false
-  },
-  {
-   "n": 12,
-   "label": "the-collection",
-   "line": "After the collection is saved. {0.5} We can create an item from every one of these variants.",
-   "pauses": [
+      "n": 5,
+      "label": "the-business",
+      "line": "When your business page opens. {0.5} Choose Lookup Stores to see all the stores of this business.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "7.0s on camera",
+      "estimated-word-time": "3.8 seconds.",
+      "target-length": "5.4 seconds.",
+      "silent": false
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "8.0s on camera",
-   "estimated-word-time": "4.7 seconds.",
-   "target-length": "6.3 seconds.",
-   "silent": false
-  },
-  {
-   "n": 13,
-   "label": "back-to-the-store",
-   "line": "Now, lets return to the collections page. {2} Then we can return to the store page. {2} Open the menu again using the gear icon. {1} Then choose Lookup Items.",
-   "pauses": [
+      "n": 6,
+      "label": "find-the-store",
+      "line": "Start typing the name of the store you are looking for, {0.3} and select it from the dropdown list. {0.5} All activities after this will act against this store alone.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "9.4s on camera",
+      "estimated-word-time": "5.8 seconds.",
+      "target-length": "7.9 seconds.",
+      "silent": false
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "8.4s on camera",
-   "estimated-word-time": "4.7 seconds.",
-   "target-length": "6.3 seconds.",
-   "silent": false
-  },
-  {
-   "n": 14,
-   "label": "item-list",
-   "line": "This is where all the store's items can be found. {0.5} To add a new item, click the plus icon button.",
-   "pauses": [
+      "n": 7,
+      "label": "the-store",
+      "line": "This is the store page. {0.5} Click on the gear icon in the menu and choose Lookup Collections.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "7.0s on camera",
+      "estimated-word-time": "3.8 seconds.",
+      "target-length": "5.4 seconds.",
+      "silent": false
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "7.0s on camera",
-   "estimated-word-time": "3.5 seconds.",
-   "target-length": "5.1 seconds.",
-   "silent": false
-  },
-  {
-   "n": 15,
-   "label": "new-item",
-   "line": "Give the item a name with the variants added. The renter can see by the item name that they are getting the item options they want. {0.5} Then search and select the collection this item belongs to. {1.5} Use the Create button to save it.",
-   "pauses": [
+      "n": 8,
+      "label": "collection-list",
+      "line": "Here you can find all the store's collections, if needed. {0.5} Press the plus icon button to add a new collection.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "7.0s on camera",
+      "estimated-word-time": "4.1 seconds.",
+      "target-length": "5.7 seconds.",
+      "silent": false
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "18.2s on camera",
-   "estimated-word-time": "8.7 seconds.",
-   "target-length": "11.0 seconds.",
-   "silent": false
-  },
-  {
-   "n": 16,
-   "label": "item-details",
-   "line": "Build out the item here, in the details page. {2} Add an Item description, {2} Confirm you are in the right collection. {2} Then add how many of this specific item you have for rent. {2} Then add the price in cents. {2} The requirement is the set of questions,{.5} that a renter answers for the equipment items they are renting from you. {2} The attributes may hold some image details that will be automatically added, so you can skip over this.",
-   "pauses": [
+      "n": 9,
+      "label": "new-collection",
+      "line": "Give the collection a unique name. {0.5} A collection is a group of items that can differ just by their options, or could be some like or similar items.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "8.4s on camera",
+      "estimated-word-time": "5.2 seconds.",
+      "target-length": "6.8 seconds.",
+      "silent": false
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "23.53s on camera (split)",
-   "estimated-word-time": "22.4 seconds.",
-   "target-length": "28.5 seconds.",
-   "silent": false
-  },
-  {
-   "n": 17,
-   "label": "item-detail-variants",
-   "line": "Finally add the specific options for this item by selecting the option variant from the dropdown list. {2} Choose the brand variant, {2} and a length variant. {2} The star after the option name indicates that you made these a required field, which means the renter needs to make a variant selection. {2} Then Press Update to save it.",
-   "pauses": [
+      "n": 10,
+      "label": "collection-details",
+      "line": "Add a description to guide your renters. {4} Then set the starting price, in cents only, meaning no decimal point.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "15.1s on camera",
+      "estimated-word-time": "8.4 seconds.",
+      "target-length": "10.8 seconds.",
+      "silent": false
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "split from item-details at 177.86s",
-   "estimated-word-time": "",
-   "target-length": "",
-   "silent": false
-  },
-  {
-   "n": 18,
-   "label": "first-variant",
-   "line": "That is the first variant saved. {0.5} Use the duplicate button to make a copy of this item.",
-   "pauses": [
+      "n": 11,
+      "label": "collection-options",
+      "line": "Options are what makes one item different from another. {0.8} The label is what renter will see. {0.5} The name is the system key the item is saved under, and used for an item match. {0.8} The type can bool, string or a number. {0.5} The required option means this item is needed to complete the order and should always be true. {0.5} The values are the list of selections the dropdown will offer.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "27.7s on camera",
+      "estimated-word-time": "18.9 seconds.",
+      "target-length": "24.4 seconds.",
+      "silent": false
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "8.0s on camera",
-   "estimated-word-time": "5.5 seconds.",
-   "target-length": "7.3 seconds.",
-   "silent": false
-  },
-  {
-   "n": 19,
-   "label": "the-other-variants",
-   "line": "",
-   "silent": true,
-   "_silent_note": "No line, on purpose — these screens repeat the first item. The scene is as long as its footage so later cues stay on the right picture. Trim or speed this stretch in the edit.",
-   "raw-source": "split at 213.42s",
-   "target-length": "156.2 seconds."
-  },
-  {
-   "n": 20,
-   "label": "duplicate-item",
-   "line": "",
-   "silent": true,
-   "_silent_note": "No line, on purpose — these screens repeat the first item. The scene is as long as its footage so later cues stay on the right picture. Trim or speed this stretch in the edit.",
-   "raw-source": "split from the-other-variants at 213.42s",
-   "target-length": "156.2 seconds."
-  },
-  {
-   "n": 21,
-   "label": "remaining-variants",
-   "line": "",
-   "silent": true,
-   "_silent_note": "No line, on purpose — these screens repeat the first item. The scene is as long as its footage so later cues stay on the right picture. Trim or speed this stretch in the edit.",
-   "raw-source": "split from the-other-variants at 236.02s",
-   "target-length": "156.2 seconds."
-  },
-  {
-   "n": 22,
-   "label": "last-variant",
-   "line": "All nine variants now exist in the collection — three brands, each in three lengths.",
-   "pauses": [
+      "n": 12,
+      "label": "the-collection",
+      "line": "After the collection is saved. {0.5} We can create an item from every one of these variants.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "8.0s on camera",
+      "estimated-word-time": "4.7 seconds.",
+      "target-length": "6.3 seconds.",
+      "silent": false
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "8.0s on camera",
-   "estimated-word-time": "4.4 seconds.",
-   "target-length": "5.7 seconds.",
-   "silent": false
-  },
-  {
-   "n": 23,
-   "label": "sign-out",
-   "line": "Back at the dashboard when you are done. {0.3} Logout is a card here, same as the rest.",
-   "pauses": [
+      "n": 13,
+      "label": "back-to-the-store",
+      "line": "Now, lets return to the collections page. {2} Then we can return to the store page. {2} Open the menu again using the gear icon. {1} Then choose Lookup Items.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "8.4s on camera",
+      "estimated-word-time": "4.7 seconds.",
+      "target-length": "6.3 seconds.",
+      "silent": false
+    },
     {
-     "seconds": 0.75
-    }
-   ],
-   "raw-source": "7.0s on camera",
-   "estimated-word-time": "4.9 seconds.",
-   "target-length": "6.5 seconds.",
-   "silent": false
-  },
-  {
-   "n": 24,
-   "label": "signed-out",
-   "line": "You are signed out. {0.5} Your collection and all nine of its variants are saved and ready to rent.",
-   "pauses": [
+      "n": 14,
+      "label": "item-list",
+      "line": "This is where all the store's items can be found. {0.5} To add a new item, click the plus icon button.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "7.0s on camera",
+      "estimated-word-time": "3.5 seconds.",
+      "target-length": "5.1 seconds.",
+      "silent": false
+    },
     {
-     "seconds": 0.75
+      "n": 15,
+      "label": "new-item",
+      "line": "Give the item a name with the variants added. The renter can see by the item name that they are getting the item options they want. {0.5} Then search and select the collection this item belongs to. {1.5} Use the Create button to save it.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "18.2s on camera",
+      "estimated-word-time": "8.7 seconds.",
+      "target-length": "11.0 seconds.",
+      "silent": false
+    },
+    {
+      "n": 16,
+      "label": "item-details",
+      "line": "Build out the item here, in the details page. {2} Add an Item description, {2} Confirm you are in the right collection. {2} Then add how many of this specific item you have for rent. {2} Then add the price in cents. {2} The requirement is the set of questions,{.5} that a renter answers for the equipment items they are renting from you. {2} The attributes may hold some image details that will be automatically added, so you can skip over this.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "23.53s on camera (split)",
+      "estimated-word-time": "22.4 seconds.",
+      "target-length": "28.5 seconds.",
+      "silent": false
+    },
+    {
+      "n": 17,
+      "label": "item-detail-variants",
+      "line": "Finally add the specific options for this item by selecting the option variant from the dropdown list. {2} Choose the brand variant, {2} and a length variant. {2} The star after the option name indicates that you made these a required field, which means the renter needs to make a variant selection. {2} Then Press Update to save it.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "split from item-details at 177.86s",
+      "estimated-word-time": "",
+      "target-length": "",
+      "silent": false
+    },
+    {
+      "n": 18,
+      "label": "first-variant",
+      "line": "That is the first variant saved. {1} Use the duplicate button to make a copy of this item.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "8.0s on camera",
+      "estimated-word-time": "5.5 seconds.",
+      "target-length": "7.3 seconds.",
+      "silent": false
+    },
+    {
+      "n": 19,
+      "label": "the-other-variants",
+      "line": "Update the new item with the same name, but with the different variant options.{1} Always remember to update this new item before you use the duplicate again. {.5} Work through all the 9 possible variations.",
+      "silent": false,
+      "_silent_note": "No line, on purpose \u2014 these screens repeat the first item. The scene is as long as its footage so later cues stay on the right picture. Trim or speed this stretch in the edit.",
+      "raw-source": "split at 213.42s",
+      "target-length": "156.2 seconds.",
+      "pauses": [
+        {
+          "seconds": 0.8
+        }
+      ]
+    },
+    {
+      "n": 20,
+      "label": "last-variant",
+      "line": "All nine variants now exist in the collection \u2014 three brands, each in three lengths.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "8.0s on camera",
+      "estimated-word-time": "4.4 seconds.",
+      "target-length": "5.7 seconds.",
+      "silent": false
+    },
+    {
+      "n": 21,
+      "label": "sign-out",
+      "line": "Back at the dashboard when you are done. {0.3} Logout is a card here, same as the rest.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "7.0s on camera",
+      "estimated-word-time": "4.9 seconds.",
+      "target-length": "6.5 seconds.",
+      "silent": false
+    },
+    {
+      "n": 22,
+      "label": "signed-out",
+      "line": "You are signed out. {0.5} Your collection and all nine of its variants are saved and ready to rent.",
+      "pauses": [
+        {
+          "seconds": 0.75
+        }
+      ],
+      "raw-source": "10.0s on camera",
+      "estimated-word-time": "5.2 seconds.",
+      "target-length": "7.0 seconds.",
+      "silent": false
     }
-   ],
-   "raw-source": "10.0s on camera",
-   "estimated-word-time": "5.2 seconds.",
-   "target-length": "7.0 seconds.",
-   "silent": false
-  }
- ],
- "_dwell_note": "Carson, 2026-09-15: bring back a 0.75s dwell at BOTH ends of every scene — a lead-in before she speaks and a close-out after. Was 0.5 in and 0.8 out. narrate_mac.py reads _lead_in_seconds from here, so this field is the one that governs the audio as well as the table."
+  ],
+  "_dwell_note": "Carson, 2026-09-15: bring back a 0.75s dwell at BOTH ends of every scene \u2014 a lead-in before she speaks and a close-out after. Was 0.5 in and 0.8 out. narrate_mac.py reads _lead_in_seconds from here, so this field is the one that governs the audio as well as the table."
 }
