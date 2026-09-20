@@ -793,6 +793,22 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.api_map(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/marks":
             return self.api_marks(urllib.parse.parse_qs(parsed.query))
+        # ⚠ WORDS CAN BE SAVED AND THE VIDEO STILL BE OUT OF DATE.
+        # A line edit here writes script.json on blur, so nothing reads as
+        # "unsaved" — but the soundtrack still says the old words until the
+        # voice is rebuilt. Carson, 2026-09-20: "The Save Timeline also needs to
+        # turn green with any changes to the narrative." Two stat()s answer it.
+        if parsed.path == "/api/pending":
+            root_rel = (urllib.parse.parse_qs(parsed.query).get("root") or [""])[0]
+            final = safe_join(root_rel)
+            if final is None or not os.path.isdir(final):
+                return self.send_json({"words_stale": False})
+            script_p = PTH.script(final)
+            nar = [f for f in os.listdir(final) if f.endswith("-narrated.mp4")]
+            stale = bool(script_p and os.path.isfile(script_p)) and (
+                not nar or os.path.getmtime(script_p)
+                > os.path.getmtime(os.path.join(final, nar[0])))
+            return self.send_json({"words_stale": stale})
         if parsed.path == "/api/view":
             return self.api_view(urllib.parse.parse_qs(parsed.query))
         if parsed.path.startswith("/web/"):
@@ -871,6 +887,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.api_span(payload, "del")
         if parsed.path == "/api/cut":
             return self.api_cut(payload)
+        if parsed.path == "/api/sync":
+            return self.api_sync(payload)
         if parsed.path == "/api/save":
             return self.api_save(payload)
         return self.send_json({"error": f"no such route: {parsed.path}"}, 404)
@@ -2178,6 +2196,45 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         finally:
             shutil.rmtree(tmp_dir, ignore_errors=True)
         self.send_json({"outdir": dest_dir, "version": version, "count": len(segments), "segments": segments})
+
+    # Where the sync lives. It belongs to the RECORDER, not to this editor:
+    # it rebuilds the Mac voice with stretch_request.py, which is that repo's
+    # tool. Overridable for a machine that keeps the repos somewhere else.
+    SYNC = os.path.expanduser(os.environ.get(
+        "SAE_VTT_SYNC",
+        "~/Rentify/Basic_E2E_Testing/Master_Flows/Recorder/scripts/sae_vtt_sync.py"))
+
+    def api_sync(self, payload):
+        """
+        Finish the job the Save button started: carry what was just written into
+        the words, the voice and the cuts.
+
+        Carson, 2026-09-20: "When I Save Timeline, you need to update the words,
+        frames, do the save and do the check, and return me to where I was."
+        Saving alone only rewrites sandbox/<scene>/segment.mp4; the cut it came
+        from, the timing and the soundtrack all stay where they were, so the
+        editor showed one length and the video played another.
+
+        This runs sae_vtt_sync.py --apply, which pushes each saved clip back
+        into its cut, rebuilds the voice when the words or a length moved, and
+        writes the new cut plus its slice of the voice back into every clip.
+
+        ⚠ IT CAN TAKE MINUTES. A rebuild re-encodes every stretched scene, so
+        the page asks for this with its own spinner up and waits.
+        """
+        root_rel = payload.get("root", "")
+        final = safe_join(root_rel)
+        if final is None or not os.path.isdir(final):
+            return self.send_json({"error": f"not a folder under Customers/: {root_rel}"}, 400)
+        if not os.path.isfile(self.SYNC):
+            return self.send_json({"error": f"no sync script at {self.SYNC}"}, 500)
+        r = subprocess.run([sys.executable, self.SYNC, final, "--apply"],
+                           capture_output=True, text=True, timeout=1800)
+        tail = [l.rstrip() for l in (r.stdout or "").splitlines() if l.strip()][-8:]
+        if r.returncode:
+            return self.send_json({"error": (r.stderr or r.stdout or "sync failed")[-400:],
+                                   "tail": tail}, 500)
+        return self.send_json({"ok": True, "tail": tail})
 
     def api_save(self, payload):
         """

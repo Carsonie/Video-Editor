@@ -303,6 +303,10 @@
      set took three and a half minutes. With nothing on screen saying so, a
      finished-looking button over a run still in flight invites a reload — and
      a reload part way through leaves the rest unwritten. */
+  /* Something on this timeline is not written to disk yet. Green, because the
+     answer is a keystroke away rather than a warning about damage. */
+  button.dirty { color:#57d98a; border-color:#2f7d4f; font-weight:700; }
+  button.dirty:hover { color:#7ce8a6; }
   button.working { position:relative; color:#cfe6f5; border-color:#2e8ecc;
                     cursor:progress; }
   button.working::after { content:''; position:absolute; right:8px;

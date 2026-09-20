@@ -37,6 +37,23 @@ function viewSlug() {
   // same line is in pair.js.
   document.title = `Segment and Avatar Editor — ${VIEW.title}`;
   document.getElementById('slider').max = VIEW.total;
+  /*
+    COME BACK WHERE YOU LEFT OFF. Save Timeline re-opens this timeline once the
+    cuts and the voice have caught up, and without this the page would land on
+    frame 1 every time. Clamped, because a scene can be shorter than it was.
+  */
+  try {
+    const raw = sessionStorage.getItem('sae.resume');
+    if (raw) {
+      const r = JSON.parse(raw);
+      sessionStorage.removeItem('sae.resume');
+      if (r && r.root === VIEW.root_rel && r.frame > 0) {
+        const f = Math.max(1, Math.min(VIEW.total, r.frame));
+        setTimeout(() => { const s = document.getElementById('slider');
+                           s.value = String(f); s.dispatchEvent(new Event('input')); }, 0);
+      }
+    }
+  } catch (_) {}
 
 
   const SEQ = VIEW.manifest;
@@ -784,7 +801,7 @@ ${d.archived_to}
         VTT.byN[s.n].line = d.line;
         VTT.byN[s.n].words = d.words;
         vLine[s.n] = d.line;
-        vDirty.delete(s.n);
+        vDirty.delete(s.n); paintDirty();
         lineDone.push(s.n);
       } catch (e) { lineFailed.push(`scene ${s.n}: ${e}`); }
     }
@@ -860,7 +877,7 @@ ${archivedTo || '(sandbox was already empty)'}
     Object.keys(HIST).forEach(k => delete HIST[k]);
     Object.keys(vLine).forEach(k => delete vLine[k]);
     LOCKED.clear();
-    vDirty.clear();
+    vDirty.clear(); paintDirty();
     ON.clear();
     RENUMBERED = false;
     VTT = null;
@@ -975,10 +992,55 @@ ${v.scenes.length} scene(s).
   // edited. Neither touches a line or a layer that isn't flagged dirty, and
   // neither archives anything first — Backup Scenes is the one button with
   // a "put the whole generation back" answer.
+  /*
+    THE SECOND HALF OF A SAVE: carry what is on disk into the cuts and the voice,
+    then re-open THIS timeline on the frame it was on.
+
+    Pulled out of saveScenes so the button can also run it when there is nothing
+    to write — a line edited here is already in script.json (it saves on blur),
+    so the only thing outstanding is the voice, and the green button has to do
+    that job too. Carson, 2026-09-20: "It needs to rebuild voice when I click it."
+  */
+  async function syncAndReturn(btn, label, what) {
+    if (btn) { btn.classList.add('working'); btn.disabled = true;
+               btn.innerHTML = 'Updating words &amp; voice…'; }
+    status(`${what} Updating the words, the cuts and the voice — this re-encodes `
+         + `any stretched scene, so give it a moment…`);
+    let sync;
+    try {
+      const rs = await fetch('/api/sync', { method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ root: ROOT_REL }) });
+      sync = await rs.json();
+    } catch (e) { sync = { error: String(e) }; }
+    if (sync && sync.error) {
+      if (btn) { btn.classList.remove('working'); btn.disabled = false; btn.innerHTML = label; }
+      renderScenes();
+      status(`${what} The update FAILED:\n⚠ ${sync.error}`);
+      return false;
+    }
+    try {
+      sessionStorage.setItem('sae.resume', JSON.stringify(
+        { root: ROOT_REL, ns: SEQ.map(s => s.n).join(','), frame: +$('slider').value }));
+    } catch (_) {}
+    status('Updated — re-reading the scenes…');
+    location.href = `/api/open-seq-go?root=${encodeURIComponent(ROOT_REL)}`
+                  + `&ns=${SEQ.map(s => s.n).join(',')}`;
+    return true;
+  }
+
   async function saveScenes(includeNarrative) {
     const withWork = SEQ.map((s, i) => ({ i, n: s.n, layers: pendingOf(i) }))
         .filter(x => x.layers.length);
     const lineWork = includeNarrative ? SEQ.filter(s => vDirty.has(s.n)) : [];
+    if (!withWork.length && !lineWork.length && WORDS_STALE) {
+      // The words are already on disk; only the soundtrack is behind.
+      stop();
+      await syncAndReturn($(includeNarrative ? 'saveAllBtn' : 'saveTimelineBtn'),
+                          includeNarrative ? '&#128221; Save all' : '&#128190; Save Timeline',
+                          'Nothing new to write.');
+      return;
+    }
     if (!withWork.length && !lineWork.length) {
       const held = SEQ.flatMap((s, i) => heldBackOf(i).map(w =>
         `  scene ${s.n}: ${w === 'base' ? 'segment' : 'overlay'} is unticked`));
@@ -1096,11 +1158,34 @@ ${list}
         VTT.byN[s.n].line = d.line;
         VTT.byN[s.n].words = d.words;
         vLine[s.n] = d.line;
-        vDirty.delete(s.n);
+        vDirty.delete(s.n); paintDirty();
         lineDone.push(s.n);
       } catch (e) { lineFailed.push(`scene ${s.n}: ${e}`); }
     }
     if (lineWork.length) paintVttSum();
+
+    /*
+      ⚠ A SAVE IS NOT FINISHED WHEN THE CLIP IS WRITTEN.
+
+      Carson, 2026-09-20: "When I Save Timeline, you need to update the words,
+      frames, do the save and do the check, and return me to where I was, so I
+      can carry on from there."
+
+      Writing sandbox/<scene>/segment.mp4 leaves the cut it came from, the
+      timing and the soundtrack on the old lengths — the editor then shows one
+      number and the video plays another, and a later rebuild quietly throws the
+      frame work away. So the same click runs the sync (push the saved clips
+      back into their cuts, rebuild the voice if the words or a length moved,
+      write the new cuts and their slice of the voice back), then re-opens THIS
+      timeline and lands on the frame it was on.
+
+      Only after a save that actually wrote something: a no-op save has nothing
+      to carry and must not cost a rebuild.
+    */
+    if (done.length || lineDone.length) {
+      await syncAndReturn(btn, label, `Saved ${done.length} scene(s).`);
+      return;
+    }
 
     // Put the labels back BEFORE anything else, so a failure below cannot
     // leave the button spinning over a run that has stopped.
@@ -1266,7 +1351,73 @@ Each repeats that track's LAST frame. Undoable per scene.`)) return;
     const s = SEQ[i];
     if (!s) return;
     if (w === 'base') s.base_edited = on; else s.over_edited = on;
+    paintDirty();
   }
+
+  /*
+    THE SAVE BUTTON SAYS WHETHER THERE IS ANYTHING TO SAVE.
+
+    Carson, 2026-09-20: "When the timeline is dirty, colour the text on the Save
+    Timeline button to green, to remind me to save." Frame edits live only in
+    this page's cache until the button is pressed, and the page looked exactly
+    the same either way — which is how a scene's work got lost to a rebuild
+    more than once.
+
+    Dirty = any scene on the timeline with an unsaved track, or a narration line
+    typed and not written. Held-back tracks (an unticked layer) are NOT counted:
+    the button would not save them, so it must not claim it will.
+  */
+  /*
+    WORDS SAVED IS NOT WORDS HEARD.
+
+    A line written here lands in script.json immediately, so nothing is
+    "unsaved" — and the button used to go straight back to grey while the
+    -narrated.mp4 still spoke the old line. This flag is the difference, polled
+    from /api/pending (two stat()s) and set the moment a line save returns.
+  */
+  let WORDS_STALE = false;
+  async function pollWords() {
+    try {
+      const r = await fetch(`/api/pending?root=${encodeURIComponent(ROOT_REL)}`);
+      const d = await r.json();
+      if (typeof d.words_stale === 'boolean' && d.words_stale !== WORDS_STALE) {
+        WORDS_STALE = d.words_stale;
+        paintDirty();
+      }
+    } catch (_) {}                      // a blip is not worth a message
+  }
+  setInterval(pollWords, 3000);
+  pollWords();
+
+  function paintDirty() {
+    const btn = $('saveTimelineBtn');
+    if (!btn || btn.classList.contains('working')) return;
+    // ⚠ READ THE MANIFEST DIRECTLY, NOT pendingOf().
+    // pendingOf() asks isLocked(), which is a `const` declared far below this
+    // point — so calling it from the page's own start-up threw a TDZ
+    // ReferenceError and the button silently stayed grey on a timeline that
+    // plainly had an edit (2026-09-20). base_edited / over_edited are on the
+    // manifest this page was built from and are true the moment a frame moves.
+    const tracks = SEQ.reduce((n, s) => n + (s.base_edited ? 1 : 0)
+                                          + (s.over_edited ? 1 : 0), 0);
+    // ⚠ `typeof` IS NOT SAFE HERE. vDirty is a const declared further down, and
+    // reading a const before its line runs throws even through typeof — which
+    // is what kept this function dying at start-up. The try/catch makes the
+    // early calls (renderScenes runs before that line) count frames only.
+    let lines = 0;
+    try { lines = vDirty ? vDirty.size : 0; } catch (_) { lines = 0; }
+    const dirty = tracks + lines > 0 || WORDS_STALE;
+    btn.classList.toggle('dirty', dirty);
+    const bits = [];
+    if (tracks) bits.push(`${tracks} track(s) not written yet`);
+    if (lines) bits.push(`${lines} line(s) still being typed`);
+    if (WORDS_STALE) bits.push('the words changed since the voice was built');
+    btn.title = dirty
+      ? bits.join(', ') + ' — Save Timeline writes everything, updates the cuts'
+        + ' and the voice, then brings you back to this frame'
+      : 'Nothing to save on this timeline';
+  }
+
   // Locked tracks that DO have unsaved edits, so a save can name what it is
   // leaving behind instead of silently skipping it.
   function heldBackOf(i) {
@@ -1368,7 +1519,7 @@ Each repeats that track's LAST frame. Undoable per scene.`)) return;
   // Save All's tip is written in the markup and does not change, so nothing
   // rewrites it here any more. This used to set a PER-SCENE wording on every
   // renumber-state load, which would now describe the wrong job.
-  function paintSaveBtn() {}
+  function paintSaveBtn() { paintDirty(); }   // the green "unsaved" state
 
 
 
@@ -1839,6 +1990,7 @@ Nothing was changed. Untick the shorter track, or move to a `
   // See saveScenes()'s own comment for why the unconditional job moved out
   // to Backup Scenes instead of staying a third mode of this call.
   $('saveTimelineBtn').onclick = () => saveScenes(false);
+  paintDirty();                      // the state the page opens in
   $('saveAllBtn').onclick = () => saveScenes(true);
 
   // ── audio ────────────────────────────────────────────────────────────
@@ -1923,7 +2075,7 @@ Nothing was changed. Untick the shorter track, or move to a `
                  + 'Saved when you click away; Esc puts it back.';
         ta.addEventListener('input', () => {
           vLine[sc.n] = ta.value;
-          vDirty.add(sc.n);
+          vDirty.add(sc.n); paintDirty();
           row.classList.add('dirty');
           paintVttRow(row, i);           // the gap moves as you type
           paintVttSum();
@@ -1931,7 +2083,7 @@ Nothing was changed. Untick the shorter track, or move to a `
         ta.addEventListener('keydown', ev => {
           if (ev.key === 'Escape') {
             ta.value = VTT.byN[sc.n].line; ta.dispatchEvent(new Event('input'));
-            vDirty.delete(sc.n); row.classList.remove('dirty'); ta.blur();
+            vDirty.delete(sc.n); paintDirty(); row.classList.remove('dirty'); ta.blur();
           }
           if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) ta.blur();
         });
@@ -2142,6 +2294,9 @@ Nothing was changed. Untick the shorter track, or move to a `
       VTT.byN[n].words = d.words;
       vLine[n] = d.line;
       vDirty.delete(n);
+      // The words are on disk now, but the soundtrack still says the old ones.
+      if (!d.unchanged) WORDS_STALE = true;
+      paintDirty();
       const row = [...document.querySelectorAll('#vttRows .vt')]
         .find(x => SEQ[+x.dataset.i].n === n);
       if (row) {
@@ -2458,6 +2613,7 @@ ${el.dataset.tip}` : '')
   }
 
   function renderScenes() {
+    paintDirty();
     $('sceneList').innerHTML = '';
     for (const it of ALL) {
       const on = ON.has(it.n);
