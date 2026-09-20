@@ -181,3 +181,15 @@ Server:          http://localhost:8846
 09:08:45  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=16  line=Build out the item here, in the details page. {2} Add an Item description, {2} Confirm you are in the right collection. {2} Then add how many of this specific item you have for rent. {2} Then add the price in cents. {2} The requirement is the set of questions,{.5} that a renter answers for the equipment items they are renting from you. {2} The attributes may hold some image details that will be automatically added. {.5} So you can skip over this.
 09:15:46  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=17  line=Finally add the specific options for this item. {.5} Select the brand variant from the dropdown list. {2} Then select the length variant. {2} The star after the option name indicates that you made these a required field. {.5} This means the renter will need to make a variant selection. {2} Then click the update button to save it.
 09:18:03  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=16,17,18,19,20
+09:29:39  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=1,16,17,18,19,20
+09:29:47  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=1
+09:32:27  + Frame        segment_1c0e1695           at=121 count=25 side=right  nb_frames=200
+09:32:27  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=1
+09:33:07  Save scene     segment_1c0e1695             nb_frames=200  duration_s=8.04
+09:33:51  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=8
+09:36:36  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=8  line=Here you can find all the store's look up and search options. {0.5} Press the plus icon button to add a new collection.
+09:38:48  + Frame        segment_358f06b5           at=115 count=30 side=right  nb_frames=225
+09:38:48  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=8
+09:39:34  Save scene     segment_358f06b5             nb_frames=225  duration_s=9.0
+09:49:30  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=22  line=You are signed out. {0.5} Your collection and all nine of its variants are saved and ready to rent. TEST
+09:49:48  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=22  line=You are signed out. {0.5} Your collection and all nine of its variants are saved and ready to rent.
