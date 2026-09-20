@@ -283,6 +283,9 @@ function render() {
       <td class="dim">${r.frames.toLocaleString()}</td>
       <td class="${wpmClass(r.sc.wpm)}">${r.sc.wpm ? r.sc.wpm : '—'}</td>
       <td class="${r.sc.add ? 'gapbad' : 'dim'}">${r.sc.add ? '~' + r.sc.add.toLocaleString() : '—'}</td>
+      <td class="${r.sc.dirty ? 'dirtyx' : 'dim'}" title="${esc(r.sc.dirty
+          || 'this scene\'s voice matches its words and its length')}"
+        >${r.sc.dirty ? '✕' : '·'}</td>
       <td class="line l"><div class="linebox${r.silent ? ' empty' : ''}"
         contenteditable="true" spellcheck="true" data-n="${r.sc.n}"
         data-ph="Silent on purpose — type to give it a line"
@@ -933,9 +936,9 @@ async function pollScript() {
   if (!m || !SCRIPT_STAMP) { SCRIPT_STAMP = m; return; }
   if (m === SCRIPT_STAMP) return;
   SCRIPT_STAMP = m;
-  say('the script changed on disk — reloading the words', 'work');
+  say('this recipe changed on disk — reloading', 'work');
   await refresh();
-  say('words reloaded from script.json');
+  say('reloaded: words, lengths and voice are current');
 }
 
 function watchScript() {

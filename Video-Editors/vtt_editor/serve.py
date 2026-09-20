@@ -61,20 +61,17 @@ WEB = os.path.join(HERE, "web")
 CACHE = os.path.join(EDITORS, "cache", "vtt_editor")
 LOGS = os.path.join(EDITORS, "logs")
 
+sys.path.insert(0, EDITORS)
+from editor_base import paths as ebpaths          # noqa: E402
+from editor_base import frames as ebframes        # noqa: E402
 # ⚠ THE TOOLS LIVE IN THE OTHER REPO, AND THAT IS DELIBERATE.
 # Making the raw mp4 is Basic_E2E_Testing's job; everything after it is this
 # repo's. The raw-capture tools sit on that boundary — they read a capture and
 # its script — so they stay where the recorder is and this editor drives them.
-# Override with BASIC_E2E_REPO if it is checked out somewhere else.
-RECORDER = os.path.join(
-    os.environ.get("BASIC_E2E_REPO",
-                   os.path.join(os.path.dirname(VE_ROOT), "Basic_E2E_Testing")),
-    "Master_Flows", "Recorder")
-SCRIPTS = os.path.join(RECORDER, "scripts")
-
-sys.path.insert(0, EDITORS)
-from editor_base import paths as ebpaths          # noqa: E402
-from editor_base import frames as ebframes        # noqa: E402
+# WHERE they are is one fact, and it lives in editor_base/recorder.py now;
+# this editor had its own spelling of it and the SAE had a second.
+from editor_base import recorder                  # noqa: E402
+SCRIPTS = recorder.scripts_dir()
 
 CUSTOMERS = os.path.join(VE_ROOT, "Customers")
 
@@ -440,6 +437,21 @@ def job_state(folder):
     # cure is frames, and this is how many: the seconds the line WOULD take at
     # 155 (its own rate scaled back) minus the room it has, at the capture's own
     # fps. A line already at or under 155 needs none. Carson, 2026-09-20.
+    # ⚠ PRISTINE OR DIRTY, ASKED OF THE TOOL THAT OWNS THE RULE.
+    # voice_scenes.py decides what needs re-speaking — no audio yet, the line
+    # changed, the length changed, the dwell changed. Re-deciding it here would
+    # be a second copy of that rule and they would drift; a --status run is one
+    # stat() per scene and comes back in about 0.05s.
+    dirty_why = {}
+    try:
+        st = recorder.run("voice_scenes.py", [folder, "--status"], timeout=120)
+        for line in (st.get("out") or "").splitlines():
+            bits = line.strip().split(None, 2)
+            if len(bits) >= 3 and bits[0].isdigit() and bits[2].startswith("DIRTY"):
+                dirty_why[int(bits[0])] = bits[2].split("—", 1)[-1].strip()
+    except Exception:
+        dirty_why = {}                    # a status we cannot read is not a defect
+
     base_wpm = 155.0
     # The capture's own rate, the same value the table counts FRAMES at.
     row_fps = float((report or {}).get("fps") or 25)
@@ -507,6 +519,8 @@ def job_state(folder):
         "scenes": [{"n": s["n"], "label": scene_label(s),
                     "wpm": said_rate.get(s["n"]),
                     "add": add_frames.get(s["n"]),
+                    # "" when this scene's voice is current; the reason when not.
+                    "dirty": dirty_why.get(s["n"], ""),
                     "line": s.get("line") or "",
                     "silent": bool(s.get("silent")),
                     "start": src_in.get(s["n"]),
@@ -559,17 +573,7 @@ def run_script(name, args, timeout=1800):
     written down — the keyframe spacing, the silent audio track, the cache key.
     A second copy here is a second copy to get wrong.
     """
-    cmd = ["python3", os.path.join(SCRIPTS, name)] + list(args)
-    t0 = time.time()
-    p = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
-    return {
-        "ok": p.returncode == 0,
-        "code": p.returncode,
-        "seconds": round(time.time() - t0, 1),
-        "out": (p.stdout or "")[-8000:],
-        "err": (p.stderr or "")[-4000:],
-        "cmd": " ".join(cmd),
-    }
+    return recorder.run(name, args, timeout=timeout)
 
 
 def promote_segments(folder):
@@ -874,9 +878,24 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         # capture every few seconds; this is a stat() and nothing else, and the
         # page only refreshes when the number moves.
         if u.path == "/api/stamp":
+            # ⚠ NOT JUST THE WORDS. A sync can change a scene's LENGTH, its cut
+            # and the voice without touching script.json — and this page shows
+            # all three. Watching the script alone left the table on old frame
+            # counts until someone reloaded by hand. Carson, 2026-09-21: "do a
+            # page refresh to make everything current, including the VTT
+            # Editor." The newest of the four is the stamp.
             folder = (q.get("folder") or [""])[0]
-            p = script_in(folder) if folder and os.path.isdir(folder) else ""
-            return self.send_json({"mtime": os.path.getmtime(p) if p and os.path.isfile(p) else 0})
+            if not folder or not os.path.isdir(folder):
+                return self.send_json({"mtime": 0})
+            watched = [script_in(folder),
+                       os.path.join(folder, "stretch_report.json"),
+                       os.path.join(folder, "narration_report.json")]
+            spec = read_json(script_in(folder)) or {}
+            cap = capture_of(folder, spec)
+            if cap:
+                watched.append(os.path.join(folder, cap.replace(".mp4", "-narrated.mp4")))
+            times = [os.path.getmtime(p) for p in watched if p and os.path.isfile(p)]
+            return self.send_json({"mtime": max(times) if times else 0})
         if u.path == "/api/state":
             folder = (q.get("folder") or [""])[0]
             if not folder or not os.path.isdir(folder):

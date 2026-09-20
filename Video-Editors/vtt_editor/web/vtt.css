@@ -349,6 +349,10 @@ table.scenes td.lab {
 }
 table.scenes td.dim { color:var(--dimmer); }
 table.scenes td.gapbad { color:var(--warn); font-weight:700; }
+/* ⚠ THE SCENE'S VOICE IS BEHIND ITS WORDS. Yellow, not red: nothing is broken
+   and nothing is lost — a Save Timeline in the SAE re-speaks it and the mark
+   clears itself. Carson, 2026-09-21. */
+table.scenes td.dirtyx { color:#f5c542; font-weight:700; text-align:center; }
 table.scenes tr.sel td { background:var(--panel-2); }
 table.scenes tr.sel td.lab { box-shadow:inset 3px 0 0 var(--accent); }
 
