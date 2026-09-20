@@ -201,6 +201,20 @@ function jobRow(j) {
   one-day-rental is 30fps and special-skis is 25. A fixed 25 is the same bug
   that put stretch_scenes' candidate edges past the end of a 66-second file.
 */
+/*
+  HOW FAST THE VOICE HAD TO SPEAK THIS LINE, coloured.
+
+  155 is Sarah's measured pace and what narrate_mac.py starts at; it only goes
+  faster when the words do not fit the screen. So anything above 155 is the
+  table saying "this scene is short for its line", and 185+ is plainly hurried.
+  A scene with no voice built yet shows a dash rather than a zero.
+*/
+function wpmClass(rate) {
+  if (!rate) return 'dim';
+  if (rate >= 185) return 'gapbad';
+  return rate > 155 ? '' : 'dim';
+}
+
 function calc(sc) {
   const w = wordsIn(sc.line);
   const b = beats(sc.line);
@@ -267,6 +281,8 @@ function render() {
       <td>${r.scene.toFixed(1)}s</td>
       <td class="${r.gap < 0 ? 'gapbad' : 'dim'}">${r.gap >= 0 ? '+' : ''}${r.gap.toFixed(1)}s</td>
       <td class="dim">${r.frames.toLocaleString()}</td>
+      <td class="${wpmClass(r.sc.wpm)}">${r.sc.wpm ? r.sc.wpm : '—'}</td>
+      <td class="${r.sc.add ? 'gapbad' : 'dim'}">${r.sc.add ? '~' + r.sc.add.toLocaleString() : '—'}</td>
       <td class="line l"><div class="linebox${r.silent ? ' empty' : ''}"
         contenteditable="true" spellcheck="true" data-n="${r.sc.n}"
         data-ph="Silent on purpose — type to give it a line"

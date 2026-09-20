@@ -433,6 +433,23 @@ def job_state(folder):
     base = int(os.environ.get("MAC_RATE", "155"))
     fast = [x for x in (narration or {}).get("lines", [])
             if x.get("rate") and x["rate"] != base]
+    said_rate = {x["n"]: x.get("rate") for x in (narration or {}).get("lines", [])
+                 if x.get("said")}
+    # ⚠ HOW MANY FRAMES THIS SCENE IS SHORT OF SPEAKING AT 155.
+    # narrate_mac.py speeds a line up only because the screen ran out, so the
+    # cure is frames, and this is how many: the seconds the line WOULD take at
+    # 155 (its own rate scaled back) minus the room it has, at the capture's own
+    # fps. A line already at or under 155 needs none. Carson, 2026-09-20.
+    base_wpm = 155.0
+    # The capture's own rate, the same value the table counts FRAMES at.
+    row_fps = float((report or {}).get("fps") or 25)
+    add_frames = {}
+    for x in (narration or {}).get("lines", []):
+        rate, spoken, room = x.get("rate") or 0, x.get("spoken") or 0, x.get("room") or 0
+        if rate > base_wpm and spoken:
+            short_s = spoken * rate / base_wpm - room
+            if short_s > 0:
+                add_frames[x["n"]] = int(round(short_s * row_fps))
     script_p = script_in(folder)
     stale = (not narrated or not os.path.isfile(narrated)
              or (script_p and os.path.isfile(script_p)
@@ -478,7 +495,15 @@ def job_state(folder):
         # The dwell at each end, and the frame rate the frames are counted at.
         "lead": lead,
         "fps": (report or {}).get("fps") or probe_fps(master)[0],
+        # ⚠ THE MEASURED RATE, NOT A PLANNED ONE. narration_report.json says how
+        # fast narrate_mac.py actually had to speak each line to fit its screen;
+        # the table's own `speech` column is a PLAN at 3.44 words a second, which
+        # is faster than the voice really is, so a line can look like it fits and
+        # still come out at 185. Carson, 2026-09-20: "add a column called WPM".
+        # A scene with no voice yet has none, and the column says so.
         "scenes": [{"n": s["n"], "label": scene_label(s),
+                    "wpm": said_rate.get(s["n"]),
+                    "add": add_frames.get(s["n"]),
                     "line": s.get("line") or "",
                     "silent": bool(s.get("silent")),
                     "start": src_in.get(s["n"]),
