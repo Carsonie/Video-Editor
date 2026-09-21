@@ -712,7 +712,7 @@ def main():
                  # and every HeyGen clip ENDS on the settled rest pose (eyes open,
                  # mouth closed), verified across all 11 scene clips, so the held
                  # frame is correct by construction. Clip STARTS are not: they are
-                 # mid-word with eyes shut. See Help_Videos/HeyGen/Sarah/README.md.
+                 # mid-word with eyes shut. See Studio/avatars/Sarah/README.md.
                  f"tpad=stop_mode=clone:stop_duration={pad_v:.3f},format=yuva420p[v];"
                  f"[0:a]apad=pad_dur={pad_v:.3f}[a]",
                  "-map", "[v]", "-map", "[a]", "-c:v", "libvpx-vp9", "-pix_fmt", "yuva420p",

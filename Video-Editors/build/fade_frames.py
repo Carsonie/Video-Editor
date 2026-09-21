@@ -83,7 +83,7 @@ USAGE
 
   # the main case: fade a clip's last frame into a pose image, as alpha webm
   fade_frames.py tail sarah-scene-11-alpha.webm \
-      --to Help_Videos/HeyGen/Sarah/sarah-rest-pose-full-alpha.png \
+      --to Studio/avatars/Sarah/sarah-rest-pose-full-alpha.png \
       --out closing-fade-alpha.webm
 
   # survey every scene boundary in a video folder (the diagnostic)

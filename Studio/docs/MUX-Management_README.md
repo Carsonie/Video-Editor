@@ -1,3 +1,8 @@
+> ⚠ **SUPERSEDED 2026-09-21 — THIS DESCRIBES A FOLDER THAT NO LONGER EXISTS.**
+> `MUX-Management/` was folded into `Studio/`. Read `Studio/README.md` for what
+> is where now. This file is kept because it is the only written account of why
+> the folder was created and what it was for.
+
 # MUX-Management — video delivery, and everything that feeds it
 
 Moved here from `Basic_E2E_Testing` on 2026-09-05, at Carson's direction.

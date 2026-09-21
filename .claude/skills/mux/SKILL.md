@@ -68,7 +68,7 @@ this repo is pinned  2.9.1                   ← already has it
 latest seen          3.13.3                  (2026-09-09)
 ```
 
-Pinned in `MUX-Management/Help_Videos/VSCode_Mux_Ex/frontend/package.json` as
+Pinned in `Studio/mux/vscode_example/frontend/package.json` as
 `@mux/mux-player-react ^2.4.0`, resolving to **2.9.1** in the lockfile. The
 caret means a fresh `npm install` could pull something newer — check the
 lockfile, not the manifest, before claiming a version.

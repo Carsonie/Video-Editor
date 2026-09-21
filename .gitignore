@@ -67,6 +67,18 @@ Customers/*/*/help-videos/**/*.vtt.artifact.html
 # before cutting. It was tracked in Basic_E2E_Testing for the same reason;
 # keep it, or the boundaries.json beside it names frames nobody can see.
 !Customers/*/*/help-videos/**/work/boundaries.png
+# THE TOOLS FOLDER — reusable overlay cards and the script that builds them.
+# Carson made it on 2026-09-21: "Add this image overlay there and we will use it
+# various locations." A card is a real asset — it gets burnt into pixels, so if
+# the PNG is lost there is no other record of what a frame was given. The
+# blanket `Customers/**` caught both the .png and the .py, which is the SAME
+# silent failure that dropped all ten *vtt.html pages twice: an untracked file
+# looks exactly like a file with no changes. Named by FOLDER, not by extension,
+# so the next card and the next helper are kept without editing this file again.
+!Customers/*/*/help-videos/*/TOOLS/**
+# ...but never a preview. make_overlay.py --preview writes <card>_on_frameN.png
+# to look at before burning; it is a screenshot of a clip, not an asset.
+Customers/*/*/help-videos/*/TOOLS/**/*_on_frame*.png
 # ...but not these. `.render_jobs.json` holds live HeyGen job ids, and a frame
 # map is regenerable diagnostics that runs to thousands of lines.
 Customers/**/.render_jobs.json
@@ -132,34 +144,68 @@ __pycache__/
 Video-Editors/tests/_fixture_source/*
 !Video-Editors/tests/_fixture_source/README.md
 
-# ── MUX-Management/ — the video DELIVERY side, moved in from Basic_E2E_Testing ─
-# 2026-09-05. Block what is DANGEROUS or LARGE; track everything else.
+# ── Studio/ — the shared half: avatars, beds, HeyGen tooling, MUX keys ────────
+# Block what is DANGEROUS or LARGE; track everything else.
 #
-# The first version of this rule excluded the whole folder and re-included only
-# .md/.txt. That would have silently DROPPED VSCode_Mux_Ex's Go + React source
-# — a real prototype, tracked in the other repo until today — turning a move
-# into a deletion of its history. Caught before the commit; do not narrow this
-# back to a docs-only allowlist.
+# ⚠⚠ THIS BLOCK SAID `MUX-Management/**` UNTIL 2026-09-21, AND THE FOLD BROKE IT.
+# Carson folded MUX-Management/ into Studio/ that day. The moment the files
+# moved, FOUR LIVE SECRETS came out from under these rules and `git status`
+# offered them as new files:
 #
-# ⚠ Live MUX API tokens and .pem SIGNING KEYS live under Help_Videos/MUX/.
-# These rules are what stop them being committed.
-MUX-Management/**/*.env
-MUX-Management/**/*.env.*
-!MUX-Management/**/*.env.example
-MUX-Management/**/*.pem
-MUX-Management/**/*.key
-MUX-Management/**/*secret*
-MUX-Management/**/*token*
-MUX-Management/**/*signing-key*
-# Media: the renders are hundreds of MB and are regenerable output.
-MUX-Management/**/*.mp4
-MUX-Management/**/*.webm
-MUX-Management/**/*.mov
-MUX-Management/**/*.mp3
-MUX-Management/**/*.wav
-MUX-Management/**/*.png
-MUX-Management/**/*.jpg
-MUX-Management/**/node_modules/
+#     Studio/mux/mux-signing-key-2bCop….pem
+#     Studio/mux/mux-signing-key-Dy4dC….pem
+#     Studio/mux/mux-Rentify.app.env
+#     Studio/mux/mux-access-token-Rentify_Video_Testing.env
+#
+# Caught by running `git check-ignore` on every .pem and .env under the new
+# path BEFORE the commit — not by eye, and not by trusting that a rule which
+# worked yesterday still points at the files. Nothing was ever committed at the
+# old path, so the history is clean. THIS IS THE THIRD TIME A FOLDER RENAME HAS
+# SILENTLY DROPPED FILES OUT OF A RULE IN THIS FILE: the other two dropped all
+# ten *vtt.html pages. An untracked file looks exactly like a file with no
+# changes.
+#
+# So the dangerous patterns below are NOT anchored to a folder name any more.
+# A key is a key wherever it sits, and the next rename cannot break them.
+#
+# The folder-wide rules that remain named are only the LARGE ones, and a
+# rename there costs disk, not a leaked key.
+#
+# ⚠ AND DO NOT NARROW THIS TO A DOCS-ONLY ALLOWLIST. The first version of the
+# old rule excluded the whole folder and re-included only .md/.txt, which would
+# have silently dropped vscode_example's Go + React source — a real prototype —
+# turning a move into a deletion of its history.
+
+# Secrets, ANYWHERE in the repo. Never anchored to a folder.
+**/*.pem
+**/*.key
+**/*signing-key*
+**/*secret*
+**/*access-token*
+**/*.env
+**/*.env.*
+!**/*.env.example
+# ⚠ `**/*token*` is deliberately NOT here — it would swallow ordinary source
+# like a tokenizer or a `tokens.json`. `*access-token*` is the real shape of
+# the MUX files; add another exact pattern rather than widening this one.
+
+# Media under Studio/: the renders are hundreds of MB and are regenerable.
+Studio/**/*.mp4
+Studio/**/*.webm
+Studio/**/*.mov
+Studio/**/*.mp3
+Studio/**/*.wav
+Studio/**/*.png
+Studio/**/*.jpg
+# ⚠ .webp TOO. 32 Pamela preview images, 7.7 MB, were never tracked at the old
+# path and `git add -A` offered every one of them the moment the folder moved —
+# the old media rules listed .png and .jpg and stopped there. They are fetched
+# on demand by avatars/pamela/fetch_pamela_looks.py, so they are output, not
+# source. Caught by reading the staged list before committing, which is the
+# only way a silent 7.7 MB shows up.
+Studio/**/*.webp
+Studio/**/*.avif
+Studio/**/node_modules/
 
 # sae_vtt_sync.py records (Basic_E2E_Testing): file sizes + times on THIS machine,
 # meaningless anywhere else. One per sandbox scene.

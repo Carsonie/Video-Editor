@@ -86,7 +86,7 @@ When it does move, `Help_Videos/MUX/` carries live API tokens and `.pem`
 signing keys. **Check `.gitignore` covers them BEFORE they land**, move
 rather than copy, and never read or print their contents.
 
-## The root is TWO folders, and every command runs from `Video-Editors/`
+## The root is THREE folders, and every command runs from `Video-Editors/`
 
 Restructured 2026-09-04, because Carson works in the customer files far more
 than in the tools and the two were interleaved at the root.
@@ -94,9 +94,15 @@ than in the tools and the two were interleaved at the root.
 ```
 Video-Editor/
 ├── Customers/       the videos — this is the work
+├── Studio/          what EVERY video shares: avatars, silence beds,
+│                    the HeyGen tooling, the MUX keys and the docs
 └── Video-Editors/   the code: the editors, build/, tests/, shared/,
                      editor_base/, Sarah/, cache/, PIPELINE.md, Makefile
 ```
+
+⚠ **IT WAS TWO FOLDERS UNTIL 2026-09-21.** `Studio/` is the folded-in
+`MUX-Management/`, which no longer exists — see its own section below. Nothing
+in `Video-Editors/` reads a path inside it, so `cd Video-Editors` is unchanged.
 
 `.git`, `.gitignore`, `.claude/` and this file **stay at the root and have
 to.** A skill only registers at `.claude/skills/<folder>/SKILL.md` relative
@@ -324,6 +330,153 @@ Customers/               the video data — GITIGNORED
 Flatter than `Basic_E2E_Testing` by one level: no `video_players/`, because
 nothing sits beside the players here. **Do not reintroduce a level above the
 players.**
+
+---
+
+## `Studio/` — the shared half. `MUX-Management/` IS GONE.
+
+Carson, 2026-09-21: *"fold `MUX-Management/` into `Studio/`."* Done the same day.
+**778.7 MB moved, nothing deleted.**
+
+```
+Studio/
+├── avatars/   12 MB   Sarah/, annie/, dt/, pamela/, find_avatar.py, *.json
+├── beds/     7.3 MB   the three silence beds
+├── heygen/   408 KB   .claude/skill/hey_gen/, scripts/, config/, metadata.json
+├── mux/       22 MB   tokens, two signing keys, vscode_example/
+├── docs/      80 KB   Mux · YouTube · VIDEO_CREATION · close_out_sarah
+└── README.md          where every item came from
+```
+
+⚠ **SHARED HERE, PER-VIDEO THERE.** Sarah, the talking-photo groups and the
+silence beds are one set for every video. A video's own HeyGen requests, clips
+and audio go in that video's `4_avatar/`. Getting this backwards is what put a
+store's video work in two unconnected places to begin with.
+
+⚠ **`HeyGen/videos/` — 679 MB, 93% of the old folder — WENT TO `z_History/`.**
+It held two entries, both superseded renders of one video, and one of them is
+**paddle-sports, which has no store row in the v10 database at all** (0 of 5
+tests runnable, cannot be re-recorded). It is at
+`z_History/MUX-Management_pre-Studio/`, with `HeyGen/_archive/` beside it.
+
+⚠ **NO CODE NAMED THE OLD PATHS — CHECKED BEFORE MOVING.** The only four hits
+in the repo were comments in `build/assemble_video.py` (117, 131, 715) and
+`build/fade_frames.py` (86), and two of those already described
+`Help_Videos/HeyGen/Sarah/` as *Basic_E2E_Testing's old layout*, so they were
+stale before this. Two now name `Studio/avatars/Sarah/`; the two that describe
+the OLD path still say the old path, on purpose.
+
+⚠ **THE SECRETS ARE STILL IN THE REPO.** `Studio/mux/` holds two `.env` token
+files and two `.pem` signing keys; `Studio/heygen/.env.local` is a third. All
+gitignored. `mux-signing-key-2bCop….pem` STILL EXISTS TWICE — the fold did not
+merge it, because `vscode_example/`'s own `Makefile` reads its copy by path.
+One copy outside the repo is proposed and **not** ruled on. Gitignored is not
+the same as safe.
+
+---
+
+## `TOOLS/` MOVED UP — it is `help-videos/TOOLS/` now
+
+Carson, 2026-09-21: *"move `TOOLS/` up to `help-videos/`."* It was in
+`BCP_raw_mp4/TOOLS/`, which said it belonged to the admin recipes; the overlay
+cards serve **BCP and UI alike**.
+
+```
+<store>/help-videos/TOOLS/
+├── back-to-dashboard.png   a TRANSPARENT layer — a card laid over real footage
+├── make_overlay.py         builds that
+├── intro-special-skis.png  an OPAQUE FULL FRAME — held as its own bookend scene
+├── make_intro.py           builds that
+└── NOTE.md                 the whole procedure, step by step
+```
+
+⚠ **READ `TOOLS/NOTE.md` BEFORE ADDING ANY CARD.** It holds the ffmpeg command,
+the pixel check that proves the card landed, and the traps — chiefly that
+**ffmpeg's `n` is 0-based while the SAE's frame numbers are 1-based**, and that
+**one frame is 0.04s and nobody can read it**.
+
+⚠ **`TOOLS/` IS NOW A SIBLING OF THE STAGE FOLDERS, SO IT LOOKS LIKE ONE.**
+`editor_base/stores.py`'s `stage_dirs()` lists every folder under
+`help-videos/`, and `videos_in()` then looks inside for a `script.json`. `TOOLS/`
+has none, so no Load picker offers it — measured, 16 videos before and after.
+But a breadcrumb that counts stages will show it. If that becomes noise, add
+`"TOOLS"` to `stores.py`'s `SKIP` set — one word, and it is `editor_base`, so it
+needs Carson's go-ahead under the editor scope lock.
+
+---
+
+## A VIDEO'S FOLDER SHAPE — SETTLED 2026-09-21, DO NOT ADD A SEVENTH
+
+Carson, 2026-09-21, after reviewing `PROPOSED_help-videos_structure.md`:
+*"keep `sandbox/ segments/ voice/`, and add `4_avatar/ 5_film/ 6_mux/`. This way
+we move on without breaking anything. And try improving the folder structure on
+our next video."*
+
+Ten linear steps, raw.mp4 to hosted video. Six are built; four are not.
+
+```
+Customers/<Business>/<store>/help-videos/<STAGE>/<recipe or video>/
+│
+│  ── BUILT AND PROVEN ON special-skis ──────────────────────────────
+├── <capture>.mp4              1  the raw master. An INPUT. Never edited.
+├── script.json                3  THE SINGLE SOURCE OF TRUTH for the words
+├── bounds.json                2  the cut plan
+├── stretch_report.json        2  the scene lengths
+├── segments/                  2  the cuts, keyed by factor/in/out/fps
+├── sandbox/                   4  THE FRAME WORK.  00-intro .. 99-closing
+├── voice/                     5  the mac voice, per scene + state.json
+├── <capture>-narrated.mp4     6  the REVIEW cut. Rebuilt on every sync.
+│
+│  ── AGREED SHAPE, TOOLS NOT BUILT ────────────────────────────────
+├── 4_avatar/                  7  HeyGen: requests/ clips/ audio/ heygen_state.json
+├── 5_film/                    8  the DELIVERABLE cut + script_v<N>.json
+└── 6_mux/                     9  mux_state.json — asset id, playback id
+                              10  then build/release_video.py -> Completed_Videos/
+```
+
+⚠ **THE NUMBERS ARE THE ORDER, AND THE OLD NAMES KEEP THEIRS.** `sandbox/`,
+`segments/` and `voice/` were NOT renamed to `2_scenes/ 1_cuts/ 3_voice/`. The
+cost was measured: `sandbox/` is named in `editor_base/paths.py` and read by all
+five editors, `build/` and three test suites. A rename buys nothing the numbering
+does not, and the 2026-09-15 stage split already proved a rename breaks whatever
+NAMES a folder, silently, in places nobody lists in advance.
+
+⚠ **A NEW VIDEO MAY BE BORN IN THE CLEAN SHAPE.** That is the deferred half, and
+it is free for a folder that does not exist yet — `0_master/ 1_cuts/ 2_scenes/
+3_voice/`. Converting the 25 existing working folders is not. Ask Carson before
+doing it to a new one, so both shapes do not appear by accident.
+
+⚠ **`5_film/` DOES NOT HOLD `<capture>-narrated.mp4`.** The mac-voice film stays
+at the recipe root. Moving it is four code spots in two repos —
+`Basic_E2E_Testing`'s `sae_vtt_sync.py:190` and this repo's
+`vtt_editor/serve.py:442, 932, 978` — plus 26 files across 25 folders. The split
+is deliberate: the root file is the REVIEW cut, `5_film/` is what SHIPS.
+
+⚠ **EVERY STAGE WITH AN OUTSIDE SERVICE WRITES A `*_state.json`. PROSE NEVER
+HOLDS A FACT.** `01-first-time-ordering/HANDOFF.md` names its source capture and
+then warns, in its own text, *"Don't read this off the doc — read
+`boundaries.json`'s `raw` field"* — it had named the wrong file for five days.
+So `heygen_state.json` and `mux_state.json` are the record; the README beside
+them only explains.
+
+⚠ **DO NOT CREATE A SEVENTH RENDER FOLDER.** `01-first-time-ordering` grew six —
+`dev/ onepass/ preview/ sarah_clips/ video/Master_Set_Of_Segments/
+video/sandbox_mp4_scenes/` — 485 MB, most of it superseded, and nothing says
+which one a reader should open. That is what "just put it here for now" becomes.
+An intermediate render belongs in the stage folder that made it, or in
+`z_History/`.
+
+⚠ **THE THREE FOLDERS ARE CREATED ON DEMAND, NOT UP FRONT.** They exist in
+`special-skis` only. There are 25 working folders across four stores, and 75
+empty directories with `.gitkeep` files in them is not a structure — it is
+noise. Each stage's tool makes its own folder the first time it writes, the same
+way `sandbox/` and `voice/` already do.
+
+⚠ **NO SECRETS IN A VIDEO FOLDER, EVER.** `mux_state.json` holds ids. The MUX
+tokens and the two `.pem` signing keys live in
+`Studio/mux/` — and one key is still DUPLICATED under
+`Studio/mux/vscode_example/`. Moving them to one copy outside the repo is
+proposed and not yet done.
 
 ---
 
