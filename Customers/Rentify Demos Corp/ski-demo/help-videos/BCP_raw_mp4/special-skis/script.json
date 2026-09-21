@@ -207,7 +207,7 @@
     {
       "n": 13,
       "label": "back-to-the-store",
-      "line": "Scroll up and use the back arrow to return to the collections page. {1} Then we can return to the store page.",
+      "line": "Scroll up and use the back arrow to return to the collections page. {2} Then we can return to the store page.",
       "pauses": [
         {
           "seconds": 0.75
@@ -319,7 +319,7 @@
     {
       "n": 21,
       "label": "sign-out",
-      "line": "Go back at the dashboard when you are done. {0.3} Use control or command plus K as the short cut keys. The Logout card here.",
+      "line": "Go back to the dashboard when you are done. {0.3} Use control or command plus the K key as the short cut keys. Use the Logout card is here.",
       "pauses": [
         {
           "seconds": 0.75
@@ -333,7 +333,7 @@
     {
       "n": 22,
       "label": "signed-out",
-      "line": "You are signed out. {0.5} Your collection and all nine of its variants are saved and ready to rent.",
+      "line": "You are signed out. {1} Your collection and all nine of its variants are saved and ready to rent.",
       "pauses": [
         {
           "seconds": 0.75

@@ -98,19 +98,19 @@
    "silent": false
   },
   "13": {
-   "line_hash": "2a4ac9150eb4",
-   "built": 12.0,
+   "line_hash": "c8a2f478189a",
+   "built": 11.04,
    "lead": 0.75,
    "rate": 155,
-   "spoken": 6.74,
+   "spoken": 7.73,
    "silent": false
   },
   "14": {
    "line_hash": "bcec5d1707e0",
-   "built": 11.76,
+   "built": 14.16,
    "lead": 0.75,
-   "rate": 215,
-   "spoken": 9.91,
+   "rate": 155,
+   "spoken": 11.7,
    "silent": false
   },
   "15": {
@@ -155,26 +155,26 @@
   },
   "20": {
    "line_hash": "32c034ecde5d",
-   "built": 8.0,
+   "built": 8.56,
    "lead": 0.75,
-   "rate": 195,
-   "spoken": 6.43,
+   "rate": 155,
+   "spoken": 6.92,
    "silent": false
   },
   "21": {
-   "line_hash": "a4bc8dcdbfa5",
-   "built": 7.0,
+   "line_hash": "b01357592920",
+   "built": 10.04,
    "lead": 0.75,
-   "rate": 250,
-   "spoken": 5.29,
+   "rate": 155,
+   "spoken": 7.89,
    "silent": false
   },
   "22": {
-   "line_hash": "0fff73027e91",
-   "built": 9.76,
+   "line_hash": "0d5d5f38e1e4",
+   "built": 8.44,
    "lead": 0.75,
    "rate": 155,
-   "spoken": 5.16,
+   "spoken": 5.65,
    "silent": false
   }
  }
