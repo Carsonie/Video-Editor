@@ -2,75 +2,101 @@
 # Two reminders, neither of which blocks. Both print every time, so the
 # question gets asked while the change is still in your head.
 #
-#   1. HELP_VIDEO_MIGRATION.md when a commit touches what it documents.
-#   2. The player commit rules when a commit touches one of the video players.
+#   1. CLAUDE.md's folder contract, when a commit moves the furniture.
+#   2. The editor commit rules, when a commit touches one of the five editors.
 #
 # Enabled by:  git config core.hooksPath .githooks
+#
+# ⚠⚠ REWRITTEN 2026-09-21, BECAUSE BOTH HALVES WERE DEAD IN THIS REPO. This
+# file was copied from Basic_E2E_Testing and never adapted, so it watched for
+# things that do not exist here and nagged about a file deleted on purpose:
+#
+#   * it asked for HELP_VIDEO_MIGRATION.md on every .gitignore change. That
+#     file was DELETED in 8f85f25 — "the migration it describes is finished".
+#     So the one reminder that ever fired was always wrong.
+#   * its triggers named `agent-tools/6_end-customer-help-video-creations/`
+#     and `video_players/shared/serve.py`. NEITHER PATH EXISTS HERE; this repo
+#     is Customers/ + Studio/ + Video-Editors/.
+#   * the player half matched `^[a-z0-9_]+/` against staged paths, so it could
+#     never fire: every editor lives under `Video-Editors/`, capital V.
+#
+# A hook whose only working message is a false one gets ignored, and the real
+# reminders it could have carried are ignored with it. Keep the triggers
+# matched to THIS repo's real paths, and check them by staging a file and
+# running `git commit` — not by reading the regex.
 set -u
 staged=$(git diff --cached --name-only)
 
-# ── 1. the migration runbook ──────────────────────────────────────────────
-DOC="HELP_VIDEO_MIGRATION.md"
-watch='(agent-tools/6_end-customer-help-video-creations/(paths|migrate_to_dev|make_scene_overlays|assemble_video)\.py|video_players/shared/(serve|frames)\.py|video_players/[a-z0-9_]+/player\.py|^Makefile$|^\.gitignore$|help-videos/.*/(dev|sandbox|segments|scenes)/)'
+# ── 1. the folder contract ────────────────────────────────────────────────
+# Carson settled the shape on 2026-09-21: "keep sandbox/ segments/ voice/, and
+# add 4_avatar/ 5_film/ 6_mux/ … And try improving the folder structure on our
+# next video." The contract is CLAUDE.md's "A VIDEO'S FOLDER SHAPE" section,
+# and a commit that moves folders around without touching it is how the next
+# session ends up inventing a seventh render folder.
+DOC="CLAUDE.md"
+watch='(^\.gitignore$|^Studio/|^PROPOSED_help-videos_structure\.md$|help-videos/[^/]+/[^/]+/(4_avatar|5_film|6_mux)/|help-videos/TOOLS/|^Video-Editors/editor_base/(paths|stores)\.py$)'
 if echo "$staged" | grep -qE "$watch"; then
   if echo "$staged" | grep -q "^$DOC$"; then
     printf '\n  \033[32m*\033[0m %s is in this commit. Good.\n' "$DOC"
   else
-    printf '\n  \033[33m!\033[0m This commit touches the help-video migration surface:\n'
+    printf '\n  \033[33m!\033[0m This commit moves the furniture:\n'
     echo "$staged" | grep -E "$watch" | sed 's/^/       /'
-    printf '\n    %s is NOT staged. Does it need updating?\n' "$DOC"
-    printf '    The "Current state" table goes stale fastest.\n'
+    printf '\n    %s is NOT staged. Does the folder contract need updating?\n' "$DOC"
+    printf '    See its "A VIDEO'"'"'S FOLDER SHAPE" section.\n'
+  fi
+  # ⚠ THE ONE THAT ACTUALLY BIT, AND IT ASKS EVEN WHEN THE DOC *IS* STAGED.
+  # A .gitignore whose secret rules name a folder stops protecting anything the
+  # moment that folder is renamed, and an untracked file looks exactly like a
+  # file with no changes. Three times here: twice it dropped all ten
+  # *vtt.html pages, and on 2026-09-21 the Studio/ fold took two .pem signing
+  # keys and two MUX .env token files out from under their rules in one move.
+  if echo "$staged" | grep -q '^\.gitignore$'; then
+    printf '\n  \033[33m!\033[0m .gitignore is staged. VERIFY the secrets, do not read the rules:\n'
+    printf '       find Studio Customers -name "*.pem" -o -name "*.env" \\\n'
+    printf '         | while read -r f; do git check-ignore -q "$f" \\\n'
+    printf '             && echo "ok $f" || echo "LEAK $f"; done\n'
   fi
 fi
 
-# ── 2. the player commit rules ────────────────────────────────────────────
-# A player is any folder under video_players/ that has a VERSION file. The
-# rules exist so the history of each player reads as its own changelog:
+# ── 2. the editor commit rules ────────────────────────────────────────────
+# An editor is any folder under Video-Editors/ that has a VERSION file — read
+# off disk, never a list, so a new editor is covered the moment it has one and
+# a non-editor folder (build/, tests/, editor_base/, cache/) is never nagged.
+# Today that is avatar_editor, frame_blender, mp4_splitter,
+# segment_avatar_editor and vtt_editor.
 #
-#   * one player per commit — never two in the same one
-#   * bump that player's VERSION
-#   * subject: "<Player Name> v<N> ADDED: <what it does now>"
+#   * one editor per commit — never two in the same one
+#   * bump that editor's VERSION
+#   * subject: "<Editor Name> v<N> ADDED: <what it does now>"   (or FIXED:)
 #
-# Shared code is exempt: shared/ belongs to no single player. So is anything
-# else under video_players/ that is not a player — tests/, for one.
-#
-# A player is recognised by its VERSION FILE, not by name. That is what the
-# comment above always claimed and what the check used to get wrong: it
-# excluded `shared/` by name and treated every other folder as a player, so
-# adding tests/ produced "tests: VERSION is NOT staged — bump it". Reading the
-# disk instead means a NEW player is covered the moment it has a VERSION in it,
-# and a new non-player folder is never nagged about.
-# The match keeps the WHOLE path, not just the part from agent-tools/ onwards.
-# A staged path starts at `.claude/`, so the shorter match could not be used to
-# test the file on disk — and the VERSION-staged check below reads better
-# against a full path too.
-PLAYER_DIRS=$(echo "$staged" \
-  | grep -oE '^[a-z0-9_]+/' \
+# ⚠ THE PREFIX IS `Video-Editors/`, AND THAT IS THE WHOLE BUG THIS FIXES. The
+# old check grepped '^[a-z0-9_]+/', which matches nothing in a repo whose code
+# all sits one level down under a capital V.
+EDITOR_DIRS=$(echo "$staged" \
+  | grep -oE '^Video-Editors/[A-Za-z0-9_]+/' \
   | sort -u \
   | while read -r d; do [ -f "${d}VERSION" ] && echo "$d"; done)
 
-if [ -n "${PLAYER_DIRS}" ]; then
-  count=$(echo "${PLAYER_DIRS}" | grep -c .)
-  printf '\n  \033[36mi\033[0m Player commit rules apply. This commit touches:\n'
-  echo "${PLAYER_DIRS}" | sed 's|/$||' | sed 's/^/       /'
+if [ -n "${EDITOR_DIRS}" ]; then
+  count=$(echo "${EDITOR_DIRS}" | grep -c .)
+  printf '\n  \033[36mi\033[0m Editor commit rules apply. This commit touches:\n'
+  echo "${EDITOR_DIRS}" | sed 's|/$||' | sed 's|^Video-Editors/||' | sed 's/^/       /'
 
   if [ "${count}" -gt 1 ]; then
-    printf '\n  \033[33m!\033[0m %s players in ONE commit. Split them —\n' "${count}"
-    printf '    a player history is only readable if each commit is about one player.\n'
+    printf '\n  \033[33m!\033[0m %s editors in ONE commit. Split them —\n' "${count}"
+    printf '    an editor history is only readable if each commit is about one editor.\n'
   fi
 
-  for d in ${PLAYER_DIRS}; do
+  for d in ${EDITOR_DIRS}; do
     name=$(basename "${d}")
-    # No ^ anchor: PLAYER_DIRS is captured by grep -o, which drops the
-    # leading ".claude/" that the staged path still carries. Anchoring here
-    # made the check never match, so a bumped VERSION still read as missing.
-    if echo "$staged" | grep -q "${d}VERSION$"; then
-      printf '  \033[32m*\033[0m %s: VERSION is staged.\n' "${name}"
+    if echo "$staged" | grep -q "^${d}VERSION$"; then
+      printf '  \033[32m*\033[0m %s: VERSION is staged (v%s).\n' "${name}" \
+             "$(tr -d '[:space:]' < "${d}VERSION" 2>/dev/null)"
     else
       printf '  \033[33m!\033[0m %s: VERSION is NOT staged — bump it.\n' "${name}"
     fi
   done
-  printf '\n    Subject line:  <Player Name> v<N> ADDED: <what it does now>\n'
+  printf '\n    Subject line:  <Editor Name> v<N> ADDED: <what it does now>\n'
   printf '    Not blocking - commit again to proceed either way.\n\n'
 fi
 exit 0
