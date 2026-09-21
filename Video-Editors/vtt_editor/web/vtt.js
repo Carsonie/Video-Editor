@@ -215,6 +215,36 @@ function wpmClass(rate) {
   return rate > 155 ? '' : 'dim';
 }
 
+/*
+  HOW MANY FRAMES THIS SCENE IS SHORT OF SPEAKING AT 155 — worked out HERE, on
+  the row being drawn, and never stored.
+
+      room = clip - lead - exit          the seconds the words actually have
+      at155 = spoken x rate / 155        what the same words cost unhurried
+      add   = (at155 - room) x fps
+
+  ⚠ IT IS DERIVED, SO IT IS NOT SAVED. `exit` is the scene's own trailing hold
+  and Carson can change it by typing a `{1}` marker straight into the table,
+  with no voice rebuild. The old code read a frame count out of
+  narration_report.json, which nothing has written since the voice went per
+  scene — so it froze. On 2026-09-21 it claimed scene 13 needed 58 more frames
+  while that scene really had 4.5s of dead air, and let scenes 14 and 21 sit
+  quiet at "155" while they truly spoke at 215 and 250 wpm.
+
+  `rate` and `spoken` are the two facts, measured by voice_scenes.py at Save
+  Timeline and kept in voice/state.json. Everything else is this sum.
+
+  A line at or under 155 was never hurried, so it needs nothing.
+*/
+function addFrames(sc, lead, fps) {
+  const rate = sc.wpm || 0, spoken = sc.spoken || 0;
+  if (rate <= 155 || !spoken) return null;
+  const exit = (typeof sc.exit === 'number' && sc.exit) ? sc.exit : lead;
+  const room = (sc.clip || 0) - lead - exit;
+  const short = spoken * rate / 155 - room;
+  return short > 0 ? Math.round(short * fps) : null;
+}
+
 function calc(sc) {
   const w = wordsIn(sc.line);
   const b = beats(sc.line);
@@ -227,14 +257,15 @@ function calc(sc) {
   // came out at 1.3s against 156.2s of picture and reported 154.9s of dead air.
   if (!w) {
     return { w: 0, b: 0, speech: 0, lead: 0, exit: 0, frames,
-             scene: sc.clip, gap: 0, silent: true };
+             scene: sc.clip, gap: 0, silent: true, add: null };
   }
   const lead = (STATE && typeof STATE.lead === 'number') ? STATE.lead : 0.75;
   const exit = (typeof sc.exit === 'number' && sc.exit) ? sc.exit : lead;
   const scene = Math.round((lead + speech + b + exit) * 10) / 10;
   let gap = Math.round((sc.clip - scene) * 10) / 10;
   if (gap === 0) gap = 0;                   // clears a "-0.0"
-  return { w, b, speech, lead, exit, frames, scene, gap, silent: false };
+  return { w, b, speech, lead, exit, frames, scene, gap, silent: false,
+           add: addFrames(sc, lead, fps) };
 }
 
 function render() {
@@ -282,7 +313,7 @@ function render() {
       <td class="${r.gap < 0 ? 'gapbad' : 'dim'}">${r.gap >= 0 ? '+' : ''}${r.gap.toFixed(1)}s</td>
       <td class="dim">${r.frames.toLocaleString()}</td>
       <td class="${wpmClass(r.sc.wpm)}">${r.sc.wpm ? r.sc.wpm : '—'}</td>
-      <td class="${r.sc.add ? 'gapbad' : 'dim'}">${r.sc.add ? '~' + r.sc.add.toLocaleString() : '—'}</td>
+      <td class="${r.add ? 'gapbad' : 'dim'}">${r.add ? '~' + r.add.toLocaleString() : '—'}</td>
       <td class="${r.sc.dirty ? 'dirtyx' : 'dim'}" title="${esc(r.sc.dirty
           || 'this scene\'s voice matches its words and its length')}"
         >${r.sc.dirty ? '✕' : '·'}</td>

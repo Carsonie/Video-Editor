@@ -276,7 +276,20 @@ def job_state(folder):
     # sandbox/, and reading the folder root would report it as having no words.
     spec = read_json(script_in(folder))
     report = read_json(os.path.join(folder, "stretch_report.json"))
-    narration = read_json(os.path.join(folder, "narration_report.json"))
+    # ⚠ narration_report.json IS DEAD WEIGHT — DO NOT READ RATES OUT OF IT.
+    # It was written by narrate_mac.py, which built ONE soundtrack for the whole
+    # video. Since the voice went per scene (voice_scenes.py, 2026-09-21) nothing
+    # writes it, so it freezes on the day of the last whole-film narration and
+    # every number in it rots from there. This page no longer opens it.
+    #
+    # THE LIVE FACTS ARE IN voice/state.json, written by voice_scenes.py every
+    # time Save Timeline speaks a dirty scene: per scene its measured `rate`,
+    # its `spoken` seconds, the `built` length it was made for and the `lead`.
+    # Carson found this on 2026-09-21: the table showed scene 13 at 185 wpm
+    # wanting 58 more frames while the real voice sat at 155 with 4.5s of dead
+    # air, and — worse — showed 14 and 21 calm at 155 while they really spoke at
+    # 215 and 250. Two of the four lies were in the reassuring direction.
+    vstate = (read_json(os.path.join(folder, "voice", "state.json")) or {}).get("scenes") or {}
     capture = capture_of(folder, spec)
     master = os.path.join(folder, capture) if capture else ""
     scenes = (spec or {}).get("scenes") or []
@@ -428,10 +441,26 @@ def job_state(folder):
     # ── VOICE ───────────────────────────────────────────────────────────────
     narrated = os.path.join(folder, capture.replace(".mp4", "-narrated.mp4")) if capture else ""
     base = int(os.environ.get("MAC_RATE", "155"))
-    fast = [x for x in (narration or {}).get("lines", [])
-            if x.get("rate") and x["rate"] != base]
-    said_rate = {x["n"]: x.get("rate") for x in (narration or {}).get("lines", [])
-                 if x.get("said")}
+    # ⚠ ONE SOURCE FOR ALL OF IT: voice/state.json. `rate` and `spoken` are
+    # facts the voice tool measured and stored; anything derived from them is
+    # worked out where it is shown, never stored. Storing a derived number is
+    # exactly what froze the old report.
+    said_rate, said_spoken = {}, {}
+    for k, v in vstate.items():
+        try:
+            n = int(k)
+        except (TypeError, ValueError):
+            continue
+        if v.get("silent"):
+            continue                      # a silent scene has no pace to report
+        if v.get("rate"):
+            said_rate[n] = v["rate"]
+            said_spoken[n] = v.get("spoken")
+    fast = [{"n": n, "rate": r} for n, r in sorted(said_rate.items()) if r != base]
+    # The voice bed is exactly as long as the picture, scene by scene, so the
+    # soundtrack's length is the sum of the lengths it was built for.
+    voice_seconds = round(sum(float(v.get("built") or 0) for v in vstate.values()), 2) or None
+    by_n = {x["n"]: scene_label(x) for x in scenes if "n" in x}
     # ⚠ HOW MANY FRAMES THIS SCENE IS SHORT OF SPEAKING AT 155.
     # narrate_mac.py speeds a line up only because the screen ran out, so the
     # cure is frames, and this is how many: the seconds the line WOULD take at
@@ -452,16 +481,17 @@ def job_state(folder):
     except Exception:
         dirty_why = {}                    # a status we cannot read is not a defect
 
-    base_wpm = 155.0
-    # The capture's own rate, the same value the table counts FRAMES at.
-    row_fps = float((report or {}).get("fps") or 25)
-    add_frames = {}
-    for x in (narration or {}).get("lines", []):
-        rate, spoken, room = x.get("rate") or 0, x.get("spoken") or 0, x.get("room") or 0
-        if rate > base_wpm and spoken:
-            short_s = spoken * rate / base_wpm - room
-            if short_s > 0:
-                add_frames[x["n"]] = int(round(short_s * row_fps))
+    # ⚠ THE `add` COLUMN IS NOT COMPUTED HERE ANY MORE. It is
+    #
+    #     add = (spoken x rate / 155 - room) x fps,  room = clip - lead - exit
+    #
+    # and `exit` is the scene's own trailing hold, which Carson can change by
+    # typing a `{1}` marker in the table with no voice rebuild. A number stored
+    # here would be wrong from that keystroke until the next save, which is the
+    # bug this whole change removes. The page has clip, lead, exit and fps
+    # already, so it does the sum on the row it is drawing. Verified against the
+    # old report on 2026-09-21: the formula matched all 19 scenes whose report
+    # rows were still valid, and disagreed on exactly the 3 that had gone stale.
     script_p = script_in(folder)
     stale = (not narrated or not os.path.isfile(narrated)
              or (script_p and os.path.isfile(script_p)
@@ -472,9 +502,9 @@ def job_state(folder):
     narrated_ok = bool(narrated) and os.path.isfile(narrated)
     voice_row = {
         "job": "voice",
-        "seconds": (narration or {}).get("seconds"),
+        "seconds": voice_seconds,
         "rushed": len(fast),
-        "rushed_rows": [{"n": x.get("n"), "label": scene_label(x),
+        "rushed_rows": [{"n": x["n"], "label": by_n.get(x["n"], ""),
                          "rate": x["rate"]} for x in fast],
         "stale": bool(stale),
         "blocked": "" if capture else
@@ -510,15 +540,17 @@ def job_state(folder):
         # The dwell at each end, and the frame rate the frames are counted at.
         "lead": lead,
         "fps": (report or {}).get("fps") or probe_fps(master)[0],
-        # ⚠ THE MEASURED RATE, NOT A PLANNED ONE. narration_report.json says how
-        # fast narrate_mac.py actually had to speak each line to fit its screen;
-        # the table's own `speech` column is a PLAN at 3.44 words a second, which
-        # is faster than the voice really is, so a line can look like it fits and
+        # ⚠ THE MEASURED RATE, NOT A PLANNED ONE. voice/state.json says how fast
+        # the voice tool actually had to speak each line to fit its screen; the
+        # table's own `speech` column is a PLAN at 3.44 words a second, which is
+        # faster than the voice really is, so a line can look like it fits and
         # still come out at 185. Carson, 2026-09-20: "add a column called WPM".
         # A scene with no voice yet has none, and the column says so.
         "scenes": [{"n": s["n"], "label": scene_label(s),
                     "wpm": said_rate.get(s["n"]),
-                    "add": add_frames.get(s["n"]),
+                    # The seconds the voice really took. The page turns this
+                    # into the `add` column against the room the scene has.
+                    "spoken": said_spoken.get(s["n"]),
                     # "" when this scene's voice is current; the reason when not.
                     "dirty": dirty_why.get(s["n"], ""),
                     "line": s.get("line") or "",
@@ -887,9 +919,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             folder = (q.get("folder") or [""])[0]
             if not folder or not os.path.isdir(folder):
                 return self.send_json({"mtime": 0})
+            # ⚠ voice/state.json, NOT narration_report.json. The dead report
+            # never changes, so watching it meant a voice-only rebuild — the
+            # common case now that scenes are spoken one at a time — moved no
+            # stamp and left this table on old wpm values until a hand reload.
             watched = [script_in(folder),
                        os.path.join(folder, "stretch_report.json"),
-                       os.path.join(folder, "narration_report.json")]
+                       os.path.join(folder, "voice", "state.json")]
             spec = read_json(script_in(folder)) or {}
             cap = capture_of(folder, spec)
             if cap:
