@@ -436,3 +436,292 @@ Server:          http://localhost:8846
 
 14:22:43  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13
 14:22:43  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13
+
+Editor Session:  2026-09-20T14:29:08
+Player:          Segment and Avatar Editor v72
+Server:          http://localhost:8856
+
+14:29:10  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+14:29:10  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+14:29:10  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+14:29:10  + Frame        segment_22137e5c           at=10 count=1 side=right  nb_frames=41
+14:29:10  + Frame        segment_22137e5c           at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+14:29:10  - Frame        segment_22137e5c           at=10 count=1 side=left  nb_frames=40
+14:29:10  + Zone         segment_22137e5c           a=5 b=9  nb_frames=45
+14:29:10  - Zone         segment_22137e5c           a=5 b=9  nb_frames=40
+14:29:10  Undo           segment_22137e5c             nb_frames=40
+14:29:10  Paste frame    segment_22137e5c           from=5 at=20  nb_frames=41
+14:29:11  Undo           segment_22137e5c             nb_frames=40
+14:29:11  Unmark all     segment_22137e5c
+14:29:11  Mark           segment_22137e5c           frame=5 on=True
+14:29:11  Mark           segment_22137e5c           frame=20 on=True
+14:29:11  Mark           segment_22137e5c           frame=5 on=False
+14:29:11  Unmark all     segment_22137e5c
+14:29:11  + Zone         segment_22137e5c           a=5 b=9  nb_frames=45
+14:29:12  Save scene     segment_22137e5c             nb_frames=45  duration_s=1.8
+14:29:12  Save scene     segment_22137e5c             REFUSED: stale
+14:29:13  Save scene     segment_22137e5c             nb_frames=45  duration_s=1.8
+14:29:13  Unmark all     segment_22137e5c
+14:29:13  Mark           segment_22137e5c           frame=15 on=True
+14:29:13  Mark           segment_22137e5c           frame=30 on=True
+14:29:14  Cut scene      segment_22137e5c             count=3  version=1
+14:29:14  Unmark all     segment_22137e5c
+14:29:14  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+14:29:14  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+14:29:14  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+14:29:14  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+14:29:14  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+14:29:14  Lift lock      _Editor_Test
+14:29:14  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+14:29:22  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+14:29:22  Archive        _Editor_Test               folder=sandbox
+14:29:22  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+14:29:22  Save All archive _Editor_Test               root=_Editor_Test
+14:29:22  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+14:29:23  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+14:29:23  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+14:29:23  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+
+Editor Session:  2026-09-20T14:29:23
+Player:          Segment and Avatar Editor v72
+Server:          http://localhost:8846
+
+
+Editor Session:  2026-09-20T14:30:39
+Player:          Segment and Avatar Editor v72
+Server:          http://localhost:8856
+
+14:30:41  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+14:30:41  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+14:30:41  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+14:30:41  + Frame        segment_22137e5c           at=10 count=1 side=right  nb_frames=41
+14:30:41  + Frame        segment_22137e5c           at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+14:30:41  - Frame        segment_22137e5c           at=10 count=1 side=left  nb_frames=40
+14:30:41  + Zone         segment_22137e5c           a=5 b=9  nb_frames=45
+14:30:41  - Zone         segment_22137e5c           a=5 b=9  nb_frames=40
+14:30:41  Undo           segment_22137e5c             nb_frames=40
+14:30:41  Paste frame    segment_22137e5c           from=5 at=20  nb_frames=41
+14:30:42  Undo           segment_22137e5c             nb_frames=40
+14:30:42  Unmark all     segment_22137e5c
+14:30:42  Mark           segment_22137e5c           frame=5 on=True
+14:30:42  Mark           segment_22137e5c           frame=20 on=True
+14:30:42  Mark           segment_22137e5c           frame=5 on=False
+14:30:42  Unmark all     segment_22137e5c
+14:30:42  + Zone         segment_22137e5c           a=5 b=9  nb_frames=45
+14:30:43  Save scene     segment_22137e5c             nb_frames=45  duration_s=1.8
+14:30:43  Save scene     segment_22137e5c             REFUSED: stale
+14:30:44  Save scene     segment_22137e5c             nb_frames=45  duration_s=1.8
+14:30:44  Unmark all     segment_22137e5c
+14:30:44  Mark           segment_22137e5c           frame=15 on=True
+14:30:44  Mark           segment_22137e5c           frame=30 on=True
+14:30:45  Cut scene      segment_22137e5c             count=3  version=1
+14:30:45  Unmark all     segment_22137e5c
+14:30:45  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+14:30:45  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+14:30:45  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+14:30:45  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+14:30:45  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+14:30:45  Lift lock      _Editor_Test
+14:30:45  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+14:30:53  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+14:30:53  Archive        _Editor_Test               folder=sandbox
+14:30:53  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+14:30:53  Save All archive _Editor_Test               root=_Editor_Test
+14:30:53  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+14:30:54  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+14:30:54  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+14:30:54  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+
+Editor Session:  2026-09-20T14:30:54
+Player:          Segment and Avatar Editor v72
+Server:          http://localhost:8846
+
+14:36:50  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13
+
+Editor Session:  2026-09-20T14:45:01
+Player:          Segment and Avatar Editor v74
+Server:          http://localhost:8856
+
+14:45:03  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+14:45:03  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+14:45:03  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3
+14:45:03  + Frame        segment_22137e5c           at=10 count=1 side=right  nb_frames=41
+14:45:03  + Frame        segment_22137e5c           at=10 count=1 side=sideways  REFUSED: side must be 'left' or 'right'
+14:45:03  - Frame        segment_22137e5c           at=10 count=1 side=left  nb_frames=40
+14:45:03  + Zone         segment_22137e5c           a=5 b=9  nb_frames=45
+14:45:03  - Zone         segment_22137e5c           a=5 b=9  nb_frames=40
+14:45:03  Undo           segment_22137e5c             nb_frames=40
+14:45:03  Paste frame    segment_22137e5c           from=5 at=20  nb_frames=41
+14:45:04  Undo           segment_22137e5c             nb_frames=40
+14:45:04  Unmark all     segment_22137e5c
+14:45:04  Mark           segment_22137e5c           frame=5 on=True
+14:45:04  Mark           segment_22137e5c           frame=20 on=True
+14:45:04  Mark           segment_22137e5c           frame=5 on=False
+14:45:04  Unmark all     segment_22137e5c
+14:45:04  + Zone         segment_22137e5c           a=5 b=9  nb_frames=45
+14:45:05  Save scene     segment_22137e5c             nb_frames=45  duration_s=1.8
+14:45:05  Save scene     segment_22137e5c             REFUSED: stale
+14:45:06  Save scene     segment_22137e5c             nb_frames=45  duration_s=1.8
+14:45:06  Unmark all     segment_22137e5c
+14:45:06  Mark           segment_22137e5c           frame=15 on=True
+14:45:06  Mark           segment_22137e5c           frame=30 on=True
+14:45:06  Cut scene      segment_22137e5c             count=3  version=1
+14:45:06  Unmark all     segment_22137e5c
+14:45:06  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+14:45:06  Edit line      _Editor_Test               n=1  line=A replacement line for the first scene.
+14:45:06  Edit line      _Editor_Test               n=99  REFUSED: scene 99 is not in the script
+14:45:06  Join           _Editor_Test               ns=[1] label=solo  REFUSED: a join needs at least two scenes
+14:45:07  Join           _Editor_Test               ns=[1, 2] label=joined tracks=['segment', 'avatar']  joined=[1, 2]  label=joined  renamed=['02-charlie-scene']
+14:45:07  Lift lock      _Editor_Test
+14:45:07  Split          _Editor_Test               n=1 at=10 labels=['same', 'same']  REFUSED: the two halves need different names
+14:45:15  Split          _Editor_Test               n=1 at=21 labels=['head', 'tail']  split=1  labels=['head', 'tail']  renamed=['02-tail', '03-charlie-scene']
+14:45:15  Archive        _Editor_Test               folder=sandbox
+14:45:15  Archive        _Editor_Test               folder=elsewhere  REFUSED: folder must be 'sandbox' or 'dev'
+14:45:15  Save All archive _Editor_Test               root=_Editor_Test
+14:45:15  Save All archive ../outside                 root=../outside  REFUSED: not a folder under Customers/: ../outside
+14:45:16  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+14:45:16  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+14:45:16  Open timeline  _Editor_Test               root=_Editor_Test ns=1,2,3  url=seq_b3d8216b34/viewer.html  slug=seq_b3d8216b34
+
+Editor Session:  2026-09-20T14:45:16
+Player:          Segment and Avatar Editor v74
+Server:          http://localhost:8846
+
+14:47:02  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=13  line=Scroll up and use the back arrow to return to the collections page. {1} Then we can return to the store page. {2} Open the menu again using the gear icon.
+14:47:07  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13
+14:47:56  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13,14,15
+14:52:33  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=376
+14:53:02  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=375
+14:54:14  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=374
+14:54:15  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=373
+14:54:15  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=372
+14:54:16  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=371
+14:54:16  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=370
+14:54:17  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=369
+14:54:17  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=368
+14:54:18  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=367
+14:54:18  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=366
+14:54:19  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=365
+14:54:20  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=364
+14:54:22  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=363
+14:54:23  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=362
+14:54:24  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=361
+14:54:24  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=360
+14:54:25  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=359
+14:54:25  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=358
+14:54:26  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=357
+14:54:26  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=356
+14:54:27  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=355
+14:54:28  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=354
+14:54:28  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=353
+14:54:29  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=352
+14:54:29  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=351
+14:54:30  - Zone         segment_28ebe6d2           a=179 b=179  nb_frames=350
+14:56:02  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=14  line=This is where all the store's items can be found. {0.5} To add a new item, click the plus icon button.
+14:56:11  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=13  line=Scroll up and use the back arrow to return to the collections page. {1} Then we can return to the store page.
+14:56:29  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=14  line=This is where all the store's items can be found. {0.5} To add a new item, click the plus icon button. {.5} {2} Open the menu again using the gear icon.
+14:56:38  Save scene     segment_28ebe6d2             nb_frames=350  duration_s=14.04
+14:56:45  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13,14,15
+15:01:50  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=13,14
+15:05:37  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=14,15
+15:05:44  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13,14,15
+15:10:01  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=14  line=Click on the gear icon.{0.5} To add a new item, click the plus icon button. {.5} {2} Open the menu again using the gear icon.
+15:13:17  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=14  line=Click on the gear icon to open the options menu.{0.5} Manage your Collections, Requirements, and Items from here. {.5} {2} Click to open Look up Collections.
+15:14:04  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=14  line=Click on the gear icon to open the options menu.{0.5} Manage your Collections, Requirements, and Items from here. {.5} {2} Click to open Look up Items.
+15:14:51  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13,14,15
+15:15:55  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=14  line=Click on the gear icon to open the options menu.{0.5} You can manage your Collections, Requirements, and Items from here. {.5} {2} Click to open Look up Items.
+18:32:14  + Frame        segment_9998a5e7           at=94 count=50 side=right  nb_frames=295
+18:32:14  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13,14,15
+20:18:17  Save scene     segment_9998a5e7             nb_frames=295  duration_s=11.8
+20:18:23  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13,14,15
+08:13:44  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=16,17,18,19,20
+08:30:22  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13,14,15
+08:30:27  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13,14,15  url=seq_2f00ec0cb3/viewer.html  slug=seq_2f00ec0cb3
+08:30:32  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13,14,15  url=seq_2f00ec0cb3/viewer.html  slug=seq_2f00ec0cb3
+08:49:57  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=12,13,14,15
+08:58:04  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=19,20,21,22
+09:01:33  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=21  line=Go back at the dashboard when you are done. {0.3} Use control or command plus K as the short cut keys. The Logout card here.
+09:01:41  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=19,20,21,22
+09:03:33  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=17
+09:06:48  + Frame        segment_18b57e95           at=497 count=40 side=right  nb_frames=645
+09:06:53  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=17
+09:09:49  - Zone         segment_18b57e95           a=498 b=537  nb_frames=605
+09:09:59  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=17
+09:10:16  Undo           segment_18b57e95             nb_frames=605
+09:10:23  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=17
+09:12:46  Mark           segment_18b57e95           frame=281 on=True
+09:12:59  Mark           segment_18b57e95           frame=281 on=False
+09:13:15  Mark           segment_18b57e95           frame=250 on=True
+09:13:28  Mark           segment_18b57e95           frame=280 on=True
+09:13:30  - Zone         segment_18b57e95           a=280 b=605  nb_frames=279
+09:14:40  Undo           segment_18b57e95             nb_frames=605
+09:14:43  Undo           segment_18b57e95             nb_frames=605
+09:15:22  Mark           segment_18b57e95           frame=300 on=True
+09:15:33  - Zone         segment_18b57e95           a=250 b=250  nb_frames=604
+09:15:34  - Zone         segment_18b57e95           a=250 b=250  nb_frames=603
+09:15:34  - Zone         segment_18b57e95           a=250 b=250  nb_frames=602
+09:15:34  - Zone         segment_18b57e95           a=250 b=250  nb_frames=601
+09:15:34  - Zone         segment_18b57e95           a=250 b=250  nb_frames=600
+09:15:35  - Zone         segment_18b57e95           a=250 b=250  nb_frames=599
+09:15:35  - Zone         segment_18b57e95           a=250 b=250  nb_frames=598
+09:15:35  - Zone         segment_18b57e95           a=250 b=250  nb_frames=597
+09:15:35  - Zone         segment_18b57e95           a=250 b=250  nb_frames=596
+09:15:36  - Zone         segment_18b57e95           a=250 b=250  nb_frames=595
+09:15:36  - Zone         segment_18b57e95           a=250 b=250  nb_frames=594
+09:15:36  - Zone         segment_18b57e95           a=250 b=250  nb_frames=593
+09:15:36  - Zone         segment_18b57e95           a=250 b=250  nb_frames=592
+09:15:36  - Zone         segment_18b57e95           a=250 b=250  nb_frames=591
+09:15:37  - Zone         segment_18b57e95           a=250 b=250  nb_frames=590
+09:15:37  - Zone         segment_18b57e95           a=250 b=250  nb_frames=589
+09:15:37  - Zone         segment_18b57e95           a=250 b=250  nb_frames=588
+09:15:37  - Zone         segment_18b57e95           a=250 b=250  nb_frames=587
+09:15:38  - Zone         segment_18b57e95           a=250 b=250  nb_frames=586
+09:15:38  - Zone         segment_18b57e95           a=250 b=250  nb_frames=585
+09:15:38  - Zone         segment_18b57e95           a=250 b=250  nb_frames=584
+09:15:38  - Zone         segment_18b57e95           a=250 b=250  nb_frames=583
+09:15:38  - Zone         segment_18b57e95           a=250 b=250  nb_frames=582
+09:15:39  - Zone         segment_18b57e95           a=250 b=250  nb_frames=581
+09:15:39  - Zone         segment_18b57e95           a=250 b=250  nb_frames=580
+09:15:39  - Zone         segment_18b57e95           a=250 b=250  nb_frames=579
+09:15:39  - Zone         segment_18b57e95           a=250 b=250  nb_frames=578
+09:15:40  - Zone         segment_18b57e95           a=250 b=250  nb_frames=577
+09:15:40  - Zone         segment_18b57e95           a=250 b=250  nb_frames=576
+09:15:40  - Zone         segment_18b57e95           a=250 b=250  nb_frames=575
+09:15:40  - Zone         segment_18b57e95           a=250 b=250  nb_frames=574
+09:15:40  - Zone         segment_18b57e95           a=250 b=250  nb_frames=573
+09:15:41  - Zone         segment_18b57e95           a=250 b=250  nb_frames=572
+09:15:41  - Zone         segment_18b57e95           a=250 b=250  nb_frames=571
+09:15:41  - Zone         segment_18b57e95           a=250 b=250  nb_frames=570
+09:15:41  - Zone         segment_18b57e95           a=250 b=250  nb_frames=569
+09:15:41  - Zone         segment_18b57e95           a=250 b=250  nb_frames=568
+09:15:42  - Zone         segment_18b57e95           a=250 b=250  nb_frames=567
+09:15:42  - Zone         segment_18b57e95           a=250 b=250  nb_frames=566
+09:15:42  - Zone         segment_18b57e95           a=250 b=250  nb_frames=565
+09:15:42  - Zone         segment_18b57e95           a=250 b=250  nb_frames=564
+09:15:42  - Zone         segment_18b57e95           a=250 b=250  nb_frames=563
+09:15:43  - Zone         segment_18b57e95           a=250 b=250  nb_frames=562
+09:15:43  - Zone         segment_18b57e95           a=250 b=250  nb_frames=561
+09:15:43  - Zone         segment_18b57e95           a=250 b=250  nb_frames=560
+09:15:43  - Zone         segment_18b57e95           a=250 b=250  nb_frames=559
+09:15:44  - Zone         segment_18b57e95           a=250 b=250  nb_frames=558
+09:15:44  - Zone         segment_18b57e95           a=250 b=250  nb_frames=557
+09:15:45  - Zone         segment_18b57e95           a=250 b=250  nb_frames=556
+09:15:47  - Zone         segment_18b57e95           a=250 b=250  nb_frames=555
+09:15:50  - Zone         segment_18b57e95           a=250 b=250  nb_frames=554
+09:17:20  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=17  line=Finally add the specific options for this item. {.5} Select the brand variant from the dropdown list. {2} Then select the length variant. {2} The star after the option name indicates that you made these a required field. {.5} This means the renter will need to make a variant selection. {2} Then click the update button.
+09:17:36  Save scene     segment_18b57e95             nb_frames=554  duration_s=22.2
+09:17:43  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=17
+09:19:17  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=17  line=Finally add the specific options for this item. {.5} Select the brand variant from the dropdown list. {2} Then select the length variant. {2} The star after the option name indicates that you made these a required field. {2} Then click the update button.
+09:19:20  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=17
+09:20:47  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=17,18
+09:21:25  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=17  line=Finally add the specific options for this item. {.5} Select the brand variant from the dropdown list. {2} Then select the length variant. {2} The star after the option name indicates that you made these a required field. {2} Then click the update button.
+09:21:47  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=17  line=Finally add the specific options for this item. {.5} Select the brand variant from the dropdown list. {1} Then select the length variant. {1} The star after the option name indicates that you made these a required field. {2} Then click the update button.
+09:21:50  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=17,18
+09:23:26  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=17  line=Finally add the specific options for this item. {.5} Select the brand variant from the dropdown list. {2} Then select the length variant. {1} The star after the option name indicates that you made these a required field. {2} Then click the update button.
+09:23:32  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=17,18
+09:24:19  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=17  line=Finally add the specific options for this item. {.5} Select the brand variant from the dropdown list. {2} Then select the length variant. {1} The star after the option name indicates that you made these a required field. {2} Then click the update button.
+09:24:33  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis n=17  line=Finally add the specific options for this item. {.5} Select the brand variant from the dropdown list. {2} Then select the length variant. {3} The star after the option name indicates that you made these a required field. {2} Then click the update button.
+09:24:37  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=17,18
+09:31:55  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=13
+09:37:47  + Frame        segment_28ebe6d2           at=90 count=30 side=right  nb_frames=330
+09:37:55  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis root=Rentify Demos Corp/ski-demo/help-videos/BCP_raw_mp4/special-skis ns=13
