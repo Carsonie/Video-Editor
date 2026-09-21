@@ -1512,15 +1512,18 @@ Each repeats that track's LAST frame. Undoable per scene.`)) return;
     -narrated.mp4 still spoke the old line. This flag is the difference, polled
     from /api/pending (two stat()s) and set the moment a line save returns.
   */
-  let WORDS_STALE = false;
+  let WORDS_STALE = false, OUT_OF_SYNC = [];
   async function pollWords() {
     try {
-      const r = await fetch(`/api/pending?root=${encodeURIComponent(ROOT_REL)}`);
+      const r = await fetch(`/api/pending?root=${encodeURIComponent(ROOT_REL)}`
+                          + `&ns=${SEQ.map(s => s.n).join(',')}`);
       const d = await r.json();
-      if (typeof d.words_stale === 'boolean' && d.words_stale !== WORDS_STALE) {
-        WORDS_STALE = d.words_stale;
-        paintDirty();
-      }
+      const os_ = Array.isArray(d.out_of_sync) ? d.out_of_sync : [];
+      const moved = (d.words_stale !== WORDS_STALE)
+                 || (os_.join(',') !== OUT_OF_SYNC.join(','));
+      WORDS_STALE = !!d.words_stale;
+      OUT_OF_SYNC = os_;                // scenes whose clip, cut or voice disagree
+      if (moved) paintDirty();
     } catch (_) {}                      // a blip is not worth a message
   }
   setInterval(pollWords, 3000);
@@ -1543,12 +1546,14 @@ Each repeats that track's LAST frame. Undoable per scene.`)) return;
     // early calls (renderScenes runs before that line) count frames only.
     let lines = 0;
     try { lines = vDirty ? vDirty.size : 0; } catch (_) { lines = 0; }
-    const dirty = tracks + lines > 0 || WORDS_STALE;
+    const dirty = tracks + lines > 0 || WORDS_STALE || OUT_OF_SYNC.length > 0;
     btn.classList.toggle('dirty', dirty);
     const bits = [];
     if (tracks) bits.push(`${tracks} track(s) not written yet`);
     if (lines) bits.push(`${lines} line(s) still being typed`);
     if (WORDS_STALE) bits.push('the words changed since the voice was built');
+    if (OUT_OF_SYNC.length) bits.push(`scene(s) ${OUT_OF_SYNC.join(', ')} `
+      + 'changed on disk and the cut, the film or the voice has not caught up');
     btn.title = dirty
       ? bits.join(', ') + ' — Save Timeline writes everything, updates the cuts'
         + ' and the voice, then brings you back to this frame'

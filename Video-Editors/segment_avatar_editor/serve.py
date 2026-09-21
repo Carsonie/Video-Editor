@@ -801,16 +801,26 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         # voice is rebuilt. Carson, 2026-09-20: "The Save Timeline also needs to
         # turn green with any changes to the narrative." Two stat()s answer it.
         if parsed.path == "/api/pending":
-            root_rel = (urllib.parse.parse_qs(parsed.query).get("root") or [""])[0]
+            # ⚠ NOT JUST "ARE THE WORDS NEWER THAN THE VOICE".
+            # A clip can be changed on disk by something that is not this page
+            # — another tool, a ring cleared by hand — and the button stayed
+            # grey over a timeline whose cut and film did not match it. The
+            # sync's own --stat says what is out of step, by stat() alone, in
+            # about 0.04s, so there is one rule rather than a second guess
+            # here. Carson, 2026-09-21: "the Save Timeline [does] not see it?"
+            q2 = urllib.parse.parse_qs(parsed.query)
+            root_rel = (q2.get("root") or [""])[0]
             final = safe_join(root_rel)
             if final is None or not os.path.isdir(final):
-                return self.send_json({"words_stale": False})
-            script_p = PTH.script(final)
-            nar = [f for f in os.listdir(final) if f.endswith("-narrated.mp4")]
-            stale = bool(script_p and os.path.isfile(script_p)) and (
-                not nar or os.path.getmtime(script_p)
-                > os.path.getmtime(os.path.join(final, nar[0])))
-            return self.send_json({"words_stale": stale})
+                return self.send_json({"words_stale": False, "out_of_sync": []})
+            ns = [x for x in (q2.get("ns") or [""])[0].split(",") if x.strip()]
+            args = [final, "--stat"] + (["--scenes", ",".join(ns)] if ns else [])
+            r = recorder.run(self.SYNC, args, timeout=120)
+            try:
+                d = json.loads((r.get("out") or "").strip().splitlines()[-1])
+            except Exception:
+                d = {"words_stale": False, "out_of_sync": [], "unsaved": []}
+            return self.send_json(d)
         if parsed.path == "/api/view":
             return self.api_view(urllib.parse.parse_qs(parsed.query))
         if parsed.path.startswith("/web/"):
