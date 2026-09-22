@@ -1,7 +1,7 @@
 {
  "source": "ski-demo_special-skis_dev_10-19-12_v12.mp4",
  "output": "ski-demo_special-skis_dev_10-19-12_v12-stretched.mp4",
- "output_seconds": 27.04,
+ "output_seconds": 15.16,
  "scenes": [
   {
    "n": 1,
@@ -65,7 +65,7 @@
    "src_out": 45.2,
    "on_camera": 9.4,
    "scene_needs": 10.4,
-   "built": 10.4,
+   "built": 11.56,
    "factor": 1.1064,
    "stretched": true
   },
@@ -98,7 +98,7 @@
    "src_out": 67.6,
    "on_camera": 8.4,
    "scene_needs": 10.1,
-   "built": 10.08,
+   "built": 11.4,
    "factor": 1.2024,
    "stretched": true
   },
@@ -171,16 +171,25 @@
   {
    "n": 16,
    "label": "item-details",
-   "src_in": 154.33,
-   "src_out": 177.86,
-   "on_camera": 23.53,
-   "scene_needs": 36.6,
-   "built": 36.64,
-   "factor": 1.5555,
-   "stretched": true
+   "built": 15.16,
+   "on_camera": 15.16,
+   "scene_needs": 15.16,
+   "factor": 1.0,
+   "stretched": false,
+   "_note": "length taken directly from sandbox/16-item-details/segment.mp4 (379 frames) -- this scene came from a 2026-09-22 split, not the master cut, so no src_in/src_out pair applies."
   },
   {
    "n": 17,
+   "label": "item-requirement",
+   "built": 19.64,
+   "on_camera": 19.64,
+   "scene_needs": 19.64,
+   "factor": 1.0,
+   "stretched": false,
+   "_note": "length taken directly from sandbox/17-item-requirement/segment.mp4 (491 frames) -- this scene came from a 2026-09-22 split, not the master cut, so no src_in/src_out pair applies."
+  },
+  {
+   "n": 18,
    "label": "item-detail-variants",
    "src_in": 177.86,
    "src_out": 186.9,
@@ -191,7 +200,7 @@
    "stretched": true
   },
   {
-   "n": 18,
+   "n": 19,
    "label": "first-variant",
    "src_in": 186.9,
    "src_out": 198.78,
@@ -202,7 +211,7 @@
    "stretched": false
   },
   {
-   "n": 19,
+   "n": 20,
    "label": "the-other-variants",
    "src_in": 198.78,
    "src_out": 213.42,
@@ -213,7 +222,7 @@
    "stretched": false
   },
   {
-   "n": 20,
+   "n": 21,
    "label": "last-variant",
    "src_in": 351.1,
    "src_out": 359.1,
@@ -224,7 +233,7 @@
    "stretched": false
   },
   {
-   "n": 21,
+   "n": 22,
    "label": "sign-out",
    "src_in": 359.1,
    "src_out": 366.1,
@@ -235,7 +244,7 @@
    "stretched": false
   },
   {
-   "n": 22,
+   "n": 23,
    "label": "signed-out",
    "src_in": 366.1,
    "src_out": 375.88,

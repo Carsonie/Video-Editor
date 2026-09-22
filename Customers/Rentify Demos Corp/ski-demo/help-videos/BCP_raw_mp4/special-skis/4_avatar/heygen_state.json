@@ -46,7 +46,7 @@
  },
  "09-new-collection": {
   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
-  "credits": 9,
+  "credits": 4,
   "note": "two-pass, targets from voice/.mac_backup/"
  },
  "10-collection-details": {
@@ -76,37 +76,37 @@
  },
  "16-item-details": {
   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
-  "credits": 27,
+  "credits": 4,
   "note": "two-pass, targets from voice/.mac_backup/"
  },
- "17-item-detail-variants": {
-  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
-  "credits": 6,
-  "note": "two-pass, targets from voice/.mac_backup/"
- },
- "18-first-variant": {
+ "23-signed-out": {
   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
   "credits": 2,
   "note": "two-pass, targets from voice/.mac_backup/"
  },
- "19-the-other-variants": {
+ "22-sign-out": {
   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
-  "credits": 4,
+  "credits": 6,
   "note": "two-pass, targets from voice/.mac_backup/"
  },
- "20-last-variant": {
+ "21-last-variant": {
   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
   "credits": 5,
   "note": "two-pass, targets from voice/.mac_backup/"
  },
- "21-sign-out": {
+ "20-the-other-variants": {
   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
-  "credits": 6,
+  "credits": 4,
   "note": "two-pass, targets from voice/.mac_backup/"
  },
- "22-signed-out": {
+ "19-first-variant": {
   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
   "credits": 2,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "18-item-detail-variants": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 6,
   "note": "two-pass, targets from voice/.mac_backup/"
  }
 }

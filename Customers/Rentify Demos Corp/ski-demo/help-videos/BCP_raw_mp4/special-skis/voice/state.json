@@ -53,10 +53,10 @@
   },
   "6": {
    "line_hash": "92ef9e8c0bf7",
-   "built": 10.4,
+   "built": 11.56,
    "lead": 0.75,
-   "rate": 1.2,
-   "spoken": 8.44,
+   "rate": 1.05,
+   "spoken": 9.04,
    "silent": false,
    "engine": "heygen",
    "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
@@ -83,10 +83,10 @@
   },
   "9": {
    "line_hash": "35bedb323f78",
-   "built": 10.08,
+   "built": 11.4,
    "lead": 0.75,
-   "rate": 1.2,
-   "spoken": 8.15,
+   "rate": 1.0,
+   "spoken": 9.46,
    "silent": false,
    "engine": "heygen",
    "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
@@ -152,56 +152,26 @@
    "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "16": {
-   "line_hash": "c998b47c8130",
-   "built": 36.64,
-   "lead": 0.75,
-   "rate": 1.2,
-   "spoken": 36.21,
-   "silent": false,
-   "engine": "heygen",
-   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
-  },
-  "17": {
-   "line_hash": "90b379033372",
-   "built": 22.16,
+   "line_hash": "09901544ebbe",
+   "built": 15.16,
    "lead": 0.75,
    "rate": 1.0,
-   "spoken": 19.93,
+   "spoken": 10.16,
    "silent": false,
    "engine": "heygen",
    "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
-  "18": {
-   "line_hash": "5a6e3ba29e2f",
-   "built": 11.88,
+  "23": {
+   "line_hash": "0d5d5f38e1e4",
+   "built": 8.44,
    "lead": 0.75,
    "rate": 1.0,
-   "spoken": 5.64,
+   "spoken": 6.43,
    "silent": false,
    "engine": "heygen",
    "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
-  "19": {
-   "line_hash": "8679cfbcc014",
-   "built": 14.64,
-   "lead": 0.75,
-   "rate": 1.0,
-   "spoken": 13.27,
-   "silent": false,
-   "engine": "heygen",
-   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
-  },
-  "20": {
-   "line_hash": "32c034ecde5d",
-   "built": 8.56,
-   "lead": 0.75,
-   "rate": 1.2,
-   "spoken": 6.71,
-   "silent": false,
-   "engine": "heygen",
-   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
-  },
-  "21": {
+  "22": {
    "line_hash": "b01357592920",
    "built": 10.04,
    "lead": 0.75,
@@ -211,15 +181,54 @@
    "engine": "heygen",
    "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
-  "22": {
-   "line_hash": "0d5d5f38e1e4",
-   "built": 8.44,
+  "21": {
+   "line_hash": "32c034ecde5d",
+   "built": 8.56,
    "lead": 0.75,
-   "rate": 1.0,
-   "spoken": 6.43,
+   "rate": 1.2,
+   "spoken": 6.71,
    "silent": false,
    "engine": "heygen",
    "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
+  },
+  "20": {
+   "line_hash": "8679cfbcc014",
+   "built": 14.64,
+   "lead": 0.75,
+   "rate": 1.0,
+   "spoken": 13.27,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
+  },
+  "19": {
+   "line_hash": "5a6e3ba29e2f",
+   "built": 11.88,
+   "lead": 0.75,
+   "rate": 1.0,
+   "spoken": 5.64,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
+  },
+  "18": {
+   "line_hash": "90b379033372",
+   "built": 22.16,
+   "lead": 0.75,
+   "rate": 1.0,
+   "spoken": 19.93,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
+  },
+  "17": {
+   "line_hash": "0cd03bbfad12",
+   "built": 19.64,
+   "lead": 0.75,
+   "rate": 215,
+   "spoken": 18.23,
+   "silent": false,
+   "engine": "mac"
   }
  }
 }
