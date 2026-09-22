@@ -445,7 +445,7 @@ def job_state(folder):
     # facts the voice tool measured and stored; anything derived from them is
     # worked out where it is shown, never stored. Storing a derived number is
     # exactly what froze the old report.
-    said_rate, said_spoken = {}, {}
+    said_rate, said_spoken, said_engine = {}, {}, {}
     for k, v in vstate.items():
         try:
             n = int(k)
@@ -456,6 +456,13 @@ def job_state(folder):
         if v.get("rate"):
             said_rate[n] = v["rate"]
             said_spoken[n] = v.get("spoken")
+            # ⚠ "rate" MEANS TWO DIFFERENT THINGS NOW. For the Mac voice it is
+            # WORDS PER MINUTE, base 155. For HeyGen it is `speed`, base 1.0 —
+            # voice_scenes.py --engine heygen writes the same JSON key to carry
+            # it, so a HeyGen scene at 1.2x reads here exactly like a Mac scene
+            # at 1.2 wpm unless the page is told which scale it is on. Old state
+            # files predate the engine field at all; they are Mac by definition.
+            said_engine[n] = v.get("engine", "mac")
     fast = [{"n": n, "rate": r} for n, r in sorted(said_rate.items()) if r != base]
     # The voice bed is exactly as long as the picture, scene by scene, so the
     # soundtrack's length is the sum of the lengths it was built for.
@@ -551,6 +558,9 @@ def job_state(folder):
                     # The seconds the voice really took. The page turns this
                     # into the `add` column against the room the scene has.
                     "spoken": said_spoken.get(s["n"]),
+                    # Which baseline `wpm` is measured against — 155 for mac,
+                    # 1.0 for heygen. The ADD column cannot be right without it.
+                    "engine": said_engine.get(s["n"], "mac"),
                     # "" when this scene's voice is current; the reason when not.
                     "dirty": dirty_why.get(s["n"], ""),
                     "line": s.get("line") or "",

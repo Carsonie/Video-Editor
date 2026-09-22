@@ -208,20 +208,32 @@ function jobRow(j) {
   faster when the words do not fit the screen. So anything above 155 is the
   table saying "this scene is short for its line", and 185+ is plainly hurried.
   A scene with no voice built yet shows a dash rather than a zero.
+
+  ⚠ HEYGEN SCENES ARE ON A DIFFERENT SCALE, AND `rate` DOES NOT SAY SO ON ITS
+  OWN. voice_scenes.py --engine heygen writes the SAME "rate" key, but it holds
+  `speed` (0.5-2.0, normal = 1.0), not words per minute. Read against base 155,
+  a HeyGen scene at 1.2x computes as 1.2/155 of normal pace — dim, "fine" —
+  while it is actually running 20% fast. `sc.engine` says which scale a row is
+  on; both this function and addFrames() below must agree on it, or the colour
+  and the frame count disagree with each other on the same row.
 */
-function wpmClass(rate) {
+function wpmClass(rate, engine) {
   if (!rate) return 'dim';
+  if (engine === 'heygen') {
+    if (rate >= 1.85) return 'gapbad';     // same proportional threshold as mac's 185/155
+    return rate > 1.0 ? '' : 'dim';
+  }
   if (rate >= 185) return 'gapbad';
   return rate > 155 ? '' : 'dim';
 }
 
 /*
-  HOW MANY FRAMES THIS SCENE IS SHORT OF SPEAKING AT 155 — worked out HERE, on
-  the row being drawn, and never stored.
+  HOW MANY FRAMES THIS SCENE IS SHORT OF SPEAKING AT ITS NORMAL PACE —
+  worked out HERE, on the row being drawn, and never stored.
 
-      room = clip - lead - exit          the seconds the words actually have
-      at155 = spoken x rate / 155        what the same words cost unhurried
-      add   = (at155 - room) x fps
+      room    = clip - lead - exit         the seconds the words actually have
+      atNorm  = spoken x rate / BASE       what the same words cost unhurried
+      add     = (atNorm - room) x fps
 
   ⚠ IT IS DERIVED, SO IT IS NOT SAVED. `exit` is the scene's own trailing hold
   and Carson can change it by typing a `{1}` marker straight into the table,
@@ -231,17 +243,26 @@ function wpmClass(rate) {
   while that scene really had 4.5s of dead air, and let scenes 14 and 21 sit
   quiet at "155" while they truly spoke at 215 and 250 wpm.
 
-  `rate` and `spoken` are the two facts, measured by voice_scenes.py at Save
-  Timeline and kept in voice/state.json. Everything else is this sum.
+  ⚠ BASE IS 155 FOR MAC, 1.0 FOR HEYGEN — see wpmClass()'s note above for why.
+  Getting this wrong does not just miscolour a cell: on 2026-09-22, before this
+  fix, every HeyGen scene sped up to fit (1.2x, 1.25x) computed a near-zero ADD
+  value and looked like it needed nothing, while scene 16 alone actually needed
+  208 frames to come back down to 1.0x. Carson found it by asking for those
+  numbers by hand and comparing them to what the column showed.
 
-  A line at or under 155 was never hurried, so it needs nothing.
+  `rate` and `spoken` are the two facts, measured by voice_scenes.py at Save
+  Timeline (or --engine heygen --yes) and kept in voice/state.json. Everything
+  else is this sum.
+
+  A line at or under its engine's normal pace was never hurried, needs nothing.
 */
 function addFrames(sc, lead, fps) {
   const rate = sc.wpm || 0, spoken = sc.spoken || 0;
-  if (rate <= 155 || !spoken) return null;
+  const base = sc.engine === 'heygen' ? 1.0 : 155;
+  if (rate <= base || !spoken) return null;
   const exit = (typeof sc.exit === 'number' && sc.exit) ? sc.exit : lead;
   const room = (sc.clip || 0) - lead - exit;
-  const short = spoken * rate / 155 - room;
+  const short = spoken * rate / base - room;
   return short > 0 ? Math.round(short * fps) : null;
 }
 
@@ -312,7 +333,8 @@ function render() {
       <td>${r.scene.toFixed(1)}s</td>
       <td class="${r.gap < 0 ? 'gapbad' : 'dim'}">${r.gap >= 0 ? '+' : ''}${r.gap.toFixed(1)}s</td>
       <td class="dim">${r.frames.toLocaleString()}</td>
-      <td class="${wpmClass(r.sc.wpm)}">${r.sc.wpm ? r.sc.wpm : '—'}</td>
+      <td class="${wpmClass(r.sc.wpm, r.sc.engine)}"
+        >${r.sc.wpm ? (r.sc.engine === 'heygen' ? r.sc.wpm + 'x' : r.sc.wpm) : '—'}</td>
       <td class="${r.add ? 'gapbad' : 'dim'}">${r.add ? '~' + r.add.toLocaleString() : '—'}</td>
       <td class="${r.sc.dirty ? 'dirtyx' : 'dim'}" title="${esc(r.sc.dirty
           || 'this scene\'s voice matches its words and its length')}"
