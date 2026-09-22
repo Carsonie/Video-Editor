@@ -73,7 +73,7 @@ user runs in their own terminal. Claude can only VIEW files the user places unde
 - Brand background: `#E8F4F8`. Canvas: 1152x1080 @ 60fps, yuv420p, AAC.
 - Generate clips via `Video Generation` (verbatim script), NOT the Video Agent.
 - Transparent corner clips: `--webm`; ALWAYS decode with `-c:v libvpx-vp9` (alpha) in ffmpeg.
-- Skills live in `.claude/skill/hey_gen/` (avatar/voice discovery, launch spec, compositing).
+- Skills live in `.claude/skills/heygen/` (avatar/voice discovery, launch spec, compositing).
 
 ## Folder layout (current)
 

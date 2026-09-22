@@ -133,7 +133,7 @@ talking at once. Convert any mm:ss timestamps to seconds first.
 ### 3.2 Generate a narration clip (transparent webm)
 ```bash
 export HEYGEN_API_KEY=$(grep '^HEYGEN_API_KEY=' .env.local | cut -d= -f2)
-python3 .claude/skill/hey_gen/generate_avatar_video.py \
+python3 .claude/skills/heygen/generate_avatar_video.py \
   --avatar 468eabb3326a4d8587ba29d065b1eba7 \
   --voice 04d0ae1d0af2489ca7d3bb402a39a890 \
   --script "Your verbatim line here." \
@@ -295,6 +295,6 @@ scriptable pipeline as features mature.
 
 ### Key paths
 - Project root: `/Users/carsonkramer/Documents/Rentify/Help Videos/HeyGen/`
-- Skills: `.claude/skill/hey_gen/` (avatar/voice discovery, launch spec, compositing, generator)
+- Skills: `.claude/skills/heygen/` (avatar/voice discovery, launch spec, compositing, generator)
 - Sources: `videos/source/` · Working clips: `videos/temp/` · Outputs: `videos/final/`
 - Frame checks: `videos/temp/check/`

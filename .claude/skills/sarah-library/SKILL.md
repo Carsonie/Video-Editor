@@ -9,7 +9,7 @@ user_invocable: true
 Sarah is the on-screen HeyGen avatar every help video narrates over — one
 locked look, one locked voice, reused across every store (her HeyGen
 identity spec — avatar_id, voice_id, how a NEW clip of her is rendered —
-lives in `docs/avatar_launch.md`; this skill is about the clips that
+lives in the `heygen` skill's `avatar_launch.md`; this skill is about the clips that
 already exist and how they're stored, standardized, and edited, not about
 generating new ones).
 
@@ -278,11 +278,13 @@ objects.
 
 ## Also relevant, not duplicated here
 
-- `docs/avatar_launch.md`, `docs/heygen_api.md`, `docs/HEYGEN_RULES.md`,
-  `docs/avatar_compositing.md` — Sarah's locked HeyGen identity (avatar_id,
-  voice_id) and how a brand-new clip of her gets rendered. Upstream of
-  everything in this skill; read those to generate new footage, this skill
-  to work with what already exists.
+- the **`heygen` skill** (`.claude/skills/heygen/`) — Sarah's locked HeyGen
+  identity (avatar_id, voice_id) and how a brand-new clip of her gets
+  rendered, plus `avatar_launch.md`, `avatar_compositing.md` and the 41 KB
+  `heygen_api.md` beside it. Upstream of everything in this skill; read that
+  to generate new footage, this skill to work with what already exists.
+  ⚠ Those files used to be cited as `docs/…`; the duplicates there were
+  deleted 2026-09-21. `docs/HEYGEN_RULES.md` is the one that stayed put.
 - `PIPELINE.md` — where rendering and placing Sarah sits in the full
   video-build pipeline.
 - `avatar_editor/README.md` — the Avatar Editor's own file-by-file

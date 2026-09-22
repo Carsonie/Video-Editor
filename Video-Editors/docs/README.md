@@ -8,17 +8,32 @@ playbook can answer *why*, not just *what*.
 | `INSTRUCTIONAL.md` | the master guide: raw recording → finished narrated video |
 | `Instructional_Lessons_Learned.md` | what went wrong on the pilot, and the pipeline that came out of it |
 | `Video_Goal.md` | what a help video is FOR — the original brief |
-| `avatar_compositing.md` | the compositing reference |
 | `HEYGEN_RULES.md` | standing rules for HeyGen work. Rule 1: never edit a deliverable in place |
 | `HANDOFF_example_paddle_sports.md` | one video's handoff, kept as the shape of a good one |
-| `heygen_api.md`, `heygen_api_addendum.md` | the API reference |
-| `avatar_launch.md`, `get_all_avatar_images.md`, `get_all_voices.md` | avatar and voice lookups |
+
+## ⚠ SIX FILES LEFT THIS FOLDER ON 2026-09-21 — THEY WERE DUPLICATES
+
+`heygen_api.md`, `heygen_api_addendum.md`, `avatar_compositing.md`,
+`avatar_launch.md`, `get_all_voices.md` and `get_all_avatar_images.md` were
+**byte-identical copies**. They now live once, in the **`heygen` skill**:
+
+    .claude/skills/heygen/
+
+That folder registers as a skill and loads on its own; this one never could.
+Two copies of one fact is one of them going stale in silence, and it was
+already happening — the copies here sat untouched from 2026-08-26 while the
+HeyGen API moved on. `PIPELINE.md` and the `sarah-library` skill were
+re-pointed at the same time.
+
+⚠ **DO NOT COPY THEM BACK.** If this playbook needs to answer *why*, cite the
+skill by path. `git show` has the deleted copies if you ever need to compare.
 
 ## What did NOT come, and why
 
 The `.py` scripts beside these docs — `generate_avatar_video.py`,
-`find_avatar.py`, `get_all_voices.py`, `get_all_avatar_images.py` — stayed in
-`Basic_E2E_Testing`.
+`get_all_voices.py`, `get_all_avatar_images.py` — never came here. They are in
+the `heygen` skill now, beside the docs they belong to. `find_avatar.py` is in
+`Studio/avatars/`, with the avatar data it reads.
 
 `build/render_narration.py` replaced them. It is not an API wrapper: it retries
 429/5xx with backoff, writes job ids the instant they exist, and **adopts**

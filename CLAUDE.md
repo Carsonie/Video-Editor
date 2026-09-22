@@ -288,6 +288,38 @@ import a shim.
 
 ---
 
+## The `heygen` skill — READ IT BEFORE SPENDING A CREDIT
+
+`.claude/skills/heygen/SKILL.md`, plus the 41 KB `heygen_api.md` and the
+avatar/voice tooling beside it.
+
+⚠ **IT DID NOT REGISTER FOR SEVEN WEEKS.** It lived at
+`Studio/heygen/.claude/skill/hey_gen/` — folder named `skill`, SINGULAR, four
+levels down inside `Studio/`, and **with no `SKILL.md` in it at all**. Three
+reasons, each enough on its own. Moved 2026-09-21 at Carson's word. A skill
+registers ONLY at `.claude/skills/<name>/SKILL.md` relative to the PROJECT
+ROOT — the same rule that keeps `.claude/` at the root in the first place.
+
+Everything a session needs before it touches HeyGen is in there. The three that
+cost the most to rediscover on 2026-09-21:
+
+- **"Sarah" is the AVATAR. The voice is Derya**, `04d0ae1d…`. This repo's own
+  docs disagree with each other about that, and nothing records which voice a
+  finished render actually used.
+- **A fixed pause DRIFTS against the picture.** `{n}` beats are fixed, the
+  speech between them is not, so the narration runs ahead — measured at 6.35s
+  early by the eighth beat of one scene. The fix is two passes: render once to
+  learn the voice's pace, compute each break from the target, render again.
+- **There is NO emotion, mood, pitch or style parameter.** Unknown fields are
+  SILENTLY IGNORED, which looks like it worked. The mood is baked into whichever
+  voice is picked.
+
+⚠ **AND A REFUSED CALL IS FREE.** A bad value returns 400 and the quota does not
+move, so probe an endpoint with a deliberately invalid field rather than paying
+to find out what it accepts.
+
+---
+
 ## ⚠ Money: ask before every HeyGen render
 
 `build/render_narration.py` is the **only** thing here that spends real money —
@@ -342,7 +374,7 @@ Carson, 2026-09-21: *"fold `MUX-Management/` into `Studio/`."* Done the same day
 Studio/
 ├── avatars/   12 MB   Sarah/, annie/, dt/, pamela/, find_avatar.py, *.json
 ├── beds/     7.3 MB   the three silence beds
-├── heygen/   408 KB   .claude/skill/hey_gen/, scripts/, config/, metadata.json
+├── heygen/   300 KB   scripts/, config/, metadata.json, four instruction docs
 ├── mux/       22 MB   tokens, two signing keys, vscode_example/
 ├── docs/      80 KB   Mux · YouTube · VIDEO_CREATION · close_out_sarah
 └── README.md          where every item came from

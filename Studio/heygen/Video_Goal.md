@@ -80,8 +80,8 @@ Here are the reference files you should read before we start:
 - `INSTRUCTIONAL.md` — the full pipeline reference
 - `Instructional_Lessons_Learned.md` — updated pipeline with CLI and lessons
 - `Video_Goal.md` — this file, our goal and philosophy
-- `.claude/skill/hey_gen/heygen_api.md` — HeyGen API reference
-- `.claude/skill/hey_gen/avatar_compositing.md` — ffmpeg compositing recipes
+- `.claude/skills/heygen/heygen_api.md` — HeyGen API reference
+- `.claude/skills/heygen/avatar_compositing.md` — ffmpeg compositing recipes
 
 Sarah's locked identity (use on every video, never change):
 
@@ -145,7 +145,7 @@ For each approved scene, generate Sarah's narration clip (verbatim):
 
 ```bash
 export HEYGEN_API_KEY=$(grep '^HEYGEN_API_KEY=' .env.local | cut -d= -f2)
-python3 .claude/skill/hey_gen/generate_avatar_video.py \
+python3 .claude/skills/heygen/generate_avatar_video.py \
   --avatar 468eabb3326a4d8587ba29d065b1eba7 \
   --voice 04d0ae1d0af2489ca7d3bb402a39a890 \
   --script "Approved narration line." \
@@ -170,7 +170,7 @@ STEP 6 — GENERATE INTRO CLIP
 Generate the intro (full-screen Sarah on brand background):
 
 ```bash
-python3 .claude/skill/hey_gen/generate_avatar_video.py \
+python3 .claude/skills/heygen/generate_avatar_video.py \
   --avatar 468eabb3326a4d8587ba29d065b1eba7 \
   --voice 04d0ae1d0af2489ca7d3bb402a39a890 \
   --script "Hi. I'm Sarah. [Topic-specific intro line.]" \

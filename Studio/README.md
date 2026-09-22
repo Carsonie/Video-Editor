@@ -12,8 +12,8 @@ Studio/
 ├── avatars/   12 MB   Sarah/, annie/, dt/, pamela/, find_avatar.py,
 │                      talking_photos.json, v3_groups.json
 ├── beds/     7.3 MB   silence-10s-pure · silence-10s-roomtone · silence-20s-roomtone
-├── heygen/   408 KB   the tooling: .claude/skill/hey_gen/, scripts/, config/,
-│                      metadata.json, and four instruction docs
+├── heygen/   300 KB   the tooling: scripts/, config/, metadata.json,
+│                      and four instruction docs
 ├── mux/       22 MB   tokens, the two signing keys, and vscode_example/
 └── docs/      80 KB   Mux Overview · Mux · Mux Session Rules · YouTube ·
                        YouTube Setup · VIDEO_CREATION · close_out_sarah

@@ -192,7 +192,7 @@ heygen-sarah --prompt "Your exact narration line."
 
 # Option B — Python script (verbatim, transparent webm — use for precise scripts)
 export HEYGEN_API_KEY=$(grep '^HEYGEN_API_KEY=' .env.local | cut -d= -f2)
-python3 .claude/skill/hey_gen/generate_avatar_video.py \
+python3 .claude/skills/heygen/generate_avatar_video.py \
   --avatar 468eabb3326a4d8587ba29d065b1eba7 \
   --voice 04d0ae1d0af2489ca7d3bb402a39a890 \
   --script "Your exact narration line." \

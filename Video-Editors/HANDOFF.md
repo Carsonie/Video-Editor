@@ -8,6 +8,38 @@ Newest work first. One file so there is one place to check for open work.
 
 ---
 
+## 2026-09-21 — the HeyGen skill registers, and `docs/` loses six duplicates
+
+⚠ **THE HEYGEN SKILL HAD NEVER REGISTERED, FOR SEVEN WEEKS.** It sat at
+`Studio/heygen/.claude/skill/hey_gen/` — folder named `skill`, SINGULAR, four
+levels down inside `Studio/`, and **with no `SKILL.md` in it at all**. Three
+reasons, each enough alone. A session working on HeyGen got none of its 41 KB
+and had to rediscover the API by calling it.
+
+Now `.claude/skills/heygen/`, with a `SKILL.md` written for it. The new file
+carries what this session paid to learn: `<break>` takes SECONDS not
+milliseconds (`2000ms` is a 400), a fixed pause DRIFTS against the picture and
+needs two passes to place, a refused call costs 0 credits so probe with an
+invalid field, ~1 credit per 15-19 words, and **there is no emotion, mood,
+pitch or style parameter** — unknown fields are silently ignored.
+
+⚠ **AND `docs/` HELD A BYTE-IDENTICAL SECOND COPY OF SIX OF THOSE FILES.**
+Copied 2026-08-26 so PIPELINE.md could answer *why*. They sat untouched while
+the API moved on — exactly the silent staleness the split was meant to avoid.
+Deleted after `cmp` proved each one identical, twice. `PIPELINE.md`,
+`docs/README.md` and the `sarah-library` skill now cite the skill instead.
+
+What stayed in `docs/`, because it exists nowhere else: `INSTRUCTIONAL.md`,
+`Instructional_Lessons_Learned.md`, `Video_Goal.md`, `HEYGEN_RULES.md`,
+`HANDOFF_example_paddle_sports.md`, `README.md`.
+
+⚠ **THE 2026-09-05 ENTRY BELOW STILL SAYS `docs/avatar_launch.md`,
+`heygen_api.md`, `avatar_compositing.md` WERE "deliberately left alone".** That
+was true on the day and the entry is left as written — this file is dated
+history, newest first. Those three paths are dead now; read them in the skill.
+
+---
+
 ## 2026-09-05 — two-folder root, dev/ as a mirror, a release is a folder
 
 Branch **`customers-videos`**, pushed, and `main` fast-forwarded to match.

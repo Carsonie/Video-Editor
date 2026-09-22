@@ -342,10 +342,25 @@ share state on purpose and one broken call cascades.
 
 ## Reference
 
-Sarah's standards and her source clips: `Sarah/` and `docs/avatar_launch.md`.
-The compositing recipes: `docs/avatar_compositing.md`. The HeyGen API:
-`docs/heygen_api.md` + `docs/heygen_api_addendum.md`. What each doc is for and
-how far to trust it: `docs/README.md`.
+Sarah's standards and her source clips: `Sarah/`. Everything HeyGen — her
+locked identity, rendering a new clip of her, the compositing recipes and the
+whole API reference — is the **`heygen` skill**, at the repo root:
+
+    .claude/skills/heygen/SKILL.md          start here
+      avatar_launch.md  avatar_compositing.md
+      heygen_api.md (41 KB)  heygen_api_addendum.md
+      get_all_voices.md  get_all_avatar_images.md
+
+⚠ **SIX OF THOSE FILES USED TO SIT IN `docs/` AS WELL, BYTE-IDENTICAL.** Copied
+there 2026-08-26 so this playbook could answer *why*; the originals stayed in
+HeyGen's own folder. Two copies of one fact is one of them going stale in
+silence, and it nearly happened — the copies were never touched again while the
+API moved on. The duplicates were deleted 2026-09-21 and these citations now
+point at the skill, which is the one place that loads on its own.
+
+What stayed in `docs/`, because it exists nowhere else: `INSTRUCTIONAL.md`,
+`Instructional_Lessons_Learned.md`, `Video_Goal.md`, `HEYGEN_RULES.md`,
+`HANDOFF_example_paddle_sports.md`, and `README.md`.
 
 | Field | Value |
 |---|---|
