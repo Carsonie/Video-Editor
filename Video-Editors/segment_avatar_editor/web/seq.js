@@ -1561,14 +1561,24 @@ Each repeats that track's LAST frame. Undoable per scene.`)) return;
     // same as "you have unsaved work" — that reads as broken, because for a
     // free scene it WOULD be.
     const freeWordsStale = WORDS_STALE && HEYGEN_PENDING.length === 0;
-    const dirty = tracks + lines > 0 || freeWordsStale || OUT_OF_SYNC.length > 0;
+    // ⚠ AND OUT_OF_SYNC IS THAT SAME TRAP THROUGH A SECOND DOOR. Carson,
+    // 2026-09-22: "Why is the button state wrong?" The fix directly above
+    // taught WORDS_STALE that a HeyGen scene cannot be cleared for free, and
+    // left this clause counting the very same scenes. 21 and 22 are out of
+    // sync BECAUSE they are owed a paid re-render, so they lit the button
+    // green under a tooltip promising Save Timeline "updates the cuts and the
+    // voice". It cannot, it ran, and they came straight back — which is
+    // indistinguishable from a broken save. Only a scene a free save can
+    // actually finish belongs in `dirty`.
+    const freeOutOfSync = OUT_OF_SYNC.filter(n => !HEYGEN_PENDING.includes(n));
+    const dirty = tracks + lines > 0 || freeWordsStale || freeOutOfSync.length > 0;
     btn.classList.toggle('dirty', dirty);
     btn.classList.toggle('pending-render', !dirty && HEYGEN_PENDING.length > 0);
     const bits = [];
     if (tracks) bits.push(`${tracks} track(s) not written yet`);
     if (lines) bits.push(`${lines} line(s) still being typed`);
     if (freeWordsStale) bits.push('the words changed since the voice was built');
-    if (OUT_OF_SYNC.length) bits.push(`scene(s) ${OUT_OF_SYNC.join(', ')} `
+    if (freeOutOfSync.length) bits.push(`scene(s) ${freeOutOfSync.join(', ')} `
       + 'changed on disk and the cut, the film or the voice has not caught up');
     if (dirty) {
       btn.title = bits.join(', ') + ' — Save Timeline writes everything, updates'
