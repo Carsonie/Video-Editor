@@ -1,0 +1,19 @@
+[
+ {
+  "pass": 1,
+  "text": "Click on the gear icon to open the options menu.<break time=\"0.5s\"/> You can manage your Collections, Requirements, and Items from here. <break time=\"0.5s\"/> <break time=\"2s\"/> Click to open Look up Items.",
+  "speed": 1.0,
+  "duration": 12.8
+ },
+ {
+  "pass": 2,
+  "text": "Click on the gear icon to open the options menu.<break time=\"0.75s\"/> You can manage your Collections, Requirements, and Items from here. <break time=\"0.2s\"/> <break time=\"3.15s\"/> Click to open Look up Items.",
+  "speed": 1.0,
+  "duration": 13.165714285714285,
+  "breaks": [
+   0.75,
+   0.2,
+   3.15
+  ]
+ }
+]

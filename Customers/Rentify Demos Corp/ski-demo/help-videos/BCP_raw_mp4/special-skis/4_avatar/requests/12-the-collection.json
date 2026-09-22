@@ -1,0 +1,17 @@
+[
+ {
+  "pass": 1,
+  "text": "After the collection is saved. <break time=\"0.5s\"/> We can create an item from every one of these variants.",
+  "speed": 1.0,
+  "duration": 5.3028571428571425
+ },
+ {
+  "pass": 2,
+  "text": "After the collection is saved. <break time=\"0.61s\"/> We can create an item from every one of these variants.",
+  "speed": 1.0,
+  "duration": 5.433469387755102,
+  "breaks": [
+   0.61
+  ]
+ }
+]

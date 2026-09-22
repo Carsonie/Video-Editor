@@ -1,183 +1,225 @@
 {
- "voice": "Samantha",
+ "voice": "04d0ae1d0af2489ca7d3bb402a39a890",
  "scenes": {
   "1": {
    "line_hash": "a5d7f05467fc",
    "built": 8.0,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 5.55,
+   "rate": 1.0,
+   "spoken": 6.09,
    "silent": false,
-   "engine": "mac"
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "2": {
    "line_hash": "6ef9616972e0",
    "built": 8.4,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 6.49,
-   "silent": false
+   "rate": 1.0,
+   "spoken": 6.74,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "3": {
    "line_hash": "7dce3a6f13ff",
    "built": 6.96,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 4.89,
-   "silent": false
+   "rate": 1.0,
+   "spoken": 4.88,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "4": {
    "line_hash": "48fdbe4c77bd",
    "built": 7.8,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 4.09,
-   "silent": false
+   "rate": 1.0,
+   "spoken": 5.09,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "5": {
    "line_hash": "39d195b7286e",
    "built": 7.0,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 5.23,
-   "silent": false
+   "rate": 1.0,
+   "spoken": 6.16,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "6": {
    "line_hash": "92ef9e8c0bf7",
    "built": 10.4,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 8.77,
-   "silent": false
+   "rate": 1.2,
+   "spoken": 8.44,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "7": {
    "line_hash": "7027fb8c4a51",
    "built": 7.0,
    "lead": 0.75,
-   "rate": 155,
+   "rate": 1.0,
    "spoken": 5.28,
-   "silent": false
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "8": {
    "line_hash": "168eedbc3ef3",
    "built": 8.4,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 6.37,
-   "silent": false
+   "rate": 1.0,
+   "spoken": 6.9,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "9": {
    "line_hash": "35bedb323f78",
    "built": 10.08,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 8.22,
-   "silent": false
+   "rate": 1.2,
+   "spoken": 8.15,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "10": {
    "line_hash": "7252ffaa6ad9",
    "built": 13.64,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 10.52,
-   "silent": false
+   "rate": 1.0,
+   "spoken": 12.15,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "11": {
    "line_hash": "d06334b3ad62",
    "built": 28.6,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 22.36,
-   "silent": false
+   "rate": 1.0,
+   "spoken": 25.21,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "12": {
    "line_hash": "1e7ac348fffb",
    "built": 7.04,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 5.05,
-   "silent": false
+   "rate": 1.0,
+   "spoken": 5.43,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "13": {
    "line_hash": "c8a2f478189a",
    "built": 11.04,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 7.73,
+   "rate": 1.0,
+   "spoken": 9.09,
    "silent": false,
-   "engine": "mac"
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "14": {
    "line_hash": "bcec5d1707e0",
    "built": 14.16,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 11.7,
-   "silent": false
+   "rate": 1.0,
+   "spoken": 13.17,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "15": {
    "line_hash": "ee7ea3516dc2",
    "built": 20.56,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 13.48,
-   "silent": false
+   "rate": 1.0,
+   "spoken": 15.02,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "16": {
-   "line_hash": "0198ebc04240",
+   "line_hash": "c998b47c8130",
    "built": 36.64,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 35.01,
-   "silent": false
+   "rate": 1.2,
+   "spoken": 36.21,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "17": {
    "line_hash": "90b379033372",
    "built": 22.16,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 20.42,
-   "silent": false
+   "rate": 1.0,
+   "spoken": 19.93,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "18": {
    "line_hash": "5a6e3ba29e2f",
    "built": 11.88,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 5.79,
-   "silent": false
+   "rate": 1.0,
+   "spoken": 5.64,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "19": {
    "line_hash": "8679cfbcc014",
    "built": 14.64,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 12.39,
-   "silent": false
+   "rate": 1.0,
+   "spoken": 13.27,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "20": {
    "line_hash": "32c034ecde5d",
    "built": 8.56,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 6.92,
-   "silent": false
+   "rate": 1.2,
+   "spoken": 6.71,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "21": {
    "line_hash": "b01357592920",
    "built": 10.04,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 7.89,
-   "silent": false
+   "rate": 1.25,
+   "spoken": 8.02,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   },
   "22": {
    "line_hash": "0d5d5f38e1e4",
    "built": 8.44,
    "lead": 0.75,
-   "rate": 155,
-   "spoken": 5.65,
-   "silent": false
+   "rate": 1.0,
+   "spoken": 6.43,
+   "silent": false,
+   "engine": "heygen",
+   "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890"
   }
  }
 }

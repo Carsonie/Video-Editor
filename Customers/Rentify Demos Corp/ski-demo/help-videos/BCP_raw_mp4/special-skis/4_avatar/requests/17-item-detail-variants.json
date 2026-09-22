@@ -1,0 +1,20 @@
+[
+ {
+  "pass": 1,
+  "text": "Finally add the specific options for this item. <break time=\"0.5s\"/> Select the brand variant from the dropdown list. <break time=\"2s\"/> Then select the length variant. <break time=\"3s\"/> The star after the option name indicates that you made these a required field. <break time=\"2s\"/> Then click the update button.",
+  "speed": 1.0,
+  "duration": 20.897959183673468
+ },
+ {
+  "pass": 2,
+  "text": "Finally add the specific options for this item. <break time=\"0.72s\"/> Select the brand variant from the dropdown list. <break time=\"1.93s\"/> Then select the length variant. <break time=\"2.93s\"/> The star after the option name indicates that you made these a required field. <break time=\"2s\"/> Then click the update button.",
+  "speed": 1.0,
+  "duration": 19.931428571428572,
+  "breaks": [
+   0.72,
+   1.93,
+   2.93,
+   2.0
+  ]
+ }
+]

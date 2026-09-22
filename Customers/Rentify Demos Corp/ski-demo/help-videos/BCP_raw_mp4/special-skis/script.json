@@ -249,7 +249,7 @@
     {
       "n": 16,
       "label": "item-details",
-      "line": "Build out the item here, in the details page. {2} Add an Item description, {2} Confirm you are in the right collection. {2} Then add how many of this specific item you have for rent. {2} Then add the price in cents. {2} The requirement is the set of questions,{.5} that a renter answers for the equipment items they are renting from you. {2} The attributes may hold some image details that will be automatically added. {.5} So you can skip over this.",
+      "line": "Build out the item here, in the details page. {1.5} Add an Item description, {1.5} Confirm you are in the right collection. {1.5} Then add how many of this specific item you have for rent. {1.5} Then add the price in cents. {1.5} The requirement is the set of questions,{.5} that a renter answers for the equipment items they are renting from you. {1.5} The attributes may hold some image details that will be automatically added. {.5} So you can skip over this.",
       "pauses": [
         {
           "seconds": 0.75

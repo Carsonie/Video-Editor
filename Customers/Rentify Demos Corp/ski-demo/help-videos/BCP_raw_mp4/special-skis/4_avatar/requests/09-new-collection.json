@@ -1,0 +1,53 @@
+[
+ {
+  "pass": 1,
+  "attempt": 0,
+  "text": "Give the collection a unique name. <break time=\"0.5s\"/> A collection is a group of items that can differ just by their options, or could be some like or similar items.",
+  "speed": 1.0,
+  "duration": 8.80326530612245
+ },
+ {
+  "pass": 2,
+  "attempt": 0,
+  "text": "Give the collection a unique name. <break time=\"0.46s\"/> A collection is a group of items that can differ just by their options, or could be some like or similar items.",
+  "speed": 1.0,
+  "duration": 9.456326530612245,
+  "breaks": [
+   0.46
+  ]
+ },
+ {
+  "pass": 1,
+  "attempt": 1,
+  "text": "Give the collection a unique name. <break time=\"0.5s\"/> A collection is a group of items that can differ just by their options, or could be some like or similar items.",
+  "speed": 1.15,
+  "duration": 7.444897959183673
+ },
+ {
+  "pass": 2,
+  "attempt": 1,
+  "text": "Give the collection a unique name. <break time=\"0.83s\"/> A collection is a group of items that can differ just by their options, or could be some like or similar items.",
+  "speed": 1.15,
+  "duration": 8.698775510204081,
+  "breaks": [
+   0.83
+  ]
+ },
+ {
+  "pass": 1,
+  "attempt": 2,
+  "text": "Give the collection a unique name. <break time=\"0.5s\"/> A collection is a group of items that can differ just by their options, or could be some like or similar items.",
+  "speed": 1.2,
+  "duration": 7.000816326530612
+ },
+ {
+  "pass": 2,
+  "attempt": 2,
+  "text": "Give the collection a unique name. <break time=\"1.12s\"/> A collection is a group of items that can differ just by their options, or could be some like or similar items.",
+  "speed": 1.2,
+  "duration": 8.150204081632653,
+  "breaks": [
+   1.12
+  ]
+ }
+]

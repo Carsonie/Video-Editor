@@ -1,0 +1,17 @@
+[
+ {
+  "pass": 1,
+  "text": "This is your admin dashboard. <break time=\"0.5s\"/> Open a Business with the store you want to work on.",
+  "speed": 1.0,
+  "duration": 4.702040816326531
+ },
+ {
+  "pass": 2,
+  "text": "This is your admin dashboard. <break time=\"0.95s\"/> Open a Business with the store you want to work on.",
+  "speed": 1.0,
+  "duration": 4.884897959183673,
+  "breaks": [
+   0.95
+  ]
+ }
+]

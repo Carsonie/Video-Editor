@@ -1,0 +1,17 @@
+[
+ {
+  "pass": 1,
+  "text": "Add a description to guide your renters. <break time=\"4s\"/> Then set the starting price, in cents only, meaning no decimal point.",
+  "speed": 1.0,
+  "duration": 10.65795918367347
+ },
+ {
+  "pass": 2,
+  "text": "Add a description to guide your renters. <break time=\"4.33s\"/> Then set the starting price, in cents only, meaning no decimal point.",
+  "speed": 1.0,
+  "duration": 12.146938775510204,
+  "breaks": [
+   4.33
+  ]
+ }
+]

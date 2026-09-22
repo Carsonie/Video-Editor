@@ -1,0 +1,38 @@
+[
+ {
+  "pass": 1,
+  "attempt": 0,
+  "text": "Start typing the name of the store you are looking for, <break time=\"0.3s\"/> and select it from the dropdown list. <break time=\"0.5s\"/> All activities after this will act against this store alone.",
+  "speed": 1.0,
+  "duration": 10.501224489795918
+ },
+ {
+  "pass": 2,
+  "attempt": 0,
+  "text": "Start typing the name of the store you are looking for, <break time=\"0.3s\"/> and select it from the dropdown list. <break time=\"0.5s\"/> All activities after this will act against this store alone.",
+  "speed": 1.0,
+  "duration": 10.501224489795918,
+  "breaks": [
+   0.3,
+   0.5
+  ]
+ },
+ {
+  "pass": 1,
+  "attempt": 1,
+  "text": "Start typing the name of the store you are looking for, <break time=\"0.3s\"/> and select it from the dropdown list. <break time=\"0.5s\"/> All activities after this will act against this store alone.",
+  "speed": 1.2,
+  "duration": 8.437551020408163
+ },
+ {
+  "pass": 2,
+  "attempt": 1,
+  "text": "Start typing the name of the store you are looking for, <break time=\"0.3s\"/> and select it from the dropdown list. <break time=\"0.5s\"/> All activities after this will act against this store alone.",
+  "speed": 1.2,
+  "duration": 8.437551020408163,
+  "breaks": [
+   0.3,
+   0.5
+  ]
+ }
+]

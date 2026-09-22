@@ -1,0 +1,18 @@
+[
+ {
+  "pass": 1,
+  "text": "Update the new item with the same name, but with the different variant options.<break time=\"1s\"/> Always remember to update this new item before you use the duplicate again. <break time=\"0.5s\"/> Work through all the 9 possible variations.",
+  "speed": 1.0,
+  "duration": 12.146938775510204
+ },
+ {
+  "pass": 2,
+  "text": "Update the new item with the same name, but with the different variant options.<break time=\"1.25s\"/> Always remember to update this new item before you use the duplicate again. <break time=\"1.42s\"/> Work through all the 9 possible variations.",
+  "speed": 1.0,
+  "duration": 13.270204081632652,
+  "breaks": [
+   1.25,
+   1.42
+  ]
+ }
+]

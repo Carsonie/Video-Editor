@@ -1,0 +1,74 @@
+[
+ {
+  "pass": 1,
+  "attempt": 0,
+  "text": "Build out the item here, in the details page. <break time=\"1.5s\"/> Add an Item description, <break time=\"1.5s\"/> Confirm you are in the right collection. <break time=\"1.5s\"/> Then add how many of this specific item you have for rent. <break time=\"1.5s\"/> Then add the price in cents. <break time=\"1.5s\"/> The requirement is the set of questions,<break time=\"0.5s\"/> that a renter answers for the equipment items they are renting from you. <break time=\"1.5s\"/> The attributes may hold some image details that will be automatically added. <break time=\"0.5s\"/> So you can skip over this.",
+  "speed": 1.0,
+  "duration": 31.973877551020408
+ },
+ {
+  "pass": 2,
+  "attempt": 0,
+  "text": "Build out the item here, in the details page. <break time=\"2.75s\"/> Add an Item description, <break time=\"2.02s\"/> Confirm you are in the right collection. <break time=\"2.24s\"/> Then add how many of this specific item you have for rent. <break time=\"2.19s\"/> Then add the price in cents. <break time=\"2.26s\"/> The requirement is the set of questions,<break time=\"0.2s\"/> that a renter answers for the equipment items they are renting from you. <break time=\"3.13s\"/> The attributes may hold some image details that will be automatically added. <break time=\"0.2s\"/> So you can skip over this.",
+  "speed": 1.0,
+  "duration": 38.817959183673466,
+  "breaks": [
+   2.75,
+   2.02,
+   2.24,
+   2.19,
+   2.26,
+   0.2,
+   3.13,
+   0.2
+  ]
+ },
+ {
+  "pass": 1,
+  "attempt": 1,
+  "text": "Build out the item here, in the details page. <break time=\"1.5s\"/> Add an Item description, <break time=\"1.5s\"/> Confirm you are in the right collection. <break time=\"1.5s\"/> Then add how many of this specific item you have for rent. <break time=\"1.5s\"/> Then add the price in cents. <break time=\"1.5s\"/> The requirement is the set of questions,<break time=\"0.5s\"/> that a renter answers for the equipment items they are renting from you. <break time=\"1.5s\"/> The attributes may hold some image details that will be automatically added. <break time=\"0.5s\"/> So you can skip over this.",
+  "speed": 1.15,
+  "duration": 28.73469387755102
+ },
+ {
+  "pass": 2,
+  "attempt": 1,
+  "text": "Build out the item here, in the details page. <break time=\"2.49s\"/> Add an Item description, <break time=\"2.21s\"/> Confirm you are in the right collection. <break time=\"2.41s\"/> Then add how many of this specific item you have for rent. <break time=\"2.56s\"/> Then add the price in cents. <break time=\"2.49s\"/> The requirement is the set of questions,<break time=\"0.2s\"/> that a renter answers for the equipment items they are renting from you. <break time=\"3.7s\"/> The attributes may hold some image details that will be automatically added. <break time=\"0.2s\"/> So you can skip over this.",
+  "speed": 1.15,
+  "duration": 36.28408163265306,
+  "breaks": [
+   2.49,
+   2.21,
+   2.41,
+   2.56,
+   2.49,
+   0.2,
+   3.7,
+   0.2
+  ]
+ },
+ {
+  "pass": 1,
+  "attempt": 2,
+  "text": "Build out the item here, in the details page. <break time=\"1.5s\"/> Add an Item description, <break time=\"1.5s\"/> Confirm you are in the right collection. <break time=\"1.5s\"/> Then add how many of this specific item you have for rent. <break time=\"1.5s\"/> Then add the price in cents. <break time=\"1.5s\"/> The requirement is the set of questions,<break time=\"0.5s\"/> that a renter answers for the equipment items they are renting from you. <break time=\"1.5s\"/> The attributes may hold some image details that will be automatically added. <break time=\"0.5s\"/> So you can skip over this.",
+  "speed": 1.2,
+  "duration": 28.05551020408163
+ },
+ {
+  "pass": 2,
+  "attempt": 2,
+  "text": "Build out the item here, in the details page. <break time=\"2.58s\"/> Add an Item description, <break time=\"2.18s\"/> Confirm you are in the right collection. <break time=\"2.7s\"/> Then add how many of this specific item you have for rent. <break time=\"2.66s\"/> Then add the price in cents. <break time=\"2.5s\"/> The requirement is the set of questions,<break time=\"0.2s\"/> that a renter answers for the equipment items they are renting from you. <break time=\"3.8s\"/> The attributes may hold some image details that will be automatically added. <break time=\"0.2s\"/> So you can skip over this.",
+  "speed": 1.2,
+  "duration": 36.205714285714286,
+  "breaks": [
+   2.58,
+   2.18,
+   2.7,
+   2.66,
+   2.5,
+   0.2,
+   3.8,
+   0.2
+  ]
+ }
+]

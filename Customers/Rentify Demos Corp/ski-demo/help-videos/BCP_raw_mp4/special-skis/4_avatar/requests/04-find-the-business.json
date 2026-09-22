@@ -1,0 +1,17 @@
+[
+ {
+  "pass": 1,
+  "text": "Start typing your business name, <break time=\"0.3s\"/> then select it from the dropdown list.",
+  "speed": 1.0,
+  "duration": 5.093877551020408
+ },
+ {
+  "pass": 2,
+  "text": "Start typing your business name, <break time=\"0.3s\"/> then select it from the dropdown list.",
+  "speed": 1.0,
+  "duration": 5.093877551020408,
+  "breaks": [
+   0.3
+  ]
+ }
+]

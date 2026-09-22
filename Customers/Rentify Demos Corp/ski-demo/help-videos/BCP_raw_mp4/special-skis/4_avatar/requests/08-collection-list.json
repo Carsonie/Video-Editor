@@ -1,0 +1,17 @@
+[
+ {
+  "pass": 1,
+  "text": "Here you can find all the store's look up and search options. <break time=\"0.5s\"/> Press the plus icon button to add a new collection.",
+  "speed": 1.0,
+  "duration": 6.086530612244898
+ },
+ {
+  "pass": 2,
+  "text": "Here you can find all the store's look up and search options. <break time=\"0.83s\"/> Press the plus icon button to add a new collection.",
+  "speed": 1.0,
+  "duration": 6.896326530612245,
+  "breaks": [
+   0.83
+  ]
+ }
+]

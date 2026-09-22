@@ -1,0 +1,17 @@
+[
+ {
+  "pass": 1,
+  "text": "When your business page opens. <break time=\"0.5s\"/> Choose Lookup Stores to see all the stores of this business.",
+  "speed": 1.0,
+  "duration": 6.530612244897959
+ },
+ {
+  "pass": 2,
+  "text": "When your business page opens. <break time=\"0.2s\"/> Choose Lookup Stores to see all the stores of this business.",
+  "speed": 1.0,
+  "duration": 6.164897959183674,
+  "breaks": [
+   0.2
+  ]
+ }
+]

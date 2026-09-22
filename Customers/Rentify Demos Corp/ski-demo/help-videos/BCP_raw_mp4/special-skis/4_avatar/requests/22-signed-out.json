@@ -1,0 +1,17 @@
+[
+ {
+  "pass": 1,
+  "text": "You are signed out. <break time=\"1s\"/> Your collection and all nine of its variants are saved and ready to rent.",
+  "speed": 1.0,
+  "duration": 5.642448979591837
+ },
+ {
+  "pass": 2,
+  "text": "You are signed out. <break time=\"1.32s\"/> Your collection and all nine of its variants are saved and ready to rent.",
+  "speed": 1.0,
+  "duration": 6.426122448979592,
+  "breaks": [
+   1.32
+  ]
+ }
+]

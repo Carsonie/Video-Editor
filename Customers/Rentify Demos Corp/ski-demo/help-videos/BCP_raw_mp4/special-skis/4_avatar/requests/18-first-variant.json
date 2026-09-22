@@ -1,0 +1,17 @@
+[
+ {
+  "pass": 1,
+  "text": "That is the first variant saved. <break time=\"1s\"/> Use the duplicate button to make a copy of this item.",
+  "speed": 1.0,
+  "duration": 5.616326530612245
+ },
+ {
+  "pass": 2,
+  "text": "That is the first variant saved. <break time=\"1.3s\"/> Use the duplicate button to make a copy of this item.",
+  "speed": 1.0,
+  "duration": 5.642448979591837,
+  "breaks": [
+   1.3
+  ]
+ }
+]

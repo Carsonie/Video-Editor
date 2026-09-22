@@ -1,0 +1,17 @@
+[
+ {
+  "pass": 1,
+  "text": "We will send you a four-digit code to that address. <break time=\"0.8s\"/> If you are not seeing it, please check your spam folder.",
+  "speed": 1.0,
+  "duration": 6.504489795918367
+ },
+ {
+  "pass": 2,
+  "text": "We will send you a four-digit code to that address. <break time=\"0.82s\"/> If you are not seeing it, please check your spam folder.",
+  "speed": 1.0,
+  "duration": 6.739591836734694,
+  "breaks": [
+   0.82
+  ]
+ }
+]

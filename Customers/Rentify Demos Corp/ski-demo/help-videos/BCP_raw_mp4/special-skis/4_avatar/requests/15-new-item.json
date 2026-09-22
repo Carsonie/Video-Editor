@@ -1,0 +1,18 @@
+[
+ {
+  "pass": 1,
+  "text": "Give the item a name with the variants added. The renter can see by the item name that they are getting the item options they want. <break time=\"0.5s\"/> Then search and select the collection this item belongs to. <break time=\"1.5s\"/> Use the Create button to save it.",
+  "speed": 1.0,
+  "duration": 13.557551020408162
+ },
+ {
+  "pass": 2,
+  "text": "Give the item a name with the variants added. The renter can see by the item name that they are getting the item options they want. <break time=\"0.37s\"/> Then search and select the collection this item belongs to. <break time=\"2.74s\"/> Use the Create button to save it.",
+  "speed": 1.0,
+  "duration": 15.020408163265307,
+  "breaks": [
+   0.37,
+   2.74
+  ]
+ }
+]

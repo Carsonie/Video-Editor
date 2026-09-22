@@ -1,0 +1,17 @@
+[
+ {
+  "pass": 1,
+  "text": "This is the store page. <break time=\"0.5s\"/> Click on the gear icon in the menu and choose Lookup Collections.",
+  "speed": 1.0,
+  "duration": 5.69469387755102
+ },
+ {
+  "pass": 2,
+  "text": "This is the store page. <break time=\"0.55s\"/> Click on the gear icon in the menu and choose Lookup Collections.",
+  "speed": 1.0,
+  "duration": 5.276734693877551,
+  "breaks": [
+   0.55
+  ]
+ }
+]
