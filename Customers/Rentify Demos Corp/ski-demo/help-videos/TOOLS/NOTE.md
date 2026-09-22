@@ -26,7 +26,7 @@ own `segment.mp4`, so it is already in every later stage. `4_avatar/` gets
 HeyGen's clips, and nothing else.
 
 ✅ **THIS FOLDER MOVED UP ON 2026-09-21.** It is `help-videos/TOOLS/` now, not
-`help-videos/BCP_raw_mp4/TOOLS/` — Carson's call, because the cards serve BCP
+`help-videos/BCP/TOOLS/` — Carson's call, because the cards serve BCP
 and UI recipes alike. **Every path below is written from a scene folder**, so
 from `<recipe>/sandbox/<NN-label>/` the card is now four levels up:
 
@@ -104,7 +104,7 @@ in `Basic_E2E_Testing/Carsons_Files/What is SAE -VTT-setup-and-launch.txt` §5.4
 ### 1. Back the clip up
 
 ```bash
-cd "<...>/BCP_raw_mp4/<recipe>/sandbox/<NN-label>"
+cd "<...>/BCP/<recipe>/sandbox/<NN-label>"
 STAMP=$(date +%Y%m%d-%H%M%S); mkdir -p "z_History/$STAMP"
 cp segment.mp4 "z_History/$STAMP/segment.mp4"
 ```
@@ -174,7 +174,7 @@ reported "no rings" on a video that plainly had them. Full resolution only.
 ```bash
 cd ~/Rentify/Basic_E2E_Testing/Master_Flows/Recorder
 python3 scripts/sae_vtt_sync.py "<the recipe folder>" --apply --scenes 20
-curl -s "http://localhost:8846/api/open-seq-go?root=<biz>/<store>/help-videos/BCP_raw_mp4/<recipe>&ns=19,20,21"
+curl -s "http://localhost:8846/api/open-seq-go?root=<biz>/<store>/help-videos/BCP/<recipe>&ns=19,20,21"
 ```
 
 Then tell Carson to press **Cmd+R**.

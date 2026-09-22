@@ -76,9 +76,18 @@ Customers/*/*/help-videos/**/*.vtt.artifact.html
 # looks exactly like a file with no changes. Named by FOLDER, not by extension,
 # so the next card and the next helper are kept without editing this file again.
 !Customers/*/*/help-videos/*/TOOLS/**
+# ⚠ AND ONE LEVEL UP, WHICH IS WHERE THE FOLDER ACTUALLY IS. The rule above was
+# written from the words "I add a folder in BCP_raw called TOOLS" and so matches
+# `help-videos/<stage>/TOOLS/`. ski-demo's sits at `help-videos/TOOLS/`, one
+# level higher, and never matched: make_intro.py and make_overlay.py have been
+# UNTRACKED since 2026-09-21, with only NOTE.md ever committed — the same silent
+# failure this comment block was written about, in the fix for it. Found
+# 2026-09-22 when add_ring.py was moved in beside them. Both depths now.
+!Customers/*/*/help-videos/TOOLS/**
 # ...but never a preview. make_overlay.py --preview writes <card>_on_frameN.png
 # to look at before burning; it is a screenshot of a clip, not an asset.
 Customers/*/*/help-videos/*/TOOLS/**/*_on_frame*.png
+Customers/*/*/help-videos/TOOLS/**/*_on_frame*.png
 # ...but not these. `.render_jobs.json` holds live HeyGen job ids, and a frame
 # map is regenerable diagnostics that runs to thousands of lines.
 Customers/**/.render_jobs.json
