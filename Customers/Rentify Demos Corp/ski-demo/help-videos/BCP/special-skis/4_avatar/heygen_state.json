@@ -1,0 +1,117 @@
+{
+ "01-sign-in": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 1,
+  "note": "no beats, single pass"
+ },
+ "13-back-to-the-store": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 3,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "02-enter-the-code": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 2,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "03-dashboard": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 2,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "04-find-the-business": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 2,
+  "note": "two-pass unavailable (no Mac reference) — sent as written"
+ },
+ "05-the-business": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 2,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "06-find-the-store": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 8,
+  "note": "two-pass unavailable (no Mac reference) — sent as written"
+ },
+ "07-the-store": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 2,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "08-collection-list": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 2,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "09-new-collection": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 4,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "10-collection-details": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 4,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "11-collection-options": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 6,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "12-the-collection": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 2,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "14-item-list": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 4,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "15-new-item": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 4,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "16-item-details": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 4,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "23-signed-out": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 2,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "22-sign-out": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 4,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "21-last-variant": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 5,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "20-the-other-variants": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 4,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "19-first-variant": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 2,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "18-item-detail-variants": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 6,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ },
+ "17-item-requirement": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 8,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ }
+}

@@ -1,0 +1,19 @@
+[
+ {
+  "pass": 1,
+  "attempt": 0,
+  "text": "Go back to the dashboard when you are done. <break time=\"0.3s\"/> Use control or command plus the K key as the short cut keys. Use the Logout card here.",
+  "speed": 1.0,
+  "duration": 8.463673469387755
+ },
+ {
+  "pass": 2,
+  "attempt": 0,
+  "text": "Go back to the dashboard when you are done. <break time=\"0.73s\"/> Use control or command plus the K key as the short cut keys. Use the Logout card here.",
+  "speed": 1.0,
+  "duration": 9.743673469387755,
+  "breaks": [
+   0.73
+  ]
+ }
+]

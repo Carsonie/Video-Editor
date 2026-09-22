@@ -1,0 +1,22 @@
+[
+ {
+  "pass": 1,
+  "attempt": 0,
+  "text": "Then add the quantity of this specific item you have for renting. <break time=\"3s\"/> Then add the price in cents. <break time=\"3s\"/> The requirement is the set of questions, that a renter answers for the equipment items they are renting from you. <break time=\"4s\"/> The attributes may hold some image details that will be automatically added. <break time=\"0.5s\"/> So you can skip over this.",
+  "speed": 1.0,
+  "duration": 27.533061224489796
+ },
+ {
+  "pass": 2,
+  "attempt": 0,
+  "text": "Then add the quantity of this specific item you have for renting. <break time=\"2.95s\"/> Then add the price in cents. <break time=\"3.06s\"/> The requirement is the set of questions, that a renter answers for the equipment items they are renting from you. <break time=\"7.14s\"/> The attributes may hold some image details that will be automatically added. <break time=\"0.2s\"/> So you can skip over this.",
+  "speed": 1.0,
+  "duration": 29.100408163265307,
+  "breaks": [
+   2.95,
+   3.06,
+   7.14,
+   0.2
+  ]
+ }
+]

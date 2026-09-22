@@ -1,0 +1,23 @@
+[
+ {
+  "pass": 1,
+  "attempt": 0,
+  "text": "Options are what makes one item different from another. <break time=\"0.8s\"/> The label is what the renter will see. <break time=\"0.5s\"/> The name is the system key the item is saved under, and used for an item match. <break time=\"0.8s\"/> The type can bool, string or a number. <break time=\"0.5s\"/> The required option means this item is needed to complete the order and should always be true. <break time=\"0.5s\"/> The values are the list of selections the dropdown will offer.",
+  "speed": 1.0,
+  "duration": 23.06612244897959
+ },
+ {
+  "pass": 2,
+  "attempt": 0,
+  "text": "Options are what makes one item different from another. <break time=\"0.91s\"/> The label is what the renter will see. <break time=\"0.59s\"/> The name is the system key the item is saved under, and used for an item match. <break time=\"0.72s\"/> The type can bool, string or a number. <break time=\"0.24s\"/> The required option means this item is needed to complete the order and should always be true. <break time=\"0.6s\"/> The values are the list of selections the dropdown will offer.",
+  "speed": 1.0,
+  "duration": 22.77877551020408,
+  "breaks": [
+   0.91,
+   0.59,
+   0.72,
+   0.24,
+   0.6
+  ]
+ }
+]
