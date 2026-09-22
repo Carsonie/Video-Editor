@@ -335,6 +335,12 @@
 
   button.dirty { color:#57d98a; border-color:#2f7d4f; font-weight:700; }
   button.dirty:hover { color:#7ce8a6; }
+  /* Waiting on a paid HeyGen render — NOT the same as unsaved work. The green
+     .dirty above means "click me, it's free"; this means "nothing left for a
+     click to do here, it needs money instead" — deliberately calmer than
+     green so it stops reading as a stuck save. Carson, 2026-09-22: "Its not
+     saving, or not clearing." */
+  button.pending-render { color:#e0a93f; border-color:#8a6a24; }
   button.working { position:relative; color:#cfe6f5; border-color:#2e8ecc;
                     cursor:progress; }
   button.working::after { content:''; position:absolute; right:8px;

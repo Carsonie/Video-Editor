@@ -1512,17 +1512,22 @@ Each repeats that track's LAST frame. Undoable per scene.`)) return;
     -narrated.mp4 still spoke the old line. This flag is the difference, polled
     from /api/pending (two stat()s) and set the moment a line save returns.
   */
-  let WORDS_STALE = false, OUT_OF_SYNC = [];
+  let WORDS_STALE = false, OUT_OF_SYNC = [], HEYGEN_PENDING = [];
   async function pollWords() {
     try {
       const r = await fetch(`/api/pending?root=${encodeURIComponent(ROOT_REL)}`
                           + `&ns=${SEQ.map(s => s.n).join(',')}`);
       const d = await r.json();
       const os_ = Array.isArray(d.out_of_sync) ? d.out_of_sync : [];
+      const hp_ = Array.isArray(d.heygen_pending) ? d.heygen_pending : [];
       const moved = (d.words_stale !== WORDS_STALE)
-                 || (os_.join(',') !== OUT_OF_SYNC.join(','));
+                 || (os_.join(',') !== OUT_OF_SYNC.join(','))
+                 || (hp_.join(',') !== HEYGEN_PENDING.join(','));
       WORDS_STALE = !!d.words_stale;
       OUT_OF_SYNC = os_;                // scenes whose clip, cut or voice disagree
+      HEYGEN_PENDING = hp_;             // scenes whose words changed but are HeyGen —
+                                        // Save Timeline will never auto-fix these, so
+                                        // they must never read as "unsaved"
       if (moved) paintDirty();
     } catch (_) {}                      // a blip is not worth a message
   }
@@ -1546,18 +1551,37 @@ Each repeats that track's LAST frame. Undoable per scene.`)) return;
     // early calls (renderScenes runs before that line) count frames only.
     let lines = 0;
     try { lines = vDirty ? vDirty.size : 0; } catch (_) { lines = 0; }
-    const dirty = tracks + lines > 0 || WORDS_STALE || OUT_OF_SYNC.length > 0;
+    // ⚠ WORDS_STALE ALONE CANNOT MEAN "UNSAVED" ANY MORE. Carson, 2026-09-22:
+    // "Its not saving, or not clearing." He clicked Save Timeline, it saved,
+    // and the button lit green again on the very next poll — because a HeyGen
+    // scene's stale words are never auto-fixed by a save (that would spend
+    // real money on its own), so WORDS_STALE stays true forever until he pays
+    // for a re-render. If every stale reason traces to a HEYGEN_PENDING scene,
+    // a free save genuinely cannot clear it, so it must not be painted the
+    // same as "you have unsaved work" — that reads as broken, because for a
+    // free scene it WOULD be.
+    const freeWordsStale = WORDS_STALE && HEYGEN_PENDING.length === 0;
+    const dirty = tracks + lines > 0 || freeWordsStale || OUT_OF_SYNC.length > 0;
     btn.classList.toggle('dirty', dirty);
+    btn.classList.toggle('pending-render', !dirty && HEYGEN_PENDING.length > 0);
     const bits = [];
     if (tracks) bits.push(`${tracks} track(s) not written yet`);
     if (lines) bits.push(`${lines} line(s) still being typed`);
-    if (WORDS_STALE) bits.push('the words changed since the voice was built');
+    if (freeWordsStale) bits.push('the words changed since the voice was built');
     if (OUT_OF_SYNC.length) bits.push(`scene(s) ${OUT_OF_SYNC.join(', ')} `
       + 'changed on disk and the cut, the film or the voice has not caught up');
-    btn.title = dirty
-      ? bits.join(', ') + ' — Save Timeline writes everything, updates the cuts'
-        + ' and the voice, then brings you back to this frame'
-      : 'Nothing to save on this timeline';
+    if (dirty) {
+      btn.title = bits.join(', ') + ' — Save Timeline writes everything, updates'
+        + ' the cuts and the voice, then brings you back to this frame';
+    } else if (HEYGEN_PENDING.length) {
+      // Distinct from "dirty": Save Timeline has nothing left to do here. This
+      // is the paid step it deliberately will not take on its own.
+      btn.title = `scene(s) ${HEYGEN_PENDING.join(', ')} — the words changed but `
+        + 'this is a HeyGen scene, so nothing auto-speaks it. Run: '
+        + `voice_scenes.py --engine heygen --scenes ${HEYGEN_PENDING.join(',')} --yes`;
+    } else {
+      btn.title = 'Nothing to save on this timeline';
+    }
   }
 
   // Locked tracks that DO have unsaved edits, so a save can name what it is
