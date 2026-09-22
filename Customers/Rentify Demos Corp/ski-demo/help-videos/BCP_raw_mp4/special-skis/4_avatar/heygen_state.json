@@ -1,0 +1,12 @@
+{
+ "01-sign-in": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 1,
+  "note": "no beats, single pass"
+ },
+ "13-back-to-the-store": {
+  "voice_id": "04d0ae1d0af2489ca7d3bb402a39a890",
+  "credits": 3,
+  "note": "two-pass, targets from voice/.mac_backup/"
+ }
+}

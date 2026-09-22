@@ -1,0 +1,17 @@
+[
+ {
+  "pass": 1,
+  "text": "Scroll up and use the back arrow to return to the collections page. <break time=\"2s\"/> Then we can return to the store page.",
+  "speed": 1.0,
+  "duration": 7.993469387755102
+ },
+ {
+  "pass": 2,
+  "text": "Scroll up and use the back arrow to return to the collections page. <break time=\"2.2s\"/> Then we can return to the store page.",
+  "speed": 1.0,
+  "duration": 9.09061224489796,
+  "breaks": [
+   2.2
+  ]
+ }
+]

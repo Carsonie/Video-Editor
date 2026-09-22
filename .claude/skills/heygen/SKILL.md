@@ -164,6 +164,40 @@ wrote, but each one placed.
 ⚠ **IT IS TWO CALLS PER SCENE**, so budget double. Pass 1's segment durations can
 be cached per scene, since the words rarely change.
 
+✅ **THIS IS NOW BUILT, NOT JUST A RECIPE.** 2026-09-21, Carson: *"Do A"* —
+`Basic_E2E_Testing/Master_Flows/Recorder/scripts/voice_scenes.py --engine heygen`
+does exactly the four steps above, automatically, per dirty scene:
+
+```bash
+python3 scripts/voice_scenes.py "<recipe folder>" --engine heygen         # ESTIMATE ONLY, spends nothing
+python3 scripts/voice_scenes.py "<recipe folder>" --engine heygen --yes   # actually speak
+```
+
+Without `--yes` it prints the dirty scenes, an estimated credit count, and the
+real credit/wallet balance, then **stops** — the money rule built into the tool
+itself, not left to whoever runs it to remember.
+
+⚠ **THE MAC TARGET IS BACKED UP ONCE, BEFORE IT CAN BE LOST.** The first time a
+scene switches engines, its then-current `voice/<NN>-<label>.m4a` (the Mac take)
+is copied to `voice/.mac_backup/<NN>-<label>.m4a` — because that file is about
+to be overwritten by the HeyGen render, and it is the only record of the timing
+the frames were tuned to. Every later re-render of that scene reads the target
+from the backup, not from whatever the last render happened to produce.
+
+⚠ **THE STATE FILE NOW TRACKS ENGINE AND VOICE, SO A SWAP IS DIRTY.**
+`why_dirty()` gained a fifth reason 2026-09-21: `voice/state.json`'s per-scene
+`engine`/`voice_id` not matching the run's `--engine`/`--voice` marks a scene
+dirty even if its words and length have not moved — otherwise asking for
+`--engine heygen` on an already-mac-spoken scene reads as pristine and is
+silently skipped.
+
+Proved on real scenes: scene 1 (no beats, **1 credit**) and scene 13 (one `{2}`
+beat, **3 credits** — two calls), both correct, then reverted to Mac with
+`--engine mac --force` (free) because the ask that day was to build the tool,
+not convert the video. `heygen_tts.py`, beside it, is the thin API client —
+`speak()`, `credits()`, `wallet()`, `silences()` (measuring a rendered clip's
+own pauses), `marks_to_breaks()` (`{n}` → `<break time="Ns"/>`).
+
 ---
 
 ## MOOD AND TUNING — WHICH KNOB EXISTS ON WHICH ENDPOINT
@@ -272,8 +306,31 @@ curl -X POST "https://api.heygen.com/v3/voices" \
        encouraging, like a product demo host. Not shouty.","gender":"female"}'
 ```
 
-⚠ **ITS COST IS UNMEASURED.** Nothing in the docs says. Measure it the usual
-way — quota before, quota after — and record the number here.
+✅ **IT IS FREE.** Measured 2026-09-21: credits 811 before and after, wallet
+$13.52 before and after. So looking costs nothing.
+
+⚠⚠ **BUT IT RETURNS NOTHING USEFUL ON THIS ACCOUNT. DO NOT PLAN AROUND IT.**
+It answers `HTTP 200` with an **empty list** and no error. Isolated against the
+doc's own example:
+
+    doc's example prompt + gender male      ->  3 voices  ✅
+    doc's example prompt + gender female    ->  0
+    doc's example prompt, no gender         ->  1
+    an upbeat female prompt + female        ->  0
+    the same prompt + male                  ->  0
+    the same prompt, no gender              ->  0
+    one word, "upbeat"                      ->  0
+
+So it is not the gender filter and not the wording — **the documented sample
+works and almost nothing else does.** Its three results are the same three
+names every time (`British Tech Pro`, `British Tech Authority`, `ProTech Pro`),
+so the answer is cached, not generated. They ARE genuinely new voices — none is
+in the 2,526-voice Starfish catalogue, and their previews sit under
+`voice-design/previews/`.
+
+⚠ **AND IT IS INCONSISTENT.** One call with `seed: 1` returned 3 voices, and
+the identical call a minute later returned 0. Whether that is a quota, a plan
+gate or just an unreliable feature cannot be told from outside.
 
 ### SO WHEN CARSON SAYS "MAKE IT PEPPIER", THE ORDER IS
 
@@ -284,6 +341,32 @@ way — quota before, quota after — and record the number here.
    words, so audition on scene 1's line, not on the preview.
 3. **The video endpoint, for `pitch` only** — last resort. Avatar-render prices
    for audio, asynchronous, and Starfish has no engine settings anyway.
+
+⚠ **STEP 1 IS EFFECTIVELY DEAD HERE** (see Design Voices above), so in practice
+it is step 2 then step 3.
+
+### THE AUDITION THAT WAS ACTUALLY RUN — AND DERYA WON
+
+Carson, 2026-09-21: *"This voice is not very energetic, can we make it more
+peppy?"* So five "Upbeat & Lively" voices were rendered on scene 1's real line
+— spread across the 113, not the first five alphabetically, because five names
+in a row are likely five similar voices. 5 credits, 1 each.
+
+    Derya   (the incumbent)   6.09s   fits
+    Elif                      7.26s   over the 6.50s of room by 0.76s
+    Tulsi                     6.79s   over by 0.29s
+    Laila                     5.15s   fits easily
+    Yolanda                   5.72s   fits
+    Zeynep                    6.45s   fits, just
+
+**Carson's answer: *"Lets use 00_Derya_current. She sounds good to me."*** So
+the voice is UNCHANGED — `04d0ae1d…`, Derya, and it stays locked.
+
+⚠ **DO NOT RE-OPEN THIS.** The peppier alternatives were heard on his own words
+and rejected. "Lifelike - Broadcaster" is the chosen style, not an oversight.
+
+⚠ **AND AUDITION ON A REAL LINE, NOT A MARKETING PREVIEW.** The generic preview
+clips did not settle it; the same 19 words in each voice did. Worth the credits.
 
 ⚠ **A VOICE SWAP DOES NOT THROW AWAY THE PAUSE WORK.** The two-pass timing is
 computed per voice from its own `word_timestamps`, so changing voice just means
