@@ -1137,7 +1137,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         # early and leaving every path below built from the wrong `final`.
         final = os.path.dirname(target)
         for _ in range(4):
-            if (os.path.basename(final) not in ("sandbox", "dev")
+            if (os.path.basename(final) not in PTH.SCENE_ROOT_NAMES + ("dev",)
                     and os.path.isfile(PTH.script(final))):
                 break
             final = os.path.dirname(final)

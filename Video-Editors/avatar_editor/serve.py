@@ -252,7 +252,7 @@ def video_root_of(seg_path):
     """
     label_dir = os.path.dirname(seg_path)
     sandbox_root = os.path.dirname(label_dir)
-    if os.path.basename(sandbox_root) != "sandbox":
+    if os.path.basename(sandbox_root) not in PTH.SCENE_ROOT_NAMES:
         return None
     return os.path.dirname(sandbox_root)
 
@@ -425,7 +425,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         # would find that very file and stop one level too early.
         final = os.path.dirname(target)
         for _ in range(4):
-            if (os.path.basename(final) not in ("sandbox", "dev")
+            if (os.path.basename(final) not in PTH.SCENE_ROOT_NAMES + ("dev",)
                     and os.path.isfile(PTH.script(final))):
                 break
             final = os.path.dirname(final)
@@ -541,7 +541,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         root = safe_join(rel)
         if root is None or not os.path.isdir(root):
             return self.json_error(400, f"not a folder under Customers/: {rel}")
-        sandbox = os.path.join(root, "sandbox")
+        sandbox = PTH.sandbox_root(root)
         if not os.path.isdir(sandbox):
             return self.json_error(400, f"no sandbox/ in {rel} — nothing to load")
 
@@ -770,7 +770,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         # sync. Best-effort: a sound bit with no matching label just has no
         # "line" in its entry, and the client falls back to its filename.
         label_lines = {}
-        script_path = os.path.join(video_root, "sandbox", "script.json")
+        script_path = os.path.join(PTH.sandbox_root(video_root), "script.json")
         if os.path.isfile(script_path):
             try:
                 script = json.load(open(script_path))

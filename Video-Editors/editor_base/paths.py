@@ -52,8 +52,49 @@ def dev_root(final):
     return os.path.join(final, "dev")
 
 
+# The numbered shape Carson approved on 2026-09-22 for videos born into it.
+NEW_SHAPE_MARKERS = ("0_master", "1_cuts")
+
+# Every name a scene root can have, newest first. Callers that walk UP a path
+# and ask "is this folder the scene root?" test against this, never a literal —
+# a literal "sandbox" silently answers no on a new-shape video and the walk
+# runs past the folder it was looking for.
+SCENE_ROOT_NAMES = ("2_scenes", "sandbox")
+
+
+def is_new_shape(final):
+    """Has this video's folder declared itself numbered?"""
+    return any(os.path.isdir(os.path.join(final, m)) for m in NEW_SHAPE_MARKERS)
+
+
 def sandbox_root(final):
-    return os.path.join(final, "sandbox")
+    """
+    The frame work: `2_scenes/` in the new shape, `sandbox/` in the old.
+
+    ⚠ BOTH SHAPES ARE LIVE AT ONCE, ON PURPOSE. Carson approved the numbered
+    shape on 2026-09-22 — `0_master/ 1_cuts/ 2_scenes/ 3_voice/ …` — for videos
+    born into it. Renaming the 25 folders already on disk was NOT approved,
+    because that is the move this project has had bite it four times: the
+    2026-09-15 stage split, and the `.gitignore` silently dropping ten
+    `*vtt.html` pages twice and the TOOLS scripts once. So the folder is asked,
+    never assumed. The name of this function is kept because nine callers use
+    it; only what it returns has changed.
+
+    ⚠ AN EXISTING FOLDER WINS, AND WITH NEITHER PRESENT THE OLD NAME IS THE
+    DEFAULT. A folder counts as new-shape only when it SAYS SO by carrying
+    `0_master/` or `1_cuts/`. Six BCP recipes have never had scenes built, so
+    this gets asked about a folder that is not there — answering `2_scenes/`
+    would quietly put a numbered folder inside an old-shaped video, the "both
+    shapes by accident" this repo's CLAUDE.md says to avoid.
+
+    Mirrors `Basic_E2E_Testing/Master_Flows/Recorder/scripts/stage_dirs.py`.
+    Change one, change the other.
+    """
+    for name in SCENE_ROOT_NAMES:
+        p = os.path.join(final, name)
+        if os.path.isdir(p):
+            return p
+    return os.path.join(final, "2_scenes" if is_new_shape(final) else "sandbox")
 
 
 def sandbox_dir(final, n, label=None):
