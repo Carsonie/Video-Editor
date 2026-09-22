@@ -174,7 +174,7 @@ wrong one gives an empty page rather than an error:
 
     RAW CAPTURE  (.../help-videos/{BCP,UI}_raw_mp4/<recipe>/, no clips yet)
       cd ~/Rentify/Basic_E2E_Testing/Master_Flows/Recorder
-      python3 scripts/vtt_build.py "<.../UI_raw_mp4/<recipe>>" --open
+      python3 scripts/vtt_build.py "<.../UI/<recipe>>" --open
 
 ⚠ **THE FOLDER NAMES ABOVE CHANGED ON 2026-09-15, ON ALL FOUR STORES.**
 `videos/` is `development_videos/`, and `raw_mp4/` split into `BCP_raw_mp4/`
@@ -434,6 +434,35 @@ has none, so no Load picker offers it — measured, 16 videos before and after.
 But a breadcrumb that counts stages will show it. If that becomes noise, add
 `"TOOLS"` to `stores.py`'s `SKIP` set — one word, and it is `editor_base`, so it
 needs Carson's go-ahead under the editor scope lock.
+
+---
+
+## THE STAGE FOLDERS ARE `BCP/` AND `UI/` — RENAMED 2026-09-22
+
+Carson: *"Rename BCP_raw_mp4 to just help-videos/BCP."* `UI_raw_mp4` went to
+`UI` in the same pass, **on all four stores**, so the two read as a pair.
+
+    help-videos/BCP/<recipe>/      the admin recipes
+    help-videos/UI/<recipe>/       the renter flows
+
+⚠ **THE OLD NAMES ARE STILL ACCEPTED, AND THAT IS DELIBERATE.**
+`record_flow.ts`'s `rawSubdirFor()` and `scene_script.py`'s `raw_folder()` try
+`BCP`, then `BCP_raw_mp4`, then the flat `raw_mp4` — because a store checked out
+from an older commit, or restored from the BK drive, still carries the old name.
+Dropping it would send that store's next recording into a brand-new `BCP/`
+beside its captures and split them in half, silently. A store with NEITHER is
+born on the new name.
+
+⚠ **ski-demo's SIX OTHER BCP RECIPES WERE CONVERTED TO THE NUMBERED SHAPE THE
+SAME DAY** — `add-collection`, `add-item`, `add-question`, `add-requirement`,
+`special-boots`, `special-poles`. **`special-skis` was deliberately LEFT on the
+old `sandbox/ voice/ segments/` shape**, at Carson's instruction, because it is
+the one finished video and there was no reason to risk it.
+
+⚠ **`ski-demo/BCP/` IS NOT THE ONLY `BCP` UNDER ski-demo.** There is an older,
+untracked `Customers/Rentify Demos Corp/ski-demo/BCP/` from 2026-08-26 holding
+`DB-Yaml-Diff.txt`, `README.md` and `status-runner.ts`. Different thing, nothing
+to do with video. Do not confuse the two.
 
 ---
 
