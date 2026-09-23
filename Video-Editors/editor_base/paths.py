@@ -59,7 +59,14 @@ NEW_SHAPE_MARKERS = ("0_master", "1_cuts")
 # and ask "is this folder the scene root?" test against this, never a literal —
 # a literal "sandbox" silently answers no on a new-shape video and the walk
 # runs past the folder it was looking for.
-SCENE_ROOT_NAMES = ("2_scenes", "sandbox")
+# ⚠ THE SCENES MOVED INSIDE `2_scenes/sandbox/` ON 2026-09-23. Carson: "the
+# scenes should be in a sandbox folder, so z_H and others do not interfere with
+# the timeline." A scene folder is recognised by its NN- prefix, so anything
+# sitting beside them gets walked as one — the SAE drew two phantom "missing"
+# rows for an archived sign-in and sign-out the moment they landed in
+# 2_scenes/z_History/. Their own folder means nothing else can be mistaken for
+# a scene. Deepest, newest layout first.
+SCENE_ROOT_NAMES = (os.path.join("2_scenes", "sandbox"), "2_scenes", "sandbox")
 
 
 def is_new_shape(final):
@@ -94,7 +101,39 @@ def sandbox_root(final):
         p = os.path.join(final, name)
         if os.path.isdir(p):
             return p
-    return os.path.join(final, "2_scenes" if is_new_shape(final) else "sandbox")
+    return os.path.join(final, SCENE_ROOT_NAMES[0] if is_new_shape(final)
+                        else SCENE_ROOT_NAMES[-1])
+
+
+def find_file(final, name, *subdirs):
+    """
+    A FILE that may sit at the video root or inside a numbered stage folder.
+
+    ⚠ THE FOLDERS MOVED AND THE FILES WENT WITH THEM. The 2026-09-22 refactor
+    put `stretch_report.json` and `bounds.json` into `1_cuts/`, and Carson moved
+    the narrated review cut there too on 2026-09-23. Every caller still joined
+    them to the video root — vtt_editor read no report at all on a converted
+    folder, so every scene's clip length came back 0.0s and the whole room/gap/
+    add column was blank. Nothing errored; it just showed zeros.
+
+    An existing file wins, in the order given. Nothing is created here.
+    """
+    for d in (*subdirs, ""):
+        p = os.path.join(final, d, name) if d else os.path.join(final, name)
+        if os.path.isfile(p):
+            return p
+    first = subdirs[0] if subdirs else ""
+    return os.path.join(final, first, name) if first else os.path.join(final, name)
+
+
+def report_file(final):
+    """stretch_report.json — 1_cuts/ in the new shape, the root in the old."""
+    return find_file(final, "stretch_report.json", "1_cuts")
+
+
+def film_file(final, name):
+    """The <capture>-narrated.mp4 review cut — 1_cuts/, 0_master/, or the root."""
+    return find_file(final, name, "1_cuts", "0_master")
 
 
 def sandbox_dir(final, n, label=None):
