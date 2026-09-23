@@ -90,6 +90,8 @@ function fillChrome(CLIP) {
   const next = document.getElementById('next');
   const prev10 = document.getElementById('prev10');
   const next10 = document.getElementById('next10');
+  const prevCut = document.getElementById('prevCut');
+  const nextCut = document.getElementById('nextCut');
   const prev100 = document.getElementById('prev100');
   const next100 = document.getElementById('next100');
   const framecount = document.getElementById('framecount');
@@ -173,6 +175,7 @@ function fillChrome(CLIP) {
     // direction — extending a hold at either end of the clip with more
     // copies of the edge frame is exactly what this mode is for.
     const adding = mode === 'frame-editor' && editSub === 'add';
+    updateCutJumpUI(n);
     prev.disabled = prev10.disabled = prev100.disabled = adding ? false : (n <= 1);
     next.disabled = next10.disabled = next100.disabled = adding ? false : (n >= N);
     updateMarkUI();
@@ -372,6 +375,21 @@ function fillChrome(CLIP) {
   // Walk to the previous/next break point. Checking a cut means visiting every
   // boundary in turn, and scrubbing thousands of frames by hand to reach each
   // one is what made that unpleasant.
+  // Greyed out when there is no cut that way to jump to, so a button never
+  // looks broken on a clip with nothing marked yet.
+  //
+  // ⚠ CALLED FROM TWO PLACES, AND THE SECOND ONE IS THE POINT. show() runs on
+  // the first paint, BEFORE /api/marks has answered, so at that moment there
+  // are no marks and both buttons disable themselves. They then stayed dead
+  // until the viewer happened to step a frame — which reads as "the new
+  // buttons do not work". refreshMarkViews() is where the marks actually
+  // arrive, so it has to update them too.
+  function updateCutJumpUI(n) {
+    const ms = [...marks].sort((x, y) => x - y);
+    prevCut.disabled = !ms.some(m => m < n);
+    nextCut.disabled = !ms.some(m => m > n);
+  }
+
   function jumpMark(dir) {
     const sorted = [...marks].sort((a, b) => a - b);
     if (!sorted.length) return;
@@ -421,6 +439,7 @@ function fillChrome(CLIP) {
     renderSegList();
     renderMarksList();
     updateMarkUI();
+    updateCutJumpUI(+slider.value);
   }
 
   // The same computeSegments() the slider bands come from, so the list and the
@@ -1083,6 +1102,13 @@ ${data.archived_to}`);
   next.addEventListener('click', () => mode === 'frame-editor' ? rightClick(1) : step(1));
   prev10.addEventListener('click', () => mode === 'frame-editor' ? leftClick(10) : step(-10));
   next10.addEventListener('click', () => mode === 'frame-editor' ? rightClick(10) : step(10));
+  // ⚠ THE FUNCTION WAS ALREADY HERE — only the buttons were missing.
+  // jumpMark() has existed since the marks list did, bound to ⌥←/⌥→ and
+  // to [ and ]. The marks label even advertised the shortcut. Carson asked
+  // for buttons on 2026-09-23 because a keyboard shortcut you have to be
+  // told about is not a control. Same call, nothing reimplemented.
+  prevCut.addEventListener('click', () => jumpMark(-1));
+  nextCut.addEventListener('click', () => jumpMark(1));
   prev100.addEventListener('click', () => mode === 'frame-editor' ? leftClick(100) : step(-100));
   next100.addEventListener('click', () => mode === 'frame-editor' ? rightClick(100) : step(100));
   // Keyboard arrows stay navigation-only in every mode, on purpose — muscle

@@ -48,16 +48,22 @@
             <option value="0.25">0.25x</option>
             <option value="0.125">0.125x</option>
           </select>
+          <button id="prevCut" class="stepbtn navbtn cutjump" title="Jump back to the previous cut (⌥← or [)">|◀ cut</button>
           <button id="prev100" class="stepbtn navbtn" title="Back 100 frames">«100</button>
           <button id="prev10" class="stepbtn navbtn" title="Back 10 frames">«10</button>
           <button id="prev" class="stepbtn navbtn one" title="Previous frame (←)">◀</button>
           <button id="next" class="stepbtn navbtn one" title="Next frame (→)">▶</button>
           <button id="next10" class="stepbtn navbtn" title="Forward 10 frames">10»</button>
           <button id="next100" class="stepbtn navbtn" title="Forward 100 frames">100»</button>
+          <button id="nextCut" class="stepbtn navbtn cutjump" title="Jump forward to the next cut (⌥→ or ])">cut ▶|</button>
           <label id="loopLbl" title="Play only the zone, over and over. Judging a cut point is watching the same two seconds repeatedly, which is what this is for."><input type="checkbox" id="loopChk" title="Play only the zone — the span between the break points either side of the pointer — over and over. With nothing marked the zone is the whole clip."> ↻ Loop Zone</label>
 
+          <!-- The frame counter is the number you actually read while judging a
+               cut, so it sits on its own in the middle of the row rather than
+               shrunk into the corner with the totals. Carson, 2026-09-23. -->
+          <div id="posLine"><span id="framecount"></span> · <span id="timecode">0.000s</span></div>
+
           <div id="readouts">
-            <div id="posLine"><span id="framecount"></span> · <span id="timecode">0.000s</span></div>
             <div id="totalTime">total <b>0.000s</b></div>
             <div id="segNow"></div>
           </div>

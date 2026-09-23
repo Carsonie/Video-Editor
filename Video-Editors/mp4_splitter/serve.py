@@ -351,7 +351,16 @@ def derive_segments_dir(source):
         if i + 1 < len(parts):
             return os.path.join(os.sep.join(parts[: i + 2]), "dev", "_cuts")
 
-    # a raw recording: find the store's newest video folder
+    # ⚠ A CAPTURE IN A NUMBERED RECIPE FOLDER CUTS INTO ITS OWN 1_cuts/segments/.
+    # That is the whole point of the shape Carson approved on 2026-09-22: a
+    # recipe owns its master AND its cuts, so a cut never has to be hunted for
+    # in some other store-level folder. Without this the cuts landed in
+    # 0_master/dev/_cuts — inside the one folder whose rule is "an INPUT, never
+    # edited" — which is the worst possible place for them.
+    if os.path.basename(d) == "0_master":
+        return os.path.join(os.path.dirname(d), "1_cuts", "segments")
+
+    # a raw recording in the old flat layout: the store's newest video folder
     if os.path.basename(d) == "raw_mp4":
         hv = os.path.dirname(d)
         vids = os.path.join(hv, "videos")
@@ -657,8 +666,21 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 # cut segments this tool itself produces, so opening one for
                 # frame-by-frame review doesn't mean walking raw_mp4 -> final ->
                 # segments by hand.
-                raw = os.path.join(full, "help-videos", "raw_mp4")
-                raw_jump = f"{childrel}/help-videos/raw_mp4" if os.path.isdir(raw) else None
+                #
+                # ⚠ THE CAPTURES MOVED TWICE AND THIS MISSED BOTH. It looked for
+                # help-videos/raw_mp4/, which stopped existing on 2026-09-15 when
+                # ski-demo split by surface, and again on 2026-09-22 when
+                # BCP_raw_mp4/UI_raw_mp4 became BCP/UI. The store list has been
+                # EMPTY since — and an empty list looks exactly like a store with
+                # nothing recorded, which is why it went unnoticed for a week.
+                # Asked of the disk now, newest name first, the same rule
+                # record_flow.ts and stage_dirs.py already use.
+                raw_jump = None
+                hv = os.path.join(full, "help-videos")
+                for stage in ("BCP", "UI", "BCP_raw_mp4", "UI_raw_mp4", "raw_mp4"):
+                    if os.path.isdir(os.path.join(hv, stage)):
+                        raw_jump = f"{childrel}/help-videos/{stage}"
+                        break
                 segs = os.path.join(full, "help-videos", "final", "segments")
                 segments_jump = f"{childrel}/help-videos/final/segments" if os.path.isdir(segs) else None
                 dirs.append({"name": name, "path": childrel,

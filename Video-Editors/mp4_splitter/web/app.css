@@ -92,9 +92,15 @@
      A smaller gap buys the 34px back — the main column is a FIXED width, so
      this does not come right on a wider window. */
   #rowNav { gap:5px; }
-  #readouts { text-align:right; min-width:104px; margin-left:auto;
+  #readouts { text-align:right; min-width:104px; margin-left:0;
               font-variant-numeric:tabular-nums; }
-  #readouts #posLine { font-size:12px; color:#e6e9ec; }
+  /* Centred in whatever space the buttons leave, and big enough to read at a
+     glance — this is the number being checked on every cut. The auto margins
+     on BOTH sides are what centre it: the row's spare width is split equally
+     either side, which also keeps #readouts pinned right. */
+  #posLine { margin:0 auto; font-size:20px; color:#e6e9ec;
+             font-variant-numeric:tabular-nums; white-space:nowrap; }
+  #posLine #framecount { font-weight:600; }
   /* Total Time is the whole reason Frame Editor exists — you stretch or
      shorten this clip until it matches the narration's fixed length. It used
      to be plain centred text between two unrelated buttons; here it sits in
@@ -199,6 +205,11 @@
            text-decoration:none; box-sizing:border-box; white-space:nowrap; }
   .navbtn { height:30px; font-size:13px; padding:0 8px; width:auto; }
   .navbtn.one { width:32px; padding:0; font-size:15px; }
+  /* The two cut-jump buttons carry the MARK colour, because that is what they
+     navigate. --mark is theme-aware (green on mp4, purple on webm), so they
+     always match the ticks on the timeline they are jumping between. */
+  .cutjump { border-color:var(--mark); color:var(--markHi); }
+  .cutjump:hover:not(:disabled) { background:var(--markGlow); }
   button:hover, a.stepbtn:hover { background:#373e43; }
   button:disabled { opacity:0.35; cursor:default; }
   button:focus-visible, a:focus-visible { outline:2px solid #7aa7ff; outline-offset:1px; }
