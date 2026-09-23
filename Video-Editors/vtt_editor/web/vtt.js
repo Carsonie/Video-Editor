@@ -827,6 +827,20 @@ function loadCrumb() {
   } catch (_) { return null; }
 }
 
+/** An absolute folder path -> the {biz, store, stage, work} crumb for it.
+    Returns null when the path is not in the tree, so the caller can SAY so
+    rather than open something else. */
+function crumbFor(path) {
+  const p = String(path).replace(/\/+$/, '');
+  for (const b of TREE)
+    for (const st of b.stores)
+      for (const sg of st.stages)
+        for (const f of sg.folders)
+          if (String(f.path).replace(/\/+$/, '') === p)
+            return { biz: b.name, store: st.name, stage: sg.name, work: f.path };
+  return null;
+}
+
 /** Is this remembered selection still a real path in the tree? */
 function crumbExists(c) {
   if (!c || !c.work) return false;
@@ -1009,7 +1023,20 @@ async function boot() {
     return;
   }
   // Remembered selection first, if it still points at something real.
-  const saved = loadCrumb();
+  // ⚠ A `?folder=` IN THE URL WINS OVER THE REMEMBERED CRUMB.
+  // Carson, 2026-09-23: "Why am I seeing this? Load the VTT with the scripts?"
+  // — the page had opened on alpine-sports' BUILT video while he was working on
+  // add-question. Every URL handed to it carried ?folder=<abs path> and the
+  // page had never read one: it restored localStorage instead, silently, so the
+  // link looked like it worked and landed somewhere else. A deep link is the
+  // only way another tool can say WHICH recipe to open.
+  const want = new URLSearchParams(location.search).get('folder');
+  let saved = loadCrumb();
+  if (want) {
+    const hit = crumbFor(want);
+    if (hit) saved = hit;
+    else say(`?folder= names a path that is not in the tree: ${want}`, 'bad');
+  }
   let restored = false, lost = '';
   if (crumbExists(saved)) {
     Object.assign(CRUMB, saved);

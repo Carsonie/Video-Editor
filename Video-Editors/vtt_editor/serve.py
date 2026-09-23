@@ -275,7 +275,7 @@ def job_state(folder):
     # ⚠ script_in(), NOT a hardcoded path — a BUILT video keeps its script in
     # sandbox/, and reading the folder root would report it as having no words.
     spec = read_json(script_in(folder))
-    report = read_json(os.path.join(folder, "stretch_report.json"))
+    report = read_json(ebpaths.report_file(folder))
     # ⚠ narration_report.json IS DEAD WEIGHT — DO NOT READ RATES OUT OF IT.
     # It was written by narrate_mac.py, which built ONE soundtrack for the whole
     # video. Since the voice went per scene (voice_scenes.py, 2026-09-21) nothing
@@ -439,7 +439,7 @@ def job_state(folder):
     }
 
     # ── VOICE ───────────────────────────────────────────────────────────────
-    narrated = os.path.join(folder, capture.replace(".mp4", "-narrated.mp4")) if capture else ""
+    narrated = ebpaths.film_file(folder, capture.replace(".mp4", "-narrated.mp4")) if capture else ""
     base = int(os.environ.get("MAC_RATE", "155"))
     # ⚠ ONE SOURCE FOR ALL OF IT: voice/state.json. `rate` and `spoken` are
     # facts the voice tool measured and stored; anything derived from them is
@@ -630,7 +630,7 @@ def promote_segments(folder):
     sandbox_dir() owns the naming, and it is the same function the SAE and
     build/ resolve with — so a folder written here is a folder they can read.
     """
-    report = read_json(os.path.join(folder, "stretch_report.json"))
+    report = read_json(ebpaths.report_file(folder))
     if not report:
         return {"ok": False, "err": "no stretch_report.json — no confirmed edges"}
     seg_dir = os.path.join(folder, "segments")
@@ -711,7 +711,7 @@ def dup_frame(folder: str, n: int, at: float, copies: int):
     """
     if copies < 1 or copies > 500:
         return {"ok": False, "err": f"{copies} copies is out of range (1-500)"}
-    report = read_json(os.path.join(folder, "stretch_report.json"))
+    report = read_json(ebpaths.report_file(folder))
     if not report:
         return {"ok": False, "err": "no stretch_report.json — no confirmed edges"}
     fps = float(report.get("fps") or 25)
@@ -809,7 +809,7 @@ def dup_frame(folder: str, n: int, at: float, copies: int):
     # note carries an em-dash, `stretch_request.py:268` writes it literally,
     # and the default would have escaped it to \u2014 — one more line of diff
     # that is not a change.
-    rp = os.path.join(folder, "stretch_report.json")
+    rp = ebpaths.report_file(folder)
     shutil.copy2(rp, rp + ".bak")
     with open(rp, "w") as fh:
         json.dump(report, fh, indent=1, ensure_ascii=False)
@@ -934,7 +934,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             # common case now that scenes are spoken one at a time — moved no
             # stamp and left this table on old wpm values until a hand reload.
             watched = [script_in(folder),
-                       os.path.join(folder, "stretch_report.json"),
+                       ebpaths.report_file(folder),
                        os.path.join(folder, "voice", "state.json")]
             spec = read_json(script_in(folder)) or {}
             cap = capture_of(folder, spec)
@@ -986,7 +986,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         want = (q.get("src") or ["raw"])[0]
         name = (capture.replace(".mp4", "-narrated.mp4")
                 if want == "narrated" else capture)
-        src = os.path.join(folder, name)
+        # ⚠ 1_cuts/ FIRST: the master is in 0_master/ and the narrated cut in
+        # 1_cuts/ since 2026-09-23, so neither is at the folder root any more.
+        src = ebpaths.film_file(folder, name)
         if not os.path.isfile(src):
             return self.json_error(
                 404, f"{name} is not on disk"
