@@ -1970,7 +1970,13 @@ Nothing was pasted. The two tracks are different lengths, so a `
          + `${done.join(', ')}. Timeline is ${(total / (SEQ[0].fps || 25)).toFixed(2)}s.`);
   }
 
-  async function doEdit(kind, span) {
+  // ⚠ `count` IS THE ONLY NEW IDEA HERE, AND THE SERVER ALREADY TOOK IT.
+  // /api/frames/dup has accepted a `count` since it was written, and
+  // del-span is a span — so ten frames is the same call with different
+  // numbers, not a second code path. Carson, 2026-09-23, asked for the
+  // ten-at-once buttons because stretching a scene to fit a line is
+  // rarely a one-frame job.
+  async function doEdit(kind, span, count = 1) {
     const i = curI();
     if (i < 0 || !SEQ[i]) return;
     const n = SEQ[i].n;
@@ -1996,7 +2002,11 @@ Nothing was pasted. The two tracks are different lengths, so a `
     // loop used to `continue` past a refusal, which changed the tracks that
     // worked and skipped the rest: a half-done edit that reads as an error.
     if (!span) {
-      const short = layers.filter(w => local > lenOf(i, w));
+      // The LAST frame the edit touches, not the first: a ten-frame delete
+      // starting two frames from the end is past the end, and checking only
+      // `local` would have let it through to a server refusal mid-run.
+      const last = kind === 'del' ? local + count - 1 : local;
+      const short = layers.filter(w => last > lenOf(i, w));
       if (short.length) {
         alert(`Frame ${local} is past the end of the `
             + `${short.map(w => w === 'base' ? 'segment' : 'overlay').join(' and ')} `
@@ -2038,13 +2048,13 @@ Nothing was changed. Untick the shorter track, or move to a `
         // Insert the copy immediately AFTER the frame on screen, so the new
         // frame is the one the playhead lands on below.
         path = '/api/frames/dup';
-        body = { slug: slugOf(i, w), at: local, count: 1, side: 'right' };
+        body = { slug: slugOf(i, w), at: local, count, side: 'right' };
       } else {
         // Delete the frame ON SCREEN. The single-frame endpoint deletes to one
         // SIDE of the current frame and so could never remove the frame you are
         // looking at; a one-frame span is exactly that frame.
         path = '/api/frames/del-span';
-        body = { slug: slugOf(i, w), a: local, b: local };
+        body = { slug: slugOf(i, w), a: local, b: local + count - 1 };
       }
       let d;
       try {
@@ -2146,6 +2156,8 @@ Nothing was changed. Untick the shorter track, or move to a `
   $('pasteFrame').onclick = () => pasteFrame();
   $('addFrame').onclick = () => doEdit('dup', false);
   $('delFrame').onclick = () => doEdit('del', false);
+  $('addFrame10').onclick = () => doEdit('dup', false, 10);
+  $('delFrame10').onclick = () => doEdit('del', false, 10);
   $('addZone').onclick  = () => doEdit('dup', true);
   $('delZone').onclick  = () => doEdit('del', true);
 
@@ -2730,7 +2742,8 @@ Nothing was changed. Untick the shorter track, or move to a `
     // track under the pointer being locked, and those two act on every scene on
     // the timeline — greying out the only way to save, because of one scene the
     // pointer happens to be sitting in, would be a trap.
-    for (const id of ['addFrame', 'delFrame', 'addZone', 'delZone',
+    for (const id of ['addFrame', 'delFrame', 'addFrame10', 'delFrame10',
+                      'addZone', 'delZone',
                       'addL', 'addR', 'delL', 'delR']) {
       const el = $(id);
       if (el) {
