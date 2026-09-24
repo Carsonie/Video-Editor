@@ -89,20 +89,21 @@ def _dirs(path):
 def script_in(folder):
     """Where this working folder's script.json is, if it has one.
 
-    ⚠ IT IS NOT ALWAYS IN THE FOLDER ITSELF, and that is the whole reason this
-    is a function. A RAW capture keeps `script.json` beside the mp4. A BUILT
-    video keeps it one level down — `sandbox/script.json`, with `dev/` carrying
-    a working copy and `video/script_v<N>.json` the snapshot each build used. A
-    gate that only checked the folder itself would report every built video as
-    having no words at all.
+    ⚠ ASK paths.script(), DO NOT KEEP A LIST HERE. This was the FOURTH private
+    copy of the same lookup — paths.script(), editor_base/vtt.py, this one, and
+    sae_vtt_sync's write_rec() — and each learned about a new location at a
+    different time. This one had never heard that a script can live under a
+    PRESENTER (3_voice/Samantha/script.json, 2026-09-24), so it answered "that
+    folder has no script.json" about a folder holding one.
+
+    `dev/` stays as this editor's own extra: a BUILT video keeps a working copy
+    there and paths.script() does not look for it.
     """
-    for rel in ("script.json",
-                os.path.join("sandbox", "script.json"),
-                os.path.join("dev", "script.json")):
-        p = os.path.join(folder, rel)
-        if os.path.isfile(p):
-            return p
-    return ""
+    p = ebpaths.script(folder)
+    if os.path.isfile(p):
+        return p
+    d = os.path.join(folder, "dev", "script.json")
+    return d if os.path.isfile(d) else ""
 
 
 def breadcrumbs():
