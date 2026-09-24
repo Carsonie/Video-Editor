@@ -1,0 +1,93 @@
+{
+ "store": "ski-demo",
+ "title": "Adding a question",
+ "_note": "BCP admin recipe add-question. Cut from ski-demo_add-question_dev_09-19-47_v4.mp4 (125.32s), recorded to the v15 standard — rings, click-through navigation, the dashboard's own Logout card. TWELVE screens: the draft's save, the walk back through the dashboard and the second trip to the question list are merged, because to a viewer they are one act. Screen edges measured off the mp4 and kept in bounds_v3.json.",
+ "words_per_second": 3.44,
+ "_wps_note": "From 01-first-time-ordering/script_v33.json, measured 31 words / 9.01s. Nothing for THIS video is rendered yet.",
+ "_pauses_note": "One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in comes from the scene's footage hold.",
+ "_lead_in_seconds": 0.75,
+ "_estimated_video_seconds": 86.6,
+ "_estimated_video_note": "12 scenes. 201 words / 3.44 wps = 58.5s of speech, + 12 lead-ins at 0.5s = 6.0s, + 12 exit pauses at 0.8s = 9.6s. ESTIMATE — recompute from the audio once it exists.",
+ "_footage_seconds": 125.56,
+ "scenes": [
+  {
+   "n": 2,
+   "label": "dashboard",
+   "line": "This is your dashboard. {0.8} Questions are shared by every store. Click Questions."
+  },
+  {
+   "n": 3,
+   "label": "question-list",
+   "line": "This lists every question you have. {0.5} Click the plus button to add a new one."
+  },
+  {
+   "n": 4,
+   "label": "new-question",
+   "line": "Give the question a name. {0.8} Then choose its type. Select One gives the renter a short list to pick from. {0.8} Now create it."
+  },
+  {
+   "n": 5,
+   "label": "question-inquiry",
+   "line": "Now the details. {0.8} The inquiry is what the renter reads. {0.8} The label is the short name on their form. {0.8} Add the options they can choose between, {0.5} set the status to Active, {0.5} and update."
+  },
+  {
+   "n": 6,
+   "label": "question-status",
+   "line": "A new question starts as a draft."
+  },
+  {
+   "n": 7,
+   "label": "status-active",
+   "line": "Set it to Active.",
+   "silent": false,
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ]
+  },
+  {
+   "n": 8,
+   "label": "attributes",
+   "line": "The attributes hold the choices a renter picks from. {0.5} Add one value for each option you want to offer."
+  },
+  {
+   "n": 9,
+   "label": "save-the-question",
+   "line": "Then press Update."
+  },
+  {
+   "n": 10,
+   "label": "back-to-questions",
+   "line": "A new question starts as a draft, {0.5} and a draft cannot be attached to anything. {0.8} So we go back to Questions to switch it on."
+  },
+  {
+   "n": 11,
+   "label": "back-at-dashboard",
+   "line": "Back to the dashboard."
+  },
+  {
+   "n": 12,
+   "label": "find-the-question",
+   "line": "Type part of the name, {0.5} then pick your question from the list."
+  },
+  {
+   "n": 13,
+   "label": "the-question",
+   "line": "This is the question you just made. {0.5} Everything you typed is still here."
+  },
+  {
+   "n": 14,
+   "label": "activate",
+   "line": "Change the status to Active, {0.8} then update. {0.8} A requirement can use it now."
+  },
+  {
+   "n": 15,
+   "label": "back-to-dashboard",
+   "line": "Head back to the dashboard. {0.5} You can get here anytime with the command + K short keys."
+  }
+ ],
+ "_dwell_note": "Carson, 2026-09-15: bring back a 0.75s dwell at BOTH ends of every scene — a lead-in before she speaks and a close-out after. Was 0.5 in and 0.8 out. narrate_mac.py reads _lead_in_seconds from here, so this field is the one that governs the audio as well as the table.",
+ "_recut_note": "Re-cut 2026-09-23 to 16 scenes from Carson's own cut points. Scenes 6-9 and 11 open EMPTY: they were split out of question-details and back-to-questions, and dividing those paragraphs is a writing decision, not a mechanical one.",
+ "_dropped_note": "Scenes 1 (sign-in) and 16 (sign-out) removed 2026-09-23 at Carson's instruction. The NUMBERS 2-15 are kept deliberately: renumbering would rename 14 scene folders and 14 cuts for no gain. Their clips are in 2_scenes/z_History/ and their cuts in 1_cuts/segments/z_History/."
+}

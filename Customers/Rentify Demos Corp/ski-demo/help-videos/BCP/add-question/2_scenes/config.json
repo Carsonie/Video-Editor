@@ -1,0 +1,10 @@
+{
+ "voice": "Samantha",
+ "_note": "WHICH PRESENTER THE TIMELINES USE. Set `voice` to a folder name in 3_voice/ — Samantha (the free Mac rehearsal) or Derya (HeyGen, paid). It picks BOTH the audio and the script: 3_voice/<voice>/script.json and 3_voice/<voice>/<NN>-<label>.m4a.",
+ "_who_wins": "THIS FILE BEATS 3_voice/state.json. state.json records what was last SPOKEN, and the voice tools rewrite it on every run; this file records what YOU chose, and nothing but you writes it. When they disagree, this one is the answer.",
+ "_switching": "Change `voice`, then re-run the sync. A presenter with no script yet is seeded from the live one on first use, after which the two are independent and are MEANT to differ — a line paced for Samantha at 155 wpm may want different words for Derya.",
+ "_available": [
+  "Samantha",
+  "Derya"
+ ]
+}

@@ -331,6 +331,53 @@ def source_of(final, path):
     return "flat"
 
 
+VOICE_TAKES = {"mac": "Samantha", "heygen": "Derya"}
+
+
+def scenes_root(final):
+    """The folder the voice config sits in — `2_scenes/`, not its sandbox."""
+    for name in ("2_scenes", "scenes"):
+        p = os.path.join(final, name)
+        if os.path.isdir(p):
+            return p
+    return final
+
+
+def active_voice(final):
+    """
+    Which presenter the timelines use — Carson's choice, not the tools'.
+
+    ⚠ `2_scenes/config.json` WINS over `3_voice/state.json`. The config records
+    what was CHOSEN and only a person writes it; state.json records what was
+    last SPOKEN and the voice tools rewrite it every run. A selector a tool can
+    overwrite is not a selector. Carson, 2026-09-24.
+
+    Mirrors stage_dirs.active_voice(). Change one, change the other.
+    """
+    cfg = os.path.join(scenes_root(final), "config.json")
+    try:
+        v = (json.load(open(cfg)).get("voice") or "").strip()
+        if v:
+            return v
+    except (OSError, ValueError):
+        pass
+    for base in ("3_voice", "voice"):
+        p = os.path.join(final, base, "state.json")
+        if not os.path.isfile(p):
+            continue
+        try:
+            v = json.load(open(p)).get("voice")
+        except (OSError, ValueError):
+            return VOICE_TAKES["mac"]
+        if not v:
+            break
+        # older state files hold a raw HeyGen voice id, not a name
+        if len(v) == 32 and all(c in "0123456789abcdef" for c in v.lower()):
+            return VOICE_TAKES["heygen"]
+        return v
+    return VOICE_TAKES["mac"]
+
+
 def script(final):
     """
     Locate a video's narrative script.
@@ -350,15 +397,46 @@ def script(final):
     there and not a moment before. An unmigrated store keeps working
     rather than failing obscurely — same reasoning the 2026-08-20 move
     used, one tier deeper.
+    ⚠⚠ ONE SOURCE OF TRUTH, AND IT IS THE VOICE FOLDER. Carson, 2026-09-23:
+    *"I only want one source of truth for the script. All vtt displays in
+    different locations need to read from that, and write that source. And it
+    needs to be the voice folder."*
+
+        3_voice/script.json      <- the live one, checked FIRST
+        voice/script.json           the same, on an old flat-shaped video
+        sandbox/script.json         where it lived 2026-08-29 .. 2026-09-23
+        video/script.json           2026-08-20 .. 2026-08-29
+        <final>/script.json         before that
+
+    ⚠ THE OLDER LOCATIONS ARE FOUND, NEVER WRITTEN TO AGAIN. Saving goes
+    through this same path, so it lands wherever the video already keeps its
+    script — a video starts writing to 3_voice/ the moment its file is moved
+    there and not a moment before, and an unmigrated one keeps working instead
+    of failing obscurely.
     """
-    new = os.path.join(final, "sandbox", "script.json")
-    mid = os.path.join(final, "video", "script.json")
-    old = os.path.join(final, "script.json")
-    if os.path.exists(new):
-        return new
-    if os.path.exists(mid):
-        return mid
-    return old
+    # ⚠ ONE SCRIPT PER PRESENTER, AND THE ACTIVE VOICE PICKS IT. Carson,
+    # 2026-09-24: develop with Samantha, finish with Derya, switch back and
+    # forth. The two are NOT expected to match — a line paced for one voice may
+    # want different words for the other, and switching is meant to switch the
+    # words with it. A presenter with no script yet falls through to the shared
+    # one rather than to an empty file.
+    #
+    # Mirrors stage_dirs.script_path(). Change one, change the other.
+    v = active_voice(final)
+    for rel in (os.path.join("3_voice", v, "script.json"),
+                os.path.join("voice", v, "script.json"),
+                os.path.join("3_voice", "script.json"),
+                os.path.join("voice", "script.json"),
+                os.path.join("sandbox", "script.json"),
+                os.path.join("video", "script.json"),
+                "script.json"):
+        p = os.path.join(final, rel)
+        if os.path.exists(p):
+            return p
+    # Nothing yet: a numbered video is born with it in 3_voice/, an old one
+    # keeps the flat name it has always had.
+    return os.path.join(final, "3_voice", "script.json") \
+        if is_new_shape(final) else os.path.join(final, "script.json")
 
 
 def videos(final):

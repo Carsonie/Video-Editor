@@ -38,7 +38,13 @@
   {
    "n": 7,
    "label": "status-active",
-   "line": "Set it to Active."
+   "line": "Set it to Active.",
+   "silent": false,
+   "pauses": [
+    {
+     "seconds": 0.8
+    }
+   ]
   },
   {
    "n": 8,
@@ -57,7 +63,7 @@
   },
   {
    "n": 11,
-   "label": "dashboard",
+   "label": "back-at-dashboard",
    "line": "Back to the dashboard."
   },
   {

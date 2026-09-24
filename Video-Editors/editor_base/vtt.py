@@ -70,19 +70,15 @@ def script_path(folder):
     known yet, so the working file stays unversioned.
     """
     import os
-    new = os.path.join(folder, "sandbox", "script.json")
-    mid = os.path.join(folder, "video", "script.json")
-    old = os.path.join(folder, "script.json")
-    if os.path.exists(new):
-        return new
-    if os.path.exists(mid):
-        print(f"  ⚠ using {mid} — move it to sandbox/script.json")
-        return mid
-    if os.path.exists(old):
-        print(f"  ⚠ using {old} — move it to sandbox/script.json")
-        return old
-    raise SystemExit(f"no script.json in {os.path.join(folder,'sandbox')}, "
-                     f"{os.path.join(folder,'video')}, or {folder}")
+    # ⚠ USE paths.script(). This was a THIRD private copy of the same lookup
+    # and so did not know about 3_voice/ (Carson, 2026-09-23). Three copies of
+    # one rule is how they drift.
+    from . import paths as _p
+    p = _p.script(folder)
+    if not os.path.exists(p):
+        raise SystemExit(f"no script.json found for {folder} — looked in "
+                         f"3_voice/, voice/, sandbox/, video/ and the root")
+    return p
 
 
 def main():
