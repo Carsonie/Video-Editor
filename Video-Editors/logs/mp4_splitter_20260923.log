@@ -1,0 +1,59 @@
+
+Editor Session:  2026-09-23T09:52:52
+Player:          MP4 Splitter v12
+Server:          http://localhost:8845
+
+10:56:12  Open clip      1_cuts                     ski-demo_add-question_dev_09-19-47_v4-narrated.mp4  REFUSED: no such route: /api/open
+10:56:27  Open clip      1_cuts                     ski-demo_add-question_dev_09-19-47_v4-narrated.mp4  url=ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed/viewer.html
+10:58:37  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=381 on=True
+10:59:29  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=381 on=False
+11:00:53  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=207 on=True
+11:00:53  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=382 on=True
+11:00:53  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=564 on=True
+11:00:53  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=758 on=True
+11:00:53  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=1171 on=True
+11:00:53  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=1975 on=True
+11:00:53  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=2239 on=True
+11:00:53  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=2401 on=True
+11:00:53  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=2572 on=True
+11:00:53  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=2790 on=True
+11:00:53  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=3002 on=True
+11:06:06  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=207 on=False
+11:06:06  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=564 on=False
+11:06:06  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=563 on=True
+11:06:44  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=758 on=False
+11:06:44  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=757 on=True
+11:07:36  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=1171 on=False
+11:07:36  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=1170 on=True
+
+Editor Session:  2026-09-23T11:19:14
+Player:          MP4 Splitter v12
+Server:          http://localhost:8845
+
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=1975 on=False
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=2239 on=False
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=2401 on=False
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=2572 on=False
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=2790 on=False
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=3002 on=False
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=1470 on=True
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=1590 on=True
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=1688 on=True
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=1906 on=True
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=1974 on=True
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=2085 on=True
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=2168 on=True
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=2400 on=True
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=2680 on=True
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=2789 on=True
+11:29:46  Mark           ski-demo_add-question_dev_09-19-47_v4-narrated_cadb67ed frame=3000 on=True
+
+Editor Session:  2026-09-23T11:36:43
+Player:          MP4 Splitter v13
+Server:          http://localhost:8845
+
+
+Editor Session:  2026-09-23T11:45:03
+Player:          MP4 Splitter v14
+Server:          http://localhost:8845
+

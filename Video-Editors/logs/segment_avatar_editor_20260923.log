@@ -1,0 +1,24 @@
+
+Editor Session:  2026-09-23T12:28:13
+Player:          Segment and Avatar Editor v77
+Server:          http://localhost:8846
+
+12:28:38  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP/add-question root=Rentify Demos Corp/ski-demo/help-videos/BCP/add-question ns=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16  url=seq_866a8c841a/viewer.html  slug=seq_866a8c841a
+17:21:53  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP/add-question root=Rentify Demos Corp/ski-demo/help-videos/BCP/add-question ns=2,3,4,5,6,7,8,9,10,11,12,13,14,15  url=seq_e4e9918450/viewer.html  slug=seq_e4e9918450
+
+Editor Session:  2026-09-23T17:30:29
+Player:          Segment and Avatar Editor v77
+Server:          http://localhost:8846
+
+17:30:44  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP/add-question root=Rentify Demos Corp/ski-demo/help-videos/BCP/add-question ns=2,3,4,5,6,7,8,9,10,11,12,13,14,15  url=seq_e4e9918450/viewer.html  slug=seq_e4e9918450
+
+Editor Session:  2026-09-23T17:36:23
+Player:          Segment and Avatar Editor v78
+Server:          http://localhost:8846
+
+17:36:46  + Frame        segment_6942eb30           at=94 count=10 side=right  nb_frames=228
+17:36:56  - Zone         segment_6942eb30           a=94 b=103  nb_frames=218
+08:51:57  Open timeline  Rentify Demos Corp/ski-demo/help-videos/BCP/add-question root=Rentify Demos Corp/ski-demo/help-videos/BCP/add-question ns=2,3,4,5,6,7,8,9,10,11,12,13,14,15  url=seq_e4e9918450/viewer.html  slug=seq_e4e9918450
+09:22:58  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP/add-question n=3  REFUSED: this store has no script.json
+09:23:04  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP/add-question n=3  REFUSED: this store has no script.json
+09:23:56  Edit line      Rentify Demos Corp/ski-demo/help-videos/BCP/add-question n=4  REFUSED: this store has no script.json
