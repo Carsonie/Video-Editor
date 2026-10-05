@@ -2921,6 +2921,21 @@ ${el.dataset.tip}` : '')
       const hist = histOf(it.n);
       const iSeq = SEQ.findIndex(x => x.n === it.n);
       const needsSave = iSeq >= 0 && pendingOf(iSeq).length > 0;
+      // ── rename ───────────────────────────────────────────────────────
+      // Carson, 2026-10-05: "Add another icon column and a click will trigger
+      // a renaming of that scene. Then I can rename in this location."
+      // Naming is done a few at a time while watching the scenes, not in one
+      // sitting, so it belongs on the row rather than only in a dialog.
+      const rb = document.createElement('button');
+      rb.className = 'histbtn rename';
+      rb.dataset.n = it.n;
+      rb.textContent = '✎';
+      rb.title = `Rename scene ${it.n}${it.label ? ' (' + it.label + ')' : ''}.`
+               + ` Renames its sandbox folder AND its row in script.json —`
+               + ` the two must never disagree.`;
+      rb.onclick = ev => { ev.stopPropagation(); renameScene(it.n, it.label || ''); };
+      d.appendChild(rb);
+
       for (const [act, glyph, cls, tip] of [
             ['undo', '↶', 'undo', 'Undo the last change to this scene'],
             ['save', '⤓', 'save', 'Save this scene to sandbox and clear its history']]) {
@@ -2993,4 +3008,117 @@ ${el.dataset.tip}` : '')
   loadRenumberState();
   loadVtt();
   renderReport();   // row 4 must say something before the first click
+
+  // ── rename one scene ────────────────────────────────────────────────────────
+  // ⚠ BOTH HALVES MOVE OR NEITHER DOES. The folder is `NN-label` and the script
+  // row is {n, label}; paths.sandbox_dir() matches on the NN prefix alone, so a
+  // row and a folder that disagree still RESOLVE and nothing complains — it just
+  // reads the wrong name from then on. The server renames the folder first and
+  // only writes the script if that worked.
+  async function renameScene(n, current) {
+    const asked = prompt(`Rename scene ${n}\n\nLetters, numbers and hyphens only — it becomes the folder name (${String(n).padStart(2,'0')}-name).`, current);
+    if (asked === null) return;                       // cancelled
+    const label = asked.toLowerCase().replace(/[^a-z0-9-]/g, '-')
+                       .replace(/-+/g, '-').replace(/^-|-$/g, '').slice(0, 49);
+    if (!label) { alert('A scene needs a name.'); return; }
+    const r = await fetch('/api/rename', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({root: ROOT_REL, n, label})
+    });
+    const data = await r.json();
+    if (data.error) { alert('Rename failed: ' + data.error); return; }
+    // Reload rather than patch the row in place: the folder moved, so every
+    // cached path for this scene is now wrong.
+    location.reload();
+  }
+
+  // ── NAME EVERY SCENE, IN ONE SITTING ────────────────────────────────────────
+  // Carson, 2026-10-05, asking for this beside Load. The ✎ on each row renames a
+  // scene while you are looking at it; this is for working down the list.
+  //
+  // ⚠ IT RENAMES ONLY WHAT CHANGED. Thirty-nine POSTs where two were needed is
+  // thirty-nine folder moves and thirty-nine script backups, and every one of
+  // them is a chance for a half-done rename. The rows are compared to what they
+  // started as, and untouched ones are skipped.
+  (function sceneNames() {
+    const btn    = document.getElementById('nameAllBtn');
+    const modal  = document.getElementById('nameModal');
+    const rows   = document.getElementById('nameRows');
+    const err    = document.getElementById('nameErr');
+    const cancel = document.getElementById('nameCancel');
+    const apply  = document.getElementById('nameApply');
+    if (!btn || !modal) return;
+
+    const clean = v => v.toLowerCase().replace(/[^a-z0-9-]/g, '-')
+                        .replace(/-+/g, '-').slice(0, 49);
+
+    function open() {
+      rows.innerHTML = ''; err.textContent = '';
+      for (const it of SEQ) {
+        const row = document.createElement('div');
+        row.className = 'nrow';
+        const n = document.createElement('span');
+        n.className = 'nn';
+        n.textContent = String(it.n).padStart(2, '0');
+        const inp = document.createElement('input');
+        inp.spellcheck = false;
+        inp.value = it.label || '';
+        inp.dataset.n = it.n;
+        inp.dataset.was = it.label || '';
+        inp.placeholder = 'scene';
+        // Enforced as you type — it becomes a folder name, and finding that out
+        // after naming thirty-nine of them is the wrong moment.
+        inp.addEventListener('input', () => {
+          const at = inp.selectionStart;
+          inp.value = clean(inp.value);
+          inp.setSelectionRange(at, at);
+          inp.classList.toggle('changed', inp.value !== inp.dataset.was);
+        });
+        row.appendChild(n); row.appendChild(inp);
+        rows.appendChild(row);
+      }
+      modal.classList.add('on');
+      rows.querySelector('input')?.focus();
+    }
+    function close() { modal.classList.remove('on'); }
+
+    btn.onclick = open;
+    cancel.onclick = close;
+    modal.onclick = e => { if (e.target === modal) close(); };
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && modal.classList.contains('on')) close();
+    });
+
+    apply.onclick = async () => {
+      const changed = [...rows.querySelectorAll('input')]
+        .filter(i => i.value.trim() && i.value !== i.dataset.was)
+        .map(i => ({n: +i.dataset.n, label: i.value.trim()}));
+      if (!changed.length) { err.textContent = 'Nothing changed.'; return; }
+      apply.disabled = cancel.disabled = true;
+      err.textContent = `Renaming ${changed.length}…`;
+      // ⚠ ONE AT A TIME, AND STOP ON THE FIRST FAILURE. Each one moves a folder;
+      // firing them in parallel means a clash reported after several have already
+      // moved, with no way to say which.
+      for (const c of changed) {
+        try {
+          const r = await fetch('/api/rename', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({root: ROOT_REL, n: c.n, label: c.label})
+          });
+          const d = await r.json();
+          if (d.error) {
+            err.textContent = `Scene ${c.n}: ${d.error} — stopped; earlier ones were renamed.`;
+            apply.disabled = cancel.disabled = false;
+            return;
+          }
+        } catch (e) {
+          err.textContent = `Scene ${c.n}: ${e} — stopped.`;
+          apply.disabled = cancel.disabled = false;
+          return;
+        }
+      }
+      // Folders moved, so every cached path for those scenes is stale.
+      location.reload();
+    };
+  })();
 })();

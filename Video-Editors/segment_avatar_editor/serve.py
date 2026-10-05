@@ -251,6 +251,7 @@ ACTIONS = {
     "/api/cut":             ("Cut scene",    ()),
     "/api/join":            ("Join",         ("ns", "label", "tracks")),
     "/api/split":           ("Split",        ("n", "at", "labels", "tracks")),
+    "/api/rename":          ("Rename scene", ("n", "label")),
     "/api/line":            ("Edit line",    ("n",)),
     "/api/renumber-clear":  ("Lift lock",    ()),
     "/api/archive":         ("Archive",      ("folder",)),
@@ -889,6 +890,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.api_archive(payload)
         if parsed.path == "/api/save-archive":
             return self.api_save_archive(payload)
+        if parsed.path == "/api/rename":
+            return self.api_rename(payload)
         if parsed.path == "/api/line":
             return self.api_line(payload)
         if parsed.path == "/api/frames/restore":
@@ -1571,6 +1574,68 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_json({"wps": doc.get("words_per_second", 3.44),
                         "store": doc.get("store", ""), "title": doc.get("title", ""),
                         "scenes": rows})
+
+    def api_rename(self, payload):
+        """
+        Rename ONE scene: its `label` in script.json AND its sandbox folder.
+
+        Carson, 2026-10-05, asking for a rename icon on each row: "Then I can
+        rename in this location." Naming thirty-nine scenes is work done a few
+        at a time while watching them, not in one sitting in a dialog.
+
+        ⚠ BOTH HALVES OR NEITHER. The folder is `NN-label` and the row is
+        {"n": NN, "label": ...} — paths.sandbox_dir() matches on the NN prefix,
+        so a row and a folder that disagree still RESOLVE, and nothing complains.
+        It just quietly reads the wrong name for the rest of the video's life.
+        The folder is moved first; if that fails the script is left alone.
+
+        ⚠ THE NN- PREFIX IS NOT PART OF THE LABEL. The folder carries it, the
+        row does not — writing a prefixed name into `label` is what made the SAE
+        list zero scenes earlier today.
+
+        The previous script is copied to z_History/line-edits/ first, the same
+        trail api_line keeps, for the same reason: a name is copy too.
+        """
+        root_rel = payload.get("root", "")
+        final = safe_join(root_rel)
+        if final is None or not os.path.isdir(final):
+            return self.send_json({"error": f"not a folder under Customers/: {root_rel}"}, 400)
+        try:
+            n = int(payload.get("n"))
+        except (TypeError, ValueError):
+            return self.send_json({"error": "n must be an integer"}, 400)
+
+        label = re.sub(r"[^a-z0-9-]", "-", str(payload.get("label", "")).lower())
+        label = re.sub(r"-+", "-", label).strip("-")[:49]
+        if not label:
+            return self.send_json({"error": "a scene needs a name"}, 400)
+
+        script_p = PTH.script(final)
+        if not os.path.isfile(script_p):
+            return self.send_json({"error": "this store has no script.json"}, 400)
+        doc = json.load(open(script_p))
+        node = next((x for x in doc.get("scenes", []) if x["n"] == n), None)
+        if node is None:
+            return self.send_json({"error": f"scene {n} is not in the script"}, 400)
+        if node.get("label", "") == label:
+            return self.send_json({"n": n, "label": label, "unchanged": True})
+
+        old_dir = PTH.sandbox_dir(final, n)
+        new_dir = os.path.join(os.path.dirname(old_dir), f"{n:02d}-{label}")
+        if os.path.isdir(old_dir) and os.path.abspath(old_dir) != os.path.abspath(new_dir):
+            if os.path.exists(new_dir):
+                return self.send_json(
+                    {"error": f"{os.path.basename(new_dir)} already exists"}, 400)
+            os.rename(old_dir, new_dir)
+
+        hist = os.path.join(final, "z_History", "line-edits")
+        os.makedirs(hist, exist_ok=True)
+        shutil.copy2(script_p, os.path.join(
+            hist, f"script-{time.strftime('%Y%m%d-%H%M%S')}.json"))
+        node["label"] = label
+        json.dump(doc, open(script_p, "w"), indent=1)
+        self.send_json({"n": n, "label": label,
+                        "folder": os.path.basename(new_dir)})
 
     def api_line(self, payload):
         """

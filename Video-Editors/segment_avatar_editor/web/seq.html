@@ -126,6 +126,10 @@
     <button id="backupBtn" title="First copies the current sandbox/ whole into sandbox/1000_archive/ (dated and numbered for today) &mdash; a full snapshot of the generation about to be replaced. Then writes EVERY scene on this timeline back over its file in sandbox/, exactly as configured here right now, whether or not it was marked as edited, LOCKED tracks included, and every narrative line to script.json unconditionally. If a join or split has renumbered the scenes, that note is cleared too &mdash; the only thing left outstanding after one.">&#9707; Backup Scenes</button>
     <button id="clearAllBtn" title="Empty this editor session: every scene, the narrative table, every mark, lock and undo step. Nothing on sandbox/ is touched &mdash; this only clears what THIS BROWSER TAB is holding, so you can load a different video into a clean editor.">&#128465; Clear All</button>
     <button id="loadBtn" title="Open a different video in this editor: pick a store, then which of its videos, then its sandbox/ scenes and narrative load in fresh. Anything unsaved in the current session is lost &mdash; Save Timeline or Save all first if you want it kept.">&#128194; Load</button>
+    <!-- Carson, 2026-10-05: "add the popup renaming modal button here, to the
+         right of LOAD". The row icons rename one scene while you watch it; this
+         is the same job done in a sitting, over the whole list. -->
+    <button id="nameAllBtn" title="Name every scene in one list. Renames each scene's sandbox folder AND its row in script.json — the two must never disagree. Only the ones you change are touched.">&#9998; Names</button>
   </div>
 
   <div class="ctlrow report" data-r="5"><span id="rep"></span>
@@ -177,6 +181,21 @@
   <div class="mrow">
     <button id="mCancel" title="Close this without changing anything. Nothing has been written yet — a join or split only touches your files once you confirm here.">Cancel</button>
     <button id="mOk" title="Do it. This writes to disk immediately: folders are created and removed in sandbox/ and script.json is rewritten, all in one go. The previous state is archived to z_History/ first, so it is recoverable but not undoable from the editor.">Confirm</button>
+  </div>
+</div></div>
+
+<!-- SCENE NAMES — the whole list in one sitting. The ✎ on each row renames
+     one scene while you are looking at it; this is for working down the list.
+     Uses .mbox like Load's so it reads as part of the same editor rather than
+     something imported from the Splitter. -->
+<div id="nameModal"><div class="mbox">
+  <h5>Name the scenes</h5>
+  <div class="nameNote">Letters, numbers and hyphens only &mdash; it becomes the folder name (<b>01-name</b>). Blank is left as it is. Only changed rows are renamed.</div>
+  <div id="nameRows" class="nameRows"></div>
+  <div id="nameErr"></div>
+  <div class="mrow">
+    <button id="nameCancel" title="Close without renaming anything.">Cancel</button>
+    <button id="nameApply" title="Rename every scene you changed.">Apply names</button>
   </div>
 </div></div>
 

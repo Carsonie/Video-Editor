@@ -399,6 +399,10 @@
   .histbtn:hover:not(:disabled) { background:#3a4248; }
   .histbtn.undo:not(:disabled) { border-color:#e0a93f; color:#e8c98a; }
   .histbtn.save:not(:disabled) { border-color:#2e8ecc; color:#8fc9ee; }
+  /* Rename sits with undo/save because it is the same kind of control — acts on
+     ONE scene, from its own row. Green ties it to the scene's identity rather
+     than to its edit history, which is what the amber and blue carry. */
+  .histbtn.rename { border-color:#2ecc40; color:#9fe0ab; }
   .histbtn:disabled { opacity:.25; cursor:default; }
   /* EXCEPT when it is dirty. A scene held by the renumber lock still HAS unsaved
      work, and fading it to a quarter says the opposite — it looks exactly like a
@@ -547,3 +551,27 @@
 .askgrid .av { font-size:12px; color:#8b949c; min-width:0; }
 .askgrid code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
                 font-size:11px; color:#c3a9e0; }
+
+  /* ── SCENE NAMES MODAL ──────────────────────────────────────────────────
+     Same shell as #loadModal on purpose: one modal idiom in this editor, not
+     two. Added 2026-10-05 with the ✎ row icon — that one renames a scene
+     while you watch it, this one works down the whole list. */
+  #nameModal { position:fixed; inset:0; z-index:200; display:none;
+               align-items:center; justify-content:center; background:rgba(0,0,0,.55); }
+  #nameModal.on { display:flex; }
+  .nameNote { font-size:11px; color:#8b949c; line-height:1.5; margin:2px 0 8px; }
+  /* ⚠ The LIST scrolls, not the box. Thirty-nine scenes is normal here, and a
+     modal that grows past the viewport puts its own Apply button off-screen. */
+  .nameRows { display:flex; flex-direction:column; gap:5px;
+              max-height:52vh; overflow-y:auto; padding-right:2px; }
+  .nameRows .nrow { display:flex; align-items:center; gap:8px; }
+  .nameRows .nn { font-size:11px; color:#8b949c; min-width:26px; text-align:right;
+                  font-variant-numeric:tabular-nums; }
+  .nameRows input { flex:1; background:#12161a; border:1px solid #39414a;
+                    border-radius:4px; color:#e6e9ec; font-size:13px;
+                    padding:4px 7px; font-family:inherit; }
+  .nameRows input:focus { outline:none; border-color:#2ecc40; }
+  /* Changed rows are marked, so Apply's "only what you changed" is visible
+     rather than a claim. */
+  .nameRows input.changed { border-color:#2ecc40; }
+  #nameErr { font-size:11px; color:#e0a93f; min-height:14px; margin-top:6px; }
