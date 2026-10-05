@@ -212,6 +212,7 @@ ACTIONS = {
     "/api/frames/del":      ("- Frame",      ("at", "count", "side")),
     "/api/frames/restore":  ("Undo",         ()),
     "/api/mark":            ("Mark",         ("frame", "on")),
+    "/api/save-scenes":     ("Save as Scenes", ("names",)),
     "/api/first-split":     ("First split",  ()),
     "/api/clear-marks":     ("Unmark all",   ()),
     "/api/save":            ("Save scene",   ()),
@@ -311,6 +312,21 @@ def load_marks(outdir):
 
 def save_marks(outdir, marks):
     json.dump({"marks": sorted(set(marks))}, open(marks_path(outdir), "w"), indent=2)
+
+
+def recipe_root(source):
+    """
+    The recipe folder a capture belongs to — the one that owns 0_master/,
+    1_cuts/, 2_scenes/ and the rest.
+
+    ⚠ TWO SHAPES, AND BOTH ARE LIVE. A converted recipe keeps its master in
+    `<recipe>/0_master/`; one that has never been through that pass has the
+    mp4 sitting directly in `<recipe>/`. ski-demo's picklist is the second
+    kind. Ask the path, never assume — the same rule record_flow.ts and
+    scene_script.py already follow for stage folders.
+    """
+    d = os.path.dirname(os.path.abspath(source))
+    return os.path.dirname(d) if os.path.basename(d) == "0_master" else d
 
 
 def derive_segments_dir(source):
@@ -607,6 +623,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         # Same trim as route_get above — this tool's own routes only.
         if parsed.path == "/api/mark":
             return self.api_mark(payload)
+        if parsed.path == "/api/save-scenes":
+            return self.api_save_scenes(payload)
         if parsed.path == "/api/first-split":
             return self.api_first_split(payload)
         if parsed.path == "/api/clear-marks":
@@ -819,6 +837,78 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             marks.discard(frame)
         save_marks(outdir, marks)
         self.send_json({"marks": sorted(marks)})
+
+    def api_save_scenes(self, payload):
+        """
+        Deposit the cut segments into `2_scenes/sandbox/` as NUMBERED SCENES,
+        with a `script.json` row for each.
+
+        ⚠ WHY NOT `/api/handoff`. That endpoint does the same job for the OLD
+        layout and refuses outright on this one: its guard requires the clip to
+        sit inside `videos/<name>/`, and a 7-folder recipe does not. Rather than
+        widen a guard that exists for a good reason — a handoff outside a video
+        folder once built a whole parallel mini-store and reported success —
+        this is the 7-folder route, and it knows exactly where it is writing.
+
+        ⚠ NAMES ARE OPTIONAL. Carson, 2026-10-05: "Lets not name them here, just
+        use our numbering." An unnamed scene becomes `01-scene`, `02-scene` …
+        and can be renamed later from the naming modal. The NN- prefix is the
+        part that matters: `paths.sandbox_dir()` finds a scene by that prefix,
+        and the VTT and every scene list read the script, so a folder without
+        one is not a scene at all.
+
+        ⚠ COPIES, NEVER MOVES. `1_cuts/segments/` is the versioned record of
+        what the splitter produced; naming has to stay repeatable.
+        """
+        outdir = resolve_outdir(payload.get("slug"), payload.get("which"))
+        if outdir is None:
+            return self.send_json({"error": "unknown slug"}, 400)
+        meta = json.load(open(os.path.join(outdir, "meta.json")))
+        src = meta.get("source")
+        if not src or not os.path.isfile(src):
+            return self.send_json({"error": "the source video has moved"}, 400)
+
+        root = recipe_root(src)
+        from_dir = os.path.join(root, "1_cuts", "segments")
+        if not os.path.isdir(from_dir):
+            from_dir = derive_segments_dir(src)
+        seg = sorted(f for f in os.listdir(from_dir)
+                     if f.lower().endswith((".mp4", ".webm"))) if os.path.isdir(from_dir) else []
+        if not seg:
+            return self.send_json(
+                {"error": "nothing to save — cut the segments first"}, 400)
+
+        names = payload.get("names") or []
+        sandbox = os.path.join(root, "2_scenes", "sandbox")
+
+        # ⚠ ARCHIVE THE GENERATION BEING REPLACED, never overwrite it. A scene
+        # folder holds hand work — rings, timings, a voice take — and a second
+        # deposit must not silently sit on top of the first.
+        if os.path.isdir(sandbox) and any(x != "z_History" for x in os.listdir(sandbox)):
+            hist = os.path.join(sandbox, "z_History", time.strftime("%Y-%m-%d_%H-%M-%S"))
+            os.makedirs(hist, exist_ok=True)
+            for f in os.listdir(sandbox):
+                if f != "z_History":
+                    shutil.move(os.path.join(sandbox, f), os.path.join(hist, f))
+        os.makedirs(sandbox, exist_ok=True)
+
+        made, scenes = [], []
+        for i, f in enumerate(seg):
+            nm = (names[i] if i < len(names) else "") or "scene"
+            nm = re.sub(r"[^a-z0-9-]", "-", nm.lower()).strip("-")[:49] or "scene"
+            label = f"{i + 1:02d}-{nm}"
+            d = os.path.join(sandbox, label)
+            os.makedirs(d, exist_ok=True)
+            ext = os.path.splitext(f)[1]
+            shutil.copy2(os.path.join(from_dir, f), os.path.join(d, "segment" + ext))
+            made.append(label)
+            scenes.append({"label": label, "line": ""})
+
+        # script.json is what makes these SCENES rather than loose folders.
+        sp = os.path.join(sandbox, "script.json")
+        json.dump({"scenes": scenes}, open(sp, "w"), indent=1)
+
+        self.send_json({"dir": sandbox, "count": len(made), "scenes": made})
 
     def api_first_split(self, payload):
         """

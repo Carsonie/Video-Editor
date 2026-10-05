@@ -37,6 +37,26 @@
           </div>
         </div>
 
+        <!-- 1b. the position, on its own line directly under the timeline.
+             Carson, 2026-10-05: "Move the frame counter to its own dedicated
+             row under the timeline." It used to be centred inside the button
+             row, where the buttons' own width decided where it sat — so it
+             drifted sideways as controls were added, and on a narrow window
+             the row wrapped and threw it off centre entirely. On its own row
+             it is always in the same place, which is what you want from the
+             number you check on every single cut. -->
+        <div class="toolRow" id="rowPos">
+          <div id="posLine"><span class="rowLbl">Frame</span><span id="framecount"></span> · <span id="timecode">0.000s</span></div>
+          <!-- Three seconds figures, in the order you need them while judging a
+               cut: how far INTO this segment you are, how far into the whole
+               clip, and how long the clip runs. The first is the one the frame
+               counter cannot tell you — it resets at every break point, so it
+               is what says whether a scene is long enough for its line. -->
+          <div id="secLine" title="Seconds: from this segment's start / from the beginning of the clip / the whole clip">
+            <span class="rowLbl">Seconds</span><b id="secSeg">0.00</b> / <b id="secAbs">0.00</b> / <b id="secTot">0.00</b>
+          </div>
+        </div>
+
         <!-- 2. moving through it -->
         <div class="toolRow" id="rowNav">
           <button id="playBtn" class="stepbtn navbtn" title="Play / pause (space)">▶</button>
@@ -63,36 +83,59 @@
                default: stepping navigates, which is what those buttons have
                always done. -->
           <button id="nudgeBtn" class="stepbtn navbtn" title="Inactive — the step buttons move the PLAYHEAD. Click to make them move the BREAK POINT you are parked on instead.">● Inactive</button>
+        </div>
+
+        <!-- 2b. looping, on its own line. Carson, 2026-10-05: "add a new row
+             just for the looping controls." It used to sit at the end of the
+             button row, where it wrapped to a second line on a narrow window
+             and read as an orphan. Judging a cut IS watching the same two
+             seconds over and over, so the control for it earns its own place
+             rather than the last gap in a row of something else. -->
+        <div class="toolRow" id="rowLoop">
           <label id="loopLbl" title="Play only the zone, over and over. Judging a cut point is watching the same two seconds repeatedly, which is what this is for."><input type="checkbox" id="loopChk" title="Play only the zone — the span between the break points either side of the pointer — over and over. With nothing marked the zone is the whole clip."> ↻ Loop Zone</label>
+          <!-- Zone: the whole span between the break points either side of the
+               playhead, acted on in one go. Trimming a dead patch out of a
+               recording is this tool's job, and one frame at a time made a
+               three-second patch seventy-five clicks.
+               Moved here from the edit row on 2026-10-05 at Carson's request,
+               and it belongs here: Loop Zone and these two act on THE SAME
+               span. You loop a zone to judge it, then repeat or delete it. -->
+          <span class="seg-group" id="zoneToggle">
+            <button id="addZoneBtn" class="sub-btn" title="Repeat the whole zone — the span between the break points either side of the pointer. With no break points the zone is the whole clip.">＋ Zone</button>
+            <button id="delZoneBtn" class="sub-btn" title="Delete the whole zone in one go — the span between the break points either side of the pointer. This is how an unwanted patch comes out.">－ Zone</button>
+          </span>
+        </div>
 
-          <!-- The frame counter is the number you actually read while judging a
-               cut, so it sits on its own in the middle of the row rather than
-               shrunk into the corner with the totals. Carson, 2026-09-23. -->
-          <div id="posLine"><span id="framecount"></span> · <span id="timecode">0.000s</span></div>
+        <!-- 2c. FRAMES — insertion and removal, kept well away from the split
+             lines. Carson, 2026-10-05: "I want to have clear separation of the
+             Split lines from the frame insertion and removal functionality."
+             These used to be the SAME six buttons as the nav row, switched by
+             a ✂️ Edit mode with its own ＋Add/－Sub sub-mode — so one control
+             had four meanings and you had to remember which was live. Both
+             modes are gone; these six do one thing each, always.
 
-          <div id="readouts">
-            <div id="totalTime">total <b>0.000s</b></div>
-            <div id="segNow"></div>
-          </div>
+             ⚠ DIRECTION IS THE OPERATION HERE, NOT THE SIDE. Carson's call,
+             asked outright 2026-10-05: left REMOVES, right ADDS, both at the
+             playhead. Six buttons cannot carry side AND operation, and a
+             number line is the reading people already have.
+
+             Blue because this row edits the SEGMENT's frames — the mark colour
+             belongs to break points, and these are the one set of controls
+             that change how long the clip actually is. -->
+        <div class="toolRow" id="rowFrames">
+          <span class="rowLbl">Frames</span>
+          <button id="fRem100" class="stepbtn navbtn framebtn" title="Remove 100 frames at the playhead">«100</button>
+          <button id="fRem10"  class="stepbtn navbtn framebtn" title="Remove 10 frames at the playhead">«10</button>
+          <button id="fRem1"   class="stepbtn navbtn framebtn one" title="Remove 1 frame at the playhead">◀</button>
+          <button id="fAdd1"   class="stepbtn navbtn framebtn one" title="Add 1 frame at the playhead (duplicates this frame)">▶</button>
+          <button id="fAdd10"  class="stepbtn navbtn framebtn" title="Add 10 frames at the playhead (duplicates this frame)">10»</button>
+          <button id="fAdd100" class="stepbtn navbtn framebtn" title="Add 100 frames at the playhead (duplicates this frame)">100»</button>
         </div>
 
         <!-- 3. changing it -->
         <div class="toolRow" id="rowEdit">
           <span class="seg-group">
             <button id="markBtn" class="mode-btn" title="Mark or unmark this frame as a break point (M)"><span class="msq"></span>Mark</button>
-            <button id="frameEditorBtn" class="mode-btn" title="Frame Editor: the step buttons insert or delete frames instead of navigating">✂️ Edit</button>
-          </span>
-          <span class="seg-group" id="subToggle">
-            <button id="addBtn" class="sub-btn" title="Add — the step buttons duplicate this frame on that side">＋ Add</button>
-            <button id="subtractBtn" class="sub-btn" title="Subtract — the step buttons delete frames on that side">－ Sub</button>
-          </span>
-          <!-- Zone: the whole span between the break points either side of the
-               playhead, acted on in one go. Trimming a dead patch out of a
-               recording is this tool's job, and one frame at a time made a
-               three-second patch seventy-five clicks. -->
-          <span class="seg-group" id="zoneToggle">
-            <button id="addZoneBtn" class="sub-btn" title="Repeat the whole zone — the span between the break points either side of the pointer. With no break points the zone is the whole clip.">＋ Zone</button>
-            <button id="delZoneBtn" class="sub-btn" title="Delete the whole zone in one go — the span between the break points either side of the pointer. This is how an unwanted patch comes out.">－ Zone</button>
           </span>
           <button id="undoBtn" class="stepbtn navbtn" disabled title="Step back through this clip's edits, one at a time. Cleared when you save. The source file is never touched either way.">↶ Undo</button>
           <!-- First split: lay a break point on every candidate scene edge, so
@@ -136,6 +179,12 @@
         <div id="segTotals"></div>
         <hr class="sep">
         <button id="cutBtn" class="stepbtn full" disabled title="Cut the SOURCE FILE at every break point and write the pieces to dev/_cuts/. Reads the original with ffmpeg — never these preview frames. Cutting again keeps the earlier attempt and bumps its version.">✂️ Cut into segments</button>
+        <!-- The deposit. Cut writes numbered pieces into 1_cuts/segments/;
+             this turns them into SCENES in 2_scenes/sandbox/ — one folder per
+             scene with an NN- prefix, plus a script.json row for each. That
+             prefix is what paths.sandbox_dir() looks for, so without it the
+             SAE and the VTT see nothing. Carson, 2026-10-05. -->
+        <button id="saveSegBtn" class="stepbtn full" title="Copy the cut segments into 2_scenes/sandbox/ as numbered scenes, with a script.json row for each — the shape the SAE and the VTT read. Opens a naming list first; leave any name blank to use the number alone. An existing sandbox is archived into z_History/ first; nothing is overwritten."><span class="btnMain">🎬 Save as Scenes</span><span class="btnPath">2_scenes/sandbox/</span></button>
         <div id="cutStatus"></div>
         <!-- The handover. The splitter writes _cuts/Num_3-v1-segment.mp4; the
              Segment and Avatar Editor reads sandbox/03-<name>/segment.mp4.
@@ -170,3 +219,24 @@
     </aside>
   </div>
   <div class="playerName" id="playerName"></div>
+
+  <!-- SCENE NAMING — a modal so it can be opened whenever, not only in the
+       moment right after a cut. Carson, 2026-10-05: "Make it modal popup so I
+       can open it from inside the SAE and add or update the scene names as I
+       progress." The rows are the same shape the handoff list has always
+       used; this gives that list a door of its own. -->
+  <div id="nameModal" class="modalWrap" hidden>
+    <div class="modalBox">
+      <div class="modalHead">
+        <span class="lbl">Name the scenes</span>
+        <button id="nameClose" class="modalX" title="Close without saving">✕</button>
+      </div>
+      <div class="modalNote">Leave a name blank to use its number alone — <b>01-scene</b>. Letters, numbers and hyphens only; it becomes the folder name.</div>
+      <div id="nameRows" class="nameRows"></div>
+      <div class="modalFoot">
+        <button id="nameCancel" class="stepbtn">Cancel</button>
+        <button id="nameSave" class="stepbtn" style="border-color:#2ecc40;color:#cfe8d4">Save as Scenes</button>
+      </div>
+      <div id="nameStatus" class="modalNote"></div>
+    </div>
+  </div>

@@ -92,14 +92,33 @@
      A smaller gap buys the 34px back — the main column is a FIXED width, so
      this does not come right on a wider window. */
   #rowNav { gap:5px; }
-  #readouts { text-align:right; min-width:104px; margin-left:0;
-              font-variant-numeric:tabular-nums; }
-  /* Centred in whatever space the buttons leave, and big enough to read at a
-     glance — this is the number being checked on every cut. The auto margins
-     on BOTH sides are what centre it: the row's spare width is split equally
-     either side, which also keeps #readouts pinned right. */
-  #posLine { margin:0 auto; font-size:20px; color:#e6e9ec;
+  /* #readouts (total / Num_N) was removed from the markup on 2026-10-05 — the
+     Seconds row under the timeline carries the total, and a segment's name and
+     length are in the Segments panel. Its rules went with it. */
+  /* Its own row: the frame counter hard left, the seconds hard right. Both are
+     read at a glance while judging a cut, and a fixed position for each is
+     what makes that possible — centring moved them as the row's contents
+     changed. Carson, 2026-10-05. */
+  #rowPos { justify-content:space-between; padding-top:0; }
+  #posLine { font-size:20px; color:#e6e9ec;
              font-variant-numeric:tabular-nums; white-space:nowrap; }
+  /* Same 20px as the frame counter — Carson, 2026-10-05. Both ends of this row
+     are read at the same glance, so one of them being smaller made it look
+     secondary when it is not. The LABEL stays small: it never changes, so it
+     is signposting, not a figure to read. */
+  #secLine { font-size:20px; color:#8b949c; white-space:nowrap;
+             font-variant-numeric:tabular-nums; }
+  /* ⚠ ONE CLASS FOR BOTH ENDS OF THE ROW. Carson, 2026-10-05: "style Frames
+     the same as seconds." The word is signposting and the figures beside it
+     are the reading — so the label is small and quiet at either end, and the
+     numbers carry the 20px. Two copies of this rule is how the two ends drift
+     apart the next time one is touched. */
+  #rowPos .rowLbl { font-size:11px; text-transform:uppercase; color:#8b949c;
+                    letter-spacing:.6px; margin-right:6px; font-weight:400; }
+  /* The segment figure is the one that answers "is this scene long enough",
+     so it carries the mark colour the way the other segment readouts do. */
+  #secLine #secSeg { color:var(--markHi); font-weight:600; }
+  #secLine #secAbs, #secLine #secTot { color:#cfd6dc; font-weight:600; }
   #posLine #framecount { font-weight:600; }
   /* Total Time is the whole reason Frame Editor exists — you stretch or
      shorten this clip until it matches the narration's fixed length. It used
@@ -217,6 +236,15 @@
      green on an mp4 and purple on a webm, matching the tick being dragged. */
   .nudging { border-color:var(--mark); color:var(--markHi); font-weight:600; }
   .nudging:hover:not(:disabled) { background:var(--markGlow); }
+  /* FRAMES ROW — blue, because these are the only controls that change how
+     long the clip IS. Green/--mark belongs to break points and purple to a
+     webm's marks; blue is this project's standard accent and is not already
+     spoken for here, so the three jobs stay visually separate: navigate,
+     split, stretch. Carson, 2026-10-05. */
+  #rowFrames { justify-content:center; gap:5px; }
+  .framebtn { border-color:#4a89bf; color:#9ec8ea; }
+  .framebtn:hover:not(:disabled) { background:rgba(74,137,191,.18); }
+  #rowFrames .rowLbl { margin-right:10px; }
   button:hover, a.stepbtn:hover { background:#373e43; }
   button:disabled { opacity:0.35; cursor:default; }
   button:focus-visible, a:focus-visible { outline:2px solid #7aa7ff; outline-offset:1px; }
@@ -275,7 +303,13 @@
   .empty { font-size:11px; color:#6d757b; padding:6px 2px; line-height:1.5; }
 
   .stack { display:flex; flex-direction:column; gap:6px; }
-  .full { width:100%; }
+  /* ⚠ display:flex AS WELL AS width — the class did not do what it says.
+     `.stepbtn` is inline-flex, and on an inline-level box `width:100%` sizes
+     to CONTENT, so `.full` buttons were rendering at their label's width
+     (Cut: 165px inside a 242px panel) and two stacked ones disagreed by 75px.
+     Found 2026-10-05 adding Save beside Cut. Making it a block-level flex is
+     what `.full` has always claimed to do. */
+  .full { width:100%; display:flex; justify-content:center; box-sizing:border-box; }
   /* Actions grouped by consequence, never mixed in one undifferentiated row:
      Cut and Save WRITE files; Clear all edits and Reset Editor THROW WORK
      AWAY. The divider and the red block are the only thing standing between
@@ -287,6 +321,35 @@
   :root.alpha #cutBtn:hover { background:#48357180; background:#483571; }
   :root.alpha .badge.on { background:var(--mark); color:#1a0d33; }
   #cutBtn:disabled { background:#2c3236; border-color:#4a5259; }
+  /* Save segments is the SECOND HALF of Cut, so it reads as Cut's follow-on:
+     the same green family, outlined rather than filled. Filled would make two
+     equal-weight primary actions stacked on each other; plain grey made it
+     look unrelated to the button directly above it. The destination sits on
+     its own small line instead of inside the label — the path is the thing
+     this button exists to make visible, and a long single line pushed the
+     button wider than the one it follows. Carson, 2026-10-05. */
+  /* ⚠ width AND box-sizing SPELLED OUT. `.full` sets width:100%, but turning
+     this into a flex container changed how that resolved and it came out 32px
+     narrower than the Cut button directly above it — two stacked buttons of
+     different widths read as a mistake. margin-top because the panel is a
+     plain block with no gap of its own. */
+  /* ⚠ inline-flex, TO MATCH #cutBtn. `.stepbtn` is inline-flex, and width:100%
+     on an inline-level box sizes to CONTENT, not the container — which is why
+     Cut renders 165px inside a 242px panel. A plain `flex` here obeyed the
+     100% properly and came out 240px, so the two stacked buttons disagreed by
+     75px. Matching Cut's display is the fix that touches nothing else; making
+     them both genuinely full-width would mean changing .stepbtn, which every
+     other button in this editor uses. */
+  #saveSegBtn { flex-direction:column; align-items:center; gap:1px;
+                margin-top:6px;
+                height:auto; padding:6px 10px; line-height:1.25;
+                background:transparent; border-color:#2ecc40; color:#cfe8d4; }
+  #saveSegBtn:hover:not(:disabled) { background:rgba(46,204,64,.12); }
+  #saveSegBtn:disabled { border-color:#4a5259; color:#6d757b; background:transparent; }
+  #saveSegBtn .btnMain { font-weight:600; }
+  #saveSegBtn .btnPath { font-size:11px; color:#8b949c;
+                         font-variant-numeric:tabular-nums; }
+  #saveSegBtn:disabled .btnPath { color:#5a6066; }
   #saveBtn { background:#1a3a5c; border-color:#2e8ecc; }
   #saveBtn:hover { background:#204a72; }
   #saveBtn:disabled { background:#2c3236; border-color:#4a5259; }
@@ -344,3 +407,36 @@
      before you touch a control. */
   .playerName { margin:22px auto 4px; text-align:center; font-size:12px;
                 letter-spacing:.16em; text-transform:uppercase; color:#6d757b; }
+
+  /* ── SCENE NAMING MODAL ───────────────────────────────────────────────────
+     A modal rather than an inline panel so the list can be opened at any
+     time, not only in the moment right after a cut — Carson, 2026-10-05, who
+     also wants it reachable from the SAE. The rows are the handoff list's own
+     shape; this gives that list a door. */
+  .modalWrap { position:fixed; inset:0; z-index:90; display:flex;
+               align-items:center; justify-content:center;
+               background:rgba(0,0,0,.55); }
+  .modalWrap[hidden] { display:none; }
+  .modalBox { background:#1b2024; border:1px solid #39414a; border-radius:8px;
+              width:min(520px, 92vw); max-height:84vh; display:flex;
+              flex-direction:column; box-shadow:0 18px 50px rgba(0,0,0,.5); }
+  .modalHead { display:flex; align-items:center; justify-content:space-between;
+               padding:12px 14px 8px; border-bottom:1px solid #2b3238; }
+  .modalX { background:none; border:none; color:#8b949c; font-size:16px;
+            cursor:pointer; width:auto; height:auto; padding:0 4px; }
+  .modalX:hover { color:#e6e9ec; background:none; }
+  .modalNote { font-size:11px; color:#8b949c; padding:8px 14px 0; line-height:1.5; }
+  /* ⚠ The list scrolls, the box does not. Thirty-nine scenes is normal and a
+     modal that grows past the viewport puts its own Save button off-screen. */
+  .nameRows { overflow-y:auto; padding:8px 14px; display:flex;
+              flex-direction:column; gap:5px; }
+  .nameRows .hrow { display:flex; align-items:center; gap:8px; }
+  .nameRows .hn { font-size:11px; color:#8b949c; min-width:76px;
+                  font-variant-numeric:tabular-nums; }
+  .nameRows input { flex:1; background:#12161a; border:1px solid #39414a;
+                    border-radius:4px; color:#e6e9ec; font-size:13px;
+                    padding:4px 7px; font-family:inherit; }
+  .nameRows input:focus { outline:none; border-color:#4a89bf; }
+  .nameRows input.bad { border-color:#c0504d; }
+  .modalFoot { display:flex; justify-content:flex-end; gap:8px;
+               padding:10px 14px 12px; border-top:1px solid #2b3238; }

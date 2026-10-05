@@ -96,6 +96,9 @@ function fillChrome(CLIP) {
   const next100 = document.getElementById('next100');
   const framecount = document.getElementById('framecount');
   const timecode = document.getElementById('timecode');
+  const secSeg = document.getElementById('secSeg');
+  const secAbs = document.getElementById('secAbs');
+  const secTot = document.getElementById('secTot');
   const markBtn = document.getElementById('markBtn');
   // The button's square was the emoji 🟩 — literally green, and unchangeable.
   // On a WebM it sat next to purple marks claiming to make green ones.
@@ -148,13 +151,36 @@ function fillChrome(CLIP) {
 
   function pad(n) { return String(n).padStart(5, '0'); }
   function fmtTime(n) { return ((n - 1) / FPS).toFixed(3) + 's'; }
+
+  // Three seconds figures, left to right: how far into THIS SEGMENT, how far
+  // into the whole clip, and how long the clip runs.
+  //
+  // ⚠ THE FIRST ONE IS THE POINT. The frame counter counts from the start of
+  // the file and cannot tell you how long the scene you are standing in has
+  // run — and that is the number that decides whether a scene is long enough
+  // for its line. It resets at every break point.
+  //
+  // ⚠ IT HAS TO BE RECOMPUTED WHEN THE MARKS MOVE, not only when the playhead
+  // does. Nudging a break point past the playhead changes which segment you
+  // are in without `n` changing at all, so refreshMarkViews() calls this too.
+  function updateSeconds(n) {
+    if (!secSeg) return;                       // older markup, nothing to fill
+    const a = (typeof zoneOf === 'function') ? zoneOf().a : 1;
+    secSeg.textContent = ((n - a) / FPS).toFixed(2);
+    secAbs.textContent = ((n - 1) / FPS).toFixed(2);
+    secTot.textContent = (N / FPS).toFixed(2);
+  }
   // The whole point of Frame Editor: the avatar's narration is the fixed
   // length, and this clip has to be stretched or shortened to match it. This
   // is the number to watch while doing that — total frames / fps, updated
   // every time N changes, never on plain navigation (moving the playhead
   // doesn't change how long the clip is).
   function updateTotalTime() {
-    totalTime.innerHTML = `total <b>${(N / FPS).toFixed(3)}s</b>`;
+    // ⚠ #totalTime and #segNow were REMOVED on 2026-10-05 — the Seconds row
+    // under the timeline carries the total now, and the segment's own name
+    // and length are in the Segments panel. Guarded rather than deleted so
+    // an older copy of the markup still runs.
+    if (totalTime) totalTime.innerHTML = `total <b>${(N / FPS).toFixed(3)}s</b>`;
     fileFrames.textContent = `${N} frames`;
   }
 
@@ -170,8 +196,9 @@ function fillChrome(CLIP) {
     n = Math.max(1, Math.min(N, n));
     slider.value = n;
     img.src = `frames/frame_${pad(n)}.jpg?v=${frameVer}`;
-    framecount.textContent = `frame ${n} / ${N}`;
+    framecount.textContent = `${n} / ${N}`;   // the word is markup now — see .rowLbl
     timecode.textContent = fmtTime(n);
+    updateSeconds(n);
     // Boundary rules depend on what a click currently DOES. Navigation and
     // Subtract both need a real frame on that side (nothing before frame 1,
     // nothing after the last frame). Add has no such limit in either
@@ -274,15 +301,18 @@ function fillChrome(CLIP) {
     const editing = mode === 'frame-editor';
     markBtn.classList.toggle('active', !editing);
     markBtn.classList.toggle('inactive', editing);
-    frameEditorBtn.classList.toggle('active', editing);
-    frameEditorBtn.classList.toggle('inactive', !editing);
-    subToggle.classList.toggle('visible', editing);
+    // ✂️ Edit and the ＋Add/－Sub pair were removed on 2026-10-05 — the
+    // Frames row does that job now, one meaning per button. Guarded so an
+    // older copy of the markup still runs.
+    if (frameEditorBtn) { frameEditorBtn.classList.toggle('active', editing);
+                          frameEditorBtn.classList.toggle('inactive', !editing); }
+    if (subToggle) subToggle.classList.toggle('visible', editing);
 
     const adding = editSub === 'add';
-    addBtn.classList.toggle('active', adding);
-    addBtn.classList.toggle('inactive', !adding);
-    subtractBtn.classList.toggle('active', !adding);
-    subtractBtn.classList.toggle('inactive', adding);
+    if (addBtn) { addBtn.classList.toggle('active', adding);
+                  addBtn.classList.toggle('inactive', !adding); }
+    if (subtractBtn) { subtractBtn.classList.toggle('active', !adding);
+                       subtractBtn.classList.toggle('inactive', adding); }
 
     // Tint by WHAT the click does, not by which side of the slider the
     // button sits on — in Add, both sides duplicate (green); in Subtract,
@@ -407,7 +437,7 @@ function fillChrome(CLIP) {
       el.classList.toggle('here', on);
       if (on) here = el;
     }
-    segNow.innerHTML = here
+    if (segNow) segNow.innerHTML = here
       ? `${here.dataset.name} · <b>${(+here.dataset.dur).toFixed(3)}s</b>`
       : '';
     // The list follows the playhead the cheap way: a class toggled on rows that
@@ -515,6 +545,10 @@ function fillChrome(CLIP) {
     renderMarksList();
     updateMarkUI();
     updateCutJumpUI(+slider.value);
+    // ⚠ The marks just changed, so WHICH SEGMENT the playhead sits in may have
+    // changed without the playhead moving. Without this the "from the split"
+    // figure keeps answering for the segment you were in before the nudge.
+    updateSeconds(+slider.value);
   }
 
   // The same computeSegments() the slider bands come from, so the list and the
@@ -642,6 +676,91 @@ function fillChrome(CLIP) {
 
   addZoneBtn.addEventListener('click', () => editZone('dup'));
   delZoneBtn.addEventListener('click', () => editZone('del'));
+
+  // ── Save as Scenes: name them, then deposit into 2_scenes/sandbox/ ───────
+  // Carson, 2026-10-05. The naming list is a MODAL so it can be opened at any
+  // time — "add or update the scene names as I progress" — rather than only in
+  // the moment after a cut.
+  const saveSegBtn  = document.getElementById('saveSegBtn');
+  const nameModal   = document.getElementById('nameModal');
+  const nameRows    = document.getElementById('nameRows');
+  const nameStatus  = document.getElementById('nameStatus');
+
+  // Remembered per clip, so reopening the list shows what you typed last time
+  // instead of a blank sheet. localStorage, because this is a convenience and
+  // the real record is the script.json the deposit writes.
+  const NAMES_KEY = () => 'sceneNames:' + SLUG;
+  function loadNames() {
+    try { return JSON.parse(localStorage.getItem(NAMES_KEY()) || '[]'); }
+    catch { return []; }
+  }
+  function saveNames(v) {
+    try { localStorage.setItem(NAMES_KEY(), JSON.stringify(v)); } catch { /* private window */ }
+  }
+  function currentNames() {
+    return [...nameRows.querySelectorAll('input')].map(i => i.value.trim());
+  }
+
+  function openNameModal() {
+    // One row per segment, numbered the way the scenes will be.
+    const n = marks.size + 1;
+    const was = loadNames();
+    nameRows.innerHTML = '';
+    for (let i = 0; i < n; i++) {
+      const row = document.createElement('div');
+      row.className = 'hrow';
+      const lab = document.createElement('span');
+      lab.className = 'hn';
+      lab.textContent = String(i + 1).padStart(2, '0') + ' ·';
+      const inp = document.createElement('input');
+      inp.placeholder = 'scene';
+      inp.spellcheck = false;
+      inp.value = was[i] || '';
+      // ⚠ Enforced AS YOU TYPE, not on submit — it becomes a folder name, and
+      // finding that out after naming thirty-nine of them is the wrong moment.
+      inp.addEventListener('input', () => {
+        inp.value = inp.value.toLowerCase().replace(/[^a-z0-9-]/g, '-')
+                             .replace(/-+/g, '-').slice(0, 49);
+      });
+      row.appendChild(lab); row.appendChild(inp);
+      nameRows.appendChild(row);
+    }
+    nameStatus.textContent = `${n} scene(s) · leave blank for the number alone`;
+    nameModal.hidden = false;
+    nameRows.querySelector('input')?.focus();
+  }
+  function closeNameModal() { saveNames(currentNames()); nameModal.hidden = true; }
+
+  if (saveSegBtn) saveSegBtn.addEventListener('click', openNameModal);
+  document.getElementById('nameClose')?.addEventListener('click', closeNameModal);
+  document.getElementById('nameCancel')?.addEventListener('click', closeNameModal);
+  nameModal?.addEventListener('click', (e) => { if (e.target === nameModal) closeNameModal(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && nameModal && !nameModal.hidden) closeNameModal();
+  });
+
+  document.getElementById('nameSave')?.addEventListener('click', async () => {
+    const btn = document.getElementById('nameSave');
+    const names = currentNames();
+    saveNames(names);
+    btn.disabled = true;
+    nameStatus.textContent = 'Copying…';
+    try {
+      const r = await fetch('/api/save-scenes', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({slug: SLUG, names})
+      });
+      const data = await r.json();
+      if (data.error) { nameStatus.textContent = 'Error: ' + data.error; return; }
+      nameModal.hidden = true;
+      cutStatus.textContent =
+        `Saved ${data.count} scene(s) to ${data.dir.replace(/^.*help-videos\//, 'help-videos/')}`;
+    } catch (e) {
+      nameStatus.textContent = 'Error: ' + e;
+    } finally {
+      btn.disabled = false;
+    }
+  });
 
   // ── first split / reset all ───────────────────────────────────────────────
   // Carson, 2026-10-05: a button to lay the first-pass scene edges down, and
@@ -936,9 +1055,9 @@ function fillChrome(CLIP) {
     mode = 'mark'; updateModeUI();
     setMark(+slider.value, !marks.has(+slider.value));
   });
-  frameEditorBtn.addEventListener('click', () => { mode = 'frame-editor'; updateModeUI(); });
-  addBtn.addEventListener('click', () => { mode = 'frame-editor'; editSub = 'add'; updateModeUI(); });
-  subtractBtn.addEventListener('click', () => { mode = 'frame-editor'; editSub = 'subtract'; updateModeUI(); });
+  if (frameEditorBtn) frameEditorBtn.addEventListener('click', () => { mode = 'frame-editor'; updateModeUI(); });
+  if (addBtn) addBtn.addEventListener('click', () => { mode = 'frame-editor'; editSub = 'add'; updateModeUI(); });
+  if (subtractBtn) subtractBtn.addEventListener('click', () => { mode = 'frame-editor'; editSub = 'subtract'; updateModeUI(); });
   tabMarks.addEventListener('click', () => setTab('marks'));
   tabFile.addEventListener('click', () => setTab('file'));
 
@@ -1229,12 +1348,24 @@ ${data.archived_to}`);
   // playhead either way, so it's how you position yourself before a cut.
   // Left button always acts on the left, right always on the right — WHAT it
   // does (duplicate vs delete) comes from editSub, independent of side.
-  function leftClick(count) { editSub === 'add' ? editDup('left', count) : editDelete('left', count); }
-  function rightClick(count) { editSub === 'add' ? editDup('right', count) : editDelete('right', count); }
-  prev.addEventListener('click', () => mode === 'frame-editor' ? leftClick(1) : nudgeOn() ? nudgeMark(-1) : step(-1));
-  next.addEventListener('click', () => mode === 'frame-editor' ? rightClick(1) : nudgeOn() ? nudgeMark(1) : step(1));
-  prev10.addEventListener('click', () => mode === 'frame-editor' ? leftClick(10) : nudgeOn() ? nudgeMark(-10) : step(-10));
-  next10.addEventListener('click', () => mode === 'frame-editor' ? rightClick(10) : nudgeOn() ? nudgeMark(10) : step(10));
+  // ⚠ NO MODE BETWEEN THE BUTTON AND THE EDIT ANY MORE. Each of the six says
+  // exactly one thing. `editSub` and the ✂️ Edit mode are gone — one control
+  // with four meanings is how a step became a deletion by accident.
+  //
+  // Side is 'right' for both: the frames land at the playhead rather than
+  // before it, which is the reading a number line gives you. editDup/editDelete
+  // keep their side argument for the callers that still pass 'left'.
+  const F = [['fRem100', 100, 'del'], ['fRem10', 10, 'del'], ['fRem1', 1, 'del'],
+             ['fAdd1', 1, 'dup'], ['fAdd10', 10, 'dup'], ['fAdd100', 100, 'dup']];
+  for (const [id, n, what] of F) {
+    const b = document.getElementById(id);
+    if (!b) continue;
+    b.addEventListener('click', () => what === 'dup' ? editDup('right', n) : editDelete('right', n));
+  }
+  prev.addEventListener('click', () => nudgeOn() ? nudgeMark(-1) : step(-1));
+  next.addEventListener('click', () => nudgeOn() ? nudgeMark(1) : step(1));
+  prev10.addEventListener('click', () => nudgeOn() ? nudgeMark(-10) : step(-10));
+  next10.addEventListener('click', () => nudgeOn() ? nudgeMark(10) : step(10));
   // ⚠ THE FUNCTION WAS ALREADY HERE — only the buttons were missing.
   // jumpMark() has existed since the marks list did, bound to ⌥←/⌥→ and
   // to [ and ]. The marks label even advertised the shortcut. Carson asked
@@ -1270,8 +1401,8 @@ ${data.archived_to}`);
     nudgeArmed = false;
     updateNudgeUI();
   }, true);
-  prev100.addEventListener('click', () => mode === 'frame-editor' ? leftClick(100) : nudgeOn() ? nudgeMark(-100) : step(-100));
-  next100.addEventListener('click', () => mode === 'frame-editor' ? rightClick(100) : nudgeOn() ? nudgeMark(100) : step(100));
+  prev100.addEventListener('click', () => nudgeOn() ? nudgeMark(-100) : step(-100));
+  next100.addEventListener('click', () => nudgeOn() ? nudgeMark(100) : step(100));
   // Keyboard arrows stay navigation-only in every mode, on purpose — muscle
   // memory reaching for the left/right keys should never delete or
   // duplicate a frame. Only the buttons themselves edit.
