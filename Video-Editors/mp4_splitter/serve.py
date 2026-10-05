@@ -902,13 +902,38 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             ext = os.path.splitext(f)[1]
             shutil.copy2(os.path.join(from_dir, f), os.path.join(d, "segment" + ext))
             made.append(label)
-            scenes.append({"label": label, "line": ""})
+            # ⚠ THE ROW SHAPE IS {n, label, line}, AND `label` HAS NO NN- PREFIX.
+            # Read off a working script (add-question) rather than invented: the
+            # FOLDER is `02-dashboard`, the row is {"n": 2, "label": "dashboard"}.
+            # Writing the prefixed name into `label` produced rows the SAE listed
+            # as zero scenes — it matches a folder by n + label, so a doubled
+            # prefix finds nothing and fails silently.
+            scenes.append({"n": i + 1, "label": nm, "line": ""})
 
-        # script.json is what makes these SCENES rather than loose folders.
-        sp = os.path.join(sandbox, "script.json")
-        json.dump({"scenes": scenes}, open(sp, "w"), indent=1)
+        # ⚠⚠ THE SCRIPT GOES WHERE paths.script() LOOKS, AND THAT IS THE VOICE
+        # FOLDER — NOT beside the scenes. Carson, 2026-09-23: "I only want one
+        # source of truth for the script. All vtt displays in different
+        # locations need to read from that, and write that source. And it needs
+        # to be the voice folder."
+        #
+        # This was written to 2_scenes/sandbox/script.json first, which LOOKED
+        # right — the script beside the scenes it describes — and was wrong:
+        # the SAE could not see picklist at all, because api_stores lists a
+        # video only when paths.script() finds its script, and that resolver
+        # reads 3_voice/<Presenter>/ then 3_voice/. A second script beside the
+        # scenes is exactly the duplicate source that rule exists to prevent.
+        from editor_base import paths as PTH
+        voice = PTH.active_voice(root) if hasattr(PTH, "active_voice") else None
+        sp = (os.path.join(root, "3_voice", voice, "script.json") if voice
+              else os.path.join(root, "3_voice", "script.json"))
+        os.makedirs(os.path.dirname(sp), exist_ok=True)
+        doc = {"store": os.path.basename(os.path.dirname(os.path.dirname(root))),
+               "title": os.path.basename(root),
+               "scenes": scenes}
+        json.dump(doc, open(sp, "w"), indent=1)
 
-        self.send_json({"dir": sandbox, "count": len(made), "scenes": made})
+        self.send_json({"dir": sandbox, "script": sp,
+                        "count": len(made), "scenes": made})
 
     def api_first_split(self, payload):
         """
