@@ -212,6 +212,7 @@ ACTIONS = {
     "/api/frames/del":      ("- Frame",      ("at", "count", "side")),
     "/api/frames/restore":  ("Undo",         ()),
     "/api/mark":            ("Mark",         ("frame", "on")),
+    "/api/first-split":     ("First split",  ()),
     "/api/clear-marks":     ("Unmark all",   ()),
     "/api/save":            ("Save scene",   ()),
     "/api/cut":             ("Cut scene",    ()),
@@ -606,6 +607,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         # Same trim as route_get above — this tool's own routes only.
         if parsed.path == "/api/mark":
             return self.api_mark(payload)
+        if parsed.path == "/api/first-split":
+            return self.api_first_split(payload)
         if parsed.path == "/api/clear-marks":
             return self.api_clear_marks(payload)
         if parsed.path == "/api/frames/dup":
@@ -816,6 +819,92 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             marks.discard(frame)
         save_marks(outdir, marks)
         self.send_json({"marks": sorted(marks)})
+
+    def api_first_split(self, payload):
+        """
+        Lay down the FIRST SPLIT — one break point per candidate scene edge, so
+        Carson has something to ADJUST instead of something to build.
+
+        ⚠ IT DETECTS NOTHING ITSELF. The detector is the recorder's
+        `first_edit.py candidates()`, reached through `editor_base.recorder`,
+        and that is deliberate. Three attempts have been made to automate this
+        judgement and all three failed — real edges changed 0.5-13.8% of the
+        frame and false ones 0.4-8.6%, complete overlap, no threshold exists.
+        The standing rule is "do not write a fourth detector", so this borrows
+        the third.
+
+        ⚠ IT IS A PROPOSAL, NOT AN ANSWER. Across seventeen captures, 741
+        candidates were 380 real scenes; the other 361 were catalogue scrolls,
+        dropdowns opening, a ring landing on a screen already open, and the same
+        frame again. Roughly half of what this lays down is meant to be taken
+        back off. Putting it in THIS editor is the point — see "THE SPLITTER IS
+        THE APPROVAL" in the vtt skill.
+
+        ⚠ AND SOME EDGES WILL BE MISSING. The detector ranks by how much the
+        frame CHANGED, so a beat that moves few pixels produces no candidate at
+        all — a ring appearing, a badge going red to green. On the picklist
+        capture the three moments that video exists for sat inside one
+        undivided 19-second stretch with nothing in it. Mark those by hand.
+        """
+        outdir = resolve_outdir(payload.get("slug"), payload.get("which"))
+        if outdir is None:
+            return self.send_json({"error": "unknown slug"}, 400)
+
+        meta = json.load(open(os.path.join(outdir, "meta.json")))
+        src = meta.get("source")
+        if not src or not os.path.isfile(src):
+            return self.send_json(
+                {"error": "the source video is not where meta.json says it is"}, 400)
+
+        # ⚠ `recorder` OWNS WHERE THE OTHER REPO IS. Do not spell that path a
+        # second time here — two spellings of one fact is one of them going
+        # stale the day somebody moves a checkout. That is the module's own
+        # reason for existing.
+        try:
+            import importlib.util
+            from editor_base import recorder
+
+            # ⚠ ITS OWN SIBLINGS MUST BE IMPORTABLE TOO. first_edit.py does
+            # `from stage_dirs import script_path`, and stage_dirs is a plain
+            # sibling in the recorder's scripts/ folder. Loading a file BY PATH
+            # does not put that folder on sys.path, so the import failed with
+            # "No module named 'stage_dirs'" and the error read as "cannot
+            # reach first_edit.py" when it had in fact been found. Prepend, so
+            # the recorder's own modules win over anything here that clashes.
+            sdir = recorder.scripts_dir()
+            if sdir not in sys.path:
+                sys.path.insert(0, sdir)
+
+            spec = importlib.util.spec_from_file_location(
+                "first_edit", recorder.script("first_edit.py"))
+            fe = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(fe)
+        except Exception as e:
+            return self.send_json(
+                {"error": f"cannot reach the recorder's first_edit.py — {e}"}, 500)
+
+        try:
+            d = fe.candidates(src)
+        except Exception as e:
+            return self.send_json({"error": f"first split failed — {e}"}, 500)
+
+        # ⚠ SECONDS -> FRAME, AND FRAMES ARE 1-BASED IN THIS EDITOR.
+        # candidates() reports `t` in seconds against the source's own fps, so
+        # it is round(t * fps) + 1. Getting this wrong by one puts every break
+        # point a frame early, which reads on screen as a cut that opens on the
+        # last frame of the screen before it.
+        fps = float(d.get("fps") or meta.get("fps") or 25.0)
+        nb = int(meta["nb_frames"])
+        found = []
+        for c in d.get("candidates", []):
+            f = int(round(float(c["t"]) * fps)) + 1
+            if 1 < f <= nb:        # never mark frame 1 — that is the clip's own start
+                found.append(f)
+
+        marks = sorted(set(found))
+        save_marks(outdir, marks)
+        self.send_json({"marks": marks, "count": len(marks),
+                        "candidates": len(d.get("candidates", []))})
 
     def api_clear_marks(self, payload):
         outdir = resolve_outdir(payload.get("slug"), payload.get("which"))

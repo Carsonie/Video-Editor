@@ -210,6 +210,13 @@
      always match the ticks on the timeline they are jumping between. */
   .cutjump { border-color:var(--mark); color:var(--markHi); }
   .cutjump:hover:not(:disabled) { background:var(--markGlow); }
+  /* NUDGE MODE — the playhead is parked ON a break point, so the six step
+     buttons move THAT BREAK POINT instead of the playhead. They take the mark
+     colour for the same reason .cutjump does: the control is acting on the
+     mark, so it should look like the mark. --mark is theme-aware, so this is
+     green on an mp4 and purple on a webm, matching the tick being dragged. */
+  .nudging { border-color:var(--mark); color:var(--markHi); font-weight:600; }
+  .nudging:hover:not(:disabled) { background:var(--markGlow); }
   button:hover, a.stepbtn:hover { background:#373e43; }
   button:disabled { opacity:0.35; cursor:default; }
   button:focus-visible, a:focus-visible { outline:2px solid #7aa7ff; outline-offset:1px; }

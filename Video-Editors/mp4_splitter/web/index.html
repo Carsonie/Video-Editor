@@ -88,6 +88,17 @@
             <button id="delZoneBtn" class="sub-btn" title="Delete the whole zone in one go — the span between the break points either side of the pointer. This is how an unwanted patch comes out.">－ Zone</button>
           </span>
           <button id="undoBtn" class="stepbtn navbtn" disabled title="Step back through this clip's edits, one at a time. Cleared when you save. The source file is never touched either way.">↶ Undo</button>
+          <!-- First split: lay a break point on every candidate scene edge, so
+               there is something to ADJUST instead of something to build. It
+               detects nothing itself — it borrows the recorder's first_edit.py,
+               because three attempts to automate this judgement have failed and
+               the rule is "do not write a fourth detector". Expect roughly half
+               of what it lays down to be wrong: 741 candidates across seventeen
+               captures were 380 real scenes. That is what this editor is for. -->
+          <span class="seg-group" id="splitToggle">
+            <button id="firstSplitBtn" class="sub-btn" title="First split — put a break point on every candidate scene edge, from the recorder's own detector. A PROPOSAL: about half will be wrong, and edges that change few pixels (a ring appearing, a badge changing colour) will be missing entirely. Scrub, remove what is not a screen, and Mark what it missed.">⎸⎸ First Split</button>
+            <button id="resetSplitBtn" class="sub-btn" title="Reset all — remove every break point on this clip and start again. The source file and the extracted frames are untouched.">↺ Reset All</button>
+          </span>
         </div>
       </div>
 

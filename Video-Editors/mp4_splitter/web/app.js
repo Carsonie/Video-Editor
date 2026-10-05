@@ -111,6 +111,8 @@ function fillChrome(CLIP) {
   const subtractBtn = document.getElementById('subtractBtn');
   const addZoneBtn = document.getElementById('addZoneBtn');
   const delZoneBtn = document.getElementById('delZoneBtn');
+  const firstSplitBtn = document.getElementById('firstSplitBtn');
+  const resetSplitBtn = document.getElementById('resetSplitBtn');
   const undoBtn = document.getElementById('undoBtn');
   const loopChk = document.getElementById('loopChk');
   const markOverlay = document.getElementById('markOverlay');
@@ -186,6 +188,62 @@ function fillChrome(CLIP) {
   function preload(n) { if (n >= 1 && n <= N) new Image().src = `frames/frame_${pad(n)}.jpg?v=${frameVer}`; }
   function step(delta) { const n = +slider.value + delta; show(n); if (Math.abs(delta) === 1) preload(n + delta); }
 
+  // ── NUDGE MODE ────────────────────────────────────────────────────────────
+  // Carson, 2026-10-05: "when I am on a Timeline Mark … I want all the
+  // navigation icons to be active on the Mark/Split point. So if I navigate 1,
+  // 10 or 100 frames, it is relocating the Mark and the Split line for me."
+  //
+  // It ARMS on its own the moment the playhead lands on a break point, because
+  // that is the only reason to be sitting there — you are judging the cut. It
+  // DISARMS on a click outside the toolbar, which is his "clicking away from
+  // the main menu box resets the editor nav to its default settings".
+  //
+  // ⚠ ARMED IS NOT THE SAME AS "ON A MARK". It has to be its own flag, not a
+  // test of marks.has(n): clicking away must drop you back to plain navigation
+  // while the playhead is still parked on that same mark. Derive it and the
+  // reset cannot be expressed.
+  let nudgeArmed = false;
+
+  function nudgeOn() {
+    // Frame Editor already owns these six buttons — two modes on one control
+    // is how a step becomes a deletion by accident.
+    return nudgeArmed && mode === 'mark' && marks.has(+slider.value);
+  }
+
+  function updateNudgeUI() {
+    const on = nudgeOn();
+    for (const b of [prev, next, prev10, next10, prev100, next100])
+      b.classList.toggle('nudging', on);
+    // ⚠ cutStatus, NOT `tip`. `tip` is the hover-tooltip element and it lives
+    // inside the tooltips() IIFE — unreachable from here, and writing to it
+    // would fight the tooltip that owns it.
+    if (on) {
+      cutStatus.textContent =
+        'On a break point — the step buttons now MOVE it. Click anywhere outside '
+        + 'these controls to go back to plain navigation.';
+    } else if (cutStatus.textContent.startsWith('On a break point')) {
+      cutStatus.textContent = '';
+    }
+  }
+
+  // Move the break point under the playhead by `delta` frames, and follow it.
+  async function nudgeMark(delta) {
+    const from = +slider.value;
+    const to = from + delta;
+    if (to < 1 || to > N) return;            // off the end — do nothing
+    if (marks.has(to)) {                     // would land on another one
+      cutStatus.textContent = `There is already a break point at frame ${to}.`;
+      return;
+    }
+    // ⚠ CLEAR THE OLD ONE FIRST. Adding then removing leaves the clip with two
+    // break points for an instant, and if the second call fails it stays that
+    // way — a split the editor never asked for, in a list of eighteen.
+    await setMark(from, false);
+    await setMark(to, true);
+    show(to);
+    updateNudgeUI();
+  }
+
   function updateMarkUI() {
     const n = +slider.value;
     const on = marks.has(n);
@@ -193,6 +251,10 @@ function fillChrome(CLIP) {
     markBtn.textContent = (on ? 'Marked' : 'Mark');
     markBtn.prepend(markSquare(on));
     markBtn.title = on ? 'Unmark this frame (M)' : 'Mark this frame as a break point (M)';
+    // Landing on a break point arms it; leaving one disarms it.
+    if (on) nudgeArmed = true;
+    else if (nudgeArmed) nudgeArmed = false;
+    updateNudgeUI();
   }
 
   function updateModeUI() {
@@ -567,6 +629,64 @@ function fillChrome(CLIP) {
 
   addZoneBtn.addEventListener('click', () => editZone('dup'));
   delZoneBtn.addEventListener('click', () => editZone('del'));
+
+  // ── first split / reset all ───────────────────────────────────────────────
+  // Carson, 2026-10-05: a button to lay the first-pass scene edges down, and
+  // one beside it to take them all back off.
+  //
+  // ⚠ IT CAN TAKE A WHILE. The detector reads EVERY frame of the source to
+  // measure how much each one changed — 2139 frames on an 85s capture — so on
+  // a long recording this is tens of seconds with nothing to look at. The
+  // button says so and disables itself; a silent wait reads as a dead button,
+  // which is a mistake this project has already made more than once.
+  firstSplitBtn.addEventListener('click', async () => {
+    const was = firstSplitBtn.textContent;
+    firstSplitBtn.disabled = resetSplitBtn.disabled = true;
+    firstSplitBtn.textContent = '… reading every frame';
+    cutStatus.textContent = 'First split: measuring the whole capture — this takes a moment on a long one…';
+    try {
+      const r = await fetch('/api/first-split', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({slug: SLUG})
+      });
+      const data = await r.json();
+      if (data.error) { cutStatus.textContent = 'Error: ' + data.error; return; }
+      marks = new Set(data.marks);
+      refreshMarkViews();
+      // ⚠ SAY IT IS A PROPOSAL, EVERY TIME. 741 candidates across seventeen
+      // captures were 380 real scenes, so about half of these are meant to come
+      // back off. A count on its own reads as an answer.
+      cutStatus.textContent =
+        `First split: ${data.count} break point(s) laid down. These are CANDIDATES — `
+        + `about half are usually not new screens (a scroll, a dropdown opening, the same `
+        + `frame again). Scrub them, unmark what is not a screen, and Mark anything it `
+        + `missed — a ring appearing or a badge changing colour moves too few pixels to `
+        + `be found this way.`;
+    } catch (e) {
+      cutStatus.textContent = 'Error: ' + e;
+    } finally {
+      firstSplitBtn.textContent = was;
+      firstSplitBtn.disabled = resetSplitBtn.disabled = false;
+    }
+  });
+
+  resetSplitBtn.addEventListener('click', async () => {
+    // ⚠ CONFIRM, BECAUSE THIS THROWS AWAY HAND WORK. The break points are the
+    // judgement calls — the expensive part — and nothing here undoes a clear.
+    if (marks.size && !confirm(
+        `Remove all ${marks.size} break point(s)?\n\n`
+        + `The video file and the extracted frames are not touched, but the break `
+        + `points themselves are gone and Undo does not cover them.`)) return;
+    const r = await fetch('/api/clear-marks', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({slug: SLUG})
+    });
+    const data = await r.json();
+    if (data.error) { cutStatus.textContent = 'Error: ' + data.error; return; }
+    marks = new Set(data.marks);
+    refreshMarkViews();
+    cutStatus.textContent = 'All break points removed.';
+  });
 
   undoBtn.addEventListener('click', async () => {
     if (!HIST.length) return;
@@ -1098,10 +1218,10 @@ ${data.archived_to}`);
   // does (duplicate vs delete) comes from editSub, independent of side.
   function leftClick(count) { editSub === 'add' ? editDup('left', count) : editDelete('left', count); }
   function rightClick(count) { editSub === 'add' ? editDup('right', count) : editDelete('right', count); }
-  prev.addEventListener('click', () => mode === 'frame-editor' ? leftClick(1) : step(-1));
-  next.addEventListener('click', () => mode === 'frame-editor' ? rightClick(1) : step(1));
-  prev10.addEventListener('click', () => mode === 'frame-editor' ? leftClick(10) : step(-10));
-  next10.addEventListener('click', () => mode === 'frame-editor' ? rightClick(10) : step(10));
+  prev.addEventListener('click', () => mode === 'frame-editor' ? leftClick(1) : nudgeOn() ? nudgeMark(-1) : step(-1));
+  next.addEventListener('click', () => mode === 'frame-editor' ? rightClick(1) : nudgeOn() ? nudgeMark(1) : step(1));
+  prev10.addEventListener('click', () => mode === 'frame-editor' ? leftClick(10) : nudgeOn() ? nudgeMark(-10) : step(-10));
+  next10.addEventListener('click', () => mode === 'frame-editor' ? rightClick(10) : nudgeOn() ? nudgeMark(10) : step(10));
   // ⚠ THE FUNCTION WAS ALREADY HERE — only the buttons were missing.
   // jumpMark() has existed since the marks list did, bound to ⌥←/⌥→ and
   // to [ and ]. The marks label even advertised the shortcut. Carson asked
@@ -1109,8 +1229,24 @@ ${data.archived_to}`);
   // told about is not a control. Same call, nothing reimplemented.
   prevCut.addEventListener('click', () => jumpMark(-1));
   nextCut.addEventListener('click', () => jumpMark(1));
-  prev100.addEventListener('click', () => mode === 'frame-editor' ? leftClick(100) : step(-100));
-  next100.addEventListener('click', () => mode === 'frame-editor' ? rightClick(100) : step(100));
+
+  // ⚠ CLICK AWAY FROM THE TOOLBAR AND THE NAV GOES BACK TO NORMAL.
+  // Carson, 2026-10-05: "clicking away from the main menu box will reset the
+  // editor nav to its default settings." Without this, nudge mode would stay
+  // armed for as long as the playhead sat on a break point, and the step
+  // buttons would keep dragging it when all you wanted was to look around.
+  //
+  // Capture phase, so it runs before anything inside swallows the event, and
+  // only when it is actually armed — otherwise this fires on every click in
+  // the page for nothing.
+  document.addEventListener('click', (e) => {
+    if (!nudgeArmed) return;
+    if (e.target.closest && e.target.closest('#toolbar')) return;
+    nudgeArmed = false;
+    updateNudgeUI();
+  }, true);
+  prev100.addEventListener('click', () => mode === 'frame-editor' ? leftClick(100) : nudgeOn() ? nudgeMark(-100) : step(-100));
+  next100.addEventListener('click', () => mode === 'frame-editor' ? rightClick(100) : nudgeOn() ? nudgeMark(100) : step(100));
   // Keyboard arrows stay navigation-only in every mode, on purpose — muscle
   // memory reaching for the left/right keys should never delete or
   // duplicate a frame. Only the buttons themselves edit.
