@@ -195,7 +195,7 @@ NOTE and no cue by design.
 Regenerating it from a recipe spec throws the edit away, along with the fields a
 spec cannot carry — the silent flags, the chapter anchors, the per-scene notes.
 
-## ⚡ "MAKE THESE VTT READY" — from a bare raw mp4, in two commands
+## ⚡ "MAKE THESE VTT READY" — from a bare raw mp4, in TWO COMMANDS AND A GATE
 
 Carson, 2026-09-15: *"This will be the first edit on these raw videos and you
 will do the following things to get them ready for me to load them into the VTT
@@ -207,7 +207,11 @@ does not start from first principles:
 
     cd ~/Rentify/Basic_E2E_Testing/Master_Flows/Recorder
     python3 scripts/first_edit.py propose "<folder holding the capture>"
-    #   ... read first_edit_sheet.png, confirm first_edit.json ...
+    #   ... read first_edit_sheet.png, drop the obvious non-screens ...
+    #
+    #   >>> THEN STOP. LOAD THE CAPTURE IN THE MP4 SPLITTER AND GET CARSON'S
+    #   >>> APPROVAL ON EVERY EDGE — see "THE SPLITTER IS THE APPROVAL" below.
+    #
     python3 scripts/first_edit.py build   "<same folder>"
 
 `propose` finds the junk at both ends, lists every candidate scene edge, and
@@ -261,6 +265,55 @@ Across the seventeen captures, **741 candidates were 380 real scenes.** The
 other 361 were catalogue scrolls, dropdowns opening, a ring landing on a screen
 already open, a pay spinner, an email being typed into a panel already showing,
 and the same frame 0.08s later. Read the sheet. It takes two minutes.
+
+### ⚠⚠ THE SPLITTER IS THE APPROVAL. THE SHEET IS NOT.
+
+Added 2026-10-05, after `propose` was run on the picklist capture and the next
+move was to write narration. Carson: *"You were suppose to ask me to review and
+approve all edges using the Splitter editor before adding any narrative."*
+
+**He is right, and nothing here said so.** Until today this section, CLAUDE.md
+and `first_edit.py`'s own `_how_to_use` string all described edge review as
+"read the contact sheet" — and the sheet was the only review surface any of
+them named. So "a person keeps the real ones" read as *the agent reads the
+PNG*, which is half the job.
+
+    propose   ->   the SHEET        a first pass. Throw out the obvious
+                                    non-screens: scrolls, a dropdown opening,
+                                    the same frame again.
+              ->   the SPLITTER     THE GATE. Carson scrubs the real video,
+                                    nudges every edge, and approves.
+    build     ->   only after that.
+
+⚠ **A CONTACT SHEET CANNOT BE SCRUBBED.** It is one still per candidate. It
+cannot show what a cut OPENS ON, whether the page was still drawing, or where
+the edge should sit by a frame or two. The Splitter shows the footage moving
+and lets an edge be moved. Those are different questions and the sheet only
+answers the first.
+
+⚠ **`build` IS NOT REVERSIBLE IN THE WAY THAT MATTERS.** It writes
+`script.json` and `bounds.json`, cuts `segments/`, and runs the voice. Narration
+written against an unapproved edge has to be rewritten once the edge moves,
+because a line is written TO ITS SCREEN'S LENGTH. That is the waste this gate
+prevents — not a broken file, a wasted pass.
+
+**How to open it** (the launcher skill has the full rules):
+
+    preview_start({name: "mp4-splitter"})          # port 8845
+    open -a "Google Chrome" http://localhost:8845  # his REAL Chrome, not the pane
+
+then browse `Customers/<Business>/<store>/help-videos/<BCP|UI>/<recipe>/` and
+click the capture. ⚠ The `?dir=` query parameter is **not** honoured — it opens
+at the root every time, so the folder has to be clicked through.
+
+⚠ **AND SOME EDGES WILL NOT BE IN THE CANDIDATE LIST AT ALL.** `propose` finds
+edges by how much the frame CHANGED, so a beat that changes few pixels produces
+no candidate — a ring appearing, a badge going red to green. On the picklist
+capture the three most important moments of the video (the row ring, the button
+ring, the toggle) sat inside one undivided 19-second stretch with no candidate
+anywhere in it. `build` reads `t` straight off whatever is kept, so an edge can
+be ADDED to `first_edit.json` by hand — but a missing edge is exactly what the
+Splitter is for, and guessing one from a timestamp is not approval.
 
 ⚠ **AND THE SETTLE TEST DOES EARN ITS KEEP.** one-day-rental's `order-complete`
 edge had a change of 213 at 59.33s and was **still moving** — the page was

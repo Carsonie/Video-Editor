@@ -1,0 +1,161 @@
+{
+ "capture": "ski-demo_picklist_dev_25-16-32_v5.mp4",
+ "fps": 25.0,
+ "frames": 2139,
+ "footage": 85.56,
+ "first_real_s": 0.0,
+ "last_real_s": 85.44,
+ "dead_lead_in_seconds": 0.0,
+ "dead_tail_seconds": 0.08,
+ "candidates": [
+  {
+   "t": 7.8,
+   "change": 2.21,
+   "settles": true,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 14.52,
+   "change": 3.01,
+   "settles": true,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 19.8,
+   "change": 2.92,
+   "settles": true,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 23.48,
+   "change": 2.53,
+   "settles": true,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 24.96,
+   "change": 2.53,
+   "settles": true,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 28.28,
+   "change": 6.73,
+   "settles": true,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 32.24,
+   "change": 6.3,
+   "settles": true,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 36.4,
+   "change": 1.98,
+   "settles": true,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 38.28,
+   "change": 1.97,
+   "settles": true,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 41.76,
+   "change": 8.38,
+   "settles": true,
+   "moved_frames": 2,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 42.68,
+   "change": 1.68,
+   "settles": true,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 48.88,
+   "change": 9.48,
+   "settles": true,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 51.68,
+   "change": 7.55,
+   "settles": true,
+   "moved_frames": 1,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 58.48,
+   "change": 210.58,
+   "settles": true,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 59.12,
+   "change": 72.95,
+   "settles": true,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 59.92,
+   "change": 140.94,
+   "settles": true,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 79.36,
+   "change": 9.49,
+   "settles": true,
+   "keep": true,
+   "label": "",
+   "line": ""
+  },
+  {
+   "t": 81.84,
+   "change": 2.59,
+   "settles": true,
+   "keep": true,
+   "label": "",
+   "line": ""
+  }
+ ],
+ "_how_to_use": "Look at first_edit_sheet.png. For every candidate that is NOT a new screen — a scroll, a dropdown, a ring landing on a screen already open, a pay spinner, the same frame again — set keep:false. Give every kept row a label. Write a line, or leave it empty for a screen too short to say anything on. Then run: first_edit.py build <folder>",
+ "title": "",
+ "store": ""
+}
