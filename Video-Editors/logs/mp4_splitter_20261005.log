@@ -1,0 +1,30 @@
+
+Editor Session:  2026-10-05T11:13:21
+Player:          MP4 Splitter v14
+Server:          http://localhost:8845
+
+11:31:23  Open clip      picklist                   ski-demo_picklist_dev_25-16-32_v5.mp4  url=ski-demo_picklist_dev_25-16-32_v5_ac98e182/viewer.html
+
+Editor Session:  2026-10-05T12:03:07
+Player:          MP4 Splitter v15
+Server:          http://localhost:8845
+
+12:03:18  First split    __nope__                     REFUSED: unknown slug
+12:04:15  Open clip      picklist                   ski-demo_picklist_dev_25-16-32_v5.mp4  url=ski-demo_picklist_dev_25-16-32_v5_ac98e182/viewer.html
+12:04:40  First split    ski-demo_picklist_dev_25-16-32_v5_ac98e182   REFUSED: cannot reach the recorder's first_edit.py — No module named 'stage_dirs'
+12:04:50  First split    ski-demo_picklist_dev_25-16-32_v5_ac98e182   REFUSED: cannot reach the recorder's first_edit.py — No module named 'stage_dirs'
+
+Editor Session:  2026-10-05T12:06:09
+Player:          MP4 Splitter v15
+Server:          http://localhost:8845
+
+12:06:22  First split    ski-demo_picklist_dev_25-16-32_v5_ac98e182   count=18
+12:21:42  Open clip      picklist                   ski-demo_picklist_dev_25-16-32_v5.mp4  url=ski-demo_picklist_dev_25-16-32_v5_ac98e182/viewer.html
+12:21:58  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=196 on=False
+12:21:58  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=206 on=True
+12:22:14  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=206 on=False
+12:22:14  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=196 on=True
+12:24:22  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=196 on=False
+12:24:22  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=195 on=True
+12:24:24  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=195 on=False
+12:24:24  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=194 on=True
