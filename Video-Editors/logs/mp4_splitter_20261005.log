@@ -57,3 +57,89 @@ Server:          http://localhost:8845
 12:46:55  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=204 on=True
 12:47:03  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=204 on=False
 12:47:03  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=194 on=True
+13:15:10  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1 on=True
+13:15:14  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1 on=False
+13:15:46  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1 on=True
+13:30:37  + Frame        ski-demo_picklist_dev_25-16-32_v5_ac98e182 at=1 count=1 side=right  nb_frames=2136
+13:30:40  + Frame        ski-demo_picklist_dev_25-16-32_v5_ac98e182 at=2 count=1 side=left  nb_frames=2137
+13:30:44  + Frame        ski-demo_picklist_dev_25-16-32_v5_ac98e182 at=1 count=10 side=right  nb_frames=2147
+13:30:46  - Frame        ski-demo_picklist_dev_25-16-32_v5_ac98e182 at=11 count=10 side=right  nb_frames=2137
+13:31:01  + Frame        ski-demo_picklist_dev_25-16-32_v5_ac98e182 at=11 count=1 side=right  nb_frames=2138
+13:31:03  + Frame        ski-demo_picklist_dev_25-16-32_v5_ac98e182 at=12 count=10 side=right  nb_frames=2148
+13:31:06  - Frame        ski-demo_picklist_dev_25-16-32_v5_ac98e182 at=22 count=1 side=right  nb_frames=2147
+13:31:20  - Frame        ski-demo_picklist_dev_25-16-32_v5_ac98e182 at=22 count=10 side=right  nb_frames=2137
+13:31:23  - Frame        ski-demo_picklist_dev_25-16-32_v5_ac98e182 at=22 count=1 side=right  nb_frames=2136
+13:31:25  - Frame        ski-demo_picklist_dev_25-16-32_v5_ac98e182 at=22 count=1 side=right  nb_frames=2135
+13:31:47  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1 on=False
+13:37:17  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=192 on=True
+13:37:35  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=194 on=False
+13:38:05  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=192 on=False
+13:38:08  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=193 on=True
+13:38:51  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=361 on=True
+13:38:56  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=359 on=False
+13:39:48  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=454 on=True
+13:40:24  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=493 on=True
+13:40:29  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=496 on=False
+13:41:00  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=521 on=True
+13:41:40  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=585 on=True
+13:42:00  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=625 on=False
+13:42:42  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=648 on=True
+13:43:07  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=705 on=True
+13:43:12  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=708 on=False
+13:43:33  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=747 on=True
+13:43:57  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=804 on=True
+13:44:03  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=807 on=False
+13:44:28  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=845 on=True
+13:44:53  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=908 on=True
+13:44:59  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=911 on=False
+13:45:38  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=955 on=True
+13:45:44  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=958 on=False
+13:46:07  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=981 on=True
+13:46:36  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1040 on=True
+13:46:44  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1045 on=False
+13:47:14  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1080 on=True
+13:47:47  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1139 on=True
+13:48:07  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1179 on=True
+13:48:31  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1220 on=True
+13:48:39  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1223 on=False
+13:48:56  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1247 on=True
+13:50:08  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1289 on=True
+13:50:17  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1293 on=False
+13:50:36  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1347 on=True
+13:51:25  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1421 on=True
+13:51:44  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1460 on=True
+13:52:00  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1476 on=True
+13:52:06  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1479 on=False
+13:52:21  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1496 on=True
+13:52:28  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1499 on=False
+13:53:00  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1546 on=True
+13:53:24  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1621 on=True
+13:56:30  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1696 on=True
+13:56:53  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1822 on=True
+13:57:14  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1888 on=True
+13:57:45  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1931 on=True
+13:58:11  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1982 on=True
+13:58:17  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=1985 on=False
+13:58:31  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=2005 on=True
+13:58:52  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=2044 on=True
+13:58:56  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=2047 on=False
+
+Editor Session:  2026-10-05T16:17:27
+Player:          MP4 Splitter v26
+Server:          http://localhost:8845
+
+16:17:28  Save segments  __nope__                     REFUSED: unknown slug
+16:17:34  Save segments  ski-demo_picklist_dev_25-16-32_v5_ac98e182   REFUSED: nothing to save — cut the segments first
+
+Editor Session:  2026-10-05T16:30:34
+Player:          MP4 Splitter v27
+Server:          http://localhost:8845
+
+16:39:40  Cut scene      ski-demo_picklist_dev_25-16-32_v5_a4b7429e   count=39  version=1
+
+Editor Session:  2026-10-05T17:03:46
+Player:          MP4 Splitter v32
+Server:          http://localhost:8845
+
+17:03:47  Save as Scenes __nope__                     REFUSED: unknown slug
+17:06:44  Save as Scenes ski-demo_picklist_dev_25-16-32_v5_a4b7429e names=[]  count=39
