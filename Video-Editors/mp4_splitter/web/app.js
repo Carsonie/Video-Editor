@@ -111,6 +111,7 @@ function fillChrome(CLIP) {
   const subtractBtn = document.getElementById('subtractBtn');
   const addZoneBtn = document.getElementById('addZoneBtn');
   const delZoneBtn = document.getElementById('delZoneBtn');
+  const nudgeBtn = document.getElementById('nudgeBtn');
   const firstSplitBtn = document.getElementById('firstSplitBtn');
   const resetSplitBtn = document.getElementById('resetSplitBtn');
   const undoBtn = document.getElementById('undoBtn');
@@ -214,6 +215,17 @@ function fillChrome(CLIP) {
     const on = nudgeOn();
     for (const b of [prev, next, prev10, next10, prev100, next100])
       b.classList.toggle('nudging', on);
+    // The switch shows what it is SET to, not whether it happens to be acting.
+    // Armed-but-not-on-a-mark is a real state: the mode is on, there is just
+    // nothing under the playhead to move. Painting it Inactive there would
+    // make the button look broken the moment you stepped off a break point.
+    nudgeBtn.classList.toggle('nudging', nudgeArmed);
+    nudgeBtn.textContent = nudgeArmed ? '● Active' : '● Inactive';
+    nudgeBtn.title = nudgeArmed
+      ? (marks.has(+slider.value)
+          ? 'Active — the step buttons are moving the break point under the playhead. Click to go back to plain navigation.'
+          : 'Active, but the playhead is not on a break point, so the step buttons navigate until it is.')
+      : 'Inactive — the step buttons move the PLAYHEAD. Click to make them move the BREAK POINT you are parked on instead.';
     // ⚠ cutStatus, NOT `tip`. `tip` is the hover-tooltip element and it lives
     // inside the tooltips() IIFE — unreachable from here, and writing to it
     // would fight the tooltip that owns it.
@@ -251,9 +263,10 @@ function fillChrome(CLIP) {
     markBtn.textContent = (on ? 'Marked' : 'Mark');
     markBtn.prepend(markSquare(on));
     markBtn.title = on ? 'Unmark this frame (M)' : 'Mark this frame as a break point (M)';
-    // Landing on a break point arms it; leaving one disarms it.
-    if (on) nudgeArmed = true;
-    else if (nudgeArmed) nudgeArmed = false;
+    // ⚠ LANDING ON A BREAK POINT NO LONGER ARMS ANYTHING. It used to, and that
+    // made the mode invisible: the step buttons silently changed job depending
+    // on where the playhead was. Carson, 2026-10-05, asked for a switch —
+    // nudgeBtn is now the only thing that sets this.
     updateNudgeUI();
   }
 
@@ -1230,11 +1243,23 @@ ${data.archived_to}`);
   prevCut.addEventListener('click', () => jumpMark(-1));
   nextCut.addEventListener('click', () => jumpMark(1));
 
-  // ⚠ CLICK AWAY FROM THE TOOLBAR AND THE NAV GOES BACK TO NORMAL.
+  // The switch. Carson, 2026-10-05: "I need a button to manage the Green
+  // button state and the Normal button state."
+  nudgeBtn.addEventListener('click', () => {
+    nudgeArmed = !nudgeArmed;
+    updateNudgeUI();
+    cutStatus.textContent = nudgeArmed
+      ? 'Active — the step buttons now MOVE the break point under the playhead. '
+        + 'Park on one, then nudge it by 1, 10 or 100 frames.'
+      : '';
+  });
+
+  // ⚠ CLICK AWAY FROM THE TOOLBAR AND IT SWITCHES ITSELF OFF.
   // Carson, 2026-10-05: "clicking away from the main menu box will reset the
-  // editor nav to its default settings." Without this, nudge mode would stay
-  // armed for as long as the playhead sat on a break point, and the step
-  // buttons would keep dragging it when all you wanted was to look around.
+  // editor nav to its default settings." Still true now that there is a
+  // button — the button SHOWS the state, this is what returns it to default,
+  // and the label flips back to Inactive so the reset is visible rather than
+  // something you find out about by stepping.
   //
   // Capture phase, so it runs before anything inside swallows the event, and
   // only when it is actually armed — otherwise this fires on every click in

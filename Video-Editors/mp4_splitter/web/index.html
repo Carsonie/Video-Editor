@@ -56,6 +56,13 @@
           <button id="next10" class="stepbtn navbtn" title="Forward 10 frames">10»</button>
           <button id="next100" class="stepbtn navbtn" title="Forward 100 frames">100»</button>
           <button id="nextCut" class="stepbtn navbtn cutjump" title="Jump forward to the next cut (⌥→ or ])">cut ▶|</button>
+          <!-- The switch that says which job the six step buttons are doing.
+               It used to arm itself the moment the playhead landed on a break
+               point, which made the mode invisible and surprising — Carson
+               asked for it to be a control, 2026-10-05. Inactive is the
+               default: stepping navigates, which is what those buttons have
+               always done. -->
+          <button id="nudgeBtn" class="stepbtn navbtn" title="Inactive — the step buttons move the PLAYHEAD. Click to make them move the BREAK POINT you are parked on instead.">● Inactive</button>
           <label id="loopLbl" title="Play only the zone, over and over. Judging a cut point is watching the same two seconds repeatedly, which is what this is for."><input type="checkbox" id="loopChk" title="Play only the zone — the span between the break points either side of the pointer — over and over. With nothing marked the zone is the whole clip."> ↻ Loop Zone</label>
 
           <!-- The frame counter is the number you actually read while judging a
