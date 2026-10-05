@@ -28,3 +28,32 @@ Server:          http://localhost:8845
 12:24:22  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=195 on=True
 12:24:24  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=195 on=False
 12:24:24  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=194 on=True
+12:40:20  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=364 on=False
+12:40:20  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=363 on=True
+12:40:20  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=363 on=False
+12:40:20  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=362 on=True
+12:40:21  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=362 on=False
+12:40:21  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=361 on=True
+12:40:21  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=361 on=False
+12:40:21  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=360 on=True
+12:40:25  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=360 on=False
+12:40:25  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=361 on=True
+12:40:30  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=361 on=False
+12:40:30  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=360 on=True
+12:40:34  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=360 on=False
+12:40:34  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=359 on=True
+12:40:36  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=359 on=False
+12:40:36  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=358 on=True
+12:40:39  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=358 on=False
+12:40:39  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=359 on=True
+12:41:13  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=359 on=False
+12:41:16  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=359 on=True
+
+Editor Session:  2026-10-05T12:46:35
+Player:          MP4 Splitter v17
+Server:          http://localhost:8845
+
+12:46:55  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=194 on=False
+12:46:55  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=204 on=True
+12:47:03  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=204 on=False
+12:47:03  Mark           ski-demo_picklist_dev_25-16-32_v5_ac98e182 frame=194 on=True
