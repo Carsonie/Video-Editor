@@ -266,6 +266,25 @@ other 361 were catalogue scrolls, dropdowns opening, a ring landing on a screen
 already open, a pay spinner, an email being typed into a panel already showing,
 and the same frame 0.08s later. Read the sheet. It takes two minutes.
 
+⚠⚠ **THAT LIST IS ABOUT SCENES. IT IS WRONG FOR SEGMENTS.** Settled 2026-10-06.
+"Dropdowns opening", "a ring landing on a screen already open" and "an email
+being typed into a panel already showing" are all **real SEGMENT cuts** — they
+are things that HAPPEN. They are not scene cuts, because the sentence does not
+change. Two units, one word, and reading this list while cutting segments
+throws away half of them:
+
+    SEGMENT   one thing HAPPENS   1_cuts/segments/    ~2s   picklist: 38
+    SCENE     one thing is SAID   2_scenes/sandbox/   ~7s   add-item: 12
+
+⚠ **CUT ON THE FIRST FRAME, NOT THE BIGGEST ONE.** `candidates()` ranks by how
+much the frame CHANGED, which is mid-transition — measured on picklist, 13 of
+its 18 candidates sat exactly THREE FRAMES after the mark a person made. A cut
+at the peak opens on the tail of the screen before.
+
+⚠ **THE FULL RULESET IS IN ONE PLACE** and is not restated here:
+`Basic_E2E_Testing/Carsons_Files/Screens-to-Scenes.txt`, section "SEGMENTS AND
+SCENES ARE NOT THE SAME CUT".
+
 ### ⚠⚠ THE SPLITTER IS THE APPROVAL. THE SHEET IS NOT.
 
 Added 2026-10-05, after `propose` was run on the picklist capture and the next
