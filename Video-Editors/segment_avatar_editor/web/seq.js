@@ -56,6 +56,54 @@ function viewSlug() {
   } catch (_) {}
 
 
+  // Which segments are ticked in the grouping column. In memory only — see
+  // the note on .grpcb; grouping is not written anywhere yet.
+  const GROUPSEL = new Set();
+  // The second checkbox column's selection. Purpose not yet defined.
+  const SEL2 = new Set();
+  // n -> group id, read from script.json. Rebuilt after every group/ungroup.
+  let SCRIPT_GROUPS = {};
+
+  function paintGroupUI() {
+    const c = document.getElementById('grpCount');
+    if (c) c.textContent = GROUPSEL.size
+      ? `${GROUPSEL.size} segment(s) selected`
+      : 'No segments selected';
+    const a = document.getElementById('sel2Count');
+    if (a) a.textContent = SEL2.size ? `${SEL2.size} selected (column 2)` : '';
+    const g = document.getElementById('groupBtn');
+    const u = document.getElementById('ungroupBtn');
+    // ⚠ TWO is the floor for grouping — a group of one is just a scene, and
+    // offering it invites a tag that means nothing.
+    if (g) g.disabled = GROUPSEL.size < 2;
+    if (u) u.disabled = ![...GROUPSEL].some(n => SCRIPT_GROUPS[n]);
+  }
+
+
+  async function sendGroup(ungroup) {
+    const members = [...GROUPSEL].sort((a, b) => a - b);
+    if (!members.length) return;
+    const r = await fetch('/api/group', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({root: ROOT_REL, members, ungroup})
+    });
+    const d = await r.json();
+    if (d.error) { alert('Group failed: ' + d.error); return; }
+    // Nothing moved on disk, so no reload — just re-read and repaint.
+    await loadGroups();
+    GROUPSEL.clear();
+    renderScenes();
+    paintGroupUI();
+  }
+
+  async function loadGroups() {
+    try {
+      const r = await fetch(`/api/vtt?root=${encodeURIComponent(ROOT_REL)}`);
+      const d = await r.json();
+      SCRIPT_GROUPS = {};
+      for (const row of (d.scenes || [])) if (row.group) SCRIPT_GROUPS[row.n] = row.group;
+    } catch { SCRIPT_GROUPS = {}; }
+  }
   const SEQ = VIEW.manifest;
   const ROOT_REL = VIEW.root_rel;
   const $ = id => document.getElementById(id);
@@ -2841,12 +2889,76 @@ ${el.dataset.tip}` : '')
       cb.onclick = ev => { ev.stopPropagation(); updatePick(); };
       d.appendChild(cb);
 
+      // ── SECOND COLUMN ────────────────────────────────────────────────────
+      // Carson, 2026-10-06: "Create one more column of checkboxes between the
+      // current checkbox and the scene #."
+      //
+      // ⚠ LAYOUT ONLY. Its job has not been named yet, so this holds a
+      // selection in memory and does nothing else — no write, no side effect.
+      // Deliberately NOT guessed at: the grouping column next to it already
+      // means something specific, and a second one that quietly did something
+      // similar would be worse than one that does nothing visible.
+      const cb2 = document.createElement('input');
+      cb2.type = 'checkbox';
+      cb2.className = 'selcb2';
+      cb2.dataset.n = it.n;
+      cb2.checked = SEL2.has(it.n);
+      cb2.title = `Scene ${it.n} — second selection column.`
+                + ` Nothing is wired to it yet.`;
+      cb2.onclick = ev => {
+        ev.stopPropagation();
+        cb2.checked ? SEL2.add(it.n) : SEL2.delete(it.n);
+        paintGroupUI();
+      };
+      d.appendChild(cb2);
+
       const body = document.createElement('span');
       body.style.cssText = 'display:flex;gap:8px;align-items:baseline;flex:1 1 0;min-width:0;overflow:hidden';
       body.innerHTML = `<span class="num">${it.n}</span>` +
-        `<span class="lab">${it.label || it.n}</span>` +
+        `<span class="lab">${it.label || it.n}</span>`;
+
+      // ── GROUPING COLUMN ──────────────────────────────────────────────────
+      // Carson, 2026-10-06: "Add a new column of checkboxes to the right side
+      // of the scene column, followed by segment <Num_1>. Do this first, so I
+      // can see the UI layout."
+      //
+      // ⚠ LAYOUT ONLY FOR NOW — ticking holds a selection in memory and nothing
+      // else. Grouping segments into scenes is the next step and its rules are
+      // not settled, so this does not guess at them or write anything to disk.
+      //
+      // ⚠ Num_N IS 1:1 WITH THE SCENE ONLY WHILE NOTHING IS GROUPED. Save as
+      // Scenes deposits one segment per scene, so today scene 7 is Num_7. The
+      // moment a scene holds several segments this has to list them all —
+      // which is exactly what this column is being built to do.
+      const gcb = document.createElement('input');
+      gcb.type = 'checkbox';
+      gcb.className = 'grpcb';
+      gcb.dataset.n = it.n;
+      gcb.checked = GROUPSEL.has(it.n);
+      gcb.title = `Select segment Num_${it.n} for grouping into a scene.`
+                + ` Nothing is saved yet — this column is the layout for the`
+                + ` grouping step.`;
+      gcb.onclick = ev => {
+        ev.stopPropagation();
+        gcb.checked ? GROUPSEL.add(it.n) : GROUPSEL.delete(it.n);
+        paintGroupUI();
+      };
+      body.appendChild(gcb);
+
+      const sgn = document.createElement('span');
+      sgn.className = 'segname';
+      // A grouped scene says which topic it belongs to. The group id is the
+      // LOWEST member's number, so it is derived and needs no counter.
+      const grp = (SCRIPT_GROUPS || {})[it.n];
+      sgn.textContent = grp
+        ? `segment Num_${it.n} · scene ${String(grp).padStart(2,'0')}`
+        : `segment Num_${it.n}`;
+      if (grp) sgn.classList.add('grouped');
+      body.appendChild(sgn);
+
+      body.insertAdjacentHTML('beforeend',
         (it.missing ? `<span class="ovv" style="color:#e05555;border-color:#7a3a3a">missing</span>` : '') +
-        `<span class="dur">${it.dur ?? '?'}s</span>`;
+        `<span class="dur">${it.dur ?? '?'}s</span>`);
       // Only a scene ON the timeline has anywhere to jump to. For the rest the
       // checkbox is the whole interaction, so the name is not dressed up as
       // clickable when clicking it can do nothing.
@@ -3007,6 +3119,10 @@ ${el.dataset.tip}` : '')
   paintPaste();
   loadRenumberState();
   loadVtt();
+  // Grouping is read once at load, then kept current by sendGroup().
+  loadGroups().then(() => { renderScenes(); paintGroupUI(); });
+  document.getElementById('groupBtn')?.addEventListener('click', () => sendGroup(false));
+  document.getElementById('ungroupBtn')?.addEventListener('click', () => sendGroup(true));
   renderReport();   // row 4 must say something before the first click
 
   // ── rename one scene ────────────────────────────────────────────────────────

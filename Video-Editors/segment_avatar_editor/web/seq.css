@@ -130,12 +130,21 @@
      of the name getting shorter, the whole row overflowed and the duration
      slid under the first checkbox. The name is the only thing here that can
      lose characters harmlessly, so it is the only thing allowed to. */
-  .scene .lab { flex:1 1 0; min-width:0; color:#dfe4e7; overflow:hidden;
+  /* ⚠ FIXED WIDTH, NOT flex:1 — AND THAT IS THE WHOLE POINT. It used to grow
+     to fill the row, so everything after it started at a different x on every
+     line and the grouping checkboxes zig-zagged down the list. A column you
+     scan down has to be a column. Carson, 2026-10-06. The slack goes to .dur
+     instead, which is pushed right with margin-left:auto. */
+  .scene .lab { flex:0 0 108px; min-width:0; color:#dfe4e7; overflow:hidden;
                 text-overflow:ellipsis; white-space:nowrap; }
   /* Everything after the name holds its size: a number cut in half is worse
      than a name cut short. */
   .scene .num, .scene .dur { flex:none; }
-  .scene .dur { color:#8a949b; font-size:12px; }
+  /* Takes the slack the name used to take, so it stays hard right. */
+  /* ⚠ A FIXED COLUMN, NOT margin-left:auto. Auto pins it to the right EDGE,
+     and the rows do not all end at the same x — measured 650 and 737 — so it
+     landed in two places. Fixed width after a growing .segname puts it at one. */
+  .scene .dur { color:#8a949b; font-size:12px; flex:0 0 52px; text-align:right; }
   .scene.inseq { background:#1d2a20; }
   /* Off the timeline, still on the list. Dimmed rather than hidden: the scene
      exists, it is simply not in this join. */
@@ -575,3 +584,30 @@
      rather than a claim. */
   .nameRows input.changed { border-color:#2ecc40; }
   #nameErr { font-size:11px; color:#e0a93f; min-height:14px; margin-top:6px; }
+
+  /* ── GROUPING COLUMN ──────────────────────────────────────────────────────
+     Carson, 2026-10-06, layout step for grouping segments into scenes. It sits
+     right of the scene name with the segment's own Num_N beside it, so you can
+     see which footage a scene is made of while deciding what belongs together.
+     Blue, because it is about SEGMENTS — green is the scene's own identity and
+     amber/blue on the right are its edit history. */
+  .grpcb { margin:0 0 0 6px; flex:none; accent-color:#4a89bf; cursor:pointer; }
+  /* Fixed too: `segment Num_7` and `segment Num_39` differ in width, and an
+     uneven second column is the same bug one notch along. */
+  /* Its LEFT edge is the column; it takes the slack so .dur sits at one x. */
+  .segname { font-size:11px; color:#8b949c; white-space:nowrap;
+             flex:1 1 auto; min-width:96px; font-variant-numeric:tabular-nums; }
+  .grpcount { font-size:11px; color:#8b949c; padding:6px 2px 0; }
+
+  /* A grouped segment says which scene it belongs to, in the scene's own green
+     — the colour this editor already uses for scene identity. */
+  .segname.grouped { color:#9fe0ab; }
+
+  /* Second selection column — sits between the timeline tick and the scene
+     number. Neutral grey: it has no job yet, and colouring it would imply one. */
+  .selcb2 { margin:0 2px 0 0; flex:none; cursor:pointer; }
+
+  /* With several segments the cell has to be allowed to be long — truncating
+     it would hide exactly what the column exists to show. It still cannot push
+     the duration out of its column: that stays fixed-width. */
+  .segname { overflow:hidden; text-overflow:ellipsis; }

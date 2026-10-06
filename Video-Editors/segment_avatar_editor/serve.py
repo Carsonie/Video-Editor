@@ -251,6 +251,7 @@ ACTIONS = {
     "/api/cut":             ("Cut scene",    ()),
     "/api/join":            ("Join",         ("ns", "label", "tracks")),
     "/api/split":           ("Split",        ("n", "at", "labels", "tracks")),
+    "/api/group":           ("Group scenes", ("members", "ungroup")),
     "/api/rename":          ("Rename scene", ("n", "label")),
     "/api/line":            ("Edit line",    ("n",)),
     "/api/renumber-clear":  ("Lift lock",    ()),
@@ -890,6 +891,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.api_archive(payload)
         if parsed.path == "/api/save-archive":
             return self.api_save_archive(payload)
+        if parsed.path == "/api/group":
+            return self.api_group(payload)
         if parsed.path == "/api/rename":
             return self.api_rename(payload)
         if parsed.path == "/api/line":
@@ -1566,7 +1569,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         for sc in doc.get("scenes", []):
             line = sc.get("line", "") or ""
             rows.append({
+                # `group` added 2026-10-06 — the scene list reads grouping from
+                # here, so leaving it out made every scene look ungrouped.
                 "n": sc["n"], "label": sc.get("label", ""), "line": line,
+                "group": sc.get("group"),
                 "words": vtt_mod.words(line),
                 "pause": sum(x.get("seconds", 0) for x in sc.get("pauses", [])),
                 "todo": bool(sc.get("_line_todo")),
@@ -1574,6 +1580,71 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_json({"wps": doc.get("words_per_second", 3.44),
                         "store": doc.get("store", ""), "title": doc.get("title", ""),
                         "scenes": rows})
+
+    def api_group(self, payload):
+        """
+        Mark a set of scenes as ONE SCENE — a topic — without touching a file.
+
+        Carson, 2026-10-06: a scene is "a topic or presentation point that the
+        user needs to understand", and a segment is one thing that HAPPENS. So
+        several segments belong inside one scene, and this is what records that.
+
+        ⚠ IT TAGS, IT DOES NOT MERGE. No mp4 is joined, no folder is renamed,
+        nothing is renumbered. Grouping is a judgement call being made for the
+        first time on every video, so it has to be changeable — and renumbering
+        a 39-scene set is precisely what broke the NN- prefix twice on
+        2026-10-06. The build joins a group later; until then each segment is
+        still its own file and still playable on its own.
+
+        A group is a `group` key on each member's row, holding the lowest `n`
+        in the set — so the id is derived, stable, and needs no counter:
+
+            {"n": 4, "label": "...", "line": "...", "group": 4}
+            {"n": 5, "label": "...", "group": 4}
+
+        ⚠ THE LINE BELONGS TO THE GROUP, AND IT LIVES ON THE LEADER. One topic,
+        one thing said. Members' lines are left where they are rather than
+        deleted — ungrouping must give them back.
+
+        `members: []` clears the grouping for whatever is named instead.
+        """
+        root_rel = payload.get("root", "")
+        final = safe_join(root_rel)
+        if final is None or not os.path.isdir(final):
+            return self.send_json({"error": f"not a folder under Customers/: {root_rel}"}, 400)
+        try:
+            members = sorted({int(x) for x in (payload.get("members") or [])})
+        except (TypeError, ValueError):
+            return self.send_json({"error": "members must be scene numbers"}, 400)
+        if not members:
+            return self.send_json({"error": "nothing selected"}, 400)
+
+        script_p = PTH.script(final)
+        if not os.path.isfile(script_p):
+            return self.send_json({"error": "this store has no script.json"}, 400)
+        doc = json.load(open(script_p))
+        rows = doc.get("scenes", [])
+        known = {r["n"] for r in rows}
+        missing = [n for n in members if n not in known]
+        if missing:
+            return self.send_json({"error": f"not in the script: {missing}"}, 400)
+
+        hist = os.path.join(final, "z_History", "line-edits")
+        os.makedirs(hist, exist_ok=True)
+        shutil.copy2(script_p, os.path.join(
+            hist, f"script-{time.strftime('%Y%m%d-%H%M%S')}.json"))
+
+        ungroup = bool(payload.get("ungroup"))
+        leader = members[0]
+        for r in rows:
+            if r["n"] in members:
+                if ungroup:
+                    r.pop("group", None)
+                else:
+                    r["group"] = leader
+        json.dump(doc, open(script_p, "w"), indent=1)
+        self.send_json({"members": members, "group": None if ungroup else leader,
+                        "ungrouped": ungroup})
 
     def api_rename(self, payload):
         """

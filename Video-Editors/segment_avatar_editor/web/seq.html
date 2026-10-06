@@ -36,6 +36,15 @@
    <h4>Time Line Scenes</h4>
    <div id="sceneList"></div>
    <button id="rebuildBtn" disabled title="Rebuild the timeline from the ticked scenes. The timeline is a different set of frames afterwards, so this is a navigation, not an edit — nothing you have changed is lost.">Tick at least one scene</button>
+   <!-- The grouping column's own readout. Carson, 2026-10-06: the column is
+        layout for grouping segments into scenes; this says what is ticked so
+        the column is not silent while the rules are still being settled. -->
+   <div id="sel2Count" class="grpcount"></div>
+   <div id="grpCount" class="grpcount">No segments selected</div>
+   <div class="bulkrow">
+     <button id="groupBtn" disabled title="Mark the ticked segments as ONE scene — one topic, one line. Nothing is joined, renamed or renumbered; it writes a `group` key on each row, so you can regroup freely.">&#9776; Group as one scene</button>
+     <button id="ungroupBtn" disabled title="Release the ticked segments from their group. Each becomes its own scene again.">Ungroup</button>
+   </div>
    <div id="bulk">
      <div class="bulkrow">
        <button id="selAll" title="Tick every scene in the list. Pair it with Rebuild to put the whole video on one timeline.">Select all</button>
