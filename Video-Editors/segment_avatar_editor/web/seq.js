@@ -56,44 +56,250 @@ function viewSlug() {
   } catch (_) {}
 
 
-  // Which segments are ticked in the grouping column. In memory only — see
-  // the note on .grpcb; grouping is not written anywhere yet.
+  // ╔══════════════════════════════════════════════════════════════════════╗
+  // ║  GROUPING SEGMENTS INTO SCENES — THE THREE COLUMNS                   ║
+  // ╚══════════════════════════════════════════════════════════════════════╝
+  //
+  // Carson, 2026-10-06, after a first attempt was reverted:
+  //
+  //   "the current display info always remains, it just gets hidden and
+  //    un-hidden as needed."
+  //
+  // ⚠ THAT SENTENCE IS THE WHOLE DESIGN, AND IT IS WHY THE FIRST ATTEMPT WAS
+  // WRONG. That one MOVED footage — picklist went from 39 scenes to 38 with an
+  // mp4 buried inside another scene's folder. Recoverable, and recovered, but
+  // the undo was a person reading backups rather than a button. Nothing here
+  // moves, joins, renames or deletes anything. A group is a HIDE, and every
+  // hide has an un-hide.
+  //
+  // THE THREE COLUMNS, LEFT TO RIGHT, each with ONE job:
+  //
+  //   1  .pick    timeline display — is this scene on the timeline
+  //   2  .selcb2  the ACTIVE scene — exactly one at a time
+  //   3  .grpcb   the active scene's group of segments
+  //
+  // WHAT "Group as one scene" DOES. The active scene keeps its own default
+  // segment; every other ticked segment is FOLDED INTO it. A folded row loses
+  // its scene identity on screen — its number, its name, its timeline checkbox
+  // and its active checkbox all go — and the scenes that are left are
+  // renumbered. It keeps its column-3 checkbox and its segment name, because
+  // that row is how you see what the scene holds and how you let it go again.
+  //
+  // "Ungroup" reverses it for whichever scene is ACTIVE.
+
+  // Column 3: ticked segments, in memory. Cleared after each group/ungroup.
   const GROUPSEL = new Set();
-  // The second checkbox column's selection. Purpose not yet defined.
-  const SEL2 = new Set();
-  // n -> group id, read from script.json. Rebuilt after every group/ungroup.
+
+  // Column 2: THE active scene. One value, not a set — see setActiveScene().
+  let ACTIVE = null;
+
+  // n -> group id, read from script.json. The id is the LOWEST member's `n`,
+  // so it is derived and needs no counter. Rebuilt after every group/ungroup.
   let SCRIPT_GROUPS = {};
 
-  function paintGroupUI() {
-    const c = document.getElementById('grpCount');
-    if (c) c.textContent = GROUPSEL.size
-      ? `${GROUPSEL.size} segment(s) selected`
-      : 'No segments selected';
-    const a = document.getElementById('sel2Count');
-    if (a) a.textContent = SEL2.size ? `${SEL2.size} selected (column 2)` : '';
-    const g = document.getElementById('groupBtn');
-    const u = document.getElementById('ungroupBtn');
-    // ⚠ TWO is the floor for grouping — a group of one is just a scene, and
-    // offering it invites a tag that means nothing.
-    if (g) g.disabled = GROUPSEL.size < 2;
-    if (u) u.disabled = ![...GROUPSEL].some(n => SCRIPT_GROUPS[n]);
+  // ── the group model, read-only helpers ────────────────────────────────
+  // All four read SCRIPT_GROUPS and nothing else, so the screen and the file
+  // cannot drift apart. Rebuild SCRIPT_GROUPS, repaint, and they agree.
+
+  /** The scenes in n's group, lowest first. A lone scene is a group of one. */
+  function groupMembers(n) {
+    const g = SCRIPT_GROUPS[n];
+    if (!g) return [n];
+    return Object.keys(SCRIPT_GROUPS)
+      .map(Number).filter(m => SCRIPT_GROUPS[m] === g)
+      .sort((a, b) => a - b);
   }
 
+  /** The group's leader — the scene that keeps its identity. */
+  function groupLeader(n) {
+    return SCRIPT_GROUPS[n] || n;
+  }
 
-  async function sendGroup(ungroup) {
-    const members = [...GROUPSEL].sort((a, b) => a - b);
-    if (!members.length) return;
+  /**
+   * Is this row FOLDED — a member that is not the leader?
+   *
+   * ⚠ THE ONE QUESTION THE REST OF THE FILE ASKS. Folded means "no longer its
+   * own scene on screen": no number, no name, no timeline checkbox, no active
+   * checkbox. It does NOT mean hidden, deleted or moved — the row is still
+   * there and still shows which segment it is.
+   */
+  function isFolded(n) {
+    const g = SCRIPT_GROUPS[n];
+    return !!g && g !== n;
+  }
+
+  /**
+   * n -> the number shown on screen.
+   *
+   * ⚠ DISPLAY ONLY. A folded row has no number at all, and the scenes that are
+   * left count 1, 2, 3… with no gaps. `n` itself never changes — it is the key
+   * into script.json and into every scene folder's NN- prefix, and renumbering
+   * those is what broke this twice already.
+   */
+  function sceneNumbers() {
+    const m = new Map();
+    let shown = 0;
+    // ⚠ `ALL` IS null UNTIL loadScenes() RETURNS, AND THE BAR IS DRAWN BEFORE
+    // THAT. The load line is `reindex(); rebuildBar(); paint(); renderNote();
+    // loadScenes(); show(1);` — so the first rebuildBar() ran while ALL was
+    // still null, `for (const it of null)` threw, and everything after it on
+    // that line died with it: no paint, no scene list, no playhead. The page
+    // came up empty and the cause was four calls earlier.
+    //
+    // Falling back to SEQ keeps the first paint numbered. It can differ from
+    // the final numbering when the timeline holds a subset, so loadScenes()
+    // calls rebuildBar() again once the real list is in — see there.
+    const rows = ALL || SEQ;
+    for (const it of rows) if (!isFolded(it.n)) m.set(it.n, ++shown);
+    return m;
+  }
+
+  // ── column 2: the active scene ────────────────────────────────────────
+
+  /**
+   * Make n the active scene, or clear it.
+   *
+   * ⚠ EXACTLY ONE AT A TIME, because grouping needs ONE destination. Ticking a
+   * second releases the first rather than refusing: the second tick is the
+   * clearer statement of intent, and a checkbox that will not tick reads as
+   * broken.
+   */
+  function setActiveScene(n, on) {
+    ACTIVE = on ? n : null;
+    // A scene cannot be folded into itself.
+    if (ACTIVE !== null) GROUPSEL.delete(ACTIVE);
+    renderScenes();
+    paintGroupUI();
+  }
+
+  // ── the two buttons ───────────────────────────────────────────────────
+
+  /**
+   * "Group as one scene" — fold the ticked segments into the active scene.
+   *
+   * Needs BOTH an active scene and at least one other ticked segment. Folding
+   * a group of one would hide nothing and mean nothing.
+   *
+   * Members already in another group come with their whole group, so a fold
+   * can never split one — half a group would leave rows folded under a leader
+   * that is itself folded, and nothing on screen could explain that.
+   */
+  async function groupAsOneScene() {
+    if (ACTIVE === null) return;
+    const wanted = new Set([ACTIVE]);
+    for (const n of GROUPSEL) for (const m of groupMembers(n)) wanted.add(m);
+    for (const m of groupMembers(ACTIVE)) wanted.add(m);
+    const members = [...wanted].sort((a, b) => a - b);
+    if (members.length < 2) return;
+    // ⚠ THE LEADER MUST BE THE LOWEST n, because /api/group derives the group
+    // id that way and isFolded() reads the id back. Picking the active scene
+    // instead would fold the leader and un-fold a member on the next reload.
+    await writeGroups(members, false);
+  }
+
+  /**
+   * "Ungroup" — give the active scene's members their identity back.
+   *
+   * Carson: it reverses "for a checkbox in the Active/true status", so the
+   * active scene names the group. Every member is released, the folded rows
+   * get their number, name and two checkboxes back, and the list renumbers.
+   */
+  async function ungroupActive() {
+    if (ACTIVE === null) return;
+    const members = groupMembers(ACTIVE);
+    if (members.length < 2) return;
+    await writeGroups(members, true);
+  }
+
+  /**
+   * Write a group, or clear one, then repaint from what came back.
+   *
+   * ⚠ IT RE-READS RATHER THAN ASSUMING. /api/group is the only thing that
+   * knows the group id, and a screen painted from a guess looked right once
+   * while the file said something else.
+   */
+  async function writeGroups(members, ungroup) {
     const r = await fetch('/api/group', {
       method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({root: ROOT_REL, members, ungroup})
     });
-    const d = await r.json();
-    if (d.error) { alert('Group failed: ' + d.error); return; }
-    // Nothing moved on disk, so no reload — just re-read and repaint.
+    const d = await r.json().catch(() => ({error: 'no reply'}));
+    if (d.error) { alert((ungroup ? 'Ungroup' : 'Group') + ' failed: ' + d.error); return; }
+    // Nothing moved on disk, so there is nothing to reload — re-read and repaint.
     await loadGroups();
     GROUPSEL.clear();
+    // ⚠ THE BAR TOO, NOT JUST THE LIST. The numbers on the timeline come from
+    // the same grouping, so a repaint that skipped rebuildBar() left the bar
+    // showing the numbering from before the group — the list said one thing
+    // and the bar said another, with nothing on screen to say which was right.
     renderScenes();
+    rebuildBar();
     paintGroupUI();
+    status(ungroup
+      ? `Ungrouped ${members.length} scenes — each is its own scene again.`
+      : `Grouped ${members.length} segments into scene ${members[0]}.`);
+  }
+
+  /**
+   * Hide or un-hide the four parts of one row.
+   *
+   * ⚠ ONE PLACE, SO HIDE AND UN-HIDE CANNOT DISAGREE. Carson named exactly
+   * four things to hide — the name, the timeline checkbox, the active
+   * checkbox, the number — and `folded` flips all four together. A second
+   * copy of this list is how an un-hide ends up missing one of them.
+   *
+   * Column 3 stays visible on a folded row ON PURPOSE: it is the only handle
+   * left on that segment, and it is what Ungroup works from.
+   */
+  function applyFold(row, n, parts) {
+    const folded = isFolded(n);
+    row.classList.toggle('folded', folded);
+    for (const el of [parts.pick, parts.active, parts.num, parts.lab]) {
+      if (el) el.style.display = folded ? 'none' : '';
+    }
+    if (!folded) return;
+    // ⚠ AND THE JUMP GOES WITH THEM. A folded row is not its own scene, so it
+    // has nowhere on the timeline to jump TO — the row builder attached a
+    // handler before it knew that. Leaving it on would move the slider to
+    // whatever index the member used to hold, which is a different scene now.
+    if (parts.body) { parts.body.onclick = null; parts.body.style.cursor = 'default'; }
+    row.title = `Segment Num_${n} — part of scene ${SCRIPT_GROUPS[n]}.`
+              + ` Untick it in the third column and press Ungroup to get it back.`;
+  }
+
+  function paintGroupUI() {
+    const c = document.getElementById('grpCount');
+    if (c) c.textContent = GROUPSEL.size
+      ? `${GROUPSEL.size} segment(s) ticked`
+      : 'No segments ticked';
+    const a = document.getElementById('sel2Count');
+    if (a) a.textContent = ACTIVE === null
+      ? 'No active scene — tick column 2 to choose one'
+      : `Active scene: ${ACTIVE}${groupMembers(ACTIVE).length > 1
+          ? ` — holds ${groupMembers(ACTIVE).length} segments` : ''}`;
+    const g = document.getElementById('groupBtn');
+    const u = document.getElementById('ungroupBtn');
+    // ⚠ A DISABLED BUTTON SAYS WHY. Both need an active scene; Group also needs
+    // something to fold, and Ungroup needs a group that exists. A live button
+    // that does nothing is the failure this editor has shipped most often.
+    if (g) {
+      const can = ACTIVE !== null && [...GROUPSEL].some(n => n !== ACTIVE);
+      g.disabled = !can;
+      g.title = ACTIVE === null
+        ? 'Tick an active scene in column 2 first.'
+        : can ? `Fold the ticked segments into scene ${ACTIVE}. Nothing is joined,`
+                + ' renamed or moved — the extra rows are hidden and the rest renumber.'
+              : 'Tick at least one other segment in column 3.';
+    }
+    if (u) {
+      const can = ACTIVE !== null && groupMembers(ACTIVE).length > 1;
+      u.disabled = !can;
+      u.title = ACTIVE === null
+        ? 'Tick an active scene in column 2 first.'
+        : can ? `Release scene ${ACTIVE}'s ${groupMembers(ACTIVE).length} segments.`
+                + ' Every hidden row comes back and the list renumbers.'
+              : `Scene ${ACTIVE} is not grouped.`;
+    }
   }
 
   async function loadGroups() {
@@ -250,11 +456,29 @@ function viewSlug() {
 
   function rebuildBar() {
     $('segbar').innerHTML = '';
+    // Carson, 2026-10-06: "I only want 1 timeline scene, not 3 segments …
+    // renumber the timeline segments with the scene # not the segment number.
+    // So now I would see 3 x #1 instead of 1 2 3 on the timeline."
+    //
+    // ⚠ THE BLOCKS STAY, THE NUMBER CHANGES. Each block is still one segment,
+    // because each one is a different length and the bar is drawn to length —
+    // merging them would be a second, separate claim about the footage. What
+    // changes is what they SAY: three segments in scene 1 all read "1", and
+    // the run reads as one scene because the numbers agree.
+    const SHOWN = sceneNumbers();
     for (let i = 0; i < SEQ.length; i++) {
       const s = SEQ[i];
       const b = document.createElement('div');
       b.className = 'segblk'; b.style.flex = String(s.base_n); b.dataset.n = s.n;
-      b.textContent = s.n;
+      const shown = SHOWN.get(groupLeader(s.n));
+      b.textContent = shown ?? s.n;
+      b.dataset.scene = String(shown ?? s.n);
+      // A run of one scene is drawn as a run: the seam between two blocks of
+      // the SAME scene closes, so the eye reads one band, and the seam between
+      // two different scenes stays. Done in CSS off this flag, not by merging.
+      const prev = SEQ[i - 1];
+      if (prev && groupLeader(prev.n) === groupLeader(s.n)) b.classList.add('samescene');
+      if (SCRIPT_GROUPS[s.n]) b.classList.add('ingroup');
       // ⚠ NO NATIVE title HERE. The browser's own tooltip fires on its own
       // schedule and cannot say where the playhead is; this block gets the
       // hover tooltip below instead, which waits a second and then counts.
@@ -314,7 +538,17 @@ function viewSlug() {
           .replace(/</g, '&lt;').replace(/>/g, '&gt;');
       // The middle line is the answer; the rest is context. It gets its own
       // class so it can be read at a glance without leaning in.
-      tip.innerHTML = `<b>${s.n} ${label}</b><br><span class="big">${where}</span><br>`
+      // ⚠ THE HEADING MUST MATCH THE BLOCK. The block now shows the SCENE
+      // number, so a tooltip still showing the segment number would have the
+      // two disagreeing about the thing under the pointer.
+      const SHOWN = sceneNumbers();
+      const lead = groupLeader(s.n);
+      const mem = groupMembers(s.n);
+      const head = mem.length > 1
+        ? `${SHOWN.get(lead)} ${label} — segment Num_${s.n}`
+          + ` (${mem.indexOf(s.n) + 1} of ${mem.length} in this scene)`
+        : `${SHOWN.get(lead) ?? s.n} ${label}`;
+      tip.innerHTML = `<b>${head}</b><br><span class="big">${where}</span><br>`
                     + `<span class="sub">${p.total.toLocaleString()} frames`
                     + `  ·  ${(p.total / fps).toFixed(2)}s  ·  starts at film frame `
                     + `${(starts[i] + 1).toLocaleString()}</span>`;
@@ -2746,6 +2980,10 @@ Nothing was changed. Untick the shorter track, or move to a `
       status('scene list unavailable — ' + e.message);
     }
     renderScenes();
+    // The bar's numbering is derived from the FULL list, which only exists
+    // now. Drawn at load from SEQ alone it can be off by however many scenes
+    // sit off the timeline.
+    rebuildBar();
   }
 
   // Scenes whose edits are blocked. A SET OF LOCKS, not of permissions, so the
@@ -2871,6 +3109,9 @@ ${el.dataset.tip}` : '')
   function renderScenes() {
     paintDirty();
     $('sceneList').innerHTML = '';
+    // Once per render, not once per row: every row needs the whole map to show
+    // its own number AND to name the scene a folded row sits under.
+    const SHOWN = sceneNumbers();
     for (const it of ALL) {
       const on = ON.has(it.n);
       const d = document.createElement('div');
@@ -2889,55 +3130,66 @@ ${el.dataset.tip}` : '')
       cb.onclick = ev => { ev.stopPropagation(); updatePick(); };
       d.appendChild(cb);
 
-      // ── SECOND COLUMN ────────────────────────────────────────────────────
-      // Carson, 2026-10-06: "Create one more column of checkboxes between the
-      // current checkbox and the scene #."
+      // ── COLUMN 2: THE ACTIVE SCENE ───────────────────────────────────────
+      // Carson, 2026-10-06: "The second column of checkboxes is for selecting
+      // an active scene, and only one scene checkbox can be active at a time."
       //
-      // ⚠ LAYOUT ONLY. Its job has not been named yet, so this holds a
-      // selection in memory and does nothing else — no write, no side effect.
-      // Deliberately NOT guessed at: the grouping column next to it already
-      // means something specific, and a second one that quietly did something
-      // similar would be worse than one that does nothing visible.
+      // The active scene is the DESTINATION a group folds into, and the scene
+      // Ungroup works on. One at a time is enforced in setActiveScene().
       const cb2 = document.createElement('input');
       cb2.type = 'checkbox';
       cb2.className = 'selcb2';
       cb2.dataset.n = it.n;
-      cb2.checked = SEL2.has(it.n);
-      cb2.title = `Scene ${it.n} — second selection column.`
-                + ` Nothing is wired to it yet.`;
+      cb2.checked = ACTIVE === it.n;
+      cb2.title = `Make scene ${it.n} the ACTIVE scene — the one segments are`
+                + ` grouped into, and the one Ungroup releases. Only one scene`
+                + ` is active at a time.`;
       cb2.onclick = ev => {
         ev.stopPropagation();
-        cb2.checked ? SEL2.add(it.n) : SEL2.delete(it.n);
-        paintGroupUI();
+        setActiveScene(it.n, cb2.checked);
       };
       d.appendChild(cb2);
 
       const body = document.createElement('span');
       body.style.cssText = 'display:flex;gap:8px;align-items:baseline;flex:1 1 0;min-width:0;overflow:hidden';
-      body.innerHTML = `<span class="num">${it.n}</span>` +
-        `<span class="lab">${it.label || it.n}</span>`;
+      // ⚠ THE NUMBER SHOWN IS THE DISPLAY NUMBER, NOT `it.n`. Folding a row
+      // takes a number out of the list, so the rest close the gap. `it.n` stays
+      // the key into script.json and into the scene folder's NN- prefix —
+      // renumbering THOSE is what broke this twice.
+      const num = document.createElement('span');
+      num.className = 'num';
+      num.textContent = SHOWN.get(it.n) ?? '';
+      num.title = SHOWN.get(it.n) === it.n ? ''
+        : `Shown as ${SHOWN.get(it.n)}; its real id is ${it.n}.`;
+      const lab = document.createElement('span');
+      lab.className = 'lab';
+      lab.textContent = it.label || it.n;
+      body.appendChild(num);
+      body.appendChild(lab);
 
       // ── GROUPING COLUMN ──────────────────────────────────────────────────
       // Carson, 2026-10-06: "Add a new column of checkboxes to the right side
       // of the scene column, followed by segment <Num_1>. Do this first, so I
       // can see the UI layout."
       //
-      // ⚠ LAYOUT ONLY FOR NOW — ticking holds a selection in memory and nothing
-      // else. Grouping segments into scenes is the next step and its rules are
-      // not settled, so this does not guess at them or write anything to disk.
+      // Carson, 2026-10-06: "The third checkbox is for selecting the active
+      // scenes group of segments."
       //
-      // ⚠ Num_N IS 1:1 WITH THE SCENE ONLY WHILE NOTHING IS GROUPED. Save as
-      // Scenes deposits one segment per scene, so today scene 7 is Num_7. The
-      // moment a scene holds several segments this has to list them all —
-      // which is exactly what this column is being built to do.
+      // ⚠ IT STAYS VISIBLE ON A FOLDED ROW, ON PURPOSE. A folded row has lost
+      // its number, its name and its other two checkboxes, so this is the only
+      // handle left on that segment — and it is what shows you what the scene
+      // above it actually holds.
       const gcb = document.createElement('input');
       gcb.type = 'checkbox';
       gcb.className = 'grpcb';
       gcb.dataset.n = it.n;
       gcb.checked = GROUPSEL.has(it.n);
-      gcb.title = `Select segment Num_${it.n} for grouping into a scene.`
-                + ` Nothing is saved yet — this column is the layout for the`
-                + ` grouping step.`;
+      gcb.title = ACTIVE === null
+        ? `Segment Num_${it.n}. Tick an active scene in column 2 first.`
+        : it.n === ACTIVE
+          ? `Scene ${it.n} is the active scene — it cannot be grouped into itself.`
+          : `Tick to group segment Num_${it.n} into scene ${ACTIVE}.`;
+      gcb.disabled = it.n === ACTIVE;
       gcb.onclick = ev => {
         ev.stopPropagation();
         gcb.checked ? GROUPSEL.add(it.n) : GROUPSEL.delete(it.n);
@@ -2947,13 +3199,22 @@ ${el.dataset.tip}` : '')
 
       const sgn = document.createElement('span');
       sgn.className = 'segname';
-      // A grouped scene says which topic it belongs to. The group id is the
-      // LOWEST member's number, so it is derived and needs no counter.
-      const grp = (SCRIPT_GROUPS || {})[it.n];
-      sgn.textContent = grp
-        ? `segment Num_${it.n} · scene ${String(grp).padStart(2,'0')}`
-        : `segment Num_${it.n}`;
-      if (grp) sgn.classList.add('grouped');
+      // A LEADER says how many segments it holds; a FOLDED row says which scene
+      // it sits under. Same key, two readings, because the two rows are
+      // answering different questions on screen.
+      const mem = groupMembers(it.n);
+      if (isFolded(it.n)) {
+        sgn.textContent = `segment Num_${it.n} → scene ${SHOWN.get(groupLeader(it.n))}`;
+        sgn.classList.add('grouped');
+      } else if (mem.length > 1) {
+        sgn.textContent = `${mem.length} segments: ` + mem.map(m => `Num_${m}`).join(' · ');
+        sgn.classList.add('grouped');
+      } else {
+        sgn.textContent = `segment Num_${it.n}`;
+      }
+      sgn.title = mem.length > 1
+        ? `Scene ${groupLeader(it.n)} holds: ` + mem.map(m => `Num_${m}`).join(', ')
+        : '';
       body.appendChild(sgn);
 
       body.insertAdjacentHTML('beforeend',
@@ -2971,6 +3232,9 @@ ${el.dataset.tip}` : '')
         d.title = `${it.n} ${it.label || ''} — tick to put it on the timeline`;
       }
       d.appendChild(body);
+      // ⚠ ONE CALL, AFTER THE PARTS EXIST. Hiding happens in exactly one place
+      // so hide and un-hide cannot disagree about which four things move.
+      applyFold(d, it.n, {pick: cb, active: cb2, num, lab, body});
       // Two locks and two counts: the SEGMENT (the footage) and the OVERLAY
       // (the avatar). They are separate controls because they are separate
       // files with separate lengths, edited one layer at a time.
@@ -3089,8 +3353,23 @@ ${el.dataset.tip}` : '')
   // Rebuilding is a NAVIGATION, not a live edit: a different set of scenes is a
   // different timeline with different frame numbers, and pretending otherwise
   // would leave the slider pointing at a frame that no longer exists.
-  const picked = () => [...document.querySelectorAll('.pick')]
-    .filter(c => c.checked).map(c => +c.dataset.n).sort((a, b) => a - b);
+  //
+  // ⚠ A FOLDED ROW'S TICK IS NOT READ, AND ITS LEADER SPEAKS FOR IT. Folding
+  // hides the timeline checkbox but the element is still in the DOM and still
+  // carries whatever it was ticked to — so reading it would let an invisible
+  // control decide what is on the timeline. That is the exact shape of bug
+  // this editor keeps shipping: code that runs, and lies. A folded segment is
+  // part of its leader's scene now, so it goes on the timeline when the
+  // LEADER is ticked and never on its own.
+  const picked = () => {
+    const out = new Set();
+    for (const c of document.querySelectorAll('.pick')) {
+      const n = +c.dataset.n;
+      if (isFolded(n) || !c.checked) continue;
+      for (const m of groupMembers(n)) out.add(m);
+    }
+    return [...out].sort((a, b) => a - b);
+  };
   function updatePick() {
     const ns = picked();
     const same = ns.length === ON.size && ns.every(n => ON.has(n));
@@ -3119,10 +3398,10 @@ ${el.dataset.tip}` : '')
   paintPaste();
   loadRenumberState();
   loadVtt();
-  // Grouping is read once at load, then kept current by sendGroup().
-  loadGroups().then(() => { renderScenes(); paintGroupUI(); });
-  document.getElementById('groupBtn')?.addEventListener('click', () => sendGroup(false));
-  document.getElementById('ungroupBtn')?.addEventListener('click', () => sendGroup(true));
+  // Grouping is read once at load, then kept current by writeGroups().
+  loadGroups().then(() => { renderScenes(); rebuildBar(); paintGroupUI(); });
+  document.getElementById('groupBtn')?.addEventListener('click', groupAsOneScene);
+  document.getElementById('ungroupBtn')?.addEventListener('click', ungroupActive);
   renderReport();   // row 4 must say something before the first click
 
   // ── rename one scene ────────────────────────────────────────────────────────

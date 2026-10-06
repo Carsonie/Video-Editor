@@ -611,3 +611,50 @@
      it would hide exactly what the column exists to show. It still cannot push
      the duration out of its column: that stays fixed-width. */
   .segname { overflow:hidden; text-overflow:ellipsis; }
+
+  /* ── A FOLDED ROW ──────────────────────────────────────────────────────
+     A segment that has been grouped into the scene above it. Its number,
+     name, timeline checkbox and active checkbox are hidden by applyFold();
+     this is what is left, and it has to read as PART OF the scene above
+     rather than as a scene that has gone wrong.
+
+     ⚠ INDENT AND A LEFT EDGE, NOT DIMMING. A dimmed row reads as disabled,
+     and this one is not — its column-3 checkbox is live and is the only way
+     to get the segment back. */
+  .scene.folded {
+    padding-left:22px;
+    border-left:2px solid #3a5b72;
+    background:rgba(74,137,191,.06);
+  }
+  .scene.folded .segname { color:#9fe0ab; }
+  /* No jump target: a folded row is not its own scene, so the pointer must
+     not promise one. */
+  .scene.folded { cursor:default; }
+
+  /* ── A GROUPED RUN ON THE TIMELINE BAR ─────────────────────────────────
+     Carson, 2026-10-06: the bar should read as ONE scene where three
+     segments were grouped — "3 x #1 instead of 1 2 3".
+
+     ⚠ THE BLOCKS ARE NOT MERGED, THE SEAM IS CLOSED. Each block keeps its
+     own width because each segment is a different length and the bar is
+     drawn to length; merging them would quietly redraw the footage. So a
+     block that follows another from the SAME scene drops the 1px gap and
+     its left radius, and the run reads as one band. */
+  .segblk.ingroup { background:#2b3a44; }
+  .segblk.ingroup:hover { background:#3a4f5c; color:#dfe4e7; }
+  .segblk.samescene {
+    margin-left:-1px;                 /* eats #segbar's 1px gap */
+    border-top-left-radius:0;
+    border-bottom-left-radius:0;
+  }
+  /* The block BEFORE a same-scene block loses its right radius too, or the
+     joined band shows a notch where the two corners meet. */
+  .segblk.ingroup:has(+ .segblk.samescene) {
+    border-top-right-radius:0;
+    border-bottom-right-radius:0;
+  }
+  /* A grouped run keeps ONE number legible: the repeats are dimmed so the
+     eye lands on the first. They still say the scene number, so nothing is
+     hidden — the run just stops shouting it three times. */
+  .segblk.samescene { color:#5d676e; }
+  .segblk.samescene.cur { color:#eaffef; }
