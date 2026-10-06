@@ -902,6 +902,41 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         names = payload.get("names") or []
         sandbox = os.path.join(root, "2_scenes", "sandbox")
 
+        # ⚠⚠ REFUSE OVER ASSEMBLED SCENES. Carson, 2026-10-06: "if I had 2 or 3
+        # scenes already grouped, I would lose all of that."
+        #
+        # This deposit replaces the WHOLE sandbox. A scene assembled in the SAE
+        # from several segments carries an assembly.json saying which ones, and
+        # re-depositing would archive every one of those recipes and lay 39
+        # single segments back down — destroying hours of grouping with a button
+        # that says "Save". The old folders go to z_History, so nothing is gone;
+        # it just looks exactly like nothing happened.
+        #
+        # ⚠ AND IT CANNOT SIMPLY KEEP THEM. A fresh cut moves the segment edges,
+        # so Num_2 after a re-cut is a different piece of film with the same
+        # name — an old recipe pointing at it is wrong rather than stale. Unwind
+        # first, deliberately, and the grouping is a judgement you remake
+        # against the footage that now exists.
+        assembled = []
+        if os.path.isdir(sandbox):
+            for d in sorted(os.listdir(sandbox)):
+                if d == "z_History":
+                    continue
+                ap = os.path.join(sandbox, d, "assembly.json")
+                if not os.path.isfile(ap):
+                    continue
+                try:
+                    if len(json.load(open(ap)).get("segments") or []) > 1:
+                        assembled.append(d)
+                except Exception:
+                    assembled.append(d)          # unreadable: assume it matters
+        if assembled:
+            return self.send_json(
+                {"error": "these scenes are assembled from several segments and a re-save"
+                          " would discard them: " + ", ".join(assembled)
+                          + ". Unwind them in the Segment and Avatar Editor first.",
+                 "assembled": assembled}, 409)
+
         # ⚠ ARCHIVE THE GENERATION BEING REPLACED, never overwrite it. A scene
         # folder holds hand work — rings, timings, a voice take — and a second
         # deposit must not silently sit on top of the first.
