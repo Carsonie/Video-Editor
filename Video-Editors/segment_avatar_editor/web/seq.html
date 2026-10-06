@@ -45,6 +45,13 @@
      <button id="groupBtn" disabled title="Mark the ticked segments as ONE scene — one topic, one line. Nothing is joined, renamed or renumbered; it writes a `group` key on each row, so you can regroup freely.">&#9776; Group as one scene</button>
      <button id="ungroupBtn" disabled title="Release the ticked segments from their group. Each becomes its own scene again.">Ungroup</button>
    </div>
+   <!-- Carson, 2026-10-06: the step that writes the grouping to disk. It is
+        separate from Group on purpose — grouping is a judgement you change
+        freely, and this is the moment you commit it to folders. -->
+   <div class="bulkrow">
+     <button id="applyGroupBtn" disabled title="Write the grouping into 2_scenes/sandbox: one folder per scene, with its extra segments inside it. Nothing is joined or re-encoded, and the whole sandbox is archived first.">&#128190; Apply grouping to sandbox</button>
+     <button id="unwindBtn" disabled title="Take the ACTIVE scene back apart into the segments it was assembled from. Only that scene — every other assembled scene is left alone.">&#8630; Unwind scene</button>
+   </div>
    <div id="bulk">
      <div class="bulkrow">
        <button id="selAll" title="Tick every scene in the list. Pair it with Rebuild to put the whole video on one timeline.">Select all</button>

@@ -669,3 +669,9 @@
     padding:7px 9px; margin:0 0 6px;
   }
   .listwarn b { color:#ffe3e3; }
+
+  /* The armed state of a button that writes to disk. Amber, not red: this is
+     "are you sure", not "something went wrong". */
+  #applyGroupBtn.armed, #unwindBtn.armed {
+    background:#5a4418; border-color:#9a7526; color:#ffe9b8; font-weight:600;
+  }

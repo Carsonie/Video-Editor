@@ -97,6 +97,16 @@ function viewSlug() {
   // so it is derived and needs no counter. Rebuilt after every group/ungroup.
   let SCRIPT_GROUPS = {};
 
+  // n -> [cut ids], for scenes ALREADY WRITTEN TO DISK as one folder holding
+  // several segments. Read from script.json's `segments`, which
+  // api_apply_grouping writes alongside each scene's own assembly.json.
+  //
+  // ⚠ NOT THE SAME THING AS SCRIPT_GROUPS, and the difference is the whole
+  // model: a GROUP is an intention you can still change for free, an ASSEMBLY
+  // is folders on disk. Group/Ungroup move the first; Apply/Unwind move the
+  // second.
+  let ASSEMBLED = {};
+
   // ── the group model, read-only helpers ────────────────────────────────
   // All four read SCRIPT_GROUPS and nothing else, so the screen and the file
   // cannot drift apart. Rebuild SCRIPT_GROUPS, repaint, and they agree.
@@ -291,6 +301,30 @@ function viewSlug() {
                 + ' renamed or moved — the extra rows are hidden and the rest renumber.'
               : 'Tick at least one other segment in column 3.';
     }
+    const uw = document.getElementById('unwindBtn');
+    if (uw) {
+      const segs = ACTIVE !== null ? ASSEMBLED[ACTIVE] : null;
+      uw.disabled = !segs;
+      uw.title = ACTIVE === null
+        ? 'Tick an active scene in column 2 first.'
+        : segs ? `Take scene ${ACTIVE} back apart into its ${segs.length} segments`
+                 + ` (${segs.map(x => 'Num_' + x).join(', ')}). Only this scene —`
+                 + ' every other assembled scene is left alone.'
+               : `Scene ${ACTIVE} is a single segment — there is nothing to unwind.`;
+    }
+    const ap = document.getElementById('applyGroupBtn');
+    if (ap) {
+      // ⚠ ENABLED BY WHAT IS ON DISK, NOT BY WHAT IS TICKED. This writes every
+      // group in script.json, not the selection — so it is live whenever any
+      // group exists, and ticking nothing does not disable it.
+      const n = Object.keys(SCRIPT_GROUPS).length;
+      ap.disabled = !n;
+      ap.title = n
+        ? `Write ${new Set(Object.values(SCRIPT_GROUPS)).size} grouped scene(s) into`
+          + ' 2_scenes/sandbox. Nothing is joined or re-encoded; the whole sandbox'
+          + ' is archived first.'
+        : 'Group some segments first — this writes the groups you have made.';
+    }
     if (u) {
       const can = ACTIVE !== null && groupMembers(ACTIVE).length > 1;
       u.disabled = !can;
@@ -306,9 +340,12 @@ function viewSlug() {
     try {
       const r = await fetch(`/api/vtt?root=${encodeURIComponent(ROOT_REL)}`);
       const d = await r.json();
-      SCRIPT_GROUPS = {};
-      for (const row of (d.scenes || [])) if (row.group) SCRIPT_GROUPS[row.n] = row.group;
-    } catch { SCRIPT_GROUPS = {}; }
+      SCRIPT_GROUPS = {}; ASSEMBLED = {};
+      for (const row of (d.scenes || [])) {
+        if (row.group) SCRIPT_GROUPS[row.n] = row.group;
+        if (row.segments && row.segments.length > 1) ASSEMBLED[row.n] = row.segments;
+      }
+    } catch { SCRIPT_GROUPS = {}; ASSEMBLED = {}; }
   }
   const SEQ = VIEW.manifest;
   const ROOT_REL = VIEW.root_rel;
@@ -3449,6 +3486,112 @@ ${el.dataset.tip}` : '')
   loadVtt();
   // Grouping is read once at load, then kept current by writeGroups().
   loadGroups().then(() => { renderScenes(); rebuildBar(); paintGroupUI(); });
+  /**
+   * Write every group in script.json into the sandbox.
+   *
+   * ⚠ TWO CLICKS, BECAUSE THIS ONE TOUCHES FILES. Group and Ungroup only edit
+   * a key; this moves folders and renumbers them. The arm-then-commit pattern
+   * is the same one the stretch page uses for its encodes.
+   *
+   * ⚠ AND THE PAGE RELOADS AFTERWARDS. Every scene folder has been renumbered,
+   * so this page's manifest now names paths that no longer exist — exactly the
+   * stale-page state the red banner was added for. Reloading is the honest
+   * response; staying put would show a list that quietly disagrees with disk.
+   */
+  let APPLY_ARMED = false;
+  async function applyGroupingToSandbox() {
+    const b = document.getElementById('applyGroupBtn');
+    if (!b) return;
+    if (!APPLY_ARMED) {
+      APPLY_ARMED = true;
+      b.textContent = '\u26a0 Press again to write it to disk';
+      b.classList.add('armed');
+      setTimeout(() => {
+        if (!APPLY_ARMED) return;
+        APPLY_ARMED = false;
+        b.textContent = '\u{1F4BE} Apply grouping to sandbox';
+        b.classList.remove('armed');
+      }, 6000);
+      return;
+    }
+    APPLY_ARMED = false;
+    b.disabled = true;
+    b.textContent = 'Writing\u2026';
+    status('Archiving the sandbox, then writing the grouping\u2026');
+    try {
+      const r = await fetch('/api/apply-grouping', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({root: ROOT_REL})
+      });
+      const d = await r.json();
+      if (d.error) {
+        status('Not applied: ' + d.error);
+        alert('Not applied.\n\n' + d.error);
+        b.disabled = false;
+        b.classList.remove('armed');
+        b.textContent = '\u{1F4BE} Apply grouping to sandbox';
+        return;
+      }
+      status(`Wrote ${d.scenes} scene(s), was ${d.was}. Reloading\u2026`);
+      location.reload();
+    } catch (e) {
+      status('Not applied: ' + e);
+      b.disabled = false;
+      b.textContent = '\u{1F4BE} Apply grouping to sandbox';
+    }
+  }
+  /**
+   * Take the ACTIVE scene back apart. Two clicks, because it moves folders.
+   *
+   * ⚠ ONE SCENE. The whole point of the per-folder recipe is that unwinding
+   * scene 5 does not read, lock or rewrite scene 1 — before assembly.json the
+   * only way back was a full Splitter re-deposit, which destroyed every other
+   * assembled scene to undo one.
+   */
+  let UNWIND_ARMED = false;
+  async function unwindActiveScene() {
+    const b = document.getElementById('unwindBtn');
+    if (!b || ACTIVE === null) return;
+    if (!UNWIND_ARMED) {
+      UNWIND_ARMED = true;
+      b.textContent = `\u26a0 Press again to unwind scene ${ACTIVE}`;
+      b.classList.add('armed');
+      setTimeout(() => {
+        if (!UNWIND_ARMED) return;
+        UNWIND_ARMED = false;
+        b.textContent = '\u21b6 Unwind scene';
+        b.classList.remove('armed');
+      }, 6000);
+      return;
+    }
+    UNWIND_ARMED = false;
+    const n = ACTIVE;
+    b.disabled = true; b.textContent = 'Unwinding\u2026';
+    status(`Archiving, then taking scene ${n} apart\u2026`);
+    try {
+      const r = await fetch('/api/unwind', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({root: ROOT_REL, n})
+      });
+      const d = await r.json();
+      if (d.error) {
+        status('Not unwound: ' + d.error);
+        alert('Not unwound.\n\n' + d.error);
+        b.disabled = false; b.classList.remove('armed');
+        b.textContent = '\u21b6 Unwind scene';
+        return;
+      }
+      status(`Scene ${n} unwound into ${d.restored.length + 1}. Reloading\u2026`);
+      location.reload();
+    } catch (e) {
+      status('Not unwound: ' + e);
+      b.disabled = false; b.textContent = '\u21b6 Unwind scene';
+    }
+  }
+  document.getElementById('unwindBtn')?.addEventListener('click', unwindActiveScene);
+
+  document.getElementById('applyGroupBtn')?.addEventListener('click', applyGroupingToSandbox);
+
   document.getElementById('groupBtn')?.addEventListener('click', groupAsOneScene);
   document.getElementById('ungroupBtn')?.addEventListener('click', ungroupActive);
   renderReport();   // row 4 must say something before the first click

@@ -95,6 +95,7 @@ checked the same way against the frame cache, not the filesystem at large.
 """
 import functools
 import http.server
+import hashlib
 import json
 import os
 import re
@@ -252,6 +253,8 @@ ACTIONS = {
     "/api/join":            ("Join",         ("ns", "label", "tracks")),
     "/api/split":           ("Split",        ("n", "at", "labels", "tracks")),
     "/api/group":           ("Group scenes", ("members", "ungroup")),
+    "/api/apply-grouping":  ("Apply grouping to sandbox", ()),
+    "/api/unwind":          ("Unwind scene", ("n",)),
     "/api/rename":          ("Rename scene", ("n", "label")),
     "/api/line":            ("Edit line",    ("n",)),
     "/api/renumber-clear":  ("Lift lock",    ()),
@@ -592,6 +595,74 @@ def make_gap_filler(like, frames, dst, log=lambda m: None):
     return dst
 
 
+ASSEMBLY = "assembly.json"
+
+
+def cuts_dir(final):
+    """The splitter's versioned output — the master every scene is copied from."""
+    return os.path.join(final, "1_cuts", "segments")
+
+
+def cut_file(final, num):
+    """`1_cuts/segments/Num_<num>-v<N>-segment.mp4`, newest version if several.
+
+    ⚠ MATCHED ON THE NUMBER, NOT BY SORTING NAMES. `sorted()` over this folder
+    is a STRING sort — Num_1, Num_10, Num_11 … — which is exactly the bug that
+    put 38 of 39 clips in the wrong scene folder on 2026-10-06.
+    """
+    d = cuts_dir(final)
+    if not os.path.isdir(d):
+        return None
+    best, best_v = None, -1
+    for f in os.listdir(d):
+        m = re.match(rf"^Num_{num}-v(\d+)-segment\.(mp4|webm|mov)$", f)
+        if m and int(m.group(1)) > best_v:
+            best, best_v = os.path.join(d, f), int(m.group(1))
+    return best
+
+
+def md5_of(path, limit=1 << 20):
+    h = hashlib.md5()
+    with open(path, "rb") as fh:
+        for b in iter(lambda: fh.read(limit), b""):
+            h.update(b)
+    return h.hexdigest()
+
+
+def read_assembly(scene_dir):
+    """This scene's recipe, or None if it was never assembled."""
+    p = os.path.join(scene_dir, ASSEMBLY)
+    if not os.path.isfile(p):
+        return None
+    try:
+        return json.load(open(p))
+    except Exception:
+        return None
+
+
+def assembled_scenes(final):
+    """[(folder, recipe)] for every scene holding more than one segment.
+
+    ⚠ THE QUESTION BOTH GUARDS ASK. The Splitter must refuse to re-deposit over
+    these, and Unwind only offers itself on these. One reader so the two cannot
+    disagree about what "assembled" means.
+    """
+    root = PTH.sandbox_root(final)
+    out = []
+    if not os.path.isdir(root):
+        return out
+    for d in sorted(os.listdir(root)):
+        if d == "z_History":
+            continue
+        full = os.path.join(root, d)
+        if not os.path.isdir(full):
+            continue
+        a = read_assembly(full)
+        if a and len(a.get("segments") or []) > 1:
+            out.append((d, a))
+    return out
+
+
 def renumber_sandbox_folders(final, scenes):
     """
     Rename sandbox folders so their NN- prefix matches the scene numbers.
@@ -893,6 +964,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.api_save_archive(payload)
         if parsed.path == "/api/group":
             return self.api_group(payload)
+        if parsed.path == "/api/apply-grouping":
+            return self.api_apply_grouping(payload)
+        if parsed.path == "/api/unwind":
+            return self.api_unwind(payload)
         if parsed.path == "/api/rename":
             return self.api_rename(payload)
         if parsed.path == "/api/line":
@@ -1645,6 +1720,349 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         json.dump(doc, open(script_p, "w"), indent=1)
         self.send_json({"members": members, "group": None if ungroup else leader,
                         "ungrouped": ungroup})
+
+    def api_apply_grouping(self, payload):
+        """
+        Write the grouping into `2_scenes/sandbox/` — the step that turns an
+        intention into folders.
+
+        Carson chose the shape, 2026-10-06: ONE FOLDER PER SCENE, SEGMENTS KEPT
+        SEPARATE.
+
+            01-scene-001/
+              segment.mp4            the leader's own footage
+              segments/
+                Num_2.mp4            everything grouped into it
+                Num_3.mp4
+
+        ⚠ NOTHING IS CONCATENATED. That is the whole point, and it is what
+        separates this from api_join. A join re-encodes and is one-way; this
+        leaves every segment its own file, so a regroup costs a button rather
+        than a re-cut. The join happens at build time, from what is recorded
+        here.
+
+        ⚠ AND NOTHING IS MOVED OUT OF 1_cuts/segments. The grouped segments are
+        COPIED from there, not lifted out of the member folders, because
+        1_cuts/ is the versioned record of what the splitter produced and
+        `2_scenes/sandbox` is derived from it. That is what makes this
+        re-runnable: run it twice and you get the same folders.
+
+        WHAT IT WRITES
+          * the leader keeps its folder, its number and its own segment.mp4
+          * each member's cut is copied to `<leader>/segments/Num_<id>.mp4`
+          * the member folders leave the active sandbox (they are in the
+            archive, taken below, not deleted)
+          * what is left is renumbered 01..N with no gaps
+          * script.json collapses each group to ONE row carrying `segments`
+
+        ⚠ IT REFUSES WHEN A MEMBER HOLDS HAND WORK. A member folder with a
+        narration.webm or an avatar.webm is a scene somebody has already voiced
+        or composited, and collapsing it would strand that work in an archive
+        nobody looks in. It stops and names the folder instead. The LEADER may
+        hold both — it keeps its folder, so nothing of its is at risk.
+        """
+        root_rel = payload.get("root", "")
+        final = safe_join(root_rel)
+        if final is None or not os.path.isdir(final):
+            return self.send_json({"error": f"not a folder under Customers/: {root_rel}"}, 400)
+
+        script_p = PTH.script(final)
+        if not os.path.isfile(script_p):
+            return self.send_json({"error": "this store has no script.json"}, 400)
+        doc = json.load(open(script_p))
+        rows = doc.get("scenes", [])
+        if not rows:
+            return self.send_json({"error": "script.json has no scenes"}, 400)
+
+        # leader -> [members], from the `group` keys the SAE writes.
+        groups = {}
+        for r in rows:
+            g = r.get("group")
+            if g:
+                groups.setdefault(g, []).append(r["n"])
+        if not groups:
+            return self.send_json({"error": "nothing is grouped — tick an active"
+                                            " scene and some segments first"}, 400)
+        for g in groups:
+            groups[g] = sorted(groups[g])
+
+        members = {n for g, ms in groups.items() for n in ms if n != g}
+        by_n = {r["n"]: r for r in rows}
+
+        # ── the refusals, ALL of them before anything is written ───────────
+        # ⚠ A HALF-APPLIED GROUPING IS WORSE THAN A REFUSED ONE. Folders moved,
+        # script not rewritten, and no single place saying which half happened.
+        blocked = []
+        for n in sorted(members):
+            r = by_n.get(n)
+            if r is None:
+                return self.send_json({"error": f"scene {n} is grouped but not in the script"}, 400)
+            for kind, path in (("narration", PTH.narration(final, n, r.get("label"))),
+                               ("avatar", PTH.avatar(final, n, r.get("label")))):
+                if path and os.path.isfile(path) and PTH.sandbox_root(final) in path:
+                    blocked.append(f"scene {n} ({r.get('label')}) has a {kind}")
+        if blocked:
+            return self.send_json({"error": "these grouped scenes hold work that would be"
+                                            " stranded — ungroup them, or move the work to the"
+                                            " scene that keeps its folder: " + "; ".join(blocked)}, 400)
+
+        missing = [n for n in sorted(members | set(groups))
+                   if not PTH.segment(final, n, (by_n.get(n) or {}).get("label"))]
+        if missing:
+            return self.send_json({"error": f"no footage found for scene(s) {missing}"}, 400)
+
+        # ── archive EVERYTHING first ───────────────────────────────────────
+        sb_root = PTH.sandbox_root(final)
+        stamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+        hist = os.path.join(sb_root, "z_History", stamp)
+        os.makedirs(hist, exist_ok=True)
+        for d in sorted(os.listdir(sb_root)):
+            if d == "z_History":
+                continue
+            src = os.path.join(sb_root, d)
+            if os.path.isdir(src):
+                shutil.copytree(src, os.path.join(hist, d))
+        hist_s = os.path.join(final, "z_History", "line-edits")
+        os.makedirs(hist_s, exist_ok=True)
+        shutil.copy2(script_p, os.path.join(
+            hist_s, f"script-{time.strftime('%Y%m%d-%H%M%S')}-before-apply-grouping.json"))
+
+        # ── copy each member's cut in, and WRITE THE RECIPE ────────────────
+        #
+        # ⚠⚠ assembly.json IS WHAT MAKES THIS REVERSIBLE, AND IT IS THE WHOLE
+        # REASON IT EXISTS. Carson, 2026-10-06: "if I had 2 or 3 scenes already
+        # grouped, I would lose all of that … I need a way to unwind any one of
+        # those assembled scenes."
+        #
+        # Before it, the only way back was the Splitter's Save as Scenes, which
+        # re-deposits the WHOLE sandbox — so undoing one assembled scene
+        # destroyed every other one. A recipe per folder makes the undo local:
+        # api_unwind reads one file and touches one scene.
+        #
+        # ⚠ IT LIVES IN THE SCENE FOLDER, NOT IN ONE INDEX. The recipe travels
+        # with the folder — archived, restored or renumbered, it stays true —
+        # and unwinding one scene never has to read, lock or rewrite anything
+        # belonging to another.
+        #
+        # ⚠ IT CARRIES EACH MEMBER'S OWN label AND line. Those are what the
+        # member scene gets BACK on an unwind. script.json loses the member rows
+        # the moment this runs, so if the recipe did not hold them the words
+        # would be gone and the folders would come back named after nothing.
+        #
+        # ⚠ AND IT CARRIES THE SOURCE'S md5. 1_cuts/ can be re-cut under a
+        # sandbox that was assembled earlier, and a re-cut Num_2 is a different
+        # piece of film with the same name. Unwind checks and says so, rather
+        # than restoring the wrong footage under the right name.
+        copied = []
+        for leader, ms in sorted(groups.items()):
+            lrow = by_n.get(leader) or {}
+            ldir = PTH.sandbox_dir(final, leader, lrow.get("label"))
+            segdir = os.path.join(ldir, "segments")
+            os.makedirs(segdir, exist_ok=True)
+            recipe = []
+            for n in ms:
+                row = by_n.get(n) or {}
+                if n == leader:
+                    rel = os.path.basename(PTH.segment(final, n, row.get("label")) or "segment.mp4")
+                else:
+                    src = PTH.segment(final, n, row.get("label"))
+                    dst = os.path.join(segdir, f"Num_{n}{os.path.splitext(src)[1]}")
+                    shutil.copy2(src, dst)
+                    copied.append(os.path.relpath(dst, sb_root))
+                    rel = os.path.join("segments", os.path.basename(dst))
+                cut = cut_file(final, n)
+                recipe.append({
+                    "num": n,
+                    "label": row.get("label") or f"scene-{n:03d}",
+                    "line": row.get("line", ""),
+                    "file": rel,
+                    "source": os.path.basename(cut) if cut else None,
+                    "md5": md5_of(cut) if cut else None,
+                })
+            json.dump({"version": 1,
+                       "assembled": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                       "segments": recipe},
+                      open(os.path.join(ldir, ASSEMBLY), "w"), indent=1)
+
+        # ── the member folders leave the active sandbox ────────────────────
+        # Removed, not renamed: a copy of every one of them is in the archive
+        # taken above, and leaving them here under their old NN- prefix would
+        # collide with the renumbering that follows.
+        for n in sorted(members):
+            d = PTH.sandbox_dir(final, n, (by_n.get(n) or {}).get("label"))
+            if os.path.isdir(d) and os.path.realpath(d).startswith(os.path.realpath(sb_root) + os.sep):
+                shutil.rmtree(d)
+
+        # ── the script: one row per scene, renumbered ──────────────────────
+        kept = []
+        for r in rows:
+            if r["n"] in members:
+                continue
+            row = dict(r)
+            row.pop("group", None)
+            ms = groups.get(r["n"])
+            if ms:
+                # ⚠ THESE ARE THE CUT IDS (Num_N), NOT SCENE NUMBERS. Scene
+                # numbers are about to change; a Num_ never does, and the files
+                # in segments/ are named for it, so the folder explains itself.
+                row["segments"] = ms
+            kept.append(row)
+        for i, r in enumerate(kept, 1):
+            r["n"] = i
+        doc["scenes"] = kept
+        json.dump(doc, open(script_p, "w"), indent=1)
+
+        renamed = renumber_sandbox_folders(final, kept)
+
+        self.send_json({"scenes": len(kept), "was": len(rows),
+                        "groups": {str(k): v for k, v in groups.items()},
+                        "copied": copied, "renamed": renamed,
+                        "archive": os.path.relpath(hist, final)})
+
+    def api_unwind(self, payload):
+        """
+        Take ONE assembled scene apart, back into the segments it was made of.
+
+        The reverse of api_apply_grouping, and local by design. Carson,
+        2026-10-06: "if I had 2 or 3 scenes already grouped, I would lose all of
+        that … I need a way to unwind any one of those assembled scenes."
+
+        ⚠ IT TOUCHES ONE SCENE. Every other assembled scene keeps its folder,
+        its segments/ and its recipe. That is the entire reason the recipe is a
+        file per scene folder instead of one index — unwinding scene 5 never
+        reads or rewrites scene 1.
+
+        ⚠ ALL THE WAY BACK TO SINGLE SEGMENTS, not one level. Carson's choice,
+        asked outright. A scene assembled from 1+2+3 and later joined by 4
+        unwinds to four plain scenes, never to [1,2,3] plus [4]. One rule, one
+        predictable result; regrouping is a click if that is what you wanted.
+
+        WHAT IT WRITES
+          * a folder per restored segment, under its ORIGINAL label, COPIED
+            FRESH FROM 1_cuts/segments — never lifted out of segments/, so the
+            master stays the master
+          * the leader keeps its folder and its own footage; its segments/ and
+            its assembly.json go
+          * each restored segment's `line` goes back into script.json, sitting
+            directly after its leader in cut order
+          * every scene renumbered 01..N, folders and rows together
+
+        ⚠ IT CHECKS THE SOURCE HASH FIRST AND REFUSES ON A MISMATCH. 1_cuts/
+        can be re-cut under a sandbox assembled earlier, and a re-cut Num_2 is
+        a different piece of film wearing the same name. Restoring it would put
+        the wrong footage under the right label — silent, and the sort of thing
+        found weeks later.
+        """
+        root_rel = payload.get("root", "")
+        final = safe_join(root_rel)
+        if final is None or not os.path.isdir(final):
+            return self.send_json({"error": f"not a folder under Customers/: {root_rel}"}, 400)
+        try:
+            n = int(payload.get("n"))
+        except (TypeError, ValueError):
+            return self.send_json({"error": "which scene? pass n"}, 400)
+
+        script_p = PTH.script(final)
+        if not os.path.isfile(script_p):
+            return self.send_json({"error": "this store has no script.json"}, 400)
+        doc = json.load(open(script_p))
+        rows = doc.get("scenes", [])
+        by_n = {r["n"]: r for r in rows}
+        row = by_n.get(n)
+        if row is None:
+            return self.send_json({"error": f"scene {n} is not in the script"}, 400)
+
+        sdir = PTH.sandbox_dir(final, n, row.get("label"))
+        rec = read_assembly(sdir)
+        segs = (rec or {}).get("segments") or []
+        if len(segs) < 2:
+            return self.send_json({"error": f"scene {n} is a single segment — "
+                                            "there is nothing to unwind"}, 400)
+
+        # ── every refusal before anything is written ───────────────────────
+        sb_root = PTH.sandbox_root(final)
+        # ⚠ THE LEADER IS THE ONE WHOSE `file` IS ITS OWN segment.mp4, NOT
+        # simply the first row. It is first today — api_apply_grouping writes
+        # the members sorted and the lowest leads — but a recipe hand-edited or
+        # written by a later tool would silently restore the wrong one, and the
+        # leader is the scene that KEEPS its folder.
+        lead = [sg for sg in segs if not str(sg.get("file", "")).startswith("segments" + os.sep)
+                and "/" not in str(sg.get("file", ""))]
+        if len(lead) != 1:
+            return self.send_json({"error": f"scene {n}'s assembly.json does not name exactly"
+                                            f" one leading segment ({len(lead)} found)"}, 400)
+        restore = [sg for sg in segs if sg is not lead[0]]
+        problems = []
+        for sg in restore:
+            cut = cut_file(final, sg.get("num"))
+            if not cut:
+                problems.append(f"Num_{sg.get('num')} is not in 1_cuts/segments any more")
+                continue
+            if sg.get("md5") and md5_of(cut) != sg["md5"]:
+                problems.append(f"Num_{sg.get('num')} in 1_cuts has CHANGED since this"
+                                " scene was assembled — it was re-cut")
+        taken = {r.get("label") for r in rows if r["n"] != n}
+        for sg in restore:
+            if sg.get("label") in taken:
+                problems.append(f"a scene called {sg.get('label')} already exists")
+        if problems:
+            return self.send_json({"error": "cannot unwind: " + "; ".join(problems)}, 400)
+
+        # ── archive the whole sandbox and the script first ─────────────────
+        stamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+        hist = os.path.join(sb_root, "z_History", stamp)
+        os.makedirs(hist, exist_ok=True)
+        for d in sorted(os.listdir(sb_root)):
+            if d == "z_History":
+                continue
+            src = os.path.join(sb_root, d)
+            if os.path.isdir(src):
+                shutil.copytree(src, os.path.join(hist, d))
+        hist_s = os.path.join(final, "z_History", "line-edits")
+        os.makedirs(hist_s, exist_ok=True)
+        shutil.copy2(script_p, os.path.join(
+            hist_s, f"script-{time.strftime('%Y%m%d-%H%M%S')}-before-unwind.json"))
+
+        # ── rebuild a folder per restored segment, from 1_cuts ─────────────
+        # Numbered off the leader's own number so they sort into place; the
+        # renumber at the end gives every folder its final prefix anyway.
+        made = []
+        for i, sg in enumerate(restore, 1):
+            cut = cut_file(final, sg["num"])
+            d = os.path.join(sb_root, f"{n + i:02d}-{sg['label']}")
+            os.makedirs(d, exist_ok=True)
+            shutil.copy2(cut, os.path.join(d, "segment" + os.path.splitext(cut)[1]))
+            made.append(os.path.basename(d))
+
+        # ── the leader goes back to being one segment ──────────────────────
+        seg_sub = os.path.join(sdir, "segments")
+        if os.path.isdir(seg_sub):
+            shutil.rmtree(seg_sub)
+        ap = os.path.join(sdir, ASSEMBLY)
+        if os.path.isfile(ap):
+            os.remove(ap)
+
+        # ── the script: the members come back after their leader ───────────
+        out = []
+        for r in rows:
+            rr = dict(r)
+            if r["n"] == n:
+                rr.pop("segments", None)
+                rr.pop("group", None)
+                out.append(rr)
+                for sg in restore:
+                    out.append({"n": 0, "label": sg["label"], "line": sg.get("line", "")})
+            else:
+                out.append(rr)
+        for i, r in enumerate(out, 1):
+            r["n"] = i
+        doc["scenes"] = out
+        json.dump(doc, open(script_p, "w"), indent=1)
+
+        renamed = renumber_sandbox_folders(final, out)
+        self.send_json({"unwound": n, "restored": made, "scenes": len(out),
+                        "was": len(rows), "renamed": renamed,
+                        "archive": os.path.relpath(hist, final)})
 
     def api_rename(self, payload):
         """
