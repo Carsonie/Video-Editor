@@ -658,3 +658,14 @@
      hidden — the run just stops shouting it three times. */
   .segblk.samescene { color:#5d676e; }
   .segblk.samescene.cur { color:#eaffef; }
+
+  /* ── THE SHORT-LIST WARNING ────────────────────────────────────────────
+     Drawn at the TOP of the scene list, not in the status bar, because the
+     thing it explains is the list itself — and a status line scrolls away
+     while a wrong-looking list stays on screen being believed. */
+  .listwarn {
+    background:#3a2326; border:1px solid #7a3a3a; border-radius:4px;
+    color:#f0c9c9; font-size:11px; line-height:1.45;
+    padding:7px 9px; margin:0 0 6px;
+  }
+  .listwarn b { color:#ffe3e3; }

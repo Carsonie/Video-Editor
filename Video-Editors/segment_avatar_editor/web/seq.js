@@ -2964,6 +2964,8 @@ Nothing was changed. Untick the shorter track, or move to a `
   // The list is the store's full set; the ticks say which are on the timeline.
   const ON = new Set(SEQ.map(s => s.n));
   let ALL = null;
+  // Why the list is short, when it is short. null means it is the real list.
+  let LIST_ERROR = null;
 
   async function loadScenes() {
     try {
@@ -2978,6 +2980,23 @@ Nothing was changed. Untick the shorter track, or move to a `
       ALL = SEQ.map(s => ({ n: s.n, label: s.label, missing: false,
                             dur: +(s.base_n / (s.fps || 25)).toFixed(2) }));
       status('scene list unavailable — ' + e.message);
+      // ⚠⚠ AND SAY SO IN THE PANEL, NOT ONLY IN THE STATUS LINE.
+      //
+      // Carson, 2026-10-06, after Save as Scenes renamed every folder under a
+      // page that was already open: "the ungrouping only loaded the 3 scenes
+      // from the ungrouped segments. All scenes should have loaded here?"
+      //
+      // That is this fallback, and it is the WORST shape a failure can take —
+      // a SHORTER LIST THAT LOOKS CORRECT. 39 scenes became 3, every row well
+      // formed, every control live, and the one line saying why had long since
+      // scrolled out of the status bar. It reads as a bug in whatever you
+      // pressed last; that day it was blamed on Ungroup, which had worked.
+      //
+      // The common cause is not an outage. It is a path that moved: this page
+      // holds the folder names it was OPENED with, and the Splitter's Save as
+      // Scenes archives those folders and writes new ones. Nothing is lost and
+      // nothing is broken — the page is simply looking at yesterday.
+      LIST_ERROR = e.message;
     }
     renderScenes();
     // The bar's numbering is derived from the FULL list, which only exists
@@ -3109,6 +3128,36 @@ ${el.dataset.tip}` : '')
   function renderScenes() {
     paintDirty();
     $('sceneList').innerHTML = '';
+    if (LIST_ERROR) {
+      const w = document.createElement('div');
+      w.className = 'listwarn';
+      w.innerHTML = '<b>Showing only the scenes on this timeline.</b>'
+        + ' The full scene list could not be read, so the rows below are NOT'
+        + ' every scene in this video.<br>Usually the folders were renamed'
+        + ' after this page was opened — Save as Scenes does that.'
+        + ' <b>Reopen the timeline</b> and the rest come back.';
+      w.title = LIST_ERROR;
+      $('sceneList').appendChild(w);
+    }
+    // ⚠⚠ RENDERABLE BEFORE THE LIST ARRIVES. `ALL` is null until loadScenes()
+    // returns, and renderScenes() is called from several places that do not
+    // wait for it — loadGroups().then() races it outright, so which one lands
+    // first depends on two fetches and changes between runs. `for (const it of
+    // null)` threw, and the throw took out everything after it: no scene rows
+    // at all, a blank panel, and a console error four calls from the cause.
+    //
+    // ⚠ THIS IS THE SECOND TIME THE SAME NULL DID THIS (sceneNumbers() was the
+    // first, the same day). THE RULE FOR THIS FILE: anything that reads ALL
+    // must survive it being null, because the render is not ordered after the
+    // load and never has been.
+    if (!ALL) {
+      const d = document.createElement('div');
+      d.className = 'listwarn';
+      d.style.cssText = 'background:#23303a;border-color:#3a5b72;color:#b9d4e6';
+      d.textContent = 'Reading the scene list…';
+      $('sceneList').appendChild(d);
+      return;
+    }
     // Once per render, not once per row: every row needs the whole map to show
     // its own number AND to name the scene a folded row sits under.
     const SHOWN = sceneNumbers();
