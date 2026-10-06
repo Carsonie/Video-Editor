@@ -713,7 +713,12 @@ function fillChrome(CLIP) {
       lab.className = 'hn';
       lab.textContent = String(i + 1).padStart(2, '0') + ' ·';
       const inp = document.createElement('input');
-      inp.placeholder = 'scene';
+      // ⚠ THE PLACEHOLDER IS THE REAL DEFAULT, NOT A HINT. A row left pristine
+      // is saved under exactly this name, so what you see here is what lands
+      // on disk. It used to read "scene" for every row, which was the name all
+      // 39 folders then shared — true at the time, and the thing that made the
+      // collision invisible until a join was pressed.
+      inp.placeholder = 'scene-' + String(i + 1).padStart(3, '0');
       inp.spellcheck = false;
       inp.value = was[i] || '';
       // ⚠ Enforced AS YOU TYPE, not on submit — it becomes a folder name, and
@@ -725,7 +730,8 @@ function fillChrome(CLIP) {
       row.appendChild(lab); row.appendChild(inp);
       nameRows.appendChild(row);
     }
-    nameStatus.textContent = `${n} scene(s) · leave blank for the number alone`;
+    nameStatus.textContent = `${n} scene(s) · leave a row blank and it is saved as`
+                           + ` the greyed name beside it`;
     nameModal.hidden = false;
     nameRows.querySelector('input')?.focus();
   }

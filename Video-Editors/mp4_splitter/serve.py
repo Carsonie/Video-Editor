@@ -872,8 +872,29 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         from_dir = os.path.join(root, "1_cuts", "segments")
         if not os.path.isdir(from_dir):
             from_dir = derive_segments_dir(src)
-        seg = sorted(f for f in os.listdir(from_dir)
-                     if f.lower().endswith((".mp4", ".webm"))) if os.path.isdir(from_dir) else []
+        # ⚠⚠ SORTED BY THE NUMBER IN THE NAME, NOT BY THE NAME. A plain
+        # sorted() is a STRING sort, so 39 cuts came back as
+        #   Num_1, Num_10, Num_11 … Num_19, Num_2, Num_20 … Num_9
+        # and the deposit filled 01-scene with Num_1, 02-scene with Num_10,
+        # 03-scene with Num_11, and so on. 38 of 39 scene folders held the
+        # wrong clip (picklist, 2026-10-06).
+        #
+        # ⚠ AND IT REPORTED SUCCESS. 39 folders, 39 files, 39 script rows,
+        # every count right and every name plausible — the only way to see it
+        # was to hash the footage against 1_cuts/segments. A deposit that is
+        # merely in the wrong ORDER looks exactly like a correct one.
+        #
+        # Nothing is lost when it happens: 1_cuts/segments keeps the cuts under
+        # their real numbers, so a re-save puts it right. That is the whole
+        # reason this copies rather than moves.
+        def _cut_no(f):
+            m = re.search(r"Num_(\d+)", f)
+            # A file the pattern does not fit sorts LAST, by name, rather than
+            # silently taking position 0 — which is where a -1 would put it.
+            return (0, int(m.group(1)), "") if m else (1, 0, f.lower())
+        seg = sorted((f for f in os.listdir(from_dir)
+                      if f.lower().endswith((".mp4", ".webm"))),
+                     key=_cut_no) if os.path.isdir(from_dir) else []
         if not seg:
             return self.send_json(
                 {"error": "nothing to save — cut the segments first"}, 400)
@@ -893,9 +914,38 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         os.makedirs(sandbox, exist_ok=True)
 
         made, scenes = [], []
+
+        # ⚠⚠ A SEGMENT LEFT PRISTINE IS NAMED FOR ITS OWN NUMBER, NOT "scene".
+        # Carson, 2026-10-06: "if I did not rename any of the segments, and they
+        # still remain pristine then add the unique id number as their name."
+        #
+        # Per segment, not all-or-nothing: name row 5 "dashboard" and leave the
+        # rest blank, and you get scene-001 … dashboard … scene-006. The id is
+        # the segment's OWN number, so a named row leaves no gap behind it.
+        #
+        # ⚠ WHY UNIQUE NAMES MATTER, AND IT IS NOT TIDINESS. Every row used to
+        # be labelled "scene", and renumber_sandbox_folders() — which api_join
+        # and api_split both call — matches a folder to its row BY LABEL. 39
+        # identical labels collapse 39 folders onto one. The NN- prefix saves
+        # the read path (paths.sandbox_dir matches on the prefix alone), so the
+        # duplicates cause no trouble at all until the day a join is pressed.
+        #
+        # ⚠ HYPHENS, NOT UNDERSCORES. The label rule below strips anything that
+        # is not [a-z0-9-], so scene_001 would land as scene001 and the folder
+        # and the row would quietly disagree again.
+        def _default_name(i):
+            return f"scene-{i + 1:03d}"
+
+        # A typed name that collides with another gets its number appended, for
+        # the same reason: two folders may not answer to one label.
+        seen = {}
         for i, f in enumerate(seg):
-            nm = (names[i] if i < len(names) else "") or "scene"
-            nm = re.sub(r"[^a-z0-9-]", "-", nm.lower()).strip("-")[:49] or "scene"
+            typed = (names[i] if i < len(names) else "").strip()
+            nm = re.sub(r"[^a-z0-9-]", "-", typed.lower()).strip("-")[:49]
+            nm = nm or _default_name(i)
+            if nm in seen:
+                nm = f"{nm}-{i + 1:03d}"[:49]
+            seen[nm] = i
             label = f"{i + 1:02d}-{nm}"
             d = os.path.join(sandbox, label)
             os.makedirs(d, exist_ok=True)
@@ -927,6 +977,20 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         sp = (os.path.join(root, "3_voice", voice, "script.json") if voice
               else os.path.join(root, "3_voice", "script.json"))
         os.makedirs(os.path.dirname(sp), exist_ok=True)
+
+        # ⚠ THIS REPLACES THE WHOLE SCRIPT, SO KEEP THE ONE IT REPLACES.
+        # Every `line` written so far and every `group` made in the SAE live in
+        # this file, and a re-save overwrites all of them — which is correct,
+        # because a fresh cut is a fresh set of scenes and the old rows no
+        # longer describe the footage. What is NOT acceptable is losing the
+        # words with no way back, so the outgoing script is archived first,
+        # beside the ones the SAE's own line edits leave.
+        if os.path.isfile(sp):
+            hist_s = os.path.join(root, "z_History", "line-edits")
+            os.makedirs(hist_s, exist_ok=True)
+            shutil.copy2(sp, os.path.join(
+                hist_s, f"script-{time.strftime('%Y%m%d-%H%M%S')}-before-save-scenes.json"))
+
         doc = {"store": os.path.basename(os.path.dirname(os.path.dirname(root))),
                "title": os.path.basename(root),
                "scenes": scenes}
