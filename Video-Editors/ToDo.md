@@ -24,12 +24,12 @@ the six recipes in `Basic_E2E_Testing/.claude/skills/`: `owner-one-item`,
 
 State on 2026-09-04, read off the folders rather than off any doc:
 
-| Store | `01-first-time-ordering` | built here | released to `Basic` |
-|---|---|---|---|
-| ski-demo | 13 scenes | `_v32.mp4` | **NO — see below** |
-| canoe-demo | 11 scenes | yes | `canoe-demo_first-time-ordering_v2.mp4` |
-| bike-demo | 12 scenes | yes | `bike-demo_first-time-ordering_v1.mp4` |
-| alpine-sports | 11 scenes | yes | `alpine-sports_first-time-ordering_v2.mp4` |
+| Store         | `01-first-time-ordering` | built here | released to `Basic`                        |
+| ------------- | ------------------------ | ---------- | ------------------------------------------ |
+| ski-demo      | 13 scenes                | `_v32.mp4` | **NO — see below**                         |
+| canoe-demo    | 11 scenes                | yes        | `canoe-demo_first-time-ordering_v2.mp4`    |
+| bike-demo     | 12 scenes                | yes        | `bike-demo_first-time-ordering_v1.mp4`     |
+| alpine-sports | 11 scenes                | yes        | `alpine-sports_first-time-ordering_v2.mp4` |
 
 **Videos 02–06 do not exist for any store. That is 20 of the 24.**
 
@@ -92,7 +92,7 @@ for a folder literally called `Customers/`, so it lands on this repo root by
 itself — but the demo data still has to carry `Basic_E2E_Testing`'s name for
 it. That is the whole of the problem; there is nothing subtler in it.
 
-*(P2.2 and P2.3 were both done 2026-08-28 — see Done.)*
+_(P2.2 and P2.3 were both done 2026-08-28 — see Done.)_
 
 ---
 
@@ -137,11 +137,11 @@ without deleting anything yet.
 move — the best signal available, and only a proxy for "last touched," not
 "last built from."
 
-| File | Last usage (mtime) |
-|---|---|
-| `TRACK_front_sarah.webm` | 2026-08-19 22:52 |
-| `TRACK_front_full.webm` | 2026-08-19 23:02 |
-| `TRACK_rear_full.mp4` | 2026-08-19 23:02 |
+| File                     | Last usage (mtime) |
+| ------------------------ | ------------------ |
+| `TRACK_front_sarah.webm` | 2026-08-19 22:52   |
+| `TRACK_front_full.webm`  | 2026-08-19 23:02   |
+| `TRACK_rear_full.mp4`    | 2026-08-19 23:02   |
 
 If no future bike-demo rebuild reads these, delete them from
 `z_History/2026-08-28_v1/`. Don't delete on this entry alone — confirm first
@@ -195,7 +195,7 @@ of each clip is just slow again while it re-extracts.
 
 ## P4 — later, by design
 
-*(P4.1 was done 2026-08-28 — see Done.)*
+_(P4.1 was done 2026-08-28 — see Done.)_
 
 ### P4.2 `dev` → `sandbox` stays a MANUAL copy — decided, not outstanding
 
@@ -261,23 +261,23 @@ way) — what's left is a few real decisions plus actually running the
 agent for a new video.
 
 - [ ] Decide: is this agent ready to run the real documented workflow for
-  a brand-new video today? Confirm the credit cost and generation-time
-  expectation with the user before starting (real HeyGen credits, 10-20+
-  min generation time isn't unusual for a multi-segment video).
+      a brand-new video today? Confirm the credit cost and generation-time
+      expectation with the user before starting (real HeyGen credits, 10-20+
+      min generation time isn't unusual for a multi-segment video).
 - [ ] Decide which Mux delivery mechanism to standardize on — the simple
-  approach already live in production vs. the more elaborate, currently
-  unused JWT-private-playback prototype sitting in this repo
-  (`Help_Videos/VSCode_Mux_Ex/`).
+      approach already live in production vs. the more elaborate, currently
+      unused JWT-private-playback prototype sitting in this repo
+      (`Help_Videos/VSCode_Mux_Ex/`).
 - [ ] Decide which store gets the first real video, and confirm the
-  delivery target (`customers/default/help_videos/` vs. a specific
-  store override) — moot until the Mux decision above is made.
+      delivery target (`customers/default/help_videos/` vs. a specific
+      store override) — moot until the Mux decision above is made.
 - [ ] Produce one real, complete help video end-to-end through this agent
-  — open with `Video_Goal.md`'s master prompt, walk the documented steps,
-  verify the final output plays correctly.
+      — open with `Video_Goal.md`'s master prompt, walk the documented steps,
+      verify the final output plays correctly.
 - [ ] Upload that finished video via the existing `mux-video-upload` skill
-  and confirm it's actually visible/playable in the app.
+      and confirm it's actually visible/playable in the app.
 - [ ] Revisit the screen-capture source once `testing-recorder-manager`
-  exists — swap manual OBS capture for an automated `flow_runner`
-  recording, if that ends up being wanted.
+      exists — swap manual OBS capture for an automated `flow_runner`
+      recording, if that ends up being wanted.
 
 ---
