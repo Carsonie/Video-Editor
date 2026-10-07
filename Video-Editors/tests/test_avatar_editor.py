@@ -215,18 +215,37 @@ def s_save_scene_proxy():
 # ski-demo — and this constant is what broke, silently, because a missing
 # fixture path reads as a failing assertion rather than a moved folder. The
 # stores split one at a time, so the name is whichever one exists.
+REAL_SCENE = "01-login"
+
+
 def _real_store_rel():
-    for stage in ("development_videos", "videos"):
-        rel = f"Rentify Demos Corp/bike-demo/help-videos/{stage}/01-first-time-ordering"
-        if os.path.isdir(os.path.join(fixture.CUSTOMERS, rel)):
-            return rel
-    return ("Rentify Demos Corp/bike-demo/help-videos/development_videos/"
-            "01-first-time-ordering")
+    # ⚠ IT LOOKS FOR THE SCENE THESE TESTS USE, NOT FOR A FOLDER NAME. The list
+    # here was `development_videos` then `videos`, and on 2026-10-07 the folder
+    # moved AGAIN — to `UI/original_video/`, renamed as well as moved, so even a
+    # deeper search for `01-first-time-ordering` would have found nothing. The
+    # scene `01-login` is what REAL_SEG and REAL_AV actually need, so that is
+    # what is searched for; it survives the folder being moved or renamed again,
+    # which on this repo's record it will be.
+    #
+    # ⚠ AND A MISSING FIXTURE READS AS A FAILING ASSERTION, not as a moved path.
+    # That is why this constant has gone stale three times without anyone
+    # noticing it was a path problem at all.
+    hv = os.path.join(fixture.CUSTOMERS, "Rentify Demos Corp", "bike-demo",
+                      "help-videos")
+    for depth in (1, 2):
+        hits = sorted(glob.glob(os.path.join(hv, *["*"] * depth,
+                                             "sandbox", REAL_SCENE)))
+        if hits:
+            # <video>/sandbox/<scene>  ->  the video folder
+            return os.path.relpath(
+                os.path.dirname(os.path.dirname(hits[0])), fixture.CUSTOMERS)
+    return os.path.join("Rentify Demos Corp", "bike-demo", "help-videos",
+                        "UI", "original_video")
 
 
 REAL_STORE_REL = _real_store_rel()
-REAL_SEG = f"{REAL_STORE_REL}/sandbox/01-login/segment.mp4"
-REAL_AV = f"{REAL_STORE_REL}/sandbox/01-login/avatar.webm"
+REAL_SEG = f"{REAL_STORE_REL}/sandbox/{REAL_SCENE}/segment.mp4"
+REAL_AV = f"{REAL_STORE_REL}/sandbox/{REAL_SCENE}/avatar.webm"
 
 # ski-demo is the one real store this suite exercises Load/lib_frames
 # against — s_load_picker borrows bike-demo for the same reason. Its OWN

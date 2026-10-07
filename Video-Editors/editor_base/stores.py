@@ -5,7 +5,10 @@ Which videos a Load picker can offer, for every editor that has one.
 Editor, in Frame Blender and in Avatar Editor. All three named
 `help-videos/videos/`, all three went blank on 2026-09-15 when every store was
 split into `BCP_raw_mp4/`, `UI_raw_mp4/`, `development_videos/` and
-`Completed_Videos/`, and all three stayed blank for six days because nothing
+`Completed_Videos/` (today `BCP/`, `UI/`, and the finished video as
+`UI/original_video/` — the last two folders were removed on 2026-10-07, which
+this walk needed no change for, which is the point), and all three stayed blank
+for six days because nothing
 fails when a listing is empty — the picker just has nothing in it. Fixing one
 copy would have left two.
 

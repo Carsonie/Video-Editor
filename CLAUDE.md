@@ -179,7 +179,19 @@ wrong one gives an empty page rather than an error:
 ⚠ **THE FOLDER NAMES ABOVE CHANGED ON 2026-09-15, ON ALL FOUR STORES.**
 `videos/` is `development_videos/`, and `raw_mp4/` split into `BCP_raw_mp4/`
 (the admin recipes) and `UI_raw_mp4/` (the renter flows). `raw_mp4` and
-`videos` no longer exist anywhere under `Customers/`. The full layout, the
+`videos` no longer exist anywhere under `Customers/`.
+
+⚠ **AND THEY CHANGED AGAIN. A STORE IS `BCP/ UI/ z_History/` NOW** — the stage
+folders were renamed on 2026-09-22, and on 2026-10-07 Carson removed
+`development_videos/` and `Completed_Videos/` from all four stores. The one
+finished video is `UI/original_video/`, a video folder sitting beside the
+recipes. `Completed_Videos/` had never held anything but a `.gitkeep`.
+
+⚠ **A VIDEO FOLDER SITS DIRECTLY UNDER ITS STAGE, ONE LEVEL, NO DEEPER.**
+`stores.videos_in()` walks `<stage>/<video>`, so a video parked at
+`UI/original_video/01-first-time-ordering/` matched nothing and vanished from
+every editor's Load picker — with no error, because a picker short by one entry
+looks exactly like a complete one. The full layout, the
 recipe→surface rule, and the traps are in `Basic_E2E_Testing/CLAUDE.md`'s
 "THE HELP-VIDEO FOLDER LAYOUT" section and in `skills/vtt/SKILL.md`.
 
