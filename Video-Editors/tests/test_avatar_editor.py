@@ -36,6 +36,7 @@ WHAT THIS PROVES THAT test_editor.py CANNOT
 import argparse
 import ast
 import json
+import glob
 import os
 import re
 import shutil
@@ -239,18 +240,38 @@ REAL_AV = f"{REAL_STORE_REL}/sandbox/01-login/avatar.webm"
 # ski-demo renamed videos/ to development_videos/ on 2026-09-15, so this
 # constant had been pointing at nothing since then — and a missing fixture
 # reads as a FAILING ASSERTION, not as a moved folder.
+SKI_SCENE = "01-intro-and-login"
+
+
 def _ski_store_rel():
-    for stage in ("development_videos", "videos"):
-        rel = f"Rentify Demos Corp/ski-demo/help-videos/{stage}/01-first-time-ordering"
-        if os.path.isdir(os.path.join(fixture.CUSTOMERS, rel)):
-            return rel
-    return ("Rentify Demos Corp/ski-demo/help-videos/development_videos/"
-            "01-first-time-ordering")
+    # ⚠ IT WALKS NOW, IT DOES NOT GUESS. The list above was `development_videos`
+    # then `videos`, and on 2026-10-07 the folder moved AGAIN — to
+    # `UI/original_video/01-first-time-ordering`, a level deeper than either —
+    # so a fixed list broke a third time. Finding the folder by NAME survives
+    # the next move, which on this repo's record there will be.
+    # ⚠ IT LOOKS FOR THE SCENE THESE TESTS USE, NOT FOR A FOLDER NAME. The
+    # name has moved three times — `videos/` to `development_videos/` to
+    # `UI/original_video/` — and was RENAMED on the last one, so even a
+    # two-depth search for `01-first-time-ordering` found nothing. The scene
+    # `01-intro-and-login` is what SKI_SEG and SKI_AV actually need, so that is
+    # what is searched for; it survives the folder being moved or renamed
+    # again, which on this repo's record it will be.
+    hv = os.path.join(fixture.CUSTOMERS, "Rentify Demos Corp", "ski-demo",
+                      "help-videos")
+    for depth in (1, 2):
+        pat = os.path.join(hv, *["*"] * depth, "sandbox", SKI_SCENE)
+        hits = sorted(glob.glob(pat))
+        if hits:
+            # <video>/sandbox/<scene>  ->  the video folder
+            return os.path.relpath(
+                os.path.dirname(os.path.dirname(hits[0])), fixture.CUSTOMERS)
+    return os.path.join("Rentify Demos Corp", "ski-demo", "help-videos",
+                        "UI", "original_video")
 
 
 SKI_STORE_REL = _ski_store_rel()
-SKI_SEG = f"{SKI_STORE_REL}/sandbox/01-intro-and-login/segment.mp4"
-SKI_AV = f"{SKI_STORE_REL}/sandbox/01-intro-and-login/avatar.webm"
+SKI_SEG = f"{SKI_STORE_REL}/sandbox/{SKI_SCENE}/segment.mp4"
+SKI_AV = f"{SKI_STORE_REL}/sandbox/{SKI_SCENE}/avatar.webm"
 COMMON_LIB_CLIP = "idle/sarah-idle-10s-alpha.webm"
 COMMON_LIB_STILL = "stills/sarah-rest-pose-corner-300-alpha.png"
 

@@ -77,9 +77,77 @@ def probe(path, entries, stream=True):
     return subprocess.run(cmd, capture_output=True, text=True).stdout.strip()
 
 
+# ── WHERE THINGS LIVE, ASKED RATHER THAN ASSUMED ──────────────────────────
+#
+# ⚠⚠ THIS FILE USED TO HARDCODE `root/script.json`, `root/rings.json`,
+# `root/segments` AND `root/sandbox`, AND ALL FOUR MOVED. The 2026-09-22
+# refactor put a recipe on `0_master/ 1_cuts/ 2_scenes/ 3_voice/ …`, and
+# 2026-09-23 made the voice folder the one source of truth for the script. So
+# on picklist this tool had already been finding nothing, and on special-skis
+# it broke the moment that folder was converted (2026-10-07).
+#
+# ⚠ IT FAILED BY FINDING NOTHING, NOT BY ERRORING. `--reapply` with no
+# rings.json loads `{"rings": []}` and paints nothing, reporting success. That
+# is the shape of bug this repo keeps paying for, so the resolution is shared
+# rather than copied: editor_base.paths is THE answer when it can be imported,
+# and the fallback below only exists for running this file somewhere that
+# cannot see the Video-Editors package.
+_PATHS = None
+for _up in range(3, 8):
+    _cand = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                         *[".."] * _up, "Video-Editors"))
+    if os.path.isdir(os.path.join(_cand, "editor_base")):
+        sys.path.insert(0, _cand)
+        try:
+            from editor_base import paths as _PATHS      # noqa: E402
+        except Exception:
+            _PATHS = None
+        break
+
+
+def _first(root, *rels):
+    """The first of these that exists; otherwise the first one, to name in an error."""
+    for r in rels:
+        p = os.path.join(root, r)
+        if os.path.exists(p):
+            return p
+    return os.path.join(root, rels[0])
+
+
+def script_path(root):
+    """script.json — the voice folder first, exactly as editor_base resolves it."""
+    if _PATHS:
+        return _PATHS.script(root)
+    v = _first(root, "3_voice", "voice")
+    for c in (os.path.join(v, "script.json"),
+              os.path.join(root, "2_scenes", "sandbox", "script.json"),
+              os.path.join(root, "sandbox", "script.json"),
+              os.path.join(root, "script.json")):
+        if os.path.isfile(c):
+            return c
+    return os.path.join(v, "script.json")
+
+
+def rings_path(root):
+    """rings.json — BESIDE script.json, which is the rule this tool documents."""
+    return os.path.join(os.path.dirname(script_path(root)), "rings.json")
+
+
+def segments_dir(root):
+    """The cuts — 1_cuts/segments/ in the new shape, segments/ in the old."""
+    return _first(root, os.path.join("1_cuts", "segments"), "segments")
+
+
+def sandbox_dir(root):
+    """The scene folders — 2_scenes/sandbox/ in the new shape, sandbox/ in the old."""
+    if _PATHS:
+        return _PATHS.sandbox_root(root)
+    return _first(root, os.path.join("2_scenes", "sandbox"), "sandbox")
+
+
 def scene_label(root, n):
     """The label as script.json spells it — the folder names are built from it."""
-    with open(os.path.join(root, "script.json")) as fh:
+    with open(script_path(root)) as fh:
         for s in json.load(fh)["scenes"]:
             if s["n"] == n:
                 return s["label"]
@@ -106,10 +174,10 @@ def find_cut(root, n, label):
     from. That is the answer; the prefix scan is only the fallback, and it
     prefers whichever cut is the same length as the clip.
     """
-    segs = os.path.join(root, "segments")
+    segs = segments_dir(root)
     if not os.path.isdir(segs):
         return None
-    sb = os.path.join(root, "sandbox", f"{n:02d}-{label}" if label else "")
+    sb = os.path.join(sandbox_dir(root), f"{n:02d}-{label}" if label else "")
     rec = os.path.join(sb, ".sync.json")
     if os.path.isfile(rec):
         try:
@@ -205,10 +273,6 @@ def yellow_count(png, box, pad=12):
     return n
 
 
-def rings_path(root):
-    return os.path.join(root, "rings.json")
-
-
 def load_rings(root):
     p = rings_path(root)
     return json.load(open(p)) if os.path.isfile(p) else {"rings": []}
@@ -275,7 +339,7 @@ def main():
 
     keep = False
     root = os.path.abspath(a.root)
-    if not os.path.isfile(os.path.join(root, "script.json")):
+    if not os.path.isfile(script_path(root)):
         sys.exit(f"no script.json in {root} — that is not a recipe folder")
     label = scene_label(root, a.scene)
     cut = find_cut(root, a.scene, label)

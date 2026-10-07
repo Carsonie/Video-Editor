@@ -80,8 +80,10 @@ def sandbox_root(final):
 
     ⚠ BOTH SHAPES ARE LIVE AT ONCE, ON PURPOSE. Carson approved the numbered
     shape on 2026-09-22 — `0_master/ 1_cuts/ 2_scenes/ 3_voice/ …` — for videos
-    born into it. Renaming the 25 folders already on disk was NOT approved,
-    because that is the move this project has had bite it four times: the
+    born into it. A wholesale rename of the 25 folders already on disk was NOT
+    approved; they convert one at a time, when Carson asks (special-skis,
+    2026-10-07). Both shapes stay readable because that is the move this
+    project has had bite it four times: the
     2026-09-15 stage split, and the `.gitignore` silently dropping ten
     `*vtt.html` pages twice and the TOOLS scripts once. So the folder is asked,
     never assumed. The name of this function is kept because nine callers use

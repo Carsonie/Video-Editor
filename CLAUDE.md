@@ -455,9 +455,21 @@ born on the new name.
 
 ⚠ **ski-demo's SIX OTHER BCP RECIPES WERE CONVERTED TO THE NUMBERED SHAPE THE
 SAME DAY** — `add-collection`, `add-item`, `add-question`, `add-requirement`,
-`special-boots`, `special-poles`. **`special-skis` was deliberately LEFT on the
-old `sandbox/ voice/ segments/` shape**, at Carson's instruction, because it is
-the one finished video and there was no reason to risk it.
+`special-boots`, `special-poles`. **`special-skis` was converted on
+2026-10-07**, at Carson's instruction, so all seven are now on the numbered
+shape. It had been left behind because it is the one finished video; Carson:
+"This no longer applys."
+
+⚠ **CONVERT IN ONE OPERATION.** `NEW_SHAPE_MARKERS = ("0_master", "1_cuts")` —
+creating either folder flips `sandbox_root()` to `2_scenes/` and `script()` to
+the voice folder at once. Folders first and files after leaves every resolver
+pointing at something that is not there yet.
+
+⚠ **AND GREP FOR THE PATHS AFTERWARDS.** `add_ring.py` hardcoded
+`root/script.json`, `root/rings.json`, `root/segments` and `root/sandbox`; it
+had been silently finding nothing on picklist since that folder was built, and
+`--reapply` on an absent rings.json paints nothing and reports success. Fixed
+2026-10-07 to resolve through `editor_base.paths`.
 
 ⚠ **`ski-demo/BCP/` IS NOT THE ONLY `BCP` UNDER ski-demo.** There is an older,
 untracked `Customers/Rentify Demos Corp/ski-demo/BCP/` from 2026-08-26 holding
