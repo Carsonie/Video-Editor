@@ -95,7 +95,7 @@ export function Browse() {
 
       {/* A VIDEO FOLDER is one holding both `sandbox/` and `video/`. Derived
           from what the listing already returned rather than asked for — the
-          Segment and Avatar Editor works on a whole video, not on one file, so
+          Scenes and Avatar Editor works on a whole video, not on one file, so
           this is the only place it can be entered from. */}
       {data &&
         data.dirs.some((d) => d.name === 'sandbox') &&
@@ -109,7 +109,7 @@ export function Browse() {
                 size="compact-sm"
                 onClick={() => navigate(`/timeline?root=${encodeURIComponent(data.path)}&ns=all`)}
               >
-                Open the Segment and Avatar Editor →
+                Open the Scenes and Avatar Editor →
               </Button>
             </Group>
           </Paper>

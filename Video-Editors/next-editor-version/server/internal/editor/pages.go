@@ -142,7 +142,7 @@ func WriteViewer(outdir string, m *Meta) error {
 	})
 }
 
-// ── the Segment and Avatar Editor, layered ──────────────────────────────────
+// ── the Scenes and Avatar Editor, layered ──────────────────────────────────
 
 type pairData struct {
 	PlayerLabel, Title, Slug string
@@ -165,7 +165,7 @@ func WritePair(outdir string, base, over *Meta, box int, baseRel, overRel string
 		maxN = over.NbFrames
 	}
 	return render(outdir, "pair.gohtml", pairData{
-		PlayerLabel: SAELabel("Segment and Avatar Editor", "segment_avatar_editor"),
+		PlayerLabel: SAELabel("Scenes and Avatar Editor", "scenes_avatar_editor"),
 		Title:       base.SourceName + " + " + over.SourceName,
 		Box:         box,
 		Slug:        filepath.Base(strings.TrimRight(outdir, "/")),
@@ -178,7 +178,7 @@ func WritePair(outdir string, base, over *Meta, box int, baseRel, overRel string
 	})
 }
 
-// ── the Segment and Avatar Editor, timeline ─────────────────────────────────
+// ── the Scenes and Avatar Editor, timeline ─────────────────────────────────
 
 type seqData struct {
 	PlayerLabel, Title, Manifest, RootRel string
@@ -203,7 +203,7 @@ func WriteSeq(outdir string, manifest []map[string]any, box int, rootRel string)
 		total = 1
 	}
 	return render(outdir, "seq.gohtml", seqData{
-		PlayerLabel: SAELabel("Segment and Avatar Editor", "segment_avatar_editor"),
+		PlayerLabel: SAELabel("Scenes and Avatar Editor", "scenes_avatar_editor"),
 		Title:       "timeline: scenes " + strings.Join(names, ", "),
 		Box:         box,
 		Total:       total,

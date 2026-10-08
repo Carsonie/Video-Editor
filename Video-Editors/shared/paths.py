@@ -2,7 +2,7 @@
 SHIM — the real module is editor_base/paths.py.
 
 This file used to be one of three byte-identical copies (here,
-mp4_splitter/, segment_avatar_editor/). They were merged into
+mp4_splitter/, scenes_avatar_editor/). They were merged into
 editor_base/ on 2026-09-03 under Carson's Option A.
 
 It stays as a re-export for one reason: nine scripts in build/ do

@@ -75,14 +75,21 @@ Customers/*/*/help-videos/**/*.vtt.artifact.html
 # silent failure that dropped all ten *vtt.html pages twice: an untracked file
 # looks exactly like a file with no changes. Named by FOLDER, not by extension,
 # so the next card and the next helper are kept without editing this file again.
+# ⚠ THE TOOLS LEFT Customers/ ON 2026-10-08. They are
+# `Video-Editors/scenes_avatar_editor/tools/` now — inside the editor that uses
+# them, which is tracked normally, so no un-ignore is needed for them any more.
+#
+# These two lines are KEPT because a store restored from the BK drive, or
+# checked out from an older commit, still has a TOOLS/ folder — and an
+# un-ignore that matches nothing costs nothing, while removing it would quietly
+# stop tracking those files if one ever came back.
+#
+# (Both depths are here for the same reason they always were: the first rule
+# was written from "a folder in BCP_raw called TOOLS" and matched
+# `help-videos/<stage>/TOOLS/`, while ski-demo's actually sat one level up at
+# `help-videos/TOOLS/` and never matched — make_intro.py and make_overlay.py
+# were UNTRACKED from 2026-09-21 until this was found on 2026-09-22.)
 !Customers/*/*/help-videos/*/TOOLS/**
-# ⚠ AND ONE LEVEL UP, WHICH IS WHERE THE FOLDER ACTUALLY IS. The rule above was
-# written from the words "I add a folder in BCP_raw called TOOLS" and so matches
-# `help-videos/<stage>/TOOLS/`. ski-demo's sits at `help-videos/TOOLS/`, one
-# level higher, and never matched: make_intro.py and make_overlay.py have been
-# UNTRACKED since 2026-09-21, with only NOTE.md ever committed — the same silent
-# failure this comment block was written about, in the fix for it. Found
-# 2026-09-22 when add_ring.py was moved in beside them. Both depths now.
 !Customers/*/*/help-videos/TOOLS/**
 # ...but never a preview. make_overlay.py --preview writes <card>_on_frameN.png
 # to look at before burning; it is a screenshot of a clip, not an asset.
@@ -97,7 +104,7 @@ Customers/**/cache/**
 # five at the repo root and Carson did not want to scroll past them:
 #   cache/_shared/                the old 8842 server and Frame Blender
 #   cache/mp4-splitter/           |
-#   cache/segment-avatar-editor/  | one per standalone editor, so one tool's
+#   cache/scenes-avatar-editor/  | one per standalone editor, so one tool's
 #   cache/avatar-editor/          | Clear can never throw away another's frames
 #   cache/go/                     the next-gen Go server's own
 #   cache/ruff/                   ruff's, via cache-dir in pyproject.toml
@@ -117,8 +124,8 @@ tests/frame_blender/*.log
 tests/frame_blender/*.txt
 tests/mp4_splitter/*.log
 tests/mp4_splitter/*.txt
-tests/segment_avatar_editor/*.log
-tests/segment_avatar_editor/*.txt
+tests/scenes_avatar_editor/*.log
+tests/scenes_avatar_editor/*.txt
 tests/editor_base/*.log
 tests/editor_base/*.txt
 !tests/*/.gitkeep

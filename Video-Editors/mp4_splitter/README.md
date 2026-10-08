@@ -12,7 +12,7 @@ Standalone — nothing else needs to be running. Its own process, its own
 port, its own extracted-frame cache (`cache/mp4-splitter/`, not the
 shared `cache/`), its own routes and its own pages. Split off
 `shared/serve.py` on 2026-09-02 at Carson's request: MP4 Splitter and the
-Segment and Avatar Editor used to share one process on port 8842, and he
+Scenes and Avatar Editor used to share one process on port 8842, and he
 asked for the two to be genuinely independent, code and all, so a change
 to one can never break the other.
 
@@ -92,7 +92,7 @@ the real file, and asserts the page actually references it — a served file
 nothing links to would otherwise pass.
 
 Avatar Editor and Frame Blender moved off the Python-string pattern on
-2026-08-30. The Segment and Avatar Editor has not yet; that is Step 13 of
+2026-08-30. The Scenes and Avatar Editor has not yet; that is Step 13 of
 `README-CODE-CLEANUP-PLAN.md`, and this tool is its worked example.
 
 ### One known rough edge

@@ -301,7 +301,7 @@ That is literally what the editors use when they archive a file on save:
 
     avatar_editor/serve.py:946      hist_dir = .../z_History/<stamp>
     frame_blender/serve.py:581      same
-    segment_avatar_editor/serve.py  script line-edits, sandbox snapshots
+    scenes_avatar_editor/serve.py  script line-edits, sandbox snapshots
 
 **Never invent a date format.** Add a label after the stamp if it helps —
 `20260904-153414_push285` — the stamp leads, the words follow. To rename an
@@ -330,7 +330,7 @@ written by the editors themselves:
 | whole sandbox | `sandbox/z_History/<date>-v_N/` | what did EVERYTHING look like before this batch |
 
 The second is written by **Save All Scenes**, and
-`segment_avatar_editor/serve.py:1623` explains the split in its own words:
+`scenes_avatar_editor/serve.py:1623` explains the split in its own words:
 one snapshot per batch is a record, one per click is a disk full of
 near-identical copies.
 

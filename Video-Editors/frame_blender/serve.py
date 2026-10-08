@@ -75,7 +75,7 @@ sys.path.insert(0, os.path.join(ROOT, "build"))
 # re-export shims for build/; import the real package directly.
 from editor_base import frames as build_mod               # noqa: E402
 # ⚠ NOT `import serve as main_serve` ANY MORE. This tool used to borrow the
-# old shared/serve.py — an 82% copy of the Segment and Avatar Editor — and
+# old shared/serve.py — an 82% copy of the Scenes and Avatar Editor — and
 # CONFIGURE it by writing into that module's globals, so the log you got
 # depended on which import ran last. Those helpers are editor_base now:
 # shared code, not a second editor imported sideways.
@@ -440,7 +440,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             maintained.
 
         The per-scene rows (frame counts, cache slugs, pristine/dirty) come
-        from siblings() above — the same recipe the Segment and Avatar
+        from siblings() above — the same recipe the Scenes and Avatar
         Editor's own api_siblings() uses, called directly now rather than
         proxied to it, so the two tools still cannot disagree about a
         scene's state. script.json is read here and returned alongside,

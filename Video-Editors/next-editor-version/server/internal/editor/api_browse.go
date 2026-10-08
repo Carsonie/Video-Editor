@@ -1,7 +1,7 @@
 package editor
 
 // The ways IN: browsing Customers/, opening a clip, and the two multi-clip
-// views the Segment and Avatar Editor is built on.
+// views the Scenes and Avatar Editor is built on.
 
 import (
 	"crypto/sha1"

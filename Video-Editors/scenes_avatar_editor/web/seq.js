@@ -1,5 +1,5 @@
 /*
- * Segment and Avatar Editor — the timeline page's behaviour.
+ * Scenes and Avatar Editor — the timeline page's behaviour.
  *
  * A plain .js file since 2026-09-04. It used to be a <script> block inside
  * a Python string in player.py: every brace doubled, no linting, no syntax
@@ -35,7 +35,7 @@ function viewSlug() {
   document.getElementById('playerName').textContent = VIEW.player_label;
   // EDITOR — what is open. See mp4_splitter/web/app.js for the why; the
   // same line is in pair.js.
-  document.title = `Segment and Avatar Editor — ${VIEW.title}`;
+  document.title = `Scenes and Avatar Editor — ${VIEW.title}`;
   document.getElementById('slider').max = VIEW.total;
   /*
     COME BACK WHERE YOU LEFT OFF. Save Timeline re-opens this timeline once the

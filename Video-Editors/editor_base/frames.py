@@ -41,12 +41,12 @@ ROOT = os.path.dirname(HERE)
 # THE ONE LINE THAT MADE THREE COPIES OF THIS FILE.
 #
 # Until 2026-09-03 this module existed three times over — shared/frames.py,
-# mp4_splitter/frames.py, segment_avatar_editor/frames.py — 776 lines each,
+# mp4_splitter/frames.py, scenes_avatar_editor/frames.py — 776 lines each,
 # and the ONLY difference between them in real code was this constant:
 #
 #     shared/                 cache/_shared
 #     mp4_splitter/           cache/mp4-splitter
-#     segment_avatar_editor/  cache/segment-avatar-editor
+#     scenes_avatar_editor/  cache/scenes-avatar-editor
 #
 # One line of configuration, paid for with two full duplicate files. So it
 # is configuration now, and there is one file.

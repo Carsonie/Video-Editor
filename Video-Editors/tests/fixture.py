@@ -181,7 +181,7 @@ def dead_handlers(serve_py_path):
     those checks pass either way. This is the only thing that can see
     the body is still there. That is not hypothetical: the 2026-09-02
     split left 15 such handlers in mp4_splitter (930 lines, 36% of its
-    serve.py) and 4 in segment_avatar_editor, all of them invisible to
+    serve.py) and 4 in scenes_avatar_editor, all of them invisible to
     a green test run for a year.
 
     REACHABILITY, NOT "IS IT CALLED ANYWHERE". Those differ, and the

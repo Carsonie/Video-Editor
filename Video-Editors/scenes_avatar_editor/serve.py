@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Segment and Avatar Editor's own standalone server — split off shared/serve.py
+Scenes and Avatar Editor's own standalone server — split off shared/serve.py
 whole on 2026-09-02, at Carson's own request: MP4 Splitter used to share
 this one process/port with it, and he asked for the two tools to be
 genuinely independent, no shared code, each on its own port. This file
@@ -18,7 +18,7 @@ Reset editor) are gone ENTIRELY.
     What stops it recurring is fixture.dead_handlers(), which walks out
     from do_GET/do_POST and fails the suite on anything unreachable.
 
-It also gets its OWN extracted-frame cache (cache/segment-avatar-editor/, not the shared
+It also gets its OWN extracted-frame cache (cache/scenes-avatar-editor/, not the shared
 cache/) and its own frames.py/paths.py/vtt.py — duplicated, not imported,
 same reason. See mp4_splitter/serve.py for that tool's own copy of this
 same split.
@@ -29,11 +29,11 @@ player (_splitter_player.py, in this same package) — see frames.py's own
 write_viewer() for where that's wired in.
 
 Serves the extracted-frame cache (same as
-`python3 -m http.server --directory cache/segment-avatar-editor`) and adds
+`python3 -m http.server --directory cache/scenes-avatar-editor`) and adds
 a folder-tree browser rooted at Customers/, so a raw recording can be
 found and opened without already knowing its path.
 
-    python3 segment_avatar_editor/serve.py [--port 8846]
+    python3 scenes_avatar_editor/serve.py [--port 8846]
 
 Routes:
   GET  /browse.html          folder-tree browser, rooted at Customers/
@@ -116,12 +116,12 @@ import urllib.parse
 # editor_base/ — the one package every editor may import from. Standalone
 # still holds where it matters: own process, own port, own cache, own routes,
 # own pages, and its own player.py right here.
-HERE = os.path.dirname(os.path.abspath(__file__))          # <repo>/segment_avatar_editor
+HERE = os.path.dirname(os.path.abspath(__file__))          # <repo>/scenes_avatar_editor
 ROOT = os.path.dirname(HERE)                                # <repo>
-CACHE = os.path.join(ROOT, "cache", "segment-avatar-editor")  # this tool's OWN cache
-sys.path.insert(0, ROOT)                                    # for the segment_avatar_editor package itself
+CACHE = os.path.join(ROOT, "cache", "scenes-avatar-editor")  # this tool's OWN cache
+sys.path.insert(0, ROOT)                                    # for the scenes_avatar_editor package itself
 from editor_base import frames as build_mod                 # noqa: E402
-from segment_avatar_editor import player as sae             # noqa: E402  this package's own player.py
+from scenes_avatar_editor import player as sae             # noqa: E402  this package's own player.py
 from editor_base import paths as PTH                        # noqa: E402
 from editor_base import vtt as vtt_mod                      # noqa: E402
 from editor_base import recorder                            # noqa: E402  the other repo's scripts
@@ -230,7 +230,7 @@ CUSTOMERS_ROOT = os.path.join(REPO_ROOT, "Customers")
 # calls that CHANGE something are logged; opening a clip is logged too, because
 # a line saying what you were working on is what makes the rest readable.
 SESSION_DIR = os.path.join(ROOT, "logs")
-SESSION_LOG = os.path.join(SESSION_DIR, f"segment_avatar_editor_{time.strftime('%Y%m%d')}.log")
+SESSION_LOG = os.path.join(SESSION_DIR, f"scenes_avatar_editor_{time.strftime('%Y%m%d')}.log")
 
 # endpoint -> (what to call it, which payload keys are worth showing).
 # Trimmed to just this tool's own routes (2026-09-02, alongside giving it
@@ -270,11 +270,11 @@ RESULT_KEYS = ("nb_frames", "count", "version", "duration_s", "joined", "split",
 
 def session_start(port):
     os.makedirs(SESSION_DIR, exist_ok=True)
-    ver_p = os.path.join(ROOT, "segment_avatar_editor", "VERSION")
+    ver_p = os.path.join(ROOT, "scenes_avatar_editor", "VERSION")
     ver = open(ver_p).read().strip() if os.path.isfile(ver_p) else "?"
     with open(SESSION_LOG, "a") as fh:
         fh.write(f"\nEditor Session:  {time.strftime('%Y-%m-%dT%H:%M:%S')}\n"
-                 f"Player:          Segment and Avatar Editor v{ver}\n"
+                 f"Player:          Scenes and Avatar Editor v{ver}\n"
                  f"Server:          http://localhost:{port}\n\n")
 
 
@@ -1381,7 +1381,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def send_web(self, name, ctype=None):
         """
-        One of this tool's own static files out of segment_avatar_editor/web/.
+        One of this tool's own static files out of scenes_avatar_editor/web/.
 
         Served from here rather than by pointing the handler's `directory` at
         web/, because that root is already the frame CACHE — the frames are
@@ -2898,7 +2898,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 
 BROWSE_HTML = """<!doctype html>
-<html><head><meta charset="utf-8"><title>Segment and Avatar Editor</title>
+<html><head><meta charset="utf-8"><title>Scenes and Avatar Editor</title>
 <style>
   :root { color-scheme: dark; }
   body { margin:0; background:#1a1a1a; color:#eee; font-family:-apple-system,sans-serif;

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 MP4 Splitter's own standalone server — split off shared/serve.py whole on
-2026-09-02, at Carson's own request: the Segment and Avatar Editor used to
+2026-09-02, at Carson's own request: the Scenes and Avatar Editor used to
 share this one process/port with it, and he asked for the two tools to be
 genuinely independent, no shared code, each on its own port. This file
 started as a literal copy of shared/serve.py and was trimmed down to just
@@ -20,7 +20,7 @@ timeline opening, ...) are gone ENTIRELY.
 
 It also gets its OWN extracted-frame cache (cache/mp4-splitter/, not the shared
 cache/) and its own frames.py/paths.py — duplicated, not imported, same
-reason. See segment_avatar_editor/serve.py for that tool's own copy of
+reason. See scenes_avatar_editor/serve.py for that tool's own copy of
 this same split.
 
 Serves the extracted-frame cache (same as
@@ -118,7 +118,7 @@ ROOT = os.path.dirname(HERE)                                # <repo>
 CACHE = os.path.join(ROOT, "cache", "mp4-splitter")         # this tool's OWN cache
 sys.path.insert(0, ROOT)                                    # for the mp4_splitter package itself
 from editor_base import frames as build_mod                 # noqa: E402
-# No segment_avatar_editor import, no vtt.py — this tool never renders a
+# No scenes_avatar_editor import, no vtt.py — this tool never renders a
 # layered/timeline/VTT page, so it has no use for either.
 from editor_base import paths as PTH                        # noqa: E402
 from mp4_splitter import player                             # noqa: E402  its name for the page footer
@@ -934,7 +934,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.send_json(
                 {"error": "these scenes are assembled from several segments and a re-save"
                           " would discard them: " + ", ".join(assembled)
-                          + ". Unwind them in the Segment and Avatar Editor first.",
+                          + ". Unwind them in the Scenes and Avatar Editor first.",
                  "assembled": assembled}, 409)
 
         # ⚠ ARCHIVE THE GENERATION BEING REPLACED, never overwrite it. A scene

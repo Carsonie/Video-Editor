@@ -145,7 +145,7 @@ Only step 5 spends money. Everything else is local ffmpeg and free.
  4  write the lines   script.json  +  vtt.py           (free, do it twice)
  5  render Sarah      render_narration.py              ($, ASK FIRST)
  6  place Sarah       morph_avatar_corner.py           → avatar.webm
- 7  adjust            Segment and Avatar Editor        (Carson's step)
+ 7  adjust            Scenes and Avatar Editor        (Carson's step)
  8  build             build_scenes.py, then --join     → video/
  9  release           release_video.py                 → Basic_E2E_Testing
 ```
@@ -177,7 +177,7 @@ By eye, in the MP4 Splitter — mark, ＋/− Frame, ＋/− Zone, Loop Zone, Cu
 the hand-off into `dev/`.
 
 ```bash
-python3 segment_avatar_editor/serve.py --port 8846   # shared/serve.py retired 2026-09-21
+python3 scenes_avatar_editor/serve.py --port 8846   # shared/serve.py retired 2026-09-21
 ```
 
 `build/cut_segments.py` can do it from flow-log stamps instead, but it must
@@ -241,7 +241,7 @@ hole.
 ### 7. Adjust — Carson's step, in the editor
 
 ```bash
-python3 segment_avatar_editor/serve.py --port 8846   # shared/serve.py retired 2026-09-21
+python3 scenes_avatar_editor/serve.py --port 8846   # shared/serve.py retired 2026-09-21
 ```
 
 Frame and zone edits, marks, Join, Split, Solo, the VTT panel, **Save Scenes**

@@ -2,7 +2,7 @@
 SHIM — the real module is editor_base/frames.py.
 
 776 lines, and it existed three times over (here, mp4_splitter/,
-segment_avatar_editor/) differing by ONE line of real code: the name of
+scenes_avatar_editor/) differing by ONE line of real code: the name of
 the cache folder. Merged into editor_base/ on 2026-09-03, where that one
 line became configuration — see editor_base.frames.use_cache().
 

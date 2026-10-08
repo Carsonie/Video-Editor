@@ -92,10 +92,23 @@ def probe(path, entries, stream=True):
 # rather than copied: editor_base.paths is THE answer when it can be imported,
 # and the fallback below only exists for running this file somewhere that
 # cannot see the Video-Editors package.
+#
+# ⚠ TWO WALKS, BECAUSE THIS FILE HAS LIVED IN TWO PLACES. It was
+# `Customers/<biz>/<store>/help-videos/TOOLS/`, five levels under the repo root
+# with `Video-Editors/` as a SIBLING; on 2026-10-08 it moved to
+# `Video-Editors/scenes_avatar_editor/tools/`, where `editor_base` is a plain
+# two levels up. The old range(3, 8) still happened to hit the new home — tools
+# -> scenes_avatar_editor -> Video-Editors -> Video-Editor, then joining
+# "Video-Editors" lands back inside — which is luck, not design, and luck that
+# would evaporate the next time this folder moved one level.
 _PATHS = None
-for _up in range(3, 8):
-    _cand = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                         *[".."] * _up, "Video-Editors"))
+_here = os.path.dirname(os.path.abspath(__file__))
+_tries = []
+for _up in range(0, 8):
+    _base = os.path.abspath(os.path.join(_here, *[".."] * _up))
+    _tries.append(_base)                       # editor_base sitting right here
+    _tries.append(os.path.join(_base, "Video-Editors"))   # ...or beside us
+for _cand in _tries:
     if os.path.isdir(os.path.join(_cand, "editor_base")):
         sys.path.insert(0, _cand)
         try:

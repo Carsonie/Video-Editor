@@ -9,7 +9,7 @@ model: sonnet
 
     ~/Rentify/Video-Editor
 
-Everything about making one is there: the MP4 Splitter, the Segment and Avatar
+Everything about making one is there: the MP4 Splitter, the Scenes and Avatar
 Editor, `build/`, `PIPELINE.md`, `HELP_VIDEO_MIGRATION.md`, and all four stores'
 working files. **Read `PIPELINE.md` there.** Start a session in that repo — its
 `CLAUDE.md` is written for the job.
@@ -32,7 +32,7 @@ Say where it happens, and offer to work there. Do not copy a tool across, and do
 not rebuild one here.
 
 **Why that matters more than it sounds.** Until 2026-08-28 both repos held the
-same working files and drifted in silence: this repo's Segment and Avatar Editor
+same working files and drifted in silence: this repo's Scenes and Avatar Editor
 was at **v29 while the real one was at v55**, and `.claude/launch.json` here
 launched the stale one. Anything rebuilt here starts that over.
 

@@ -216,7 +216,7 @@ def s_no_duplicate_copies_left():
     OWNED = ("paths.py", "frames.py", "vtt.py")
     SHIM_MAX = 60          # the real modules are 465, 776 and 300+ lines
 
-    for pkg in ("mp4_splitter", "segment_avatar_editor",
+    for pkg in ("mp4_splitter", "scenes_avatar_editor",
                 "avatar_editor", "frame_blender"):
         for mod in OWNED:
             p = os.path.join(REPO, pkg, mod)

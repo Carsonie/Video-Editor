@@ -223,7 +223,7 @@ export function MarksPanel({
               styles={{ label: { fontSize: 11, color: 'var(--dim)' } }}
             />
           ))}
-          <Tooltip label="Copy these segments into dev/ as named scenes, and write a scene row for each into script.json. This is where the Segment and Avatar Editor picks the work up. dev holds ONE generation — the one it replaces is archived first.">
+          <Tooltip label="Copy these segments into dev/ as named scenes, and write a scene row for each into script.json. This is where the Scenes and Avatar Editor picks the work up. dev holds ONE generation — the one it replaces is archived first.">
             <Button fullWidth disabled={!namesReady} onClick={() => void doHandoff()}>
               → Hand off to dev
             </Button>

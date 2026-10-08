@@ -13,7 +13,7 @@ tracked whatever .gitignore later says.)
 
 THE COMMAND
 -----------
-    cd "Customers/Rentify Demos Corp/ski-demo/help-videos/TOOLS"
+    cd "Video-Editors/scenes_avatar_editor/tools"
     python3 make_intro.py \
       --w 2304 --h 1926 \
       --title "The Picklist" \

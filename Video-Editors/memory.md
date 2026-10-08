@@ -52,7 +52,7 @@ That stopped being true over about a day of real use:
   live in the same control.
 - Then it needed to **save** what it built, and to **know** whether a scene
   had already been changed by someone else — which meant it needed the same
-  save path, and the same pristine/dirty signal, the Segment and Avatar
+  save path, and the same pristine/dirty signal, the Scenes and Avatar
   Editor already has. Rather than duplicate either, `/api/save` grew a
   staleness check (refuses to overwrite a file that changed on disk since
   its cache was built, unless told `force`) and Frame Blender became a real
@@ -172,7 +172,7 @@ touched, never committed over.
 By 2026-08-30 Frame Blender had grown real teeth — Save, Undo, Load, a
 real Build — by reaching into the main editor's process (`shared/
 serve.py`, port 8842) for its save/undo/dirty-state machinery, and MP4
-Splitter and the Segment and Avatar Editor still lived together in that
+Splitter and the Scenes and Avatar Editor still lived together in that
 SAME process, one combined page on one port. Carson's own call, stated
 directly: he was about to develop different functionality in each tool
 and did not want a small change in one to be able to break another —
@@ -186,7 +186,7 @@ functions as a plain Python module, since that's sharing code, not a
 running process). Then Avatar Editor was created as a full duplicate of
 Frame Blender, to split Carson's own upcoming work between the two
 rather than have one tool do everything. Then MP4 Splitter and the
-Segment and Avatar Editor split apart from each other the same way —
+Scenes and Avatar Editor split apart from each other the same way —
 own port, own cache directory, own duplicated `frames.py`/`paths.py` —
 with one deliberate exception: SAE's "open this scene on its own" link
 still works, via a PRIVATE duplicate of MP4 Splitter's player
@@ -240,14 +240,14 @@ already established, applied to the one place it had been missed.
 
 ## Two editors had never been tested standalone (2026-09-02)
 
-MP4 Splitter and the Segment and Avatar Editor had been running as
+MP4 Splitter and the Scenes and Avatar Editor had been running as
 independent processes since 2026-09-01/02, verified by hand at the
 time — curl and a real browser — but neither ever got a permanent,
 automated suite of its own. `test_editor.py` still proved the
 underlying code correct (both started as literal copies of it), but
 nothing proved the STANDALONE server — its own trimmed dispatch table,
 its own cache directory, its own session log — actually held together.
-`tests/test_mp4_splitter.py` and `tests/test_segment_avatar_editor.py`
+`tests/test_mp4_splitter.py` and `tests/test_scenes_avatar_editor.py`
 closed that gap: 82 and 90 checks, built the same way `test_frame_
 blender.py`/`test_avatar_editor.py` already were, plus a check that
 every route each split deliberately dropped is confirmed truly gone

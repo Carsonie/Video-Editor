@@ -124,7 +124,7 @@ export interface ApiError {
   error: string;
 }
 
-// ── the Segment and Avatar Editor ───────────────────────────────────────────
+// ── the Scenes and Avatar Editor ───────────────────────────────────────────
 
 /** One scene on the timeline. Each keeps its OWN extraction — they are ordinary
  *  pairs, cached and reused — and the manifest maps a global frame to a scene

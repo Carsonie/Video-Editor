@@ -29,7 +29,7 @@ import { usePlayback } from '../hooks/usePlayback';
 const BOX = 750;
 
 /**
- * The Segment and Avatar Editor.
+ * The Scenes and Avatar Editor.
  *
  * Several scenes on ONE timeline, the avatar laid over the footage. A scene on
  * its own cannot show the thing that most often goes wrong — how one scene

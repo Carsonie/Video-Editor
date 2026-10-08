@@ -65,7 +65,7 @@ GROUPS = [
         ("Reset Editor",              "Reset Editor"),
         ("Frame preloading",          "preloadFrames"),
     ]),
-    ("Segment and Avatar Editor — timeline", "next-editor-version/web/src/routes/Editor.tsx", [
+    ("Scenes and Avatar Editor — timeline", "next-editor-version/web/src/routes/Editor.tsx", [
         ("Play / mute / speed",       "play.setRate"),
         ("Step 1 and 10 frames",      "onStep(10)"),
         ("Previous / next scene",     "onScene"),
@@ -93,7 +93,7 @@ GROUPS = [
         # at the CONTROL, not at the call it would make.
         ("＋ / － Frame on the LEFT",  "onFrameSide"),
     ]),
-    ("Segment and Avatar Editor — layered (one scene)", None, [
+    ("Scenes and Avatar Editor — layered (one scene)", None, [
         ("A dedicated layered page",  "routes/Pair.tsx"),
         ("Solo one layer",            "soloLayer"),
         ("Show / hide each layer",    "showLayer"),
@@ -108,8 +108,8 @@ def python_controls():
     """Every control id in the three Python page templates."""
     out = {}
     jobs = [("MP4 Splitter", "mp4_splitter/player.py", "TEMPLATE"),
-            ("SAE layered", "segment_avatar_editor/player.py", "PAIR_TEMPLATE"),
-            ("SAE timeline", "segment_avatar_editor/player.py", "SEQ_TEMPLATE")]
+            ("SAE layered", "scenes_avatar_editor/player.py", "PAIR_TEMPLATE"),
+            ("SAE timeline", "scenes_avatar_editor/player.py", "SEQ_TEMPLATE")]
     for name, mod, var in jobs:
         src = open(os.path.join(REPO, mod)).read()
         tpl = ""

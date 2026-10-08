@@ -882,7 +882,7 @@ function fillChrome(CLIP) {
   }
 
   // ── tooltips ────────────────────────────────────────────────────────────
-  // Ported from the Segment and Avatar Editor. Reads each element's own
+  // Ported from the Scenes and Avatar Editor. Reads each element's own
   // `title`, so every control is covered — including the ones whose text
   // changes with state. The title is REMOVED while hovering and put back on
   // leave, or the browser's native tooltip appears underneath this one at its
@@ -1108,7 +1108,7 @@ function fillChrome(CLIP) {
 
   // ── hand off to the sandbox ─────────────────────────────────────────────
   // The last step this tool was missing. A cut leaves
-  // sandbox/_cuts/Num_3-v1-segment.mp4; the Segment and Avatar Editor reads
+  // sandbox/_cuts/Num_3-v1-segment.mp4; the Scenes and Avatar Editor reads
   // sandbox/03-<name>/segment.mp4 and the scene rows in script.json. Naming
   // them here is what turns loose cuts into scenes, and it is the point where
   // this tool's job ends and the editor's begins.
@@ -1217,7 +1217,7 @@ The cuts stay in _cuts/ either way.`)) return;
         + `
 
 The store now has ${data.scenes} scene(s). Open it in the `
-        + `Segment and Avatar Editor to write the lines and add the avatar.`;
+        + `Scenes and Avatar Editor to write the lines and add the avatar.`;
       handoffBtn.textContent = '✓ Handed off';
     } catch (e) {
       handoffStatus.textContent = 'Error: ' + e;

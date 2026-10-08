@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-Exercise the Segment and Avatar Editor's own endpoints — the standalone
-server (segment_avatar_editor/serve.py, port 8846) — against the same
+Exercise the Scenes and Avatar Editor's own endpoints — the standalone
+server (scenes_avatar_editor/serve.py, port 8846) — against the same
 disposable store test_editor.py builds.
 
-    python3 tests/test_segment_avatar_editor.py            # build, run, tear down
-    python3 tests/test_segment_avatar_editor.py --keep      # leave the store to poke at
+    python3 tests/test_scenes_avatar_editor.py            # build, run, tear down
+    python3 tests/test_scenes_avatar_editor.py --keep      # leave the store to poke at
 
 WHY THIS FILE DIDN'T EXIST UNTIL NOW
-    MP4 Splitter and the Segment and Avatar Editor split off shared/serve.py
+    MP4 Splitter and the Scenes and Avatar Editor split off shared/serve.py
     into fully independent processes on 2026-09-02 (own port, own cache,
-    duplicated code — see segment_avatar_editor/serve.py's own module
+    duplicated code — see scenes_avatar_editor/serve.py's own module
     docstring). That work was verified by hand at the time — curl and a
     real browser — but never got a permanent, automated suite of its own,
     so a regression in this tool's OWN dispatch table, cache, or log could
@@ -50,7 +50,7 @@ sys.path.insert(0, HERE)
 import fixture  # noqa: E402
 
 PLAYERS = os.path.dirname(HERE)
-SAE_SERVE = os.path.join(PLAYERS, "segment_avatar_editor", "serve.py")
+SAE_SERVE = os.path.join(PLAYERS, "scenes_avatar_editor", "serve.py")
 
 SAE_BASE = None    # set by main()
 RESULTS = []
@@ -173,8 +173,8 @@ def s_static_page():
     """
     step("the landing page — clean title, sandbox scenes only")
     html = urllib.request.urlopen(SAE_BASE + "/", timeout=10).read().decode()
-    check("titled just \"Segment and Avatar Editor\", no \"Browse Customers —\" prefix",
-          "<title>Segment and Avatar Editor</title>" in html)
+    check("titled just \"Scenes and Avatar Editor\", no \"Browse Customers —\" prefix",
+          "<title>Scenes and Avatar Editor</title>" in html)
     for gone in ("gap-builder.js", "sarah_clips"):
         check(f"nothing about {gone!r} on this page", gone not in html)
 
@@ -272,11 +272,11 @@ def s_own_cache():
     run can legitimately leave a same-named folder in the shared cache/ it
     uses, and that is not a collision: it is a different directory. What
     matters, and what this checks, is that THIS pair landed in this
-    tool's own cache/segment-avatar-editor/.
+    tool's own cache/scenes-avatar-editor/.
     """
-    step("its own cache — cache/segment-avatar-editor/, not the shared cache/")
-    own = os.path.join(PLAYERS, "cache", "segment-avatar-editor", PAIR)
-    check("the pair just opened landed in cache/segment-avatar-editor/",
+    step("its own cache — cache/scenes-avatar-editor/, not the shared cache/")
+    own = os.path.join(PLAYERS, "cache", "scenes-avatar-editor", PAIR)
+    check("the pair just opened landed in cache/scenes-avatar-editor/",
           os.path.isdir(own), own)
 
 
@@ -502,13 +502,13 @@ def s_dropped_routes_are_gone():
 
 def s_session_log():
     """
-    A dedicated file (logs/segment_avatar_editor_<date>.log), not shared/
+    A dedicated file (logs/scenes_avatar_editor_<date>.log), not shared/
     serve.py's combined logs/editor_<date>.log — split apart per editor
     2026-09-02, at the same time this suite was added.
     """
     step("its own dedicated session log")
     log_path = os.path.join(PLAYERS, "logs",
-                             f"segment_avatar_editor_{time.strftime('%Y%m%d')}.log")
+                             f"scenes_avatar_editor_{time.strftime('%Y%m%d')}.log")
     check("the file exists", os.path.isfile(log_path), log_path)
     text = open(log_path).read() if os.path.isfile(log_path) else ""
     check("carries this run's own actions (Save scene)", "Save scene" in text, text[-200:])
@@ -646,13 +646,13 @@ def s_api_view():
     eq("total is the sum of the scenes' frames", view.get("total"),
        sum(m["base_n"] for m in view["manifest"]))
 
-    # `title` is the BARE name. web/seq.js composes the tab title as "Segment and Avatar Editor — <title>"
+    # `title` is the BARE name. web/seq.js composes the tab title as "Scenes and Avatar Editor — <title>"
     # (Carson's format, 2026-09-04). Prefixing it here too would double it,
     # and the suite cannot see document.title — this guards the half it can.
     for slug, what in ((seq_slug, "timeline"),):
         v, _ = get("/api/view", slug=slug)
         check(f"{what}: title is bare, not prefixed with the editor",
-              not str(v.get("title", "")).startswith("Segment and Avatar"),
+              not str(v.get("title", "")).startswith("Scenes and Avatar"),
               v.get("title"))
 
     _, code = get("/api/view", slug="no-such-slug-at-all")
@@ -686,7 +686,7 @@ def s_deeper_paths_are_not_the_layered_page():
         layered = r.read().decode()
     check("two segments still give the timeline page", "/web/seq.js" in layered)
 
-    cache = os.path.join(PLAYERS, "cache", "segment-avatar-editor", slug)
+    cache = os.path.join(PLAYERS, "cache", "scenes-avatar-editor", slug)
     for half in ("base", "overlay"):
         f = os.path.join(cache, half, "viewer.html")
         check(f"{half}: no page is written for it any more",
@@ -711,7 +711,7 @@ def s_stale_cached_pages():
     replaces it.
     """
     step("a pre-migration cache still serves its own page")
-    stale = os.path.join(PLAYERS, "cache", "segment-avatar-editor",
+    stale = os.path.join(PLAYERS, "cache", "scenes-avatar-editor",
                          "pair_stalefixture99")
     os.makedirs(stale, exist_ok=True)
     marker = "PRE-MIGRATION-BAKED-PAGE"
@@ -766,9 +766,9 @@ def main():
     a = ap.parse_args()
     SAE_BASE = f"http://localhost:{a.port}"
 
-    out(f"Segment and Avatar Editor Test:  {time.strftime('%Y-%m-%dT%H:%M:%S')}")
+    out(f"Scenes and Avatar Editor Test:  {time.strftime('%Y-%m-%dT%H:%M:%S')}")
     out(f"Store:                            {fixture.ROOT_REL}  (built, used, deleted)")
-    out(f"Segment and Avatar Editor:        {SAE_BASE}")
+    out(f"Scenes and Avatar Editor:        {SAE_BASE}")
 
     step("Build the test store")
     for n, label, ns, na, nn, _ in fixture.SCENES:
@@ -781,7 +781,7 @@ def main():
         cwd=os.path.dirname(SAE_SERVE), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
         if not wait_up(SAE_BASE + "/"):
-            sys.exit("  segment_avatar_editor never came up")
+            sys.exit("  scenes_avatar_editor never came up")
 
         for fn in FUNCTIONS:
             fn()
@@ -797,11 +797,11 @@ def main():
     out(f"\n  Checks:  {passed}/{len(RESULTS)} passed")
     out(f"  Result:  {'PASS' if passed == len(RESULTS) else 'FAIL'}")
 
-    # Own folder, own log + report — tests/segment_avatar_editor/, never another
+    # Own folder, own log + report — tests/scenes_avatar_editor/, never another
     # editor's (see fixture.write_report()'s own docstring for why this
     # is shared code rather than copied four times).
-    base = fixture.write_report("segment_avatar_editor", LOG, RESULTS, STEPS)
-    out(f"  Report:  tests/segment_avatar_editor/{base}.txt")
+    base = fixture.write_report("scenes_avatar_editor", LOG, RESULTS, STEPS)
+    out(f"  Report:  tests/scenes_avatar_editor/{base}.txt")
 
     if passed != len(RESULTS):
         sys.exit(1)

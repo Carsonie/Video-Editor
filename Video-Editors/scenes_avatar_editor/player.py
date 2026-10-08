@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-The Segment and Avatar Editor — one scene's footage with its alpha avatar laid
+The Scenes and Avatar Editor — one scene's footage with its alpha avatar laid
 over it, in two shapes:
 
   layered   (PAIR_TEMPLATE)  one scene, mp4 underneath and WebM on top
@@ -23,7 +23,7 @@ get_frame_map = frames.get_frame_map
 # The player's name and version, shown at the foot of its page. The version
 # lives in a VERSION file beside this module rather than in the source, so a
 # bump is a one-line diff that a commit hook can see and a reader can trust.
-NAME = "Segment and Avatar Editor"
+NAME = "Scenes and Avatar Editor"
 
 def _version():
     p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "VERSION")

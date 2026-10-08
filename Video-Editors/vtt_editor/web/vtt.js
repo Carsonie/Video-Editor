@@ -743,7 +743,7 @@ async function refresh() {
 
   // ⚠ THE WRONG TOOL, SAID PLAINLY. A BUILT video's lengths live in its
   // sandbox clips, not in its script, so this editor would show 11 scenes of
-  // 0.0s — indistinguishable from a bug. The Segment and Avatar Editor owns
+  // 0.0s — indistinguishable from a bug. The Scenes and Avatar Editor owns
   // that stage, and build/vtt_html.py draws its table.
   if (STATE.kind === 'built') {
     $('jobs').innerHTML = '';
@@ -754,10 +754,10 @@ async function refresh() {
     $('headmeta').innerHTML = `<span>${esc(STATE.store)}</span>`
       + `<span><b>${esc(STATE.recipe)}</b></span><span>built video</span>`;
     $('railnote').textContent = 'this is a BUILT video — vtt_editor covers raw '
-      + 'captures. Open it in the Segment and Avatar Editor, or draw its table '
+      + 'captures. Open it in the Scenes and Avatar Editor, or draw its table '
       + 'with build/vtt_html.py.';
     say(`${STATE.recipe} is a BUILT video — its scene lengths come from its `
-      + 'sandbox clips, not its script. Use the Segment and Avatar Editor.', 'bad');
+      + 'sandbox clips, not its script. Use the Scenes and Avatar Editor.', 'bad');
     return;
   }
 
@@ -976,7 +976,7 @@ function hookHScroll() {
 /*
   WATCH script.json, BECAUSE THIS PAGE IS NOT ITS ONLY WRITER.
 
-  The Segment and Avatar Editor edits the same lines, in the same file, the
+  The Scenes and Avatar Editor edits the same lines, in the same file, the
   moment focus leaves one of its boxes. Nothing told this page, so its table
   stayed on the old words until it was reloaded by hand.
 

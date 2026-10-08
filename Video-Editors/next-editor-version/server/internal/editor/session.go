@@ -83,7 +83,7 @@ func (s *SessionLog) Start(port int, root string) {
 		return
 	}
 	_ = os.MkdirAll(filepath.Dir(s.path), 0o755)
-	ver := SAELabel("Segment and Avatar Editor", "segment_avatar_editor")
+	ver := SAELabel("Scenes and Avatar Editor", "scenes_avatar_editor")
 	s.write(fmt.Sprintf("\nEditor Session:  %s\nPlayer:          %s\nServer:          http://localhost:%d  (Go)\n\n",
 		time.Now().Format("2006-01-02T15:04:05"), ver, port))
 }

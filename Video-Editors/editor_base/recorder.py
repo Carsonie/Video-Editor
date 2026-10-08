@@ -8,7 +8,7 @@ with the recorder and an editor drives them rather than re-implementing them.
 
 ⚠ THE EDITORS WERE EACH INVENTING THEIR OWN PATH TO THEM. vtt_editor derived it
 from this repo's parent directory with a `BASIC_E2E_REPO` override;
-segment_avatar_editor hard-coded `~/Rentify/Basic_E2E_Testing/...` with an
+scenes_avatar_editor hard-coded `~/Rentify/Basic_E2E_Testing/...` with an
 override of its own. Two spellings of one fact is one of them going stale in
 silence on the day somebody moves a checkout. This module is that fact, once.
 

@@ -234,7 +234,7 @@ written down, and it changes as the library does.
 ## When Carson asks to open, launch, start, or run an editor
 
 Read **`.claude/skills/editor-launchers/SKILL.md`** first, every time. Six
-separate tools now — MP4 Splitter, Segment and Avatar Editor, Frame
+separate tools now — MP4 Splitter, Scenes and Avatar Editor, Frame
 Blender, Avatar Editor, the still-existing old combined server
 (shared/serve.py, port 8842 — still not removable: Frame Blender and
 Avatar Editor both import plain functions out of it, and Avatar Editor
@@ -252,7 +252,7 @@ launch.json they all run from lives in
 ## Editor changes stay inside the one editor in scope
 
 When a task is about one editor, code changes go in that editor's own
-files only. The other editors — of MP4 Splitter, Segment and Avatar
+files only. The other editors — of MP4 Splitter, Scenes and Avatar
 Editor, Frame Blender, Avatar Editor — do not get touched, even if the
 same fix would technically apply to them too. Only Carson can widen the
 scope, and only by saying so directly in the chat, in that same
@@ -362,7 +362,7 @@ Never print it, never commit it.
 
 ```
 mp4_splitter/            MP4 Splitter — cut a recording into segments
-segment_avatar_editor/   Segment and Avatar Editor — finish them
+scenes_avatar_editor/   Scenes and Avatar Editor — finish them
 editor_base/             frames.py  paths.py  vtt.py — the ONE shared package
 shared/                  serve.py, plus re-export shims for build/
 build/                   the tools that make the finished video
@@ -419,20 +419,44 @@ the same as safe.
 
 ---
 
-## `TOOLS/` MOVED UP — it is `help-videos/TOOLS/` now
+## `TOOLS/` LEFT `Customers/` — it is the editor's `tools/` now
 
-Carson, 2026-09-21: *"move `TOOLS/` up to `help-videos/`."* It was in
-`BCP_raw_mp4/TOOLS/`, which said it belonged to the admin recipes; the overlay
-cards serve **BCP and UI alike**.
+Carson, 2026-10-08: *"I think these tools are mostly used by the SAE. So lets
+move all the tools into the segment_avatar_editor folder."*
 
 ```
-<store>/help-videos/TOOLS/
+Video-Editors/scenes_avatar_editor/tools/
 ├── back-to-dashboard.png   a TRANSPARENT layer — a card laid over real footage
 ├── make_overlay.py         builds that
 ├── intro-special-skis.png  an OPAQUE FULL FRAME — held as its own bookend scene
 ├── make_intro.py           builds that
+├── add_ring.py             paints a click ring onto an already-recorded scene
 └── NOTE.md                 the whole procedure, step by step
 ```
+
+⚠ **NONE OF THEM WAS EVER ski-demo-SPECIFIC.** They sat in
+`ski-demo/help-videos/TOOLS/` from 2026-09-21, and every value they need comes
+in as an argument — so making bike-demo's intro meant reaching across into
+another store's folder for the tool. The other three stores never had a copy.
+
+⚠ **AND BEING UNDER `Customers/` COST THEM TRACKING, TWICE.** `Customers/**` is
+excluded, so each tool needed its own un-ignore line — and the first one matched
+`help-videos/<stage>/TOOLS/` while ski-demo's folder sat one level up, so
+`make_intro.py` and `make_overlay.py` were UNTRACKED from 2026-09-21 until it
+was found a day later. Under `Video-Editors/` they are tracked like any other
+code, with no rule to get wrong.
+
+⚠ **`add_ring.py` FINDS `editor_base` BY WALKING, AND THE DISTANCE CHANGED.**
+It was five levels under the repo root with `Video-Editors/` as a sibling; it is
+two levels inside it now. The old `range(3, 8)` walk still happened to hit —
+tools -> scenes_avatar_editor -> Video-Editors -> Video-Editor, then joining
+"Video-Editors" lands back inside — which was luck, not design. It now tries
+both "`editor_base` is right here" and "`Video-Editors/` is beside us" at every
+level, so the next move does not break it.
+
+*(The 2026-09-21 move this replaces: `BCP_raw_mp4/TOOLS/` -> `help-videos/TOOLS/`,
+because the cards serve BCP and UI alike. Still true — they now serve every
+store as well.)*
 
 ⚠ **READ `TOOLS/NOTE.md` BEFORE ADDING ANY CARD.** It holds the ffmpeg command,
 the pixel check that proves the card landed, and the traps — chiefly that
@@ -693,7 +717,7 @@ raw_mp4/  →  MP4 Splitter (or cut_segments.py)     →  dev/
           →  vtt.py + preview_narration.py    check the timing, FREE
           →  render_narration.py              THE ONLY PAID STEP
           →  morph_avatar_corner.py           →  avatar.webm
-          →  the Segment and Avatar Editor    Carson adjusts
+          →  the Scenes and Avatar Editor    Carson adjusts
           →  build_scenes.py                  every scene, checked
           →  build_scenes.py --join <N>       →  video/<store>_<title>_v<N>.mp4
           →  release_video.py                 →  Basic_E2E_Testing
@@ -713,7 +737,7 @@ and closing handling; it is not how a video gets built.
   directly after an E2E run, from the other repo.
 - **`dev/`** — where a video starts. The splitter deposits its named cut here.
   Files are versioned: `segment-v1.mp4`.
-- **`sandbox/`** — the Segment and Avatar Editor's ground. Files carry no
+- **`sandbox/`** — the Scenes and Avatar Editor's ground. Files carry no
   version: `segment.mp4`.
 - **`_cuts/`** — the splitter's numbered output, inside `dev/`. Not yet scenes.
 - **`z_History/`** — each of `dev/`, `sandbox/` and `video/` keeps its previous
@@ -736,7 +760,7 @@ session-log path on start.
 
 - **MP4 Splitter** — mark, ＋/− Frame, ＋/− Zone, Undo, Loop Zone, the segment
   list, Cut, and the hand-off into `dev/`.
-- **Segment and Avatar Editor** — scenes on a timeline (one, or several);
+- **Scenes and Avatar Editor** — scenes on a timeline (one, or several);
   frame and zone edits, marks, Save, Cut, Join, Split, and the VTT panel where
   a scene's line is edited in place.
 
@@ -759,7 +783,7 @@ Every page in this repo is a static file in an editor's own `web/` folder,
 fetched with its data over an API. Avatar Editor and Frame Blender moved on
 2026-08-30; MP4 Splitter and the SAE's two pages on 2026-09-04.
 
-The last one, `segment_avatar_editor/_splitter_player.py`, was **deleted**
+The last one, `scenes_avatar_editor/_splitter_player.py`, was **deleted**
 on 2026-09-04 rather than migrated — nothing in any UI linked to the page
 it rendered, and a session with it commented out changed nothing anybody
 noticed. Its whole player hook went too (`use_player()`, `write_viewer()`
@@ -778,7 +802,7 @@ name, then an em dash, then whatever is loaded:
 
 ```
 MP4 Splitter — segment.mp4
-Segment and Avatar Editor — timeline: scenes 1, 2, 3
+Scenes and Avatar Editor — timeline: scenes 1, 2, 3
 Frame Blender — 01-intro-and-login
 Avatar Editor — 01-intro-and-login
 ```
@@ -824,7 +848,7 @@ actually run, not only against the code they started as a copy of.
 ```bash
 python3 tests/test_editor.py                    # shared/serve.py, port 8842 (old combined) — 166 checks
 python3 tests/test_avatar_editor.py             # avatar_editor/serve.py, port 8844          — 165 checks
-python3 tests/test_segment_avatar_editor.py     # segment_avatar_editor/serve.py, port 8846  — 119 checks
+python3 tests/test_scenes_avatar_editor.py     # scenes_avatar_editor/serve.py, port 8846  — 119 checks
 python3 tests/test_mp4_splitter.py              # mp4_splitter/serve.py, port 8845           — 102 checks
 python3 tests/test_frame_blender.py             # frame_blender/serve.py, port 8843          —  71 checks
 python3 tests/test_editor_base.py               # editor_base/ — no server, pure functions   —  57 checks
@@ -852,7 +876,7 @@ A run writes `tests/log_reports/editor_<HH>_<MM>_<SS>.log`. Real editing
 writes to a log **dedicated to whichever editor did it** (also split
 2026-09-02, so one editor's actions are never interleaved with another's):
 `logs/editor_<date>.log` for the old combined server, and `logs/
-mp4_splitter_<date>.log` / `segment_avatar_editor_<date>.log` /
+mp4_splitter_<date>.log` / `scenes_avatar_editor_<date>.log` /
 `frame_blender_<date>.log` / `avatar_editor_<date>.log` for the standalone
 four. All gitignored.
 

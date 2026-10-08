@@ -24,7 +24,7 @@ WHAT A SCENE IS BUILT FROM — and it is NOT what assemble_video.py used
     avatar.webm   Sarah, VP9 with real alpha, already placed in her corner,
                   and carrying the narration audio
 
-    `avatar.webm` is the file the Segment and Avatar Editor shows. Until
+    `avatar.webm` is the file the Scenes and Avatar Editor shows. Until
     2026-08-27 the build composited `narration.webm` instead — the raw 1920x1080
     HeyGen render — so every frame balanced in the editor was balancing a file
     the build never opened. The editor was right and the video was wrong, with

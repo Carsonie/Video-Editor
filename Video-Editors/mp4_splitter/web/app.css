@@ -167,7 +167,7 @@
      end, but the ticks and the segment bar were laid out across the FULL
      width. So a break point and the pointer could only agree at the exact
      middle, and drifted by up to half a thumb at the ends — clicking a marker
-     left the pointer visibly beside it. Fixed in the Segment and Avatar Editor
+     left the pointer visibly beside it. Fixed in the Scenes and Avatar Editor
      first; the same bug was still here. The thumb is given an explicit size so
      the inset is a known number rather than whatever the browser picked. */
   :root { --thumb:14px; --halfthumb:7px; }
@@ -353,7 +353,7 @@
   #saveBtn { background:#1a3a5c; border-color:#2e8ecc; }
   #saveBtn:hover { background:#204a72; }
   #saveBtn:disabled { background:#2c3236; border-color:#4a5259; }
-  /* Ported from the Segment and Avatar Editor. A native tooltip appears at the
+  /* Ported from the Scenes and Avatar Editor. A native tooltip appears at the
      browser's own timing and cannot be styled or placed, so a control whose tip
      runs to three lines is unreadable at the moment you need it. */
   #segList { margin:6px 0 0; max-height:190px; overflow:auto; }

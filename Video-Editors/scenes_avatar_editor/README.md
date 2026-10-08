@@ -1,4 +1,4 @@
-# Segment and Avatar Editor
+# Scenes and Avatar Editor
 
 One scene's footage with its alpha avatar laid over it — or several
 scenes on a timeline, to judge how they join. Frame and zone edits,
@@ -6,11 +6,11 @@ marks, Save, Cut, Join, Split, and the VTT panel where a scene's
 narration line is edited in place.
 
 ```bash
-python3 segment_avatar_editor/serve.py          # http://localhost:8846
+python3 scenes_avatar_editor/serve.py          # http://localhost:8846
 ```
 
 Standalone — nothing else needs to be running. Its own process, its own
-port, its own extracted-frame cache (`cache/segment-avatar-editor/`, not
+port, its own extracted-frame cache (`cache/scenes-avatar-editor/`, not
 the shared `cache/`), its own routes and its own pages. Split off
 `shared/serve.py` on 2026-09-02 at Carson's request: this tool and MP4
 Splitter used to share one process on port 8842, and he asked for the two
@@ -138,7 +138,7 @@ suite. If you delete a route, delete its handler in the same commit.
 ## Tests
 
 ```bash
-python3 tests/test_segment_avatar_editor.py
+python3 tests/test_scenes_avatar_editor.py
 ```
 
 91 checks in 33 steps — roughly one step per endpoint, which is why a
@@ -150,8 +150,8 @@ trap), used, then deleted. It never touches a real store.
 Each run writes both a full transcript and a pass/fail report:
 
 ```
-tests/segment_avatar_editor/segment_avatar_editor_<HH>_<MM>_<SS>.log
-tests/segment_avatar_editor/segment_avatar_editor_<HH>_<MM>_<SS>.txt
+tests/scenes_avatar_editor/scenes_avatar_editor_<HH>_<MM>_<SS>.log
+tests/scenes_avatar_editor/scenes_avatar_editor_<HH>_<MM>_<SS>.txt
 ```
 
 Every assertion is an exact decoded frame count. The refusals are tested
@@ -165,7 +165,7 @@ split that never ran.
 1. **One player per commit.** Never two. Shared code is its own commit.
 2. **Bump `VERSION`** in the same commit — it renders at the foot of the
    page, so the version on screen is the version in git.
-3. **Subject:** `Segment and Avatar Editor v<N> ADDED: <what it does now>`
+3. **Subject:** `Scenes and Avatar Editor v<N> ADDED: <what it does now>`
 
 Write what the tool *does now*, not what you edited. `ADDED:` is the
 form even when the change is a fix. **A restructure is not an `ADDED:`**

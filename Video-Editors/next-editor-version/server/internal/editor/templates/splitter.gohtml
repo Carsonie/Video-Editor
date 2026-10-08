@@ -126,7 +126,7 @@
      end, but the ticks and the segment bar were laid out across the FULL
      width. So a break point and the pointer could only agree at the exact
      middle, and drifted by up to half a thumb at the ends — clicking a marker
-     left the pointer visibly beside it. Fixed in the Segment and Avatar Editor
+     left the pointer visibly beside it. Fixed in the Scenes and Avatar Editor
      first; the same bug was still here. The thumb is given an explicit size so
      the inset is a known number rather than whatever the browser picked. */
   :root { --thumb:14px; --halfthumb:7px; }
@@ -256,7 +256,7 @@
   #saveBtn { background:#1a3a5c; border-color:#2e8ecc; }
   #saveBtn:hover { background:#204a72; }
   #saveBtn:disabled { background:#2c3236; border-color:#4a5259; }
-  /* Ported from the Segment and Avatar Editor. A native tooltip appears at the
+  /* Ported from the Scenes and Avatar Editor. A native tooltip appears at the
      browser's own timing and cannot be styled or placed, so a control whose tip
      runs to three lines is unreadable at the moment you need it. */
   #segList { margin:6px 0 0; max-height:190px; overflow:auto; }
@@ -419,13 +419,13 @@
         <button id="cutBtn" class="stepbtn full" disabled title="Cut the SOURCE FILE at every break point and write the pieces to dev/_cuts/. Reads the original with ffmpeg — never these preview frames. Cutting again keeps the earlier attempt and bumps its version.">✂️ Cut into segments</button>
         <div id="cutStatus"></div>
         <!-- The handover. The splitter writes _cuts/Num_3-v1-segment.mp4; the
-             Segment and Avatar Editor reads sandbox/03-<name>/segment.mp4.
+             Scenes and Avatar Editor reads sandbox/03-<name>/segment.mp4.
              Naming them here is what turns loose cuts into scenes. -->
         <div id="handoff" hidden>
           <hr class="sep">
           <span class="lbl">Hand off to sandbox</span>
           <div id="handoffRows"></div>
-          <button id="handoffBtn" class="stepbtn full" title="Copy these segments into the sandbox as named scenes, and write a scene row for each into script.json. This is where the Segment and Avatar Editor picks the work up.">→ Hand off to sandbox</button>
+          <button id="handoffBtn" class="stepbtn full" title="Copy these segments into the sandbox as named scenes, and write a scene row for each into script.json. This is where the Scenes and Avatar Editor picks the work up.">→ Hand off to sandbox</button>
           <div id="handoffStatus"></div>
         </div>
       </section>
@@ -989,7 +989,7 @@
   }
 
   // ── tooltips ────────────────────────────────────────────────────────────
-  // Ported from the Segment and Avatar Editor. Reads each element's own
+  // Ported from the Scenes and Avatar Editor. Reads each element's own
   // `title`, so every control is covered — including the ones whose text
   // changes with state. The title is REMOVED while hovering and put back on
   // leave, or the browser's native tooltip appears underneath this one at its
@@ -1215,7 +1215,7 @@
 
   // ── hand off to the sandbox ─────────────────────────────────────────────
   // The last step this tool was missing. A cut leaves
-  // sandbox/_cuts/Num_3-v1-segment.mp4; the Segment and Avatar Editor reads
+  // sandbox/_cuts/Num_3-v1-segment.mp4; the Scenes and Avatar Editor reads
   // sandbox/03-<name>/segment.mp4 and the scene rows in script.json. Naming
   // them here is what turns loose cuts into scenes, and it is the point where
   // this tool's job ends and the editor's begins.
@@ -1324,7 +1324,7 @@ The cuts stay in _cuts/ either way.`)) return;
         + `
 
 The store now has ${data.scenes} scene(s). Open it in the `
-        + `Segment and Avatar Editor to write the lines and add the avatar.`;
+        + `Scenes and Avatar Editor to write the lines and add the avatar.`;
       handoffBtn.textContent = '✓ Handed off';
     } catch (e) {
       handoffStatus.textContent = 'Error: ' + e;

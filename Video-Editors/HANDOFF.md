@@ -103,7 +103,7 @@ one commit each.
 |---|---|---|
 | old combined server | 167 | 167 |
 | Avatar Editor | 210 | **165** |
-| Segment and Avatar Editor | 90 | **117** |
+| Scenes and Avatar Editor | 90 | **117** |
 | MP4 Splitter | 82 | **101** |
 | Frame Blender | 49 | **71** |
 | `editor_base` | — | **57** (new) |
@@ -118,7 +118,7 @@ one commit each.
   the nine `build/` scripts import unchanged — one of them,
   `assemble_video.py`, must not be edited.
 - **12, 13 — the pages are static files.** `mp4_splitter/player.py` 1,568
-  -> 66 lines; `segment_avatar_editor/player.py` 3,966 -> 134. Pages ship
+  -> 66 lines; `scenes_avatar_editor/player.py` 3,966 -> 134. Pages ship
   empty and the clip arrives over `/api/clip` and `/api/view`.
 - **14, 15, 16 — the front end.** `gap-builder.js`'s 21 globals became
   three `const` state objects, then the file split into five; Frame
@@ -168,7 +168,7 @@ commit; that file now marks them `✅ done`.
 | Avatar Editor | 210 | **141** (79 source-text greps -> 9) |
 | Frame Blender | 49 | 50 |
 | MP4 Splitter | 82 | 83 |
-| Segment and Avatar Editor | 90 | 91 |
+| Scenes and Avatar Editor | 90 | 91 |
 | the old combined `test_editor.py` | — | 167, untouched |
 
 All five green. The +1s are the new dead-handler guard.
@@ -186,7 +186,7 @@ All five green. The +1s are the new dead-handler guard.
   deliberately RED so the guard's find was on the record before the fix.
 - **Steps 3–4 — 1,387 unreachable lines deleted.** mp4_splitter
   2,556 -> 1,383 (15 handlers + 5 orphaned module-level helpers);
-  segment_avatar_editor 2,587 -> 2,373 (4 handlers + a stale
+  scenes_avatar_editor 2,587 -> 2,373 (4 handlers + a stale
   `session_log()` branch still formatting a line for `/api/open`).
 - **Steps 5–6 — the two missing READMEs written**, every factual claim
   verified rather than recalled.
@@ -207,7 +207,7 @@ strategy, and nothing past it can start without an answer:
 - `paths.py` is byte-identical in three places.
 - `_splitter_player.py` differs from `mp4_splitter/player.py` by 16
   lines out of ~1,570.
-- `mp4_splitter/serve.py` and `segment_avatar_editor/serve.py` were 88%
+- `mp4_splitter/serve.py` and `scenes_avatar_editor/serve.py` were 88%
   identical before this cleanup.
 - Meanwhile Avatar Editor and Frame Blender each import 13 symbols from
   the legacy `shared/serve.py` and cannot run without it.
@@ -371,7 +371,7 @@ them rather than absorbing them.
 
 Before today, none of the four newer per-editor suites
 (`test_avatar_editor.py`, `test_frame_blender.py`,
-`test_mp4_splitter.py`, `test_segment_avatar_editor.py`) wrote a log
+`test_mp4_splitter.py`, `test_scenes_avatar_editor.py`) wrote a log
 file at all — only the old combined `test_editor.py` did. Each of the
 four now writes into its own folder:
 
@@ -380,7 +380,7 @@ tests/avatar_editor/avatar_editor_<HH>_<MM>_<SS>.log   the full transcript
 tests/avatar_editor/avatar_editor_<HH>_<MM>_<SS>.txt   the pass/fail report
 tests/frame_blender/frame_blender_<HH>_<MM>_<SS>.{log,txt}
 tests/mp4_splitter/mp4_splitter_<HH>_<MM>_<SS>.{log,txt}
-tests/segment_avatar_editor/segment_avatar_editor_<HH>_<MM>_<SS>.{log,txt}
+tests/scenes_avatar_editor/scenes_avatar_editor_<HH>_<MM>_<SS>.{log,txt}
 ```
 
 The `.txt` report: total run, total passed, every step's own PASS/FAIL,
@@ -404,12 +404,12 @@ separation of concerns, cross-editor use, readability) delivered to
 Carson as a downloadable `.txt`. Nothing from it has been acted on yet.
 Short version, ranked by what would help most:
 
-1. Give MP4 Splitter and Segment and Avatar Editor a README each —
+1. Give MP4 Splitter and Scenes and Avatar Editor a README each —
    Avatar Editor's and Frame Blender's are right there as a template.
 2. Move both off the Python-string page-building style, the way Avatar
    Editor and Frame Blender already did (2026-08-30) — this is the
    single biggest structural fix available.
-3. Split `segment_avatar_editor/player.py` (3,966 lines, the biggest
+3. Split `scenes_avatar_editor/player.py` (3,966 lines, the biggest
    file in the whole codebase) into its two page types.
 4. Decide on `_splitter_player.py` — a documented, deliberate duplicate
    of MP4 Splitter's own player, copied rather than imported.
@@ -430,7 +430,7 @@ Short version, ranked by what would help most:
 Branch **`next_gen_editors`**. 5 commits made today sit **ahead of `origin/
 next_gen_editors`, not yet pushed** (oldest first):
 `d58e1ba` Frame Blender v14, `4bfced5` Avatar Editor v3, `3abace8` MP4
-Splitter v11, `6099590` Segment and Avatar Editor v60, `38337cf` the
+Splitter v11, `6099590` Scenes and Avatar Editor v60, `38337cf` the
 CLAUDE.md Tests-section doc update. Push only if Carson says to.
 
 **On top of those, working-tree changes not yet committed** (in
@@ -465,7 +465,7 @@ commit over it.
    once the split was made explicit. Frame Blender's own Gap Builder
    (it had one too, from before the split) was removed the same way,
    moving the other direction.
-2. **MP4 Splitter and the Segment and Avatar Editor's landing/viewer
+2. **MP4 Splitter and the Scenes and Avatar Editor's landing/viewer
    pages cleaned up**: no more `Browse Customers —` prefix, the tab
    title stays on the clean tool name even with a clip/scene open
    (was drifting to the source filename before). SAE's landing page
@@ -478,16 +478,16 @@ commit over it.
    actions mislabeled `"FB: Load video"` even when it was Avatar Editor
    that acted. Now each of the four writes to its own dedicated file
    (`frame_blender_<date>.log`, `avatar_editor_<date>.log`,
-   `mp4_splitter_<date>.log`, `segment_avatar_editor_<date>.log`),
+   `mp4_splitter_<date>.log`, `scenes_avatar_editor_<date>.log`),
    correctly labeled, verified live by triggering a real action on each
    running server and reading the right line out of the right file.
    MP4 Splitter's and SAE's own `ACTIONS` label tables were also
    trimmed to just the routes each process actually serves — both
    still carried entries for routes that belong to OTHER tools,
    inherited from the shared table they were copied out of.
-4. **MP4 Splitter and Segment and Avatar Editor each got their first
+4. **MP4 Splitter and Scenes and Avatar Editor each got their first
    real automated test suite** — `tests/test_mp4_splitter.py` (82
-   checks) and `tests/test_segment_avatar_editor.py` (90 checks).
+   checks) and `tests/test_scenes_avatar_editor.py` (90 checks).
    Neither existed before today; both tools had been standalone
    processes since 2026-09-01/02 but were only ever checked by hand.
    Every kept route gets a real check, every route the split dropped is

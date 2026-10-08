@@ -1,8 +1,8 @@
 :root {
     --bg: #0f1214; --panel: #171b1e; --border: #3a4248; --text: #dfe4e7;
     --sub: #8b949c; --accent: #2ecc40; --accent2: #7aa7ff;
-    /* Same language the Segment and Avatar Editor already uses for these two
-       tracks (segment_avatar_editor/player.py's own --seg/--over) — blue for
+    /* Same language the Scenes and Avatar Editor already uses for these two
+       tracks (scenes_avatar_editor/player.py's own --seg/--over) — blue for
        the segment/base, purple for the overlay, said the same way here. */
     --seg: #4fc3f7; --over: #a56cff;
   }
@@ -112,7 +112,7 @@
     color: var(--sub); margin: 0 0 10px; }
   #resultCanvas {
     /* Green is the third colour in the same language as --seg/--over above —
-       segment_avatar_editor/player.py's own --both, for when BOTH tracks are
+       scenes_avatar_editor/player.py's own --both, for when BOTH tracks are
        shown together, which is exactly what this canvas is. */
     width: 340px; height: 340px; border-radius: 8px; border: 1px solid var(--accent);
     background:

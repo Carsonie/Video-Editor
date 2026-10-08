@@ -16,7 +16,7 @@
 //
 'use strict';
   // ── Timeline Scenes ──────────────────────────────────────────────────────
-  // A read-mostly companion to the Segment and Avatar Editor's own panel of
+  // A read-mostly companion to the Scenes and Avatar Editor's own panel of
   // the same name, sharing its actual data rather than a copy of it: Load
   // asks the main editor for this store's real scene list, and every dirty
   // dot comes from the SAME per-scene cache flag the editor's own icons
@@ -53,7 +53,7 @@
       <span class="lab" title="${it.label || ''}">${it.label || '(scene ' + it.n + ')'}</span>
       <span class="dur">${durTxt}</span>
       <span class="dot${dirty ? ' dirty' : ''}" title="${dirty ? 'Has unsaved changes in its cache' : 'Pristine — file matches its cache'}"></span>
-      <button class="ibtn undo" disabled title="Frame Blender doesn't edit scenes itself yet, so there's nothing here to undo — Undo the change in the Segment and Avatar Editor instead.">&#8630;</button>
+      <button class="ibtn undo" disabled title="Frame Blender doesn't edit scenes itself yet, so there's nothing here to undo — Undo the change in the Scenes and Avatar Editor instead.">&#8630;</button>
       <button class="ibtn save${dirty ? ' dirty' : ''}" ${dirty ? '' : 'disabled'}
         title="${dirty ? 'Save this scene\'s cache to sandbox/ (same as the editor\'s own Save)' : 'No unsaved changes to save'}">&#8593;</button>`;
     d.querySelector('.save').onclick = ev => { ev.stopPropagation(); tlSaveScene(it); };

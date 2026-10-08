@@ -608,7 +608,7 @@ once:
 editor scope lock, needs an explicit go-ahead.** Measured, not guessed:
 
     mp4_splitter/serve.py     355, 651, 660-661
-    segment_avatar_editor/serve.py  490, 506-514, 907, 916-917, 959, 975
+    scenes_avatar_editor/serve.py  490, 506-514, 907, 916-917, 959, 975
     avatar_editor/serve.py    396, 412
     Video-Editors/Makefile    19, 109, 118
     avatar_editor/web/library.js  30  (a comment only)
@@ -1210,7 +1210,7 @@ segment) before trusting a clean match as evidence nothing is wrong.
 
 ## The EVTT — the editor's own live VTT panel
 
-**A third, separate thing from the two tables above.** The Segment and Avatar
+**A third, separate thing from the two tables above.** The Scenes and Avatar
 Editor has its own built-in VTT view, right in the browser, alongside the
 timeline. Call this one the **EVTT** to keep it unambiguous from `vtt.py`'s
 report and the combined table — three different things that all show
@@ -1219,7 +1219,7 @@ similar numbers, easy to conflate by accident.
 ⚠ **Do not change the EVTT's behavior or appearance unless specifically
 asked to.** This section documents what it already does, for reference —
 it is not an invitation to "improve" it. It lives in
-`segment_avatar_editor/player.py` (`renderVtt()`, `paintVttRow()`,
+`scenes_avatar_editor/player.py` (`renderVtt()`, `paintVttRow()`,
 `paintVttSum()`), served as part of the editor at `shared/serve.py`'s
 `/api/vtt` route.
 

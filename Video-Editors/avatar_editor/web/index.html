@@ -53,7 +53,7 @@
       <!-- Shared by every Sound Bits row's own play button below — one
            player rather than one per clip, same reasoning as the Frame
            Selector's own single shared viewer. Speed options match the
-           Segment and Avatar Editor's own rateSel exactly, same values,
+           Scenes and Avatar Editor's own rateSel exactly, same values,
            same order, so "how fast Sarah talks" means the same thing in
            both tools. -->
       <div class="soundBitPlayer" id="soundBitPlayer" hidden>
@@ -65,7 +65,7 @@
       <h3>Timeline Scenes</h3>
       <div class="pillrow">
         <button class="pill" id="tlClearBtn" title="Empty this panel and forget the loaded store. Does not touch any file.">&#128465; Clear</button>
-        <button class="pill" id="tlLoadBtn" title="Load every scene in this pair's store from sandbox/ — the same list and pristine/dirty state the Segment and Avatar Editor shows. Reads sandbox/ only; it never falls back to dev/.">&#128193; Load Sandbox</button>
+        <button class="pill" id="tlLoadBtn" title="Load every scene in this pair's store from sandbox/ — the same list and pristine/dirty state the Scenes and Avatar Editor shows. Reads sandbox/ only; it never falls back to dev/.">&#128193; Load Sandbox</button>
         <button class="pill" id="tlLoadFsBtn" title="Put the OPEN scene's avatar track into the Frame Selector, so you can pick frames from Sarah's own performance in this scene the same way you pick them from her library. Open a scene first by clicking its row.">&#127916; Load Frame Selector</button>
       </div>
       <div class="tlstatus" id="tlStatus">Nothing loaded — click Load.</div>
@@ -184,7 +184,7 @@
         <button class="gapMenuBtn" id="gmAudioClearAll" title="Stops every player, unloads whatever is in them and puts this menu back to nothing loaded. Does not untick anything in sarah_clips/libs — that is the Frame Selector Menu's own Clear All.">Clear All</button>
         <div class="audioMenuRow">
           <span class="soundBitName" id="soundBitName">No Sound Bit loaded</span>
-          <select id="soundBitRate" title="Playback speed — same options as the Segment and Avatar Editor.">
+          <select id="soundBitRate" title="Playback speed — same options as the Scenes and Avatar Editor.">
             <option value="2">2x</option>
             <option value="1" selected>1x</option>
             <option value="0.5">0.5x</option>

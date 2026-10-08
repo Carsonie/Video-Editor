@@ -66,7 +66,7 @@ the ports and the paths in the original were pre-split:
       slider bands, Cut writes to `dev/_cuts/`
 - [ ] **Hand off** deposits into `dev/`, archiving what was there to
       `dev/z_History/<date>-v_N/`
-- [ ] **Segment and Avatar Editor** (8846): opens a scene layered, and 2+ as a
+- [ ] **Scenes and Avatar Editor** (8846): opens a scene layered, and 2+ as a
       timeline; frame and zone edits; Save writes the exact frame count; Cut;
       Join; Split; the save-as-a-set lock; the VTT reads and its lines save
 - [ ] **Avatar Editor** (8844) and **Frame Blender** (8843): the same pass over
@@ -199,7 +199,7 @@ _(P4.1 was done 2026-08-28 — see Done.)_
 
 ### P4.2 `dev` → `sandbox` stays a MANUAL copy — decided, not outstanding
 
-Recorded here so it is not "fixed" by accident. The Segment and Avatar Editor
+Recorded here so it is not "fixed" by accident. The Scenes and Avatar Editor
 reads `sandbox` only and never falls back to `dev`, which is what stops an edit
 looking like it worked when it went somewhere else. Moving a fresh cut across
 is a deliberate human step.

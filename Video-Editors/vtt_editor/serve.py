@@ -523,7 +523,7 @@ def job_state(folder):
     # ⚠ A BUILT VIDEO IS A DIFFERENT STAGE, AND THIS EDITOR DOES NOT OWN IT.
     # Its script carries no `raw-source` and no "Cut from" — the clip lengths
     # come from ffprobing sandbox/<NN-label>/segment.mp4, which is what the
-    # Segment and Avatar Editor and build/vtt_html.py already do. Loading one
+    # Scenes and Avatar Editor and build/vtt_html.py already do. Loading one
     # here produced a table of 11 scenes all zero seconds long, which reads as
     # a broken editor rather than as the wrong tool. So it is NAMED, not faked:
     # the folder stays in the picker and the page says where to go instead.
@@ -912,7 +912,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.send_json({"ok": True, "folders": recipe_folders()})
         if u.path == "/api/tree":
             return self.send_json({"ok": True, "tree": breadcrumbs()})
-        # ⚠ ONE NUMBER, POLLED. The Segment and Avatar Editor writes a line edit
+        # ⚠ ONE NUMBER, POLLED. The Scenes and Avatar Editor writes a line edit
         # straight into script.json (its api_line), so this page can be showing
         # yesterday's words while the file on disk is minutes old — Carson hit
         # exactly that on 2026-09-20: "when I change the narrative in the SAE

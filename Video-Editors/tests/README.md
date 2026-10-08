@@ -7,7 +7,7 @@ Five of them. Four drive a real server over HTTP against a disposable store
 built from real footage; the fifth has no server in it.
 
 ⚠ THERE WERE SIX. `test_editor.py` drove `shared/serve.py` on 8842 — an 82%
-copy of the Segment and Avatar Editor that Frame Blender and Avatar Editor
+copy of the Scenes and Avatar Editor that Frame Blender and Avatar Editor
 imported and configured by writing into its globals. Both now use
 `editor_base/server.py` and `editor_base/session.py`, so the copy and its
 suite were retired on 2026-09-21. `git show` has them if a question ever
@@ -15,7 +15,7 @@ needs the old behaviour.
 
 ```bash
 python3 tests/test_avatar_editor.py          # avatar_editor/serve.py, port 8844          — 173
-python3 tests/test_segment_avatar_editor.py  # segment_avatar_editor/serve.py, port 8846  — 119
+python3 tests/test_scenes_avatar_editor.py  # scenes_avatar_editor/serve.py, port 8846  — 119
 python3 tests/test_mp4_splitter.py           # mp4_splitter/serve.py, port 8845           — 102
 python3 tests/test_frame_blender.py          # frame_blender/serve.py, port 8843          —  71
 python3 tests/test_editor_base.py            # editor_base/ — pure functions, no server   —  57
@@ -97,7 +97,7 @@ it is 71 now, after its own page split added a load-order guard.
 ## The four standalone editors have their own folders, own logs, own reports
 
 `test_avatar_editor.py`, `test_frame_blender.py`, `test_mp4_splitter.py` and
-`test_segment_avatar_editor.py` are separate suites for the four genuinely
+`test_scenes_avatar_editor.py` are separate suites for the four genuinely
 independent editor processes (each its own port, cache and code — see each
 editor's own README for why). Since 2026-09-03 each writes its own run's
 output into its own folder, never a shared one:
@@ -107,7 +107,7 @@ tests/avatar_editor/avatar_editor_<HH>_<MM>_<SS>.log            # the full trans
 tests/avatar_editor/avatar_editor_<HH>_<MM>_<SS>.txt            # the pass/fail report
 tests/frame_blender/frame_blender_<HH>_<MM>_<SS>.{log,txt}
 tests/mp4_splitter/mp4_splitter_<HH>_<MM>_<SS>.{log,txt}
-tests/segment_avatar_editor/segment_avatar_editor_<HH>_<MM>_<SS>.{log,txt}
+tests/scenes_avatar_editor/scenes_avatar_editor_<HH>_<MM>_<SS>.{log,txt}
 tests/editor_base/editor_base_<HH>_<MM>_<SS>.{log,txt}
 ```
 

@@ -2,7 +2,7 @@
 The plumbing every editor server needs, once.
 
 ⚠ THIS CODE EXISTED TWICE, VERBATIM, AND TWO MORE EDITORS IMPORTED ONE OF THE
-COPIES. `shared/serve.py` was an 82% duplicate of the Segment and Avatar
+COPIES. `shared/serve.py` was an 82% duplicate of the Scenes and Avatar
 Editor's own server (2711 lines against 2487), Frame Blender and Avatar Editor
 did `import serve as main_serve` and then CONFIGURED it by writing into its
 globals (`main_serve.CACHE = ...`), and nine of these ten helpers were

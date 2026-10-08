@@ -8,7 +8,7 @@ test_editor.py builds.
     python3 tests/test_mp4_splitter.py --keep      # leave the store to poke at
 
 WHY THIS FILE DIDN'T EXIST UNTIL NOW
-    MP4 Splitter and the Segment and Avatar Editor split off shared/serve.py
+    MP4 Splitter and the Scenes and Avatar Editor split off shared/serve.py
     into fully independent processes on 2026-09-02 (own port, own cache,
     duplicated code — see mp4_splitter/serve.py's own module docstring).
     That work was verified by hand at the time — curl and a real browser —
@@ -141,7 +141,7 @@ def s_static_page():
     html = urllib.request.urlopen(MP4_BASE + "/", timeout=10).read().decode()
     check("titled just \"MP4 Splitter\", no \"Browse Customers —\" prefix",
           "<title>MP4 Splitter</title>" in html, "ok" if "<title>MP4 Splitter</title>" in html else html[:120])
-    for gone in ("Segment and Avatar Editor", "gap-builder.js", "sarah_clips"):
+    for gone in ("Scenes and Avatar Editor", "gap-builder.js", "sarah_clips"):
         check(f"nothing about {gone!r} on this page", gone not in html)
 
 
@@ -345,7 +345,7 @@ def s_archive():
 def s_dropped_routes_are_gone():
     """
     The other tools' own routes — Join/Split/Line/Paste/dup-span/del-span
-    belong to the Segment and Avatar Editor now; the multi-clip Open flows
+    belong to the Scenes and Avatar Editor now; the multi-clip Open flows
     (open-pair, open-seq) and Frame Blender's/Avatar Editor's Load-video/
     Load-store/Build/Save-MP4 belong to THEM. A route left reachable here
     by accident would mean the split's own trim silently regressed.

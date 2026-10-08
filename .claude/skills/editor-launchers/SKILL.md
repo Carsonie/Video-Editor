@@ -1,6 +1,6 @@
 ---
 name: editor-launchers
-description: Launch any of the Video-Editor tools (Segment and Avatar Editor, MP4 Splitter, Frame Blender, Avatar Editor, the next-gen web editor) in the browser, individually or all together. Use whenever Carson asks to open, launch, start, run, or reload an editor by name, or asks to "run the editors"/"run all 4 editors"/"reload."
+description: Launch any of the Video-Editor tools (Scenes and Avatar Editor, MP4 Splitter, Frame Blender, Avatar Editor, the next-gen web editor) in the browser, individually or all together. Use whenever Carson asks to open, launch, start, run, or reload an editor by name, or asks to "run the editors"/"run all 4 editors"/"reload."
 user_invocable: true
 ---
 
@@ -16,7 +16,7 @@ into two) — always these four unless he names a different set:
 | Editor | What it is | Launch.json name | Port | Own cache |
 |---|---|---|---|---|
 | **MP4 Splitter** | Cuts a raw recording into numbered segments. `mp4_splitter/serve.py` | `mp4-splitter` | 8845 | `cache/mp4-splitter/` |
-| **Segment and Avatar Editor** | Layers a segment + avatar overlay, timelines, Join/Split. `segment_avatar_editor/serve.py` | `segment-avatar-editor` | 8846 | `cache/segment-avatar-editor/` |
+| **Scenes and Avatar Editor** | Layers a segment + avatar overlay, timelines, Join/Split. `scenes_avatar_editor/serve.py` | `scenes-avatar-editor` | 8846 | `cache/scenes-avatar-editor/` |
 | **Frame Blender** | Monitors how the base and overlay tracks flow together, frame by frame, to form the current scene — and (planned) drives a visual frame-by-frame mp4 build, showing the build as it happens. `frame_blender/` | `frame-blender` | 8843 | `cache/_shared/` — its own now that 8842 is retired. Renaming it `cache/frame-blender/` for symmetry is a separate task. |
 | **Avatar Editor** | Edits Sarah's own overlay — her clip library (stills, idle loops, transitions, sound bits) via the Gap Builder, for building and adjusting her overlay scene by scene. `avatar_editor/` | `avatar-editor` | 8844 | `cache/avatar-editor/` — its own since 2026-09-04. It shared the old repo-root `cache/` with Frame Blender until then. |
 
@@ -47,7 +47,7 @@ process (`shared/serve.py`, port 8842, `browse.html`); Carson asked for
 them to split apart the same way Frame Blender/Avatar Editor did
 (2026-09-02). Each new copy started as a literal copy of `shared/serve.py`,
 trimmed to just the routes its own page actually calls — see
-`mp4_splitter/serve.py`'s and `segment_avatar_editor/serve.py`'s own module
+`mp4_splitter/serve.py`'s and `scenes_avatar_editor/serve.py`'s own module
 docstrings for exactly what was kept, dropped, and why. The SAE's "open this scene on its own" page is GONE (2026-09-04). It was
 rendered by a private duplicate of MP4 Splitter's player
 (`_splitter_player.py`), kept so the two tools stayed unlinked — but
@@ -55,7 +55,7 @@ nothing in any UI ever linked to the page itself, so it was deleted.
 `/<slug>/base/viewer.html` now 404s, by design.
 
 **`shared/serve.py` IS RETIRED — 2026-09-21, and port 8842 with it.** It was
-an 82% copy of the Segment and Avatar Editor's own server (2711 lines against
+an 82% copy of the Scenes and Avatar Editor's own server (2711 lines against
 2487), kept alive only because Frame Blender and Avatar Editor imported plain
 functions out of it (`resolve_outdir`, `build_segment`, `cache_state`, ...) and
 then CONFIGURED it by writing into its globals — Avatar Editor monkey-patched
@@ -94,7 +94,7 @@ it specifically.
 Use the Browser-pane preview tool with the exact `name` from the table:
 
 - **MP4 Splitter**: `preview_start({name: "mp4-splitter"})` — standalone.
-- **Segment and Avatar Editor**: `preview_start({name: "segment-avatar-editor"})` — standalone.
+- **Scenes and Avatar Editor**: `preview_start({name: "scenes-avatar-editor"})` — standalone.
 - **Frame Blender**: `preview_start({name: "frame-blender"})` — standalone.
 - **Avatar Editor**: `preview_start({name: "avatar-editor"})` — standalone.
 - **Next-gen web editor**: it is TWO processes — a Go API with nothing to look
@@ -129,13 +129,13 @@ combined 8842 server) running first.
 
 1. Start all four servers (order doesn't matter, none depend on each other):
    - `preview_start({name: "mp4-splitter"})` — 8845
-   - `preview_start({name: "segment-avatar-editor"})` — 8846
+   - `preview_start({name: "scenes-avatar-editor"})` — 8846
    - `preview_start({name: "frame-blender"})` — 8843
    - `preview_start({name: "avatar-editor"})` — 8844
 2. Open each in a real Chrome tab (`open -a "Google Chrome" <url>` via Bash —
    `preview_start` itself only opens the embedded pane, not real Chrome):
    - `http://localhost:8845` — MP4 Splitter
-   - `http://localhost:8846` — Segment and Avatar Editor
+   - `http://localhost:8846` — Scenes and Avatar Editor
    - `http://localhost:8843` — Frame Blender
    - `http://localhost:8844` — Avatar Editor
 
@@ -153,7 +153,7 @@ you whether the process behind it is even still running.
    - `preview_list()` — returns a `serverId` per running server
    - `preview_stop({serverId})` for each of the four
    - then `preview_start({name})` for each: `mp4-splitter` 8845,
-     `segment-avatar-editor` 8846, `frame-blender` 8843, `avatar-editor` 8844
+     `scenes-avatar-editor` 8846, `frame-blender` 8843, `avatar-editor` 8844
    - each result should say `"reused": false`. **If it says `true`, the stop
      did not take and you are about to test stale code.**
 2. Reload each real Chrome tab whose URL contains one of those four ports,
@@ -219,8 +219,8 @@ by plain `Bash` earlier in a session; killing that process and re-running
 # MP4 Splitter — standalone, own cache
 python3 mp4_splitter/serve.py --port 8845
 
-# Segment and Avatar Editor — standalone, own cache
-python3 segment_avatar_editor/serve.py --port 8846
+# Scenes and Avatar Editor — standalone, own cache
+python3 scenes_avatar_editor/serve.py --port 8846
 
 # Frame Blender
 python3 frame_blender/serve.py --port 8843

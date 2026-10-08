@@ -1,6 +1,6 @@
 ---
 name: video-development
-description: The small hands-on tasks that come up while editing a help video in the browser. FOUR NAMED PHRASES trigger it directly, and they are printed in the Segment and Avatar Editor's own "ASK CLAUDE" box so Carson can read them off the screen: "Capture Still" (take the frame currently on screen, from the right source file, into Sarah's library), "Read Screen" (say which scene, frame, selection and unsaved state his own Chrome tab is showing), and "Which Source" (which of the frame cache, avatar.webm or narration.webm a job should read), and "Open Close Pose" (put Sarah's 3-frame rest pose at the end of a scene, the start of the next, or both, so the cut between them is invisible), and "Push Narrative" / "Pull Narrative" (slide Sarah's whole performance N frames later or earlier inside a scene, picture and voice together, without changing the scene's frame count or length), and "Inbound Transition" / "Outbound Transition" (replace the frames between a resting pose and a target frame with a blend, so she eases into or out of live footage instead of cutting). Also use whenever asked to grab, capture or save a frame, still or pose, to add something to Sarah's library from what is on screen, to say where he is in an editor, or when a task needs a frame out of a scene at full quality. What a still IS and how it is named lives in the sarah-library skill; this one is how to get one.
+description: The small hands-on tasks that come up while editing a help video in the browser. FOUR NAMED PHRASES trigger it directly, and they are printed in the Scenes and Avatar Editor's own "ASK CLAUDE" box so Carson can read them off the screen: "Capture Still" (take the frame currently on screen, from the right source file, into Sarah's library), "Read Screen" (say which scene, frame, selection and unsaved state his own Chrome tab is showing), and "Which Source" (which of the frame cache, avatar.webm or narration.webm a job should read), and "Open Close Pose" (put Sarah's 3-frame rest pose at the end of a scene, the start of the next, or both, so the cut between them is invisible), and "Push Narrative" / "Pull Narrative" (slide Sarah's whole performance N frames later or earlier inside a scene, picture and voice together, without changing the scene's frame count or length), and "Inbound Transition" / "Outbound Transition" (replace the frames between a resting pose and a target frame with a blend, so she eases into or out of live footage instead of cutting). Also use whenever asked to grab, capture or save a frame, still or pose, to add something to Sarah's library from what is on screen, to say where he is in an editor, or when a task needs a frame out of a scene at full quality. What a still IS and how it is named lives in the sarah-library skill; this one is how to get one.
 user_invocable: true
 ---
 
@@ -58,7 +58,7 @@ Only two things are readable without setup: a tab's **URL** and its
 list in it:
 
 ```
-Segment and Avatar Editor — timeline: scenes 1, 2
+Scenes and Avatar Editor — timeline: scenes 1, 2
 ```
 
 For anything inside the page, Chrome needs one setting, and only Carson can
@@ -108,7 +108,7 @@ things:
 | `soloBtn` | `◉ Both`, or which track is soloed |
 | `sceneList` | the rows; `input[type=checkbox]:checked` = ticked scenes |
 
-Read the ids out of `segment_avatar_editor/web/seq.html` rather than
+Read the ids out of `scenes_avatar_editor/web/seq.html` rather than
 guessing them — several obvious guesses (`scStat`, `vttSummary`, `statbar`)
 do not exist.
 

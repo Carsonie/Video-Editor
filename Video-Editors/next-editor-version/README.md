@@ -143,7 +143,7 @@ already inside `meta.json`.
 The Python run stays at 29/29 and the step says why it skipped, rather than
 showing a green tick that means "not applicable".
 
-## Phase 3 — the Segment and Avatar Editor in React
+## Phase 3 — the Scenes and Avatar Editor in React
 
 **Done.** Several scenes on one timeline, the avatar laid over the footage,
 with every operation driven and checked in a browser: mark, ＋/－ Frame, ＋/－

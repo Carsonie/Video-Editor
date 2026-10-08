@@ -1,7 +1,7 @@
 """
 SHIM — the real module is editor_base/vtt.py.
 
-Byte-identical to segment_avatar_editor/vtt.py until 2026-09-03, when both
+Byte-identical to scenes_avatar_editor/vtt.py until 2026-09-03, when both
 were merged into editor_base/ under Carson's Option A.
 
 Kept as a re-export for the same reason as shared/paths.py: scripts in

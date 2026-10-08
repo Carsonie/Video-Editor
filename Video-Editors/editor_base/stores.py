@@ -1,7 +1,7 @@
 """
 Which videos a Load picker can offer, for every editor that has one.
 
-⚠ THIS WAS THE SAME LOOP, WRITTEN OUT THREE TIMES — in the Segment and Avatar
+⚠ THIS WAS THE SAME LOOP, WRITTEN OUT THREE TIMES — in the Scenes and Avatar
 Editor, in Frame Blender and in Avatar Editor. All three named
 `help-videos/videos/`, all three went blank on 2026-09-15 when every store was
 split into `BCP_raw_mp4/`, `UI_raw_mp4/`, `development_videos/` and

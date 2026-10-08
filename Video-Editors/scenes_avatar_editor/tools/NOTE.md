@@ -25,7 +25,10 @@ SHAPE"**, settled 2026-09-21. The three new ones are:
 own `segment.mp4`, so it is already in every later stage. `4_avatar/` gets
 HeyGen's clips, and nothing else.
 
-✅ **THIS FOLDER MOVED UP ON 2026-09-21.** It is `help-videos/TOOLS/` now, not
+✅ **THIS FOLDER LEFT `Customers/` ON 2026-10-08.** It is
+`Video-Editors/scenes_avatar_editor/tools/` now — inside the editor that uses
+it, and tracked like any other code. (It moved up to `help-videos/TOOLS/` on
+2026-09-21, from
 `help-videos/BCP/TOOLS/` — Carson's call, because the cards serve BCP
 and UI recipes alike. **Every path below is written from a scene folder**, so
 from `<recipe>/sandbox/<NN-label>/` the card is now four levels up:
@@ -95,7 +98,7 @@ tab**, never the newest `seq_` cache folder:
 ```bash
 osascript -e 'tell application "Google Chrome" to get URL of every tab of every window'
 # -> http://localhost:8846/seq_<slug>/viewer.html
-python3 -c "import json;d=json.load(open('/Users/carsonkramer/Rentify/Video-Editor/Video-Editors/cache/segment-avatar-editor/seq_<slug>/view.json'));print([x['n'] for x in d['manifest']])"
+python3 -c "import json;d=json.load(open('/Users/carsonkramer/Rentify/Video-Editor/Video-Editors/cache/scenes-avatar-editor/seq_<slug>/view.json'));print([x['n'] for x in d['manifest']])"
 ```
 
 Out of scope, or the words do not fit the target? **Stop and confirm.** Full rule
@@ -132,7 +135,7 @@ frame **214** is `n=213`. Getting this wrong puts the card one frame off, which
 nobody sees until playback.
 
 ```bash
-ffmpeg -v error -i segment.mp4 -i "<store>/help-videos/TOOLS/back-to-dashboard.png" \
+ffmpeg -v error -i segment.mp4 -i "Video-Editors/scenes_avatar_editor/tools/back-to-dashboard.png" \
   -filter_complex "[0][1]overlay=0:0:enable='eq(n,213)'[v]" \
   -map "[v]" -map "0:a" \
   -c:v libx264 -crf 16 -preset medium -pix_fmt yuv420p \
@@ -217,7 +220,7 @@ on one with dead air at the end it makes the dead air worse. Read the scene's
 ## MAKING A DIFFERENT CARD
 
 ```bash
-cd "<store>/help-videos/TOOLS"
+cd "Video-Editors/scenes_avatar_editor/tools"
 python3 make_overlay.py --head "Back to the Store" \
                         --keys "Mac:  Command + J" \
                         --keys "Windows:  Control + J" \
