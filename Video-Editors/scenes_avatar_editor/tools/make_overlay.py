@@ -72,17 +72,55 @@ DEFAULT_KEYS = ["Mac:  Command + K", "Windows:  Control + K"]
 DEFAULT_FOOT = "works from any page"
 
 
-def build(w, h, head, keys, foot, cw=1500, ch=560):
-    """One transparent full-frame layer with the card centred in it."""
+KEY_STEP = 100          # baseline-to-baseline for a key line
+PAD = 60                # the card's own inner margin, left and right
+
+
+def build(w, h, head, keys, foot, cw=1500, ch=None):
+    """One transparent full-frame layer with the card centred in it.
+
+    ⚠ THE CARD GROWS TO FIT. `ch` used to be a fixed 560 and the key lines were
+    drawn as `keys[:2]` — so a third line was SILENTLY DROPPED. Found 2026-10-08
+    writing the BCP login card: three lines went in, two came out, the tool
+    reported success, and the only way to see it was to look at the picture.
+
+    A note that quietly says less than it was given is worse than one that
+    refuses, because the missing line is invisible in the output and in the
+    command that made it. So: every line is drawn, the card is as tall as it
+    needs to be, and a line too WIDE to fit stops the build by name.
+    """
+    f_head = ImageFont.truetype(BOLD, HEAD_PT)
+    f_key = ImageFont.truetype(BOLD, KEY_PT)
+    f_foot = ImageFont.truetype(REG, FOOT_PT)
+
+    # ⚠ WIDTH IS A REFUSAL, NOT A SHRINK. Scaling the text down to fit would
+    # make one card's wording smaller than the others', and the set looking
+    # like one set is the whole reason this script exists.
+    inner = cw - 2 * PAD
+    for line, font, what in ([(head, f_head, "the title")]
+                             + [(k, f_key, "a message line") for k in keys]
+                             + ([(foot, f_foot, "the footer")] if foot else [])):
+        tw = font.getlength(line)
+        if tw > inner:
+            raise ValueError(
+                f"{what} is {int(tw)}px wide and only {inner}px fits — "
+                f"split it across two --keys, or shorten it:\n    {line!r}")
+
+    # Height from the content: header block, one step per key line, then the
+    # footer if there is one, plus the bottom margin.
+    if ch is None:
+        # ⚠ THESE TWO NUMBERS ARE PINNED BY THE EXISTING CARD. With 2 keys and
+        # a foot they must give exactly 560 — the fixed height this used to
+        # have — so back-to-dashboard.png rebuilds BYTE-IDENTICAL. It is in a
+        # finished video; a card that quietly resized would be a silent edit
+        # to shipped footage.
+        ch = 208 + max(1, len(keys)) * KEY_STEP + (112 if foot else 0) + 40
+
     card = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     d = ImageDraw.Draw(card)
     x0, y0 = (w - cw) // 2, (h - ch) // 2
     d.rounded_rectangle([x0, y0, x0 + cw, y0 + ch], radius=30,
                         fill=FILL, outline=EDGE, width=5)
-
-    f_head = ImageFont.truetype(BOLD, HEAD_PT)
-    f_key = ImageFont.truetype(BOLD, KEY_PT)
-    f_foot = ImageFont.truetype(REG, FOOT_PT)
 
     def mid(text, font, y, fill):
         tw = d.textbbox((0, 0), text, font=font)[2]
@@ -90,10 +128,10 @@ def build(w, h, head, keys, foot, cw=1500, ch=560):
 
     mid(head, f_head, y0 + 55, WHITE)
     d.line([x0 + 300, y0 + 170, x0 + cw - 300, y0 + 170], fill=RULE, width=3)
-    for i, line in enumerate(keys[:2]):
-        mid(line, f_key, y0 + 208 + i * 100, GREEN)
+    for i, line in enumerate(keys):          # ⚠ EVERY line, not keys[:2]
+        mid(line, f_key, y0 + 208 + i * KEY_STEP, GREEN)
     if foot:
-        mid(foot, f_foot, y0 + 430, GREY)
+        mid(foot, f_foot, y0 + 208 + len(keys) * KEY_STEP + 22, GREY)
     return card
 
 

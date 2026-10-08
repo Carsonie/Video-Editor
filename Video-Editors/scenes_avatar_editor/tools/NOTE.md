@@ -45,7 +45,8 @@ place it was written down, and they are corrected here.
 | file | what it is |
 |---|---|
 | `back-to-dashboard.png` | the card, **full frame 2304×1926**, everything outside the card transparent |
-| `make_overlay.py` | the builder — rebuilds that PNG, or a new card with different words |
+| `bcp-login.png` | the BCP login card — same shape, three message lines. Added 2026-10-08 |
+| `make_overlay.py` | the builder — rebuilds either PNG, or a new card with different words |
 | `intro-special-skis.png` | the INTRO frame — **opaque, full frame**, held as its own scene |
 | `make_intro.py` | the intro builder. Same palette and fonts as `make_overlay.py` |
 
@@ -258,3 +259,39 @@ under its own title. So the card there tells a viewer how to reach the page they
 are already on, and it covers the Questions and Logout tiles — which is what that
 scene is about. Flagged to Carson on 2026-09-21; the placement is his call, and
 `z_History/20260921-112717` is the clean clip if it comes off.
+
+
+---
+
+## `bcp-login.png` — the Business Control Panel card
+
+Carson, 2026-10-08. Where a viewer needs to be told where the admin lives.
+
+```bash
+python3 make_overlay.py \
+  --head "Business Control Panel" \
+  --keys "Your login is at" \
+  --keys "https://bcp.rentify.app/" \
+  --keys "to access your all settings." \
+  --foot "" \
+  --out bcp-login.png
+```
+
+⚠ **THE MESSAGE IS SPLIT ACROSS THREE `--keys`, AND IT HAS TO BE.** As one
+string it measures 2255px against 1380px of card. The split keeps the URL whole
+on its own line, which is the part a viewer has to read and copy.
+
+⚠ **THIS CARD IS WHY `make_overlay.py` DRAWS EVERY LINE NOW.** It used to run
+`for i, line in enumerate(keys[:2])` — a hard slice to two. Three lines went in,
+two came out, the tool printed its usual success line, and the ONLY way to see
+the missing one was to look at the picture. A note that quietly says less than
+it was given is worse than one that refuses, because the loss is invisible in
+both the output and the command that made it.
+
+So the builder now draws all of them, grows the card to fit, and STOPS by name
+on a line too wide — `a message line is 2255px wide and only 1380px fits`.
+
+⚠ **AND THE HEIGHT CONSTANTS ARE PINNED TO THE OLD CARD.** With two keys and a
+footer they still give exactly 560, so `back-to-dashboard.png` rebuilds
+BYTE-IDENTICAL. It is in a finished video; a card that quietly resized would be
+a silent edit to shipped footage. Verified by md5 either side of the change.
