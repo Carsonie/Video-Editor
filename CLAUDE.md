@@ -499,24 +499,61 @@ our next video."*
 
 Ten linear steps, raw.mp4 to hosted video. Six are built; four are not.
 
+⚠ **THAT 2026-09-21 SHAPE IS HISTORY — THE NUMBERED ONE IS UNIVERSAL NOW.**
+`sandbox/ segments/ voice/` were kept at the recipe root back then so nothing
+broke. special-skis was the last folder anywhere still on them and it was
+converted on 2026-10-07, so NO store has the flat shape any more. The block
+below is current; the one after it is what it replaced, kept because the old
+names still RESOLVE on purpose (see `NEW_SHAPE_MARKERS` below).
+
 ```
 Customers/<Business>/<store>/help-videos/<STAGE>/<recipe or video>/
 │
-│  ── BUILT AND PROVEN ON special-skis ──────────────────────────────
-├── <capture>.mp4              1  the raw master. An INPUT. Never edited.
-├── script.json                3  THE SINGLE SOURCE OF TRUTH for the words
-├── bounds.json                2  the cut plan
-├── stretch_report.json        2  the scene lengths
-├── segments/                  2  the cuts, keyed by factor/in/out/fps
-├── sandbox/                   4  THE FRAME WORK.  00-intro .. 99-closing
-├── voice/                     5  the mac voice, per scene + state.json
-├── <capture>-narrated.mp4     6  the REVIEW cut. Rebuilt on every sync.
+│  ── BUILT AND PROVEN ────────────────────────────────────────────
+├── 0_master/<capture>.mp4        1  the raw master. An INPUT. Never edited.
+├── 1_cuts/bounds.json            2  the cut plan
+├── 1_cuts/stretch_report.json    2  the scene lengths
+├── 1_cuts/segments/              2  the cuts, keyed by factor/in/out/fps
+├── 2_scenes/sandbox/             4  THE FRAME WORK.  00-intro .. 99-closing
+├── 3_voice/script.json           3  THE SINGLE SOURCE OF TRUTH for the words
+├── 3_voice/*.m4a, state.json     5  the mac voice, per scene
+├── 1_cuts/<capture>-narrated.mp4 6  the REVIEW cut. Rebuilt on every sync.
 │
 │  ── AGREED SHAPE, TOOLS NOT BUILT ────────────────────────────────
-├── 4_avatar/                  7  HeyGen: requests/ clips/ audio/ heygen_state.json
-├── 5_film/                    8  the DELIVERABLE cut + script_v<N>.json
-└── 6_mux/                     9  mux_state.json — asset id, playback id
-                              10  then build/release_video.py -> Completed_Videos/
+├── 4_avatar/                     7  HeyGen: requests/ clips/ audio/ heygen_state.json
+├── 5_film/WIP-<Name>-v<N>.mp4    8a the WORK IN PROGRESS — the MUX staging post
+├── 5_film/<capture>-avatar_v<N>.mp4 8b the DELIVERABLE + script_v<N>.json
+└── 6_mux/                        9  mux_state.json — asset id, playback id
+```
+
+⚠ **`5_film/` IS THE STAGING POST FOR MUX, ADDED 2026-10-08.** Carson: *"This
+is where I want to keep my most recent versions of our progress before placing
+it onto the MUX service provider."* Whatever is the newest watchable cut lands
+here as `WIP-<Video Name>-v<N>.mp4`, whichever voice is on it.
+
+The NAME is the video's, not the capture's — `WIP-Special Skis-v12.mp4`, never
+`ski-demo_special-skis_dev_10-19-12_v12`, because this folder is read by a
+person deciding what to upload. And `v<N>` is the CUT's version, not the
+capture's; they start the same and diverge the first time a cut is rebuilt.
+
+⚠⚠ **THE REVIEW CUT IS COPIED INTO 5_film, NEVER MOVED.** `sae_vtt_sync.py`
+REBUILDS `1_cuts/<capture>-narrated.mp4` on every sync, and that path is
+hardcoded in four spots across two repos — `sae_vtt_sync.py:190` and
+`vtt_editor/serve.py:442, 932, 978`. Move it and the next sync quietly writes a
+second film at the old path, leaving two cuts that disagree about which is
+newest with nothing on screen to say so. This happened on 2026-10-08 and was
+put back the same day.
+
+⚠ **`Completed_Videos/` IS GONE** (2026-10-07) — step 10 used to say
+"`release_video.py` -> `Completed_Videos/`". That folder held nothing but a
+`.gitkeep` on all four stores and was removed. A finished video is a video
+folder beside the recipes, like `UI/original_video/`.
+
+*What the numbered shape replaced, for reading old commits:*
+
+```
+├── <capture>.mp4   script.json   bounds.json   stretch_report.json
+├── segments/       sandbox/      voice/        <capture>-narrated.mp4
 ```
 
 ⚠ **THE NUMBERS ARE THE ORDER, AND THE OLD NAMES KEEP THEIRS.** `sandbox/`,
