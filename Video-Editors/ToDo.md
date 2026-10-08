@@ -48,6 +48,69 @@ same day.
 Each remaining video is the full nine-step pipeline, and **step 5 spends
 real money on HeyGen**. Nothing here should be batched without asking.
 
+### P1.4 `/api/save` stamps a duration ONE FRAME longer than it writes
+
+Found 2026-10-08, burning a card into picklist's scene 37. The save reported:
+
+    "nb_frames": 98, "frames_written": 98, "frames_expected": 98,
+    "duration_s": 3.96, "warning": null
+
+**98 frames at 25fps is 3.92s. 3.96s is 99 frames.** The file holds 98 and
+claims 99, and nothing in the reply says so — `frames_written` and
+`frames_expected` agree, so the `warning` stays null.
+
+⚠ **IT ONLY BITES ON THE NEXT RE-ENCODE, WHICH IS WHY IT HAS SURVIVED.** The
+saved file plays correctly on its own. But a later `-fps_mode cfr` pass — which
+is what `NOTE.md`'s overlay-burn command uses, and `cut_segments.py` too — came
+back with ONE MORE FRAME than it was given, and everything shifted right by one.
+
+That is how it was found: a card burnt at frames 1-76 landed on 2-77, and the
+98-frame clip came back 99. The card was right and the arithmetic was right;
+the input disagreed with itself about its own length.
+
+⚠⚠ **THE MECHANISM IS NOT PROVEN — ONLY THE SYMPTOM IS.** The obvious theory is
+that cfr pads to fill the over-stated duration, and an attempt to reproduce THAT
+in isolation FAILED: a 10-frame clip forced to a longer duration with `-c copy`
+and `-t` kept its duration, and a cfr re-encode of it gained nothing. So either
+the duration stamp is not the cause, or `-t` is the wrong way to fake it. Start
+by reproducing it for real against a saved file before fixing anything — a fix
+aimed at the wrong cause would leave the symptom and look done.
+
+What IS measured, and can be relied on:
+
+  * the save reported 98 frames and 3.96s, which cannot both be true at 25fps
+  * a cfr re-encode of that file produced 99 decoded frames
+  * the overlay moved from n=1..76 to n=2..77, matching a one-frame shift
+
+⚠ **IT IS THE BUILT FILE, NOT THE REPORTING.** `api_save` takes the number
+straight off the thing it just made — `got = float(build_mod.probe(built,
+"duration"))` — so `build_segment()` in `editor_base/server.py:205` is
+producing it. The multi-run path is the suspect: a hold piece is a still looped
+at the source fps and concatenated between cut pieces, and that concat appears
+to carry one extra frame of duration without an extra frame.
+
+⚠ **`build_segment` ALREADY LEARNED THE OTHER HALF OF THIS.** Its own docstring
+records that `-t duration` dropped the last frame of every piece and `-frames:v
+N` fixed it. The frame COUNT is right now; the container DURATION was never
+re-checked against it.
+
+**What to do**
+
+- Reproduce it FIRST, through the real save path — duplicate one frame in a
+  short clip, call `/api/save`, then `ffprobe -count_frames` the result and
+  compare `nb_read_frames / fps` against `format=duration`. Faking the
+  mismatch with `-t` does not work (see above).
+- Fix it in `build_segment`, not in the caller — a save that reports an honest
+  duration fixes every tool downstream at once.
+- Then make `api_save` CHECK it: compare `nb_frames / fps` against the probed
+  duration and set `warning` when they disagree. A silent mismatch is what made
+  this cost an hour; an honest one costs a glance.
+
+**The workaround, until then.** Do not `cfr` re-encode a file straight after a
+save. Rebuild from lossless frames and pin the length with `-frames:v N` — that
+is what scene 37 was finally built with, and its frames and duration agree
+(98 / 3.920s).
+
 ### P1.2 The demo checklist has never been walked by hand here
 
 The suites all pass (678 checks) and every page loads, but **no one has
