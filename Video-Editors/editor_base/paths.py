@@ -349,14 +349,25 @@ def active_voice(final):
     """
     Which presenter the timelines use — Carson's choice, not the tools'.
 
-    ⚠ `2_scenes/config.json` WINS over `3_voice/state.json`. The config records
+    ⚠ `3_voice/config.json` WINS over `3_voice/state.json`. The config records
     what was CHOSEN and only a person writes it; state.json records what was
     last SPOKEN and the voice tools rewrite it every run. A selector a tool can
     overwrite is not a selector. Carson, 2026-09-24.
 
+    ⚠⚠ IT MOVED OUT OF `2_scenes/` ON 2026-10-08. Carson: *"This is 3_voice is
+    where the narrative happens. I do not want 1_cuts and 2_scenes folders to
+    know anything about the voice or narrative."* The voice selector sitting in
+    the SCENES folder was the plainest breach of that — 2_scenes decided which
+    presenter spoke.
+
+    The old path is still READ, second, so a recipe that has not been moved
+    keeps working; nothing is ever written back to it.
+
     Mirrors stage_dirs.active_voice(). Change one, change the other.
     """
-    cfg = os.path.join(scenes_root(final), "config.json")
+    cfg = os.path.join(final, "3_voice", "config.json")
+    if not os.path.isfile(cfg):                    # pre-2026-10-08 recipes
+        cfg = os.path.join(scenes_root(final), "config.json")
     try:
         v = (json.load(open(cfg)).get("voice") or "").strip()
         if v:

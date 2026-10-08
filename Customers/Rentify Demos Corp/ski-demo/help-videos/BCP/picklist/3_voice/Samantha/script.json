@@ -5,197 +5,199 @@
   {
    "n": 1,
    "label": "scene-001",
-   "line": ""
+   "line": "Sign in by email"
   },
   {
    "n": 2,
    "label": "scene-002",
-   "line": ""
+   "line": "Enter the emailed code"
   },
   {
    "n": 3,
    "label": "scene-003",
-   "line": ""
+   "line": "The admin dashboard appears"
   },
   {
    "n": 4,
    "label": "scene-004",
-   "line": ""
+   "line": "Open the Businesses card"
   },
   {
    "n": 5,
    "label": "scene-005",
-   "line": ""
+   "line": "Business lookup opens empty"
   },
   {
    "n": 6,
    "label": "scene-006",
-   "line": ""
+   "line": "Click the search field"
   },
   {
    "n": 7,
    "label": "scene-007",
-   "line": ""
+   "line": "Type the business name"
   },
   {
    "n": 8,
    "label": "scene-008",
-   "line": ""
+   "line": "Matching businesses are listed"
   },
   {
    "n": 9,
    "label": "scene-009",
-   "line": ""
+   "line": "Select Rentify Demo Corp"
   },
   {
    "n": 10,
    "label": "scene-010",
-   "line": ""
+   "line": "The business page opens"
   },
   {
    "n": 11,
    "label": "scene-011",
-   "line": ""
+   "line": "Open Lookup Stores menu"
   },
   {
    "n": 12,
    "label": "scene-012",
-   "line": ""
+   "line": "Store lookup opens empty"
   },
   {
    "n": 13,
    "label": "scene-013",
-   "line": ""
+   "line": "Click the store field"
   },
   {
    "n": 14,
    "label": "scene-014",
-   "line": ""
+   "line": "Type the store name"
   },
   {
    "n": 15,
    "label": "scene-015",
-   "line": ""
+   "line": "Matching stores are listed"
   },
   {
    "n": 16,
    "label": "scene-016",
-   "line": ""
+   "line": "Select Ski Demo store"
   },
   {
    "n": 17,
    "label": "scene-017",
-   "line": ""
+   "line": "The store page opens"
   },
   {
    "n": 18,
    "label": "scene-018",
-   "line": ""
+   "line": "Store details and attributes"
   },
   {
    "n": 19,
    "label": "scene-019",
-   "line": ""
+   "line": "Open the gear menu"
   },
   {
    "n": 20,
    "label": "scene-020",
-   "line": ""
+   "line": "The store menu opens"
   },
   {
    "n": 21,
    "label": "scene-021",
-   "line": ""
+   "line": "Choose Order Picklists here"
   },
   {
    "n": 22,
    "label": "scene-022",
-   "line": ""
+   "line": "Picklists open on Today"
   },
   {
    "n": 23,
    "label": "scene-023",
-   "line": ""
+   "line": "Three day tabs default"
   },
   {
    "n": 24,
    "label": "scene-024",
-   "line": ""
+   "line": "Open the Tomorrow tab"
   },
   {
    "n": 25,
    "label": "scene-025",
-   "line": ""
+   "line": "The days menu opens"
   },
   {
    "n": 26,
    "label": "scene-026",
-   "line": ""
+   "line": "Choose three days out"
   },
   {
    "n": 27,
    "label": "scene-027",
-   "line": ""
+   "line": "Three days of picklists"
   },
   {
    "n": 28,
    "label": "scene-028",
-   "line": ""
+   "line": "A new tab opens"
   },
   {
    "n": 29,
    "label": "scene-029",
-   "line": ""
+   "line": "The picklist PDF renders"
   },
   {
    "n": 30,
    "label": "scene-030",
-   "line": ""
+   "line": "Close the PDF tab"
   },
   {
    "n": 31,
    "label": "scene-031",
-   "line": ""
+   "line": "Find your own order"
   },
   {
    "n": 32,
    "label": "scene-032",
-   "line": ""
+   "line": "Ready still reads No"
   },
   {
    "n": 33,
    "label": "scene-033",
-   "line": ""
+   "line": "Ready now reads Yes"
   },
   {
    "n": 34,
    "label": "scene-034",
-   "line": ""
+   "line": "Open the days menu"
   },
   {
    "n": 35,
    "label": "scene-035",
-   "line": ""
+   "line": "Choose fifteen days out"
   },
   {
    "n": 36,
    "label": "scene-036",
-   "line": ""
+   "line": "Fifteen days of picklists"
   },
   {
    "n": 37,
    "label": "scene-037",
-   "line": ""
+   "line": "Return to the dashboard"
   },
   {
    "n": 38,
    "label": "scene-038",
-   "line": ""
+   "line": "Sign out from here"
   },
   {
    "n": 39,
    "label": "scene-039",
-   "line": ""
+   "line": "Back at the login"
   }
- ]
+ ],
+ "words_per_second": 3.44,
+ "_note": "BCP admin recipe picklist. Cut from ski-demo_picklist_dev_25-16-32_v5.mp4, in 0_master/. Every line is FOUR WORDS describing its screen \u2014 Carson, 2026-10-08: \"add 4 words on scenes 2 to 40 that describe the scene. No sentences yet.\" They are placeholders for real narration, not finished copy. 30 of the 39 screens were too short to say four words at Derya's 3.44 wps, so each was stretched by HOLDING ITS LAST FRAME to 67 frames (2.68s = 0.75 lead + 1.16 speech + 0.75 exit). 00-intro is a bookend with no row here, on purpose."
 }

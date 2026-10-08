@@ -551,6 +551,32 @@ Customers/<Business>/<store>/help-videos/<STAGE>/<recipe or video>/
 └── 6_mux/                        9  mux_state.json — asset id, playback id
 ```
 
+⚠⚠ **`3_voice/` OWNS THE NARRATIVE, AND THE OTHER STAGES KNOW NOTHING OF IT.**
+Carson, 2026-10-08: *"This is 3_voice is where the narrative happens. I do not
+want 1_cuts and 2_scenes folders to know anything about the voice or
+narrative."*
+
+`3_voice/<Presenter>/script.json` is the MASTER LIST of scene narratives, and
+every VTT surface reads it from there. Two files moved out of `2_scenes/` that
+day, both the same mistake — a fact about the WORDS filed under the PICTURE:
+
+    2_scenes/config.json                     -> 3_voice/config.json
+        the voice SELECTOR; the scenes folder was deciding who spoke
+    2_scenes/sandbox/<NN-label>/.sync.json   -> 3_voice/sync/<NN-label>.json
+        the sync record, which carries `voice_sig`
+
+and `scene_needs` — "how long this scene must be to fit its line" — was dropped
+from `1_cuts/stretch_report.json`. Nothing read it back; `stretch_request.py`
+recomputes it from the script on every run.
+
+59 sync records were migrated and none is left in `2_scenes`. The old paths are
+still READ, second, so an unmoved recipe keeps working — but a WRITE always goes
+to the new place, or nothing would ever migrate.
+
+⚠ **ONE BREACH IS LEFT, ON PURPOSE.** `2_scenes/sandbox/<NN>/segment.mp4` still
+has the Mac voice mixed in — that is what makes a scene audible while you scrub
+it in the SAE. Removing it would silence the editor, so it waits on a decision.
+
 ⚠ **`5_film/` IS THE STAGING POST FOR MUX, ADDED 2026-10-08.** Carson: *"This
 is where I want to keep my most recent versions of our progress before placing
 it onto the MUX service provider."* Whatever is the newest watchable cut lands

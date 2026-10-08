@@ -1,0 +1,362 @@
+{
+ "source": "/Users/carsonkramer/Rentify/Video-Editor/Customers/Rentify Demos Corp/ski-demo/help-videos/BCP/picklist/0_master/ski-demo_picklist_dev_25-16-32_v5.mp4",
+ "output": null,
+ "output_seconds": 120.12,
+ "scenes": [
+  {
+   "n": 1,
+   "label": "scene-001",
+   "on_camera": 7.68,
+   "scene_needs": 7.68,
+   "built": 7.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 2,
+   "label": "scene-002",
+   "on_camera": 6.72,
+   "scene_needs": 6.72,
+   "built": 6.72,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 3,
+   "label": "scene-003",
+   "on_camera": 3.72,
+   "scene_needs": 3.72,
+   "built": 3.72,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 4,
+   "label": "scene-004",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 5,
+   "label": "scene-005",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 6,
+   "label": "scene-006",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 7,
+   "label": "scene-007",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 8,
+   "label": "scene-008",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 9,
+   "label": "scene-009",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 10,
+   "label": "scene-010",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 11,
+   "label": "scene-011",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 12,
+   "label": "scene-012",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 13,
+   "label": "scene-013",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 14,
+   "label": "scene-014",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 15,
+   "label": "scene-015",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 16,
+   "label": "scene-016",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 17,
+   "label": "scene-017",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 18,
+   "label": "scene-018",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 19,
+   "label": "scene-019",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 20,
+   "label": "scene-020",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 21,
+   "label": "scene-021",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 22,
+   "label": "scene-022",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 23,
+   "label": "scene-023",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 24,
+   "label": "scene-024",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 25,
+   "label": "scene-025",
+   "on_camera": 2.96,
+   "scene_needs": 2.96,
+   "built": 2.96,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 26,
+   "label": "scene-026",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 27,
+   "label": "scene-027",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 28,
+   "label": "scene-028",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 29,
+   "label": "scene-029",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 30,
+   "label": "scene-030",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 31,
+   "label": "scene-031",
+   "on_camera": 3.0,
+   "scene_needs": 3.0,
+   "built": 3.0,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 32,
+   "label": "scene-032",
+   "on_camera": 3.0,
+   "scene_needs": 3.0,
+   "built": 3.0,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 33,
+   "label": "scene-033",
+   "on_camera": 5.04,
+   "scene_needs": 5.04,
+   "built": 5.04,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 34,
+   "label": "scene-034",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 35,
+   "label": "scene-035",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 36,
+   "label": "scene-036",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 37,
+   "label": "scene-037",
+   "on_camera": 3.92,
+   "scene_needs": 3.92,
+   "built": 3.92,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 38,
+   "label": "scene-038",
+   "on_camera": 2.68,
+   "scene_needs": 2.68,
+   "built": 2.68,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
+   "n": 39,
+   "label": "scene-039",
+   "on_camera": 3.68,
+   "scene_needs": 3.68,
+   "built": 3.68,
+   "factor": 1.0,
+   "stretched": false
+  }
+ ],
+ "segments_reused": 0,
+ "segments_encoded": 39,
+ "fps": 25,
+ "_note": "MEASURED off the sandbox clips on 2026-10-08, not produced by stretch_scenes.py. picklist was cut by the MP4 Splitter's Save as Scenes, which writes no report \u2014 so the VTT read none and showed every clip as 0.0s and every screen as too short. src_in/src_out are OMITTED on purpose: they are the master's timecodes and this report does not know them. A real stretch_scenes.py run will replace this."
+}
