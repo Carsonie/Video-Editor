@@ -1,0 +1,68 @@
+HOW intro-picklist.png WAS MADE
+===============================
+Built 2026-10-08 for the picklist video's 00-intro bookend.
+
+⚠ THE PNG IS NOT IN GIT, AND CANNOT BE. `Customers/**` is excluded and only
+.json / .md / .txt / .vtt are un-ignored under help-videos. So this file IS the
+asset as far as the repo is concerned: the picture is reproducible from the
+command below, byte for byte, and nothing else records the step list.
+
+(special-skis' intro PNG looks like an exception. It is not — it sits in
+TOOLS/ and was tracked before the rule existed, and a tracked file stays
+tracked whatever .gitignore later says.)
+
+THE COMMAND
+-----------
+    cd "Customers/Rentify Demos Corp/ski-demo/help-videos/TOOLS"
+    python3 make_intro.py \
+      --w 2304 --h 1926 \
+      --title "The Picklist" \
+      --sub "Use and Review" \
+      --step "Sign in" \
+      --step "Find your store" \
+      --step "Opening the order picklists" \
+      --step "Filtering by days out" \
+      --step "Opening a picklist to print" \
+      --step "Marking a picklist ready" \
+      --step "Sign out" \
+      --out "../BCP/picklist/0_master/intro-picklist.png"
+
+⚠ THE TITLE IS ONE LINE, AND THAT IS NOT A STYLE CHOICE. A two-line title —
+"The Picklist|Use and Review" — makes make_intro.py REFUSE:
+
+    the intro needs 1744px but only 1698px fits
+    — drop a step, shorten the title, or lower the sizes
+
+It measures the layout instead of letting it overflow. Seven steps and a
+two-line title do not both fit in 2304x1926. One line frees ~170px and keeps
+all seven steps, which is the trade that was taken.
+
+⚠ THE STEPS COME FROM THE FLOW, NOT FROM MEMORY. They are the eleven numbered
+steps of
+    Basic_E2E_Testing/Master_Flows/BCP/Nav/flows/picklist_review.test.ts
+grouped into seven a viewer would read. If the flow changes, reread it rather
+than editing this list from recall — the whole point of a "what this covers"
+card is that it matches what the film actually shows.
+
+ENCODING IT AS THE BOOKEND
+--------------------------
+    ffmpeg -y \
+      -loop 1 -framerate 25 -i 0_master/intro-picklist.png \
+      -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=48000 \
+      -t 4 -r 25 -fps_mode cfr \
+      -c:v libx264 -profile:v high -pix_fmt yuv420p -crf 18 \
+      -c:a aac -b:a 128k -shortest \
+      2_scenes/sandbox/00-intro/segment.mp4
+
+⚠ THE SILENT AAC TRACK IS REQUIRED, NOT COSMETIC. 38 of picklist's 39 scenes
+carry audio, and a clip with none in a concat drops or shifts the sound of
+everything after it. special-skis' bookend carries one for the same reason.
+
+⚠ 00-intro HAS NO ROW IN script.json, ON PURPOSE. That is what makes it a
+bookend: the SAE's `in_script` flag already understands a scene folder with no
+script row, and giving it one would put it in the narration and the VTT.
+
+⚠ AND CHECK THE LAST FRAME, NOT THE FIRST. A `-loop 1` that ends early looks
+perfect at frame 1. The check that caught nothing here but would catch that:
+extract at -sseof -0.1 and diff against the source PNG — mean difference came
+back 0.19/255, which is just h264 being lossy.
