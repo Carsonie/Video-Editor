@@ -1500,7 +1500,35 @@ ${v.scenes.length} scene(s).
         : RENUMBERED
           ? `No scene has unsaved edits. A join or split left a renumber note; `
             + `Backup Scenes is what clears it.`
-          : `No scene has unsaved edits.`);
+          // ⚠⚠ SAY WHY THE BUTTON WAS LIT. Carson, 2026-10-08: "It seemed to do
+          // the save. But it didn't reset/clear the save btn. Did it save
+          // everything?" It had — there was nothing to save — but the button was
+          // green because scenes are OUT OF SYNC, and a save cannot clear that.
+          // So it lit, he clicked, nothing happened, and it stayed lit:
+          // indistinguishable from a broken save.
+          //
+          // ⚠ THIRD DOOR INTO THE SAME TRAP. The two notes in paintDirty() below
+          // already taught this button that a HeyGen scene's stale words, and a
+          // HeyGen scene's out-of-sync state, cannot be cleared for free.
+          // Out-of-sync for any OTHER reason was still counted, and picklist
+          // found it: 30 of its scenes were stretched by hand, so every clip
+          // differs from its cut, permanently.
+          //
+          // ⚠ AND THE FIX IS A SENTENCE, NOT AN ACTION. Clearing this needs
+          // /api/sync, which runs sae_vtt_sync.py --apply — and that re-cuts
+          // from the master, which would throw away exactly those hand-made
+          // stretches. A button that quietly destroyed them would be far worse
+          // than one that explains itself.
+          : OUT_OF_SYNC.length
+            ? `Nothing to save — every scene on this timeline is already `
+              + `written to disk. The button is lit because `
+              + `${OUT_OF_SYNC.length} scene(s) are OUT OF SYNC: the clip no `
+              + `longer matches the cut it came from. A save cannot change `
+              + `that — it is a sync job, and on a recipe whose scenes were `
+              + `stretched by hand a sync would re-cut from the master and lose `
+              + `the stretches. scene(s) ${OUT_OF_SYNC.slice(0, 12).join(', ')}`
+              + (OUT_OF_SYNC.length > 12 ? ` …and ${OUT_OF_SYNC.length - 12} more` : ``)
+            : `No scene has unsaved edits.`);
       return;
     }
     const lines = withWork.map(x => {
@@ -1890,9 +1918,24 @@ Each repeats that track's LAST frame. Undoable per scene.`)) return;
     // indistinguishable from a broken save. Only a scene a free save can
     // actually finish belongs in `dirty`.
     const freeOutOfSync = OUT_OF_SYNC.filter(n => !HEYGEN_PENDING.includes(n));
-    const dirty = tracks + lines > 0 || freeWordsStale || freeOutOfSync.length > 0;
+
+    // ⚠⚠ "UNSAVED WORK" AND "OUT OF SYNC" ARE DIFFERENT COLOURS NOW.
+    // Carson, 2026-10-08: "It seemed to do the save. But it didn't reset/clear
+    // the save btn." Out-of-sync alone was painted `dirty`, the same green as a
+    // frame you have genuinely not written — so the button asked to be clicked,
+    // a save found nothing to do, and it stayed green. Clicking harder has
+    // never fixed it, because a SAVE writes clips and only a SYNC repairs a cut.
+    //
+    // ⚠ AND ON SOME RECIPES IT CAN NEVER CLEAR. picklist's 30 hand-stretched
+    // scenes differ from their cuts permanently; a sync would re-cut from the
+    // master and lose the stretches. A green button promising a fix that must
+    // not be run is worse than an amber one saying what it is.
+    const unsaved = tracks + lines > 0 || freeWordsStale;
+    const syncOnly = !unsaved && freeOutOfSync.length > 0;
+    const dirty = unsaved;
     btn.classList.toggle('dirty', dirty);
-    btn.classList.toggle('pending-render', !dirty && HEYGEN_PENDING.length > 0);
+    btn.classList.toggle('sync-only', syncOnly);
+    btn.classList.toggle('pending-render', !dirty && !syncOnly && HEYGEN_PENDING.length > 0);
     const bits = [];
     if (tracks) bits.push(`${tracks} track(s) not written yet`);
     if (lines) bits.push(`${lines} line(s) still being typed`);
@@ -1902,6 +1945,19 @@ Each repeats that track's LAST frame. Undoable per scene.`)) return;
     if (dirty) {
       btn.title = bits.join(', ') + ' — Save Timeline writes everything, updates'
         + ' the cuts and the voice, then brings you back to this frame';
+    } else if (syncOnly) {
+      // ⚠ THE TOOLTIP MUST NOT PROMISE WHAT THE CLICK CANNOT DO. The `dirty`
+      // one above says Save Timeline "updates the cuts and the voice" — true
+      // when there is work to write, and a straight falsehood here: with
+      // nothing unsaved the click finds no work and returns. Saying so IS the
+      // fix; the click now explains the same thing.
+      btn.title = `Nothing to save — every scene is already on disk. `
+        + `scene(s) ${freeOutOfSync.slice(0, 12).join(', ')}`
+        + (freeOutOfSync.length > 12 ? ` …+${freeOutOfSync.length - 12}` : ``)
+        + ` are OUT OF SYNC: the clip no longer matches the cut it came from. `
+        + `That is a sync job, not a save — and on a recipe whose scenes were `
+        + `stretched by hand it must NOT be run, because a sync re-cuts from `
+        + `the master and loses the stretches.`;
     } else if (HEYGEN_PENDING.length) {
       // Distinct from "dirty": Save Timeline has nothing left to do here. This
       // is the paid step it deliberately will not take on its own.

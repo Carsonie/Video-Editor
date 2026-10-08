@@ -675,3 +675,13 @@
   #applyGroupBtn.armed, #unwindBtn.armed {
     background:#5a4418; border-color:#9a7526; color:#ffe9b8; font-weight:600;
   }
+
+  /* ── OUT OF SYNC, BUT NOTHING TO SAVE ──────────────────────────────────
+     A SAVE writes clips; a SYNC repairs a cut. Painting the second in the
+     first's green made the button ask to be clicked, do nothing, and stay
+     lit (Carson, 2026-10-08). Amber says "something is off here" without
+     promising that this button fixes it — and on a hand-stretched recipe it
+     must NOT be fixed, because the sync would re-cut from the master. */
+  #saveTimelineBtn.sync-only, #saveAllBtn.sync-only {
+    background:#4a3a18; border-color:#8a6a26; color:#ffe3b0;
+  }
