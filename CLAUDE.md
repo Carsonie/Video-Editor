@@ -427,7 +427,8 @@ move all the tools into the segment_avatar_editor folder."*
 ```
 Video-Editors/scenes_avatar_editor/tools/
 ├── back-to-dashboard.png   a TRANSPARENT layer — a card laid over real footage
-├── make_overlay.py         builds that
+├── bcp-login.png           the same, saying where the admin lives
+├── make_overlay.py         builds both
 ├── intro-special-skis.png  an OPAQUE FULL FRAME — held as its own bookend scene
 ├── make_intro.py           builds that
 ├── add_ring.py             paints a click ring onto an already-recorded scene
