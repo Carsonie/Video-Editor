@@ -139,6 +139,47 @@ def slug_for(path):
     return f"{safe}_{h}"
 
 
+def voice_take_for(src):
+    """
+    The VOICE TAKE that belongs to this clip, or None.
+
+    ⚠⚠ 3_voice OWNS THE NARRATIVE. Carson, 2026-10-08: *"I do not want 1_cuts
+    and 2_scenes folders to know anything about the voice or narrative."* So a
+    scene's `segment.mp4` may be SILENT, and the sound the SAE plays beside it
+    comes from `3_voice/<Presenter>/<NN>-<label>.m4a` instead.
+
+    Nothing about the player had to change for this: the page has always
+    fetched `<cache>/<slug>/audio.m4a` as its own file rather than reading
+    sound out of the video. Only where that file is FILLED FROM changes.
+
+        .../2_scenes/sandbox/<NN>-<label>/segment.mp4
+             ^ recipe root is everything before /2_scenes/
+                                ^ and this is the take's name
+
+    ⚠ IT RETURNS None FOR ANYTHING THAT IS NOT A SANDBOX SCENE. A raw capture,
+    a built film, an avatar clip — those keep their own audio, and guessing a
+    take for them would silence a clip that was never narrated per scene.
+    """
+    marker = os.sep + "2_scenes" + os.sep + "sandbox" + os.sep
+    if marker not in src:
+        return None
+    root, rest = src.split(marker, 1)
+    scene = rest.split(os.sep)[0]                 # <NN>-<label>
+    try:
+        from editor_base import paths as _p       # local: frames.py is imported early
+        voice = _p.active_voice(root)
+    except Exception:
+        voice = None
+    cands = []
+    if voice:
+        cands.append(os.path.join(root, "3_voice", voice, scene + ".m4a"))
+    cands.append(os.path.join(root, "3_voice", scene + ".m4a"))   # flat, older shape
+    for c in cands:
+        if os.path.isfile(c):
+            return c
+    return None
+
+
 def extract_audio(src, outdir, log=print):
     """
     Pull `src`'s audio to outdir/audio.m4a. True if the clip ends up with sound.
@@ -156,12 +197,23 @@ def extract_audio(src, outdir, log=print):
     short of re-extracting 3325 frames. The audio itself takes half a second.
     """
     audio_path = os.path.join(outdir, "audio.m4a")
+
+    # ⚠⚠ THE VOICE TAKE WINS. A scene's picture may be silent now — the
+    # narrative lives in 3_voice/ and nowhere else (Carson, 2026-10-08) — so
+    # the sound beside it is that scene's own take, not whatever is muxed into
+    # the clip. Falls back to the clip's own audio for everything that is not a
+    # sandbox scene: raw captures, built films and avatar clips keep theirs.
+    take = voice_take_for(src)
+    sound_from = take or src
+
     has_audio = bool(subprocess.run(
         ["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries",
-         "stream=codec_type", "-of", "csv=p=0", src],
+         "stream=codec_type", "-of", "csv=p=0", sound_from],
         capture_output=True, text=True).stdout.strip())
     if has_audio:
-        ar = subprocess.run(["ffmpeg", "-v", "error", "-i", src, "-vn",
+        if take:
+            log(f"  voice from 3_voice: {os.path.basename(take)}")
+        ar = subprocess.run(["ffmpeg", "-v", "error", "-i", sound_from, "-vn",
                              "-c:a", "aac", "-b:a", "128k", "-y", audio_path],
                             capture_output=True, text=True)
         if ar.returncode != 0:
@@ -189,12 +241,47 @@ def build_frames(video, out=None, box=750, force=False, log=print, alpha_png=Fal
     meta_path = os.path.join(outdir, "meta.json")
 
     st = os.stat(src)
+    # ⚠⚠ THE VOICE TAKE IS PART OF THE SIGNATURE, AND IT HAS TO BE. The cache
+    # is reused when the SOURCE VIDEO has not moved — but the sound now comes
+    # from `3_voice/`, which changes on its own. Without this, editing a line
+    # and re-rendering the take left the SAE playing the OLD voice: the picture
+    # was identical, so nothing invalidated, and the page sounded convincing
+    # while being wrong. Silent staleness, the failure this project keeps
+    # paying for.
+    #
+    # `None` when there is no take, which is every clip that is not a sandbox
+    # scene — so nothing else's cache behaviour changes at all.
+    _take = voice_take_for(src)
+    _tsig = None
+    if _take:
+        _ts = os.stat(_take)
+        _tsig = [_ts.st_size, _ts.st_mtime]
+
     sig = {"source": src, "size": st.st_size, "mtime": st.st_mtime, "box": box,
-           "alpha_png": bool(alpha_png)}
+           "alpha_png": bool(alpha_png), "voice_take": _tsig}
 
     cached = os.path.exists(meta_path) and os.path.isdir(frames_dir)
     if cached and not force:
         prior = json.load(open(meta_path))
+
+        # ⚠⚠ A CHANGED VOICE TAKE IS AN AUDIO REFRESH, NOT A RE-EXTRACTION.
+        # Everything else about the cache is still valid — same video, same
+        # box, same frames — and only the sound beside it moved. Re-extracting
+        # every frame to gain half a second of audio is what the comment below
+        # already refused to do for the same reason; this is that rule applied
+        # to the take. On picklist that is ~3000 frames not re-cut when a line
+        # is re-spoken.
+        #
+        # ⚠ The FIRST open after this change lands here too: an older cache has
+        # no `voice_take` key at all, so `prior.get()` is None and a scene that
+        # now has a take refreshes its audio instead of rebuilding.
+        if (prior.get("voice_take") != sig["voice_take"]
+                and all(prior.get(k) == sig[k] for k in sig if k != "voice_take")):
+            log("  the voice take changed — refreshing just the audio")
+            prior["has_audio"] = extract_audio(src, outdir, log=log)
+            prior["voice_take"] = sig["voice_take"]
+            json.dump(prior, open(meta_path, "w"))
+
         if all(prior.get(k) == sig[k] for k in sig):
             # Same reasoning as the viewer rewrite below: a cache built before
             # audio was extracted should not have to be thrown away to gain it.
