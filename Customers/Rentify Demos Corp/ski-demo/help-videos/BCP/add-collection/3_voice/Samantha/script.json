@@ -1,13 +1,13 @@
 {
  "store": "ski-demo",
  "title": "Adding a collection and its items",
- "_note": "BCP admin recipe add-collection. Cut from ski-demo_add-collection_dev_09-20-00_v4.mp4 (389.94s) — TWO flows in one browser: create the collection and set its options, then add two items to it. FORTY-FOUR screens, not the 34 the old script assumed. Carson chose to narrate all of them rather than collapse the repeated second item. Twelve of the 44 are the `↰ back x6` walk, which goes BACKWARDS through pages already visited, so they get one short line each and the narration says plainly that we are retracing our steps. Screen edges in bounds_v4.json, taken from the flow logs and checked frame by frame.",
+ "_note": "BCP admin recipe add-collection. Cut from ski-demo_add-collection_dev_09-20-00_v4.mp4 (389.94s) \u2014 TWO flows in one browser: create the collection and set its options, then add two items to it. FORTY-FOUR screens, not the 34 the old script assumed. Carson chose to narrate all of them rather than collapse the repeated second item. Twelve of the 44 are the `\u21b0 back x6` walk, which goes BACKWARDS through pages already visited, so they get one short line each and the narration says plainly that we are retracing our steps. Screen edges in bounds_v4.json, taken from the flow logs and checked frame by frame.\n\n\u26a0 2026-10-08: THE 44 CUTS IN 1_cuts/ WERE MADE FROM v4, AND v4 IS IN z_History/. 0_master holds v5, which is 2.3s longer. Carson's call, asked outright: KEEP THE v4 CUTS. They match this script exactly, 44 to 44, and every line here was written against their timings \u2014 re-cutting from v5 with v4's src_in/src_out would land each cut slightly off its screen. \u26a0 SO DO NOT TRUST 0_master TO BE WHAT THESE CUTS CAME FROM. Four scenes (2, 11, 30, 42) also had a dead cut beside the live one, left by a re-cut; the dead four are in 1_cuts/segments/z_History/, identified by the stretch_report's own factor rather than by sort order.",
  "words_per_second": 3.44,
  "_wps_note": "From 01-first-time-ordering/script_v33.json, measured 31 words / 9.01s. Nothing for THIS video is rendered yet.",
  "_pauses_note": "One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in comes from the scene's footage hold.",
  "_lead_in_seconds": 0.75,
  "_estimated_video_seconds": 226.9,
- "_estimated_video_note": "44 scenes. 456 words / 3.44 wps = 132.6s of speech, + 44 lead-ins at 0.5s = 22.0s, + 44 exit pauses at 0.8s = 35.2s. ESTIMATE — recompute from the audio once it exists.",
+ "_estimated_video_note": "44 scenes. 456 words / 3.44 wps = 132.6s of speech, + 44 lead-ins at 0.5s = 22.0s, + 44 exit pauses at 0.8s = 35.2s. ESTIMATE \u2014 recompute from the audio once it exists.",
  "_footage_seconds": 392.24,
  "scenes": [
   {
@@ -26,7 +26,7 @@
   {
    "n": 2,
    "label": "enter-the-code",
-   "line": "A four-digit code is sent to that address. {0.5} Type it in — the screen moves on by itself.",
+   "line": "A four-digit code is sent to that address. {0.5} Type it in \u2014 the screen moves on by itself.",
    "pauses": [
     {
      "seconds": 0.75
@@ -583,5 +583,5 @@
    "target-length": "4.1 seconds."
   }
  ],
- "_dwell_note": "Carson, 2026-09-15: bring back a 0.75s dwell at BOTH ends of every scene — a lead-in before she speaks and a close-out after. Was 0.5 in and 0.8 out. narrate_mac.py reads _lead_in_seconds from here, so this field is the one that governs the audio as well as the table."
+ "_dwell_note": "Carson, 2026-09-15: bring back a 0.75s dwell at BOTH ends of every scene \u2014 a lead-in before she speaks and a close-out after. Was 0.5 in and 0.8 out. narrate_mac.py reads _lead_in_seconds from here, so this field is the one that governs the audio as well as the table."
 }

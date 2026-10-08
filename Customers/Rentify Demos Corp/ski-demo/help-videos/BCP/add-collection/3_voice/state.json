@@ -1,0 +1,401 @@
+{
+ "voice": "Samantha",
+ "scenes": {
+  "1": {
+   "line_hash": "1012ae922c1a",
+   "built": 8.12,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 4.91,
+   "silent": false,
+   "engine": "mac"
+  },
+  "2": {
+   "line_hash": "cb96e47ca85d",
+   "built": 7.2,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 5.51,
+   "silent": false,
+   "engine": "mac"
+  },
+  "3": {
+   "line_hash": "e1f4fa3fa8f8",
+   "built": 7.32,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 5.76,
+   "silent": false,
+   "engine": "mac"
+  },
+  "4": {
+   "line_hash": "d5385f23732d",
+   "built": 8.48,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 3.88,
+   "silent": false,
+   "engine": "mac"
+  },
+  "5": {
+   "line_hash": "374e1c4eda4c",
+   "built": 6.96,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 4.91,
+   "silent": false,
+   "engine": "mac"
+  },
+  "6": {
+   "line_hash": "e4568ad53d90",
+   "built": 9.48,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 3.01,
+   "silent": false,
+   "engine": "mac"
+  },
+  "7": {
+   "line_hash": "a8dcad64a991",
+   "built": 10.12,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 5.63,
+   "silent": false,
+   "engine": "mac"
+  },
+  "8": {
+   "line_hash": "d660d03a4cf5",
+   "built": 8.76,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 4.45,
+   "silent": false,
+   "engine": "mac"
+  },
+  "9": {
+   "line_hash": "529576332a10",
+   "built": 6.28,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 2.53,
+   "silent": false,
+   "engine": "mac"
+  },
+  "10": {
+   "line_hash": "9ea44e95cbd9",
+   "built": 14.52,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 6.65,
+   "silent": false,
+   "engine": "mac"
+  },
+  "11": {
+   "line_hash": "79a10c6c282d",
+   "built": 2.68,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 1.17,
+   "silent": false,
+   "engine": "mac"
+  },
+  "12": {
+   "line_hash": "45c40d45cf19",
+   "built": 8.0,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 3.62,
+   "silent": false,
+   "engine": "mac"
+  },
+  "13": {
+   "line_hash": "0a416a17ca37",
+   "built": 3.88,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 1.57,
+   "silent": false,
+   "engine": "mac"
+  },
+  "14": {
+   "line_hash": "9fce6637170a",
+   "built": 8.0,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 1.73,
+   "silent": false,
+   "engine": "mac"
+  },
+  "15": {
+   "line_hash": "ec64a590419a",
+   "built": 3.24,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 1.62,
+   "silent": false,
+   "engine": "mac"
+  },
+  "16": {
+   "line_hash": "c24209a785b8",
+   "built": 8.64,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 4.65,
+   "silent": false,
+   "engine": "mac"
+  },
+  "17": {
+   "line_hash": "7f4357144342",
+   "built": 6.96,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 3.38,
+   "silent": false,
+   "engine": "mac"
+  },
+  "18": {
+   "line_hash": "dbe2b18914f6",
+   "built": 9.48,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 2.41,
+   "silent": false,
+   "engine": "mac"
+  },
+  "19": {
+   "line_hash": "fe8afb7a6c45",
+   "built": 10.12,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 4.08,
+   "silent": false,
+   "engine": "mac"
+  },
+  "20": {
+   "line_hash": "5dceeecc318f",
+   "built": 9.08,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 2.99,
+   "silent": false,
+   "engine": "mac"
+  },
+  "21": {
+   "line_hash": "1db169ae03e9",
+   "built": 20.24,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 10.03,
+   "silent": false,
+   "engine": "mac"
+  },
+  "22": {
+   "line_hash": "1b0a5c1080dd",
+   "built": 8.4,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 5.89,
+   "silent": false,
+   "engine": "mac"
+  },
+  "23": {
+   "line_hash": "e78816023663",
+   "built": 8.64,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 2.58,
+   "silent": false,
+   "engine": "mac"
+  },
+  "24": {
+   "line_hash": "34b151c34e13",
+   "built": 6.96,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 3.11,
+   "silent": false,
+   "engine": "mac"
+  },
+  "25": {
+   "line_hash": "dbe2b18914f6",
+   "built": 9.48,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 2.41,
+   "silent": false,
+   "engine": "mac"
+  },
+  "26": {
+   "line_hash": "08cd503f82be",
+   "built": 10.16,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 4.45,
+   "silent": false,
+   "engine": "mac"
+  },
+  "27": {
+   "line_hash": "2218eb42abc0",
+   "built": 18.72,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 4.91,
+   "silent": false,
+   "engine": "mac"
+  },
+  "28": {
+   "line_hash": "07085baaede3",
+   "built": 13.72,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 5.33,
+   "silent": false,
+   "engine": "mac"
+  },
+  "29": {
+   "line_hash": "6dae40c03028",
+   "built": 12.72,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 9.38,
+   "silent": false,
+   "engine": "mac"
+  },
+  "30": {
+   "line_hash": "c828bf1efc31",
+   "built": 3.48,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 1.94,
+   "silent": false,
+   "engine": "mac"
+  },
+  "31": {
+   "line_hash": "9ab6787aec20",
+   "built": 8.04,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 3.09,
+   "silent": false,
+   "engine": "mac"
+  },
+  "32": {
+   "line_hash": "0a416a17ca37",
+   "built": 3.92,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 1.57,
+   "silent": false,
+   "engine": "mac"
+  },
+  "33": {
+   "line_hash": "9fce6637170a",
+   "built": 7.92,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 1.73,
+   "silent": false,
+   "engine": "mac"
+  },
+  "34": {
+   "line_hash": "ec64a590419a",
+   "built": 3.28,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 1.62,
+   "silent": false,
+   "engine": "mac"
+  },
+  "35": {
+   "line_hash": "77320726d5e4",
+   "built": 8.6,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 3.97,
+   "silent": false,
+   "engine": "mac"
+  },
+  "36": {
+   "line_hash": "34b151c34e13",
+   "built": 7.0,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 3.11,
+   "silent": false,
+   "engine": "mac"
+  },
+  "37": {
+   "line_hash": "dbe2b18914f6",
+   "built": 9.48,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 2.41,
+   "silent": false,
+   "engine": "mac"
+  },
+  "38": {
+   "line_hash": "24fa1febed14",
+   "built": 10.16,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 3.92,
+   "silent": false,
+   "engine": "mac"
+  },
+  "39": {
+   "line_hash": "0fc342f69b14",
+   "built": 3.8,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 2.01,
+   "silent": false,
+   "engine": "mac"
+  },
+  "40": {
+   "line_hash": "70852d8f8c8f",
+   "built": 28.92,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 10.44,
+   "silent": false,
+   "engine": "mac"
+  },
+  "41": {
+   "line_hash": "4ee3467d13c3",
+   "built": 12.6,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 9.53,
+   "silent": false,
+   "engine": "mac"
+  },
+  "42": {
+   "line_hash": "735997513dd3",
+   "built": 4.4,
+   "lead": 0.75,
+   "rate": 200,
+   "spoken": 2.79,
+   "silent": false,
+   "engine": "mac"
+  },
+  "43": {
+   "line_hash": "3a3b6d73a5b5",
+   "built": 8.52,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 5.36,
+   "silent": false,
+   "engine": "mac"
+  },
+  "44": {
+   "line_hash": "7e287a2bac08",
+   "built": 5.56,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 3.02,
+   "silent": false,
+   "engine": "mac"
+  }
+ }
+}
