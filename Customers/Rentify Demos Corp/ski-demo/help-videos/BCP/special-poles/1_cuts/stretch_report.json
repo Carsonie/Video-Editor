@@ -1,6 +1,6 @@
 {
  "source": null,
- "_why": "Nothing was stretched. The capture was recorded at a flat minimum, its screens were measured, and the lines were written to fit them \u2014 so every scene already had the footage it needed. `built` is the measured screen length, which is what narrate_mac.py needs to place each line.",
+ "_why": "Nothing was stretched. The capture was recorded at a flat minimum, its screens were measured, and the lines were written to fit them — so every scene already had the footage it needed. `built` is the measured screen length, which is what narrate_mac.py needs to place each line.",
  "output_seconds": 622.72,
  "tail_padded_to_capture": true,
  "screens_total_seconds": 621.2,
@@ -214,10 +214,10 @@
    "n": 18,
    "label": "the-other-variants",
    "src_in": 213.9,
-   "src_out": 596.2,
-   "on_camera": 382.3,
-   "built": 382.3,
-   "scene_needs": 382.3,
+   "src_out": 234.5,
+   "on_camera": 20.6,
+   "built": 20.6,
+   "scene_needs": 20.6,
    "factor": 1.0,
    "stretched": false,
    "silent": true
@@ -240,7 +240,7 @@
    "src_in": 604.2,
    "src_out": 611.2,
    "on_camera": 7.0,
-   "built": 7.0,
+   "built": 10.0,
    "scene_needs": 6.5,
    "factor": 1.0,
    "stretched": false,
@@ -258,5 +258,10 @@
    "stretched": false,
    "silent": false
   }
- ]
+ ],
+ "_trim_note": "SCENE 18 'the-other-variants' WAS TRIMMED ON 2026-10-08, at Carson's instruction, following special-skis — which cut 137.7s of the same repetitive duplication out of its own cut and kept about 15 seconds. It ran 213.9-596.2 (382.3s) of SILENT footage, the same Duplicate-rename-change-Update cycle over and over. It now holds ONE complete cycle, 213.9-234.5, and has a line. The dropped footage is still in 0_master/ and this field is how to find it again.",
+ "_output_removed": "ski-demo_special-poles_dev_10-20-23_v1-stretched.mp4 was deleted after narration — it is picture-only and silent by design, and its name reads like the finished cut. Rebuild it in ~20s from segments/: python3 scripts/stretch_request.py \"<this folder>\"",
+ "fps": 25.0,
+ "_fps_note": "ADDED 2026-10-08. This report was written by an older tool that left `fps` out, and sae_vtt_sync.py reads it on the first line of load() — so it died with a bare KeyError: 'fps' and laid no voice at all. The value is 25.0: the master is 25/1 and every segment is named -25fps.",
+ "_cards_note": "SCENES 1 AND 20 ARE NO LONGER PURE CUTS FROM THE MASTER. 2026-10-08. Scene 1 carries the BCP login card over live frames 25..100. Scene 20 carries the Back-to-the-Dashboard card on 75 HELD frames INSERTED after its frame 37 — the last item page, with the dashboard arriving on frame 38. It ran 175 -> 250 frames and its built seconds went 7.0 -> 10.0. ⚠ THE VOICE WAS CUT AND RE-JOINED AT THE SAME POINT, not padded at the end: 3.0s of silence was spliced into the m4a at 37/25 s, so 'Back at the dashboard when you are done' still lands exactly as the dashboard appears. Padding at the end would have left the line playing over a held item page. ⚠ A re-cut from 0_master/ wipes both cards and shortens scene 20 back."
 }
