@@ -126,6 +126,15 @@
    "spoken": 5.36,
    "silent": false,
    "engine": "mac"
+  },
+  "1": {
+   "line_hash": "987888e1795b",
+   "built": 15.24,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 8.99,
+   "silent": false,
+   "engine": "mac"
   }
  }
 }

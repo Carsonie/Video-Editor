@@ -11,6 +11,11 @@
  "_footage_seconds": 125.56,
  "scenes": [
   {
+   "n": 1,
+   "label": "sign-in",
+   "line": "Type the email address for your back-office account. {0.8} A four-digit code is sent to it. {0.5} Type the code in — the screen moves on by itself."
+  },
+  {
    "n": 2,
    "label": "dashboard",
    "line": "This is your dashboard. {0.8} Questions are shared by every store. Click Questions."

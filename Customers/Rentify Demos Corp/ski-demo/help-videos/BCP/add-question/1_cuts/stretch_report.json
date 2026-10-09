@@ -5,6 +5,17 @@
  "fps": 25,
  "scenes": [
   {
+   "n": 1,
+   "label": "sign-in",
+   "src_in": 0.0,
+   "src_out": 15.24,
+   "on_camera": 15.24,
+   "scene_needs": 15.24,
+   "built": 15.24,
+   "factor": 1.0,
+   "stretched": false
+  },
+  {
    "n": 2,
    "label": "dashboard",
    "src_in": 15.24,
@@ -143,7 +154,7 @@
    "src_out": 111.52,
    "on_camera": 4.36,
    "scene_needs": 4.36,
-   "built": 4.36,
+   "built": 7.36,
    "factor": 1.0,
    "stretched": false
   },
@@ -160,5 +171,7 @@
   }
  ],
  "_note": "Re-cut 2026-09-23 from Carson's own 15 cut points (1_cuts/My Cuts.txt). 16 scenes, 3139 frames. The previous 12-scene report is in z_History/.",
- "_dropped_note": "Scenes 1 (sign-in) and 16 (sign-out) removed 2026-09-23 at Carson's instruction. The NUMBERS 2-15 are kept deliberately: renumbering would rename 14 scene folders and 14 cuts for no gain. Their clips are in 2_scenes/z_History/ and their cuts in 1_cuts/segments/z_History/."
+ "_dropped_note": "Scenes 1 (sign-in) and 16 (sign-out) removed 2026-09-23 at Carson's instruction. The NUMBERS 2-15 are kept deliberately: renumbering would rename 14 scene folders and 14 cuts for no gain. Their clips are in 2_scenes/z_History/ and their cuts in 1_cuts/segments/z_History/.",
+ "_restored_note": "SCENE 1 WAS BROUGHT BACK FROM 2_scenes/z_History/ ON 2026-10-08, at Carson's instruction, so the recipe can carry the BCP login card — requirement 2 of a BCP film needs a login screen to sit on. It had been taken out on 2026-09-23 along with 16-sign-out. 16-sign-out stays out: the film already ends on the dashboard with Logout ringed.",
+ "_cards_note": "SCENES 1 AND 14 ARE NO LONGER PURE CUTS FROM THE MASTER. 2026-10-08. Scene 1 carries the BCP login card burnt over live frames 25..100. Scene 14 carries the Back-to-the-Dashboard card on 75 HELD frames APPENDED to its last frame, so it ran 109 -> 184 frames and its built seconds went 4.36 -> 7.36. Scene 15 is the dashboard for all 211 of its frames, which is why the card sits at the end of 14. A re-cut from 0_master/ wipes both cards. ⚠ SCENE 14's LABEL SAYS 'activate' AND THE SCREEN IS THE QUESTION LOOKUP SEARCH."
 }
