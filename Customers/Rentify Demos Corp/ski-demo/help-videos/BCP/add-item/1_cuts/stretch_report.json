@@ -142,7 +142,7 @@
    "src_out": 118.8,
    "on_camera": 5.2,
    "scene_needs": 3.0,
-   "built": 5.2,
+   "built": 8.2,
    "factor": 1.0,
    "stretched": false
   }
@@ -150,5 +150,6 @@
  "segments_reused": 0,
  "segments_encoded": 13,
  "fps": 25.0,
- "_output_removed": "ski-demo_add-item_dev_09-14-17_v15-stretched.mp4 was deleted after narration — it is picture-only and silent by design, and its name reads like the finished cut. Rebuild it in ~20s from segments/: python3 scripts/stretch_request.py \"<this folder>\""
+ "_output_removed": "ski-demo_add-item_dev_09-14-17_v15-stretched.mp4 was deleted after narration — it is picture-only and silent by design, and its name reads like the finished cut. Rebuild it in ~20s from segments/: python3 scripts/stretch_request.py \"<this folder>\"",
+ "_cards_note": "SCENES 1 AND 13 ARE NO LONGER PURE CUTS FROM THE MASTER. 2026-10-08. Scene 1 carries the BCP login card burnt over live frames 25..100. Scene 13 carries the Back-to-the-Dashboard card on 75 HELD frames INSERTED between its frame 88 (the last item page) and frame 89 (where the dashboard appears), so it ran 130 -> 205 frames and its built seconds went 5.2 -> 8.2. A re-cut from 0_master/ wipes both cards and shortens scene 13 back. ⚠ THE LABELS LIE ON THE LAST THREE SCENES: 11-saved, 12-back-to-dashboard and 13-sign-out all open on the item edit form, and the dashboard only appears 88 frames into 13. The Cmd+K moment is INSIDE scene 13, which is why the card is there and not at the end of scene 12."
 }
