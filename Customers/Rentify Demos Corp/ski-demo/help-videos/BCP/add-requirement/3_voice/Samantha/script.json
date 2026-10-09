@@ -1,7 +1,7 @@
 {
  "store": "ski-demo",
  "title": "Adding a requirement",
- "_note": "BCP admin recipe add-requirement. Cut from ski-demo_add-requirement_dev_09-19-50_v3.mp4 (129.68s), recorded to the v15 standard. THIRTEEN screens. The requirement's own page is ONE screen holding 38.6s — three questions ticked from the picker, the status set, then update — so it carries the most narration of any screen in the four recipes. Screen edges in bounds_v3.json.",
+ "_note": "BCP admin recipe add-requirement. Cut from ski-demo_add-requirement_dev_09-19-50_v4.mp4 (129.68s), recorded to the v15 standard. THIRTEEN screens. The requirement's own page is ONE screen holding 38.6s — three questions ticked from the picker, the status set, then update — so it carries the most narration of any screen in the four recipes. Screen edges in bounds_v3.json. ⚠ _note said v3 until 2026-10-08; 0_master/ holds v4 and always did, so every tool that resolves the capture from this field was looking for a file that is not there.",
  "words_per_second": 3.44,
  "_wps_note": "From 01-first-time-ordering/script_v33.json, measured 31 words / 9.01s. Nothing for THIS video is rendered yet.",
  "_pauses_note": "One 0.8s exit pause per scene, at the end of the line. A 0.5s lead-in is NOT here: `pauses` can only place a gap after matched text or at the end, so the lead-in comes from the scene's footage hold.",

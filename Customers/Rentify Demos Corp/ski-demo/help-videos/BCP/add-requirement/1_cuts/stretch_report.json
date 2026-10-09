@@ -120,7 +120,7 @@
    "src_out": 115.72,
    "on_camera": 5.4,
    "scene_needs": 5.2,
-   "built": 5.4,
+   "built": 8.4,
    "factor": 1.0,
    "stretched": false
   },
@@ -150,5 +150,6 @@
  "segments_reused": 0,
  "segments_encoded": 13,
  "fps": 25.0,
- "_output_removed": "ski-demo_add-requirement_dev_09-19-50_v3-stretched.mp4 was deleted after narration — it is picture-only and silent by design, and its name reads like the finished cut. Rebuild it in ~20s from segments/: python3 scripts/stretch_request.py \"<this folder>\""
+ "_output_removed": "ski-demo_add-requirement_dev_09-19-50_v3-stretched.mp4 was deleted after narration — it is picture-only and silent by design, and its name reads like the finished cut. Rebuild it in ~20s from segments/: python3 scripts/stretch_request.py \"<this folder>\"",
+ "_cards_note": "SCENES 1 AND 11 ARE NO LONGER PURE CUTS FROM THE MASTER. 2026-10-08. Scene 1 carries the BCP login card over live frames 25..100. Scene 11 carries the Back-to-the-Dashboard card on 75 HELD frames INSERTED between its frame 134 (the last requirement page) and frame 135, so it ran 135 -> 210 frames and built went 5.4 -> 8.4. A re-cut from 0_master/ wipes both. ⚠ ALMOST EVERY SCENE IN THIS RECIPE ENDS WITH ONE FRAME OF THE NEXT SCREEN — the cut edges are one frame late. 11 of 13 scenes have their biggest frame-to-frame change on their OWN LAST FRAME. That is why the card could not simply be appended to scene 11: holding its last frame held the DASHBOARD. It was built that way once and caught on the proof strip. Check this before appending a card to any scene of this capture."
 }

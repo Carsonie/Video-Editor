@@ -1,0 +1,122 @@
+{
+ "voice": "Samantha",
+ "scenes": {
+  "1": {
+   "line_hash": "1012ae922c1a",
+   "built": 8.16,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 4.91,
+   "silent": false,
+   "engine": "mac"
+  },
+  "2": {
+   "line_hash": "cb96e47ca85d",
+   "built": 7.2,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 5.51,
+   "silent": false,
+   "engine": "mac"
+  },
+  "3": {
+   "line_hash": "5e46f6250024",
+   "built": 7.36,
+   "lead": 0.75,
+   "rate": 185,
+   "spoken": 5.73,
+   "silent": false,
+   "engine": "mac"
+  },
+  "4": {
+   "line_hash": "d5385f23732d",
+   "built": 8.44,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 3.88,
+   "silent": false,
+   "engine": "mac"
+  },
+  "5": {
+   "line_hash": "374e1c4eda4c",
+   "built": 7.0,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 4.91,
+   "silent": false,
+   "engine": "mac"
+  },
+  "6": {
+   "line_hash": "e4568ad53d90",
+   "built": 9.52,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 3.01,
+   "silent": false,
+   "engine": "mac"
+  },
+  "7": {
+   "line_hash": "068eadf39b6c",
+   "built": 10.12,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 6.21,
+   "silent": false,
+   "engine": "mac"
+  },
+  "8": {
+   "line_hash": "dc3dc80d97b0",
+   "built": 8.76,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 4.62,
+   "silent": false,
+   "engine": "mac"
+  },
+  "9": {
+   "line_hash": "5768436b2fd3",
+   "built": 7.4,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 5.68,
+   "silent": false,
+   "engine": "mac"
+  },
+  "10": {
+   "line_hash": "fae4fc133a84",
+   "built": 38.64,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 19.64,
+   "silent": false,
+   "engine": "mac"
+  },
+  "11": {
+   "line_hash": "d9d02c3fc97f",
+   "built": 5.4,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 3.73,
+   "silent": false,
+   "engine": "mac"
+  },
+  "12": {
+   "line_hash": "3a3b6d73a5b5",
+   "built": 8.48,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 5.36,
+   "silent": false,
+   "engine": "mac"
+  },
+  "13": {
+   "line_hash": "7e287a2bac08",
+   "built": 5.48,
+   "lead": 0.75,
+   "rate": 155,
+   "spoken": 3.02,
+   "silent": false,
+   "engine": "mac"
+  }
+ }
+}
