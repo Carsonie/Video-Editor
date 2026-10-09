@@ -10,6 +10,51 @@ this file is the whole procedure.
 
 ---
 
+## ⚠⚠ WHICH SCENE EACH CARD GOES ON — settled 2026-10-08
+
+Two cards, two different rules. Getting this wrong was the whole of the first
+add-collection film being rejected.
+
+| card | scene | frames |
+|---|---|---|
+| `bcp-login.png` | the FIRST scene, the login screen | over LIVE frames 25..100 |
+| `back-to-dashboard.png` | the scene you press **Cmd+K FROM** | on 75 **HELD** frames **ADDED** to the end |
+
+⚠ **THE DASHBOARD CARD NEVER GOES ON THE DASHBOARD.** Carson, 2026-10-08:
+*"You put the layover on the wrong page. You can not get here without the
+Control K command. You need to extent the last frame, of the previous scene for
+3 sec and put the layover onto those frames."* The dashboard is the RESULT of
+the shortcut. A card there teaches a thing the viewer has already done.
+
+⚠ **AND IT NEVER GOES OVER LIVE FOOTAGE.** GROW the scene instead: composite the
+card onto its LAST frame and write that composite 75 more times, then re-encode
+from the PNG sequence. Three STILL seconds is what makes a card readable.
+
+```python
+last = Image.open(frames[-1]).convert("RGBA")
+card = Image.open(CARD).convert("RGBA")
+held = Image.alpha_composite(last, card).convert("RGB")
+for i in range(have + 1, have + 75 + 1):
+    held.save(os.path.join(tmp, f"{i:04d}.png"))
+```
+
+Re-encode with an explicit `-frames:v <total>`; a duration cutoff drops or pads
+a frame. Then fix that scene's `built` seconds in `stretch_report.json` and add
+a `_cards_note` — the scene is no longer a pure cut from the master.
+
+    add-collection, 2026-10-08:
+        42-item-saved-2   111 -> 186 frames, card on 112..186 (3.00s)
+        43-dashboard-3    unchanged, clean
+
+⚠ **THE LOGIN CARD STAYS OVER LIVE FRAMES, ON PURPOSE.** The login screen is a
+still form — nothing moves under it. Section 3 below is the procedure for THAT
+case.
+
+⚠ **picklist STILL HAS THE OLD SHAPE** — its card is over LIVE frames 25..99 of
+scene 37. It needs the same fix.
+
+---
+
 ## WHERE THIS SITS IN THE PIPELINE
 
 A card is laid on at step 4, THE FRAMES — after the words are settled and before

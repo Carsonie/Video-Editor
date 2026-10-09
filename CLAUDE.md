@@ -426,8 +426,11 @@ move all the tools into the segment_avatar_editor folder."*
 
 ```
 Video-Editors/scenes_avatar_editor/tools/
-├── back-to-dashboard.png   a TRANSPARENT layer — a card laid over real footage
-├── bcp-login.png           the same, saying where the admin lives
+├── back-to-dashboard.png   a TRANSPARENT layer — laid over HELD frames that
+│                           EXTEND the scene before the dashboard, never over
+│                           live footage and never on the dashboard itself
+├── bcp-login.png           the same layer, over LIVE login-screen frames,
+│                           saying where the admin lives
 ├── make_overlay.py         builds both
 ├── intro-special-skis.png  an OPAQUE FULL FRAME — held as its own bookend scene
 ├── make_intro.py           builds that
@@ -550,6 +553,57 @@ Customers/<Business>/<store>/help-videos/<STAGE>/<recipe or video>/
 ├── 5_film/<capture>-avatar_v<N>.mp4 8b the DELIVERABLE + script_v<N>.json
 └── 6_mux/                        9  mux_state.json — asset id, playback id
 ```
+
+⚠⚠ **EVERY BCP VIDEO CARRIES THREE THINGS, AND A FILM WITHOUT THEM IS NOT
+FINISHED.** Carson, 2026-10-08, on the first add-collection film: *"Why is there
+garbage still here at the end? Why is there no BCP login overlay? Why is there
+no logout overlay?"* All three were right, and picklist already had all three.
+
+    1  NO DEAD TAIL     Recorder/scripts/tail_check.py "<recipe>" --trim
+    2  THE LOGIN CARD   tools/bcp-login.png over LIVE frames 25..100 of the
+                        login scene
+    3  THE LOGOUT CARD  tools/back-to-dashboard.png on 75 HELD frames APPENDED
+                        to the scene you press Cmd+K FROM — never the dashboard
+
+⚠ **THE DEAD TAIL IS ONE FRAME AND THAT IS THE POINT.** OBS keeps recording
+after the browser closes, so the last scene can end on the macOS DESKTOP —
+add-collection's was a single frame out of 139. Invisible while it plays, and
+it is the frame you land on when the video STOPS, which is how Carson found it.
+`tail_check.py` measures against the clip's OWN page brightness (34 for the BCP,
+85 for the wallpaper), trims only a run at the END, and refuses anything longer
+than 50 frames rather than cutting it.
+
+⚠⚠ **THE LOGOUT CARD IS NOT ON THE DASHBOARD, AND IT IS NOT OVER LIVE
+FOOTAGE.** Carson, 2026-10-08, after seeing it there: *"You put the layover on
+the wrong page. You can not get here without the Control K command. You need to
+extent the last frame, of the previous scene for 3 sec and put the layover onto
+those frames."* The dashboard is the RESULT of the shortcut; a card there
+teaches a thing the viewer has already done.
+
+GROW the previous scene instead — composite the card onto its LAST frame and
+write that composite 75 more times, then re-encode from the PNG sequence with an
+explicit `-frames:v <total>` (a duration cutoff drops or pads a frame). The live
+part of the scene stays clean, and three STILL seconds is what makes the card
+readable:
+
+    add-collection   42-item-saved-2   111 → 186 frames, card on 112..186
+                     43-dashboard-3    unchanged, clean
+
+Then fix that scene's `built` seconds in `stretch_report.json` (42 went 4.44 →
+7.44) and add a `_cards_note` — the scene is no longer a pure cut from the
+master, and a re-cut would undo it.
+
+⚠ **THE LOGIN CARD STAYS OVER LIVE FRAMES, ON PURPOSE.** The login screen is a
+still form — nothing moves under it. Only the logout card sits mid-action, so
+only it needs held frames.
+
+⚠ **ffmpeg COUNTS FROM 0 AND THE SAE FROM 1.** The login card's scene frames
+25..100 are `between(n,24,99)` — 75 frames, 3.0s. One frame of card is 40ms, far
+too short to read. Both cards are burnt into the SCENE CLIP, so a re-cut from
+the master wipes them.
+
+⚠ **picklist STILL HAS THE OLD SHAPE** — its card is burnt over LIVE frames
+25..99 of scene 37. Same wrong idea, different film. It needs the same fix.
 
 ⚠⚠ **`3_voice/` OWNS THE NARRATIVE, AND THE OTHER STAGES KNOW NOTHING OF IT.**
 Carson, 2026-10-08: *"This is 3_voice is where the narrative happens. I do not

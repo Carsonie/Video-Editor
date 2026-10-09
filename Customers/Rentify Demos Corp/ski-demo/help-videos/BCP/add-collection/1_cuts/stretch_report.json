@@ -461,7 +461,7 @@
    "src_out": 375.84,
    "on_camera": 4.28,
    "scene_needs": 4.4,
-   "built": 4.44,
+   "built": 7.44,
    "factor": 1.028,
    "stretched": true
   },
@@ -483,7 +483,7 @@
    "src_out": 389.94,
    "on_camera": 5.58,
    "scene_needs": 4.3,
-   "built": 5.56,
+   "built": 5.52,
    "factor": 1.0,
    "stretched": false
   }
@@ -498,5 +498,6 @@
   "42-item-saved-2",
   "11-collection-saved",
   "30-item-saved"
- ]
+ ],
+ "_cards_note": "\u26a0 SCENES 42 AND 44 ARE NOT PURE CUTS ANY MORE. 42 carries 75 HELD frames at its end with the Back-to-the-Dashboard card on them \u2014 the card teaches Cmd+K, so it must sit on the screen you press it FROM, never on the dashboard it takes you to. 44 had one frame of macOS desktop trimmed off its end. Neither length comes from stretch_scenes.py, and a re-cut from the master would undo both."
 }
