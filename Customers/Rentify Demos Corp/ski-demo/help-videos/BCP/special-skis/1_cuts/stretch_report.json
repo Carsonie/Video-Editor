@@ -228,7 +228,7 @@
    "src_out": 359.1,
    "on_camera": 8.0,
    "scene_needs": 7.7,
-   "built": 9.64,
+   "built": 10.36,
    "factor": 1.0,
    "stretched": false
   },
@@ -258,5 +258,6 @@
  "segments_reused": 21,
  "segments_encoded": 1,
  "fps": 25.0,
- "_output_removed": "ski-demo_special-skis_dev_10-19-12_v12-stretched.mp4 was deleted after narration — it is picture-only and silent by design, and its name reads like the finished cut. Rebuild it in ~20s from segments/: python3 scripts/stretch_request.py \"<this folder>\""
+ "_output_removed": "ski-demo_special-skis_dev_10-19-12_v12-stretched.mp4 was deleted after narration — it is picture-only and silent by design, and its name reads like the finished cut. Rebuild it in ~20s from segments/: python3 scripts/stretch_request.py \"<this folder>\"",
+ "_cards_note": "SCENES 1, 21 AND 22 ARE NO LONGER PURE CUTS FROM THE MASTER. 2026-10-08. Scene 1 gained the BCP login card over live frames 25..100 — it had none. ⚠ THE BACK-TO-THE-DASHBOARD CARD WAS ALREADY HERE AND IT WAS IN THE WRONG PLACE: burnt over LIVE frames 185..241 of scene 21 AND over the first 40 frames of scene 22, which is the DASHBOARD. A card on the dashboard teaches a thing the viewer has already done — Carson's call, 2026-10-08. ⚠ AND IT IS BURNT INTO 1_cuts/segments/ TOO, not just the sandbox clip, so there is no clean cut to go back to. Re-cutting from 0_master/ would also destroy this recipe's hand frame work — eight scenes have built > on_camera with factor 1.0. So it was fixed in place: scene 21 gained 18 HELD copies of its last frame (241 -> 259), making the card exactly 75 frames / 3.00s, and scene 22's first 40 frames were overwritten with its own frame 41 — the same static dashboard, without the card. Verified by counting the card's green pixels: 21 has 75 card frames, 22 and 23 have none. ⚠ DO NOT RUN sae_vtt_sync --apply ON THIS RECIPE WITHOUT READING THIS. It rebuilds a clip from its cut, and the cuts for 21 and 22 still carry the old, wrongly-placed card."
 }

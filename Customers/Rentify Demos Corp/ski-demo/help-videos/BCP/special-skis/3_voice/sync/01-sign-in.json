@@ -5,12 +5,13 @@
   1789914261.3419783
  ],
  "clip_sig": [
-  339589,
-  1790045409.58513
+  342105,
+  1791508106.2015371
  ],
  "voice_sig": [
   150257,
   1790045387.25439
  ],
- "synced": "20260921-225009"
+ "synced": "20260921-225009",
+ "_cards": "clip carries a card; do not rebuild it from 1_cuts/segments/"
 }

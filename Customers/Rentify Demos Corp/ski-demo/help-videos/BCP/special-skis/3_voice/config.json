@@ -1,0 +1,9 @@
+{
+ "voice": "Derya",
+ "_note": "WHICH PRESENTER THE TIMELINES USE. Set `voice` to a folder name in 3_voice/ — Samantha (the free Mac rehearsal) or Derya (HeyGen, paid). It picks BOTH the audio and the script: 3_voice/<voice>/script.json and 3_voice/<voice>/<NN>-<label>.m4a.",
+ "_who_wins": "THIS FILE BEATS 3_voice/state.json. state.json records what was last SPOKEN and the voice tools rewrite it on every run; this file records what YOU chose, and nothing but you writes it.",
+ "_available": [
+  "Derya"
+ ],
+ "_special_skis_note": "THE 23 TAKES HERE ARE PAID HeyGen RENDERS, voice_id 04d0ae1d0af2489ca7d3bb402a39a890, 83 credits in 4_avatar/heygen_state.json. They sat FLAT in 3_voice/ until 2026-10-08 — stage_dirs.voice_take_dir() named this recipe outright as the one that had to stay flat 'until someone moves them on purpose'. This is that move. There is no Samantha folder: no Mac rehearsal survives, so re-voicing any scene costs money."
+}
